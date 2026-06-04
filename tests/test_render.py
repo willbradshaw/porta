@@ -148,7 +148,9 @@ def test_svg_root_is_svg_with_viewbox_and_matching_size() -> None:
     min_x, min_y, vbw, vbh = (float(n) for n in view_box.split())
     # TWO spans x[0,30], y[0,20]; viewBox starts a margin up-and-left of that.
     assert (min_x, min_y) == (-MARGIN, -MARGIN)
-    assert vbw == 30 + 2 * MARGIN
+    assert (
+        vbw >= 30 + 2 * MARGIN
+    )  # at least the plan + margins (wider if a key line is)
     assert vbh >= 20 + 2 * MARGIN  # extra room below for the caption + key
     # width/height are the viewBox extent scaled up for a usable default size.
     assert float(root.get("width", "0")) == vbw * SCALE

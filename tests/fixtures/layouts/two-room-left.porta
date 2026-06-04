@@ -1,2 +1,2 @@
-room a "A" 10x10 root
-room b "B" 10x10 left-of a
+room a "Room A" 10x10 root
+room b "Room B" 10x10 left-of a

@@ -17,8 +17,10 @@ _SVG_NS = "http://www.w3.org/2000/svg"
 _MARGIN_FT = 10  # padding around the plan, in feet
 _WALL_STROKE_FT = 0.5  # wall line thickness, in feet
 _LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
-_KEY_FONT_FT = 1.5  # key/caption text size, in feet (small chrome, not a room label)
-_KEY_LINE_FT = 2.5  # key line spacing, in feet
+_KEY_RATIO = 0.05  # key font as a fraction of the plan's larger side...
+_KEY_MIN_FT = 3.0  # ...with this floor so it stays readable on small plans
+_KEY_LINE_RATIO = 1.6  # key line spacing as a multiple of the key font
+_CHAR_W = 0.6  # rough average glyph width (fraction of font) for canvas fitting
 _GRID_COLOUR = "#bbb"  # grey 5-ft grid
 _GRID_STROKE_FT = 0.15  # grid line thickness, in feet
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
@@ -92,12 +94,26 @@ def render_svg(building: Building) -> str:
     max_x = max(x + room.width for room, x, _ in placed)
     max_y = max(y + room.height for room, _, y in placed)
 
+    plan_w = max_x - min_x
+    plan_h = max_y - min_y
+
+    # Chrome (caption + key) is sized to the drawing: scaled to the plan with a
+    # floor so it stays readable on small plans. The canvas widens to contain a
+    # key line longer than the plan.
+    key_font = max(max(plan_w, plan_h) * _KEY_RATIO, _KEY_MIN_FT)
+    key_line = key_font * _KEY_LINE_RATIO
+    caption = f"1 square = {_GRID_FT} ft"
+    entries = [
+        f"{glyphs[room.id]}  {room.name}  ({room.width}x{room.height} ft)"
+        for room in building.rooms
+    ]
+    chrome = [caption, *entries]
+    key_width = max(len(line) for line in chrome) * key_font * _CHAR_W
+
     view_x = min_x - _MARGIN_FT
     view_y = min_y - _MARGIN_FT
-    view_w = (max_x - min_x) + 2 * _MARGIN_FT
-    # plan margins (top, gap-to-key, bottom) plus a caption line and one key
-    # line per room.
-    view_h = (max_y - min_y) + 3 * _MARGIN_FT + (len(building.rooms) + 1) * _KEY_LINE_FT
+    view_w = max(plan_w, key_width) + 2 * _MARGIN_FT
+    view_h = plan_h + 3 * _MARGIN_FT + len(chrome) * key_line
 
     lines = [
         f'<svg xmlns="{_SVG_NS}" '
@@ -144,18 +160,14 @@ def render_svg(building: Building) -> str:
 
     key_top = max_y + _MARGIN_FT
     lines.append(
-        f'  <text class="scale" x="{_num(min_x)}" '
-        f'y="{_num(key_top + _KEY_LINE_FT)}" '
-        f'font-size="{_num(_KEY_FONT_FT)}">1 square = {_GRID_FT} ft</text>'
+        f'  <text class="scale" x="{_num(min_x)}" y="{_num(key_top + key_line)}" '
+        f'font-size="{_num(key_font)}">{escape(caption)}</text>'
     )
-    for i, room in enumerate(building.rooms):
-        label = escape(
-            f"{glyphs[room.id]}  {room.name}  ({room.width}x{room.height} ft)"
-        )
+    for i, entry in enumerate(entries):
         lines.append(
             f'  <text class="key" x="{_num(min_x)}" '
-            f'y="{_num(key_top + (i + 2) * _KEY_LINE_FT)}" '
-            f'font-size="{_num(_KEY_FONT_FT)}">{label}</text>'
+            f'y="{_num(key_top + (i + 2) * key_line)}" '
+            f'font-size="{_num(key_font)}">{escape(entry)}</text>'
         )
 
     lines.append("</svg>")
@@ -163,7 +175,8 @@ def render_svg(building: Building) -> str:
 
 
 def _num(value: float) -> str:
-    """Format a number for SVG: drop a trailing ``.0`` so 10.0 renders as ``10``."""
+    """Format a number for SVG: round off float noise, drop a trailing ``.0``."""
+    value = round(value, 3)
     return str(int(value)) if value == int(value) else str(value)
 
 

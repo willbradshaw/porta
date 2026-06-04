@@ -247,3 +247,16 @@ def test_manor_renders_to_golden_svg_fixture() -> None:
     source = Path("examples/manor.porta").read_text()
     expected = Path("tests/fixtures/manor.svg").read_text()
     assert render_svg(solve(parse(source))) == expected
+
+
+# A corpus of small, human-reviewed layouts: each tests/fixtures/layouts/
+# <case>.porta has a reviewed <case>.svg golden. Adding a case is just dropping
+# in the input/golden pair.
+_LAYOUT_CASES = sorted(Path("tests/fixtures/layouts").glob("*.porta"))
+
+
+@pytest.mark.parametrize("porta_file", _LAYOUT_CASES, ids=lambda p: p.stem)
+def test_layout_renders_to_svg_golden(porta_file: Path) -> None:
+    expected = porta_file.with_suffix(".svg").read_text()
+    actual = render_svg(solve(parse(porta_file.read_text())))
+    assert actual == expected

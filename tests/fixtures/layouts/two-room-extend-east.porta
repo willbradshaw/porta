@@ -1,0 +1,2 @@
+room a "A" 10x10 root
+room b "B" 20x10 up-of a

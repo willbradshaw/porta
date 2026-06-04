@@ -1,0 +1,3 @@
+room a "A" 10x10 root
+room b "B" 10x10 left-of a
+room c "C" 10x10 left-of a down-of b

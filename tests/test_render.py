@@ -145,10 +145,12 @@ def test_svg_root_is_svg_with_viewbox_and_matching_size() -> None:
     assert root.tag == tag("svg")
     view_box = root.get("viewBox")
     assert view_box is not None
-    min_x, min_y, vbw, vbh = (float(n) for n in view_box.split())
-    # TWO spans x[0,30], y[0,20]; viewBox starts a margin up-and-left of that.
-    assert (min_x, min_y) == (-MARGIN, -MARGIN)
-    assert vbw == 30 + 2 * MARGIN  # canvas is exactly the plan width plus margins
+    vb_x, vb_y, vbw, vbh = (float(n) for n in view_box.split())
+    # TWO's plan spans x[0,30], y[0,20]; the viewBox encloses it with at least a
+    # margin on every side (it may be wider and centred to fit the key).
+    assert vb_y == -MARGIN
+    assert vb_x <= -MARGIN
+    assert vb_x + vbw >= 30 + MARGIN
     assert vbh >= 20 + 2 * MARGIN  # extra room below for the caption + key
     # width/height are the viewBox extent scaled up for a usable default size
     # (independent rounding of each makes the relation exact only to a tolerance).

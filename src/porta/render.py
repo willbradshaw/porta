@@ -18,7 +18,8 @@ _MARGIN_FT = 10  # padding around the plan, in feet
 _WALL_STROKE_FT = 0.5  # wall line thickness, in feet
 _LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
 _KEY_LINE_RATIO = 1.6  # key line spacing as a multiple of the key font
-_CHAR_W = 0.6  # rough average glyph width (fraction of font); sizes the key to the plan
+_KEY_GLYPH_FRACTION = 0.4  # key font relative to the smallest room's shorter side
+_CHAR_W = 0.6  # rough average glyph width (fraction of font), for centring the key
 _GRID_COLOUR = "#bbb"  # grey 5-ft grid
 _GRID_STROKE_FT = 0.15  # grid line thickness, in feet
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
@@ -101,16 +102,19 @@ def render_svg(building: Building) -> str:
         for room in building.rooms
     ]
     chrome = [caption, *entries]
-    # Size the key so its longest line spans the plan width: readable, and the
-    # canvas stays exactly the plan width (no overflow, no dead space beside it).
-    longest = max(len(line) for line in chrome)
-    key_font = plan_w / (longest * _CHAR_W)
+    # Size the key relative to the rooms (like their labels) so it reads
+    # consistently at any map size. If a key line is wider than the plan, the
+    # canvas grows and both plan and key are centred (no lopsided dead space).
+    smallest = min(min(room.width, room.height) for room in building.rooms)
+    key_font = smallest * _KEY_GLYPH_FRACTION
     key_line = key_font * _KEY_LINE_RATIO
+    key_width = max(len(line) for line in chrome) * key_font * _CHAR_W
 
-    view_x = min_x - _MARGIN_FT
+    center_x = (min_x + max_x) / 2
+    view_w = max(plan_w, key_width) + 2 * _MARGIN_FT
+    view_h = plan_h + _MARGIN_FT + (len(chrome) + 1) * key_line
+    view_x = center_x - view_w / 2
     view_y = min_y - _MARGIN_FT
-    view_w = plan_w + 2 * _MARGIN_FT
-    view_h = plan_h + 3 * _MARGIN_FT + len(chrome) * key_line
 
     lines = [
         f'<svg xmlns="{_SVG_NS}" '
@@ -155,16 +159,15 @@ def render_svg(building: Building) -> str:
             f"{glyphs[room.id]}</text>"
         )
 
-    key_top = max_y + _MARGIN_FT
-    lines.append(
-        f'  <text class="scale" x="{_num(min_x)}" y="{_num(key_top + key_line)}" '
-        f'font-size="{_num(key_font)}">{escape(caption)}</text>'
-    )
-    for i, entry in enumerate(entries):
+    # Centre the key block but left-align the lines within it (a legend reads
+    # best as a left-aligned list).
+    key_left = center_x - key_width / 2
+    for j, line in enumerate(chrome):
+        css = "scale" if j == 0 else "key"
         lines.append(
-            f'  <text class="key" x="{_num(min_x)}" '
-            f'y="{_num(key_top + (i + 2) * key_line)}" '
-            f'font-size="{_num(key_font)}">{escape(entry)}</text>'
+            f'  <text class="{css}" x="{_num(key_left)}" '
+            f'y="{_num(max_y + (j + 1) * key_line)}" '
+            f'font-size="{_num(key_font)}">{escape(line)}</text>'
         )
 
     lines.append("</svg>")

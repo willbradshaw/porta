@@ -176,6 +176,11 @@ def test_each_relation_keyword_maps_to_its_direction(
         # ids
         pytest.param('room 2nd "Second" 10x10 root', id="id-starts-with-digit"),
         pytest.param('room r! "R" 10x10 root', id="id-illegal-char"),
+        # shift modifier
+        pytest.param('room r "R" 20x20 shift=10', id="shift-without-relation"),
+        pytest.param('room r "R" 20x20 root shift=10', id="shift-after-root"),
+        pytest.param('room r "R" 20x20 up-of a shift=7', id="shift-off-grid"),
+        pytest.param('room r "R" 20x20 up-of a shift=x', id="shift-non-integer"),
     ],
 )
 def test_invalid_source_raises(source: str) -> None:
@@ -193,3 +198,16 @@ def test_error_reports_the_offending_line_number() -> None:
     with pytest.raises(ParseError) as exc:
         parse(text)
     assert exc.value.line == 2
+
+
+@pytest.mark.parametrize(
+    ("source", "expected_shift"),
+    [
+        ('room b "B" 10x10 up-of a', 0),  # default
+        ('room b "B" 10x10 up-of a shift=10', 10),
+        ('room b "B" 10x10 up-of a shift=-5', -5),
+        ('room b "B" 10x10 up-of a shift=0', 0),
+    ],
+)
+def test_shift_is_parsed_onto_the_relation(source: str, expected_shift: int) -> None:
+    assert parse(source).room("b").relations[0].shift == expected_shift

@@ -85,6 +85,56 @@ def test_align_start_propagates_to_create_a_gap() -> None:
     assert coords(text, "smoking") == (20, -20)
 
 
+# --- shift -----------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("relation", "shift", "expected"),
+    [
+        # Anchor 'a' is 20x20 at the origin; 'b' is 10x10. Positive shift is
+        # east (for up/down-of) or south (for left/right-of). Magnitudes stay
+        # small enough to keep b sharing a wall with a.
+        ("up-of", 5, (5, -10)),
+        ("up-of", -5, (-5, -10)),
+        ("down-of", 5, (5, 20)),
+        ("down-of", -5, (-5, 20)),
+        ("left-of", 5, (-10, 5)),
+        ("left-of", -5, (-10, -5)),
+        ("right-of", 5, (20, 5)),
+        ("right-of", -5, (20, -5)),
+    ],
+)
+def test_shift_nudges_along_the_free_axis(
+    relation: str, shift: int, expected: tuple[int, int]
+) -> None:
+    text = f'room a "A" 20x20 root\nroom b "B" 10x10 {relation} a shift={shift}'
+    assert coords(text, "b") == expected
+
+
+def test_shift_propagates_to_dependents() -> None:
+    text = (
+        'room a "A" 10x10 root\n'
+        'room b "B" 10x10 up-of a shift=5\n'
+        'room c "C" 10x10 up-of b'
+    )
+    assert coords(text, "b") == (5, -10)
+    assert coords(text, "c") == (5, -20)  # c stacks on the shifted b
+
+
+def test_shift_with_both_axes_constrained_raises() -> None:
+    # 'up-of' shifts along x, but 'right-of' already pins x -> no free axis.
+    text = 'room a "A" 20x20 root\nroom b "B" 10x10 up-of a shift=10 right-of a'
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
+def test_shift_that_detaches_from_the_anchor_raises() -> None:
+    # shift = the room width slides b fully off a (corner-touch, no shared wall).
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 up-of a shift=10'
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
 # --- structural validation -------------------------------------------------
 
 

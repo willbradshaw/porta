@@ -43,6 +43,7 @@ class Relation:
     direction: Direction
     anchor: str
     line: int
+    shift: int = 0  # feet to nudge along the free axis after align-start
 
 
 @dataclass

@@ -75,23 +75,23 @@ def test_legend_lists_rooms_in_source_order() -> None:
 # --- the north-star manor (golden) ----------------------------------------
 
 MANOR_ASCII = """\
-L L L L L L H H H H H H H H D D D D D D . . .
-L L L L L L H H H H H H H H D D D D D D . . .
-L L L L L L H H H H H H H H D D D D D D . . .
-L L L L L L H H H H H H H H D D D D D D . . .
-L L L L L L H H H H H H H H D D D D D D . . .
-L L L L L L H H H H H H H H D D D D D D . . .
-. . P P P P E E E E C C C C K K K K K K A A A
-. . P P P P E E E E C C C C K K K K K K A A A
-. . P P P P E E E E C C C C K K K K K K A A A
-. . P P P P E E E E C C C C K K K K K K A A A
-. . S S S S . . . . . . . . K K K K K K A A A
-. . S S S S . . . . . . . . U U U U U U . . .
-. . S S S S . . . . . . . . U U U U U U . . .
-. . S S S S . . . . . . . . U U U U U U . . .
-. . . . . . . . . . . . . . U U U U U U . . .
+L L L L L L H H H H H H H H D D D D D D . . . . . .
+L L L L L L H H H H H H H H D D D D D D . . . . . .
+L L L L L L H H H H H H H H D D D D D D . . . . . .
+L L L L L L H H H H H H H H D D D D D D . . . . . .
+L L L L L L H H H H H H H H D D D D D D . . . . . .
+L L L L L L H H H H H H H H D D D D D D . . . . . .
+. . P P P P E E E E C C C C K K K K K K A A A . . .
+. . P P P P E E E E C C C C K K K K K K A A A R R R
+. . P P P P E E E E C C C C K K K K K K A A A R R R
+. . P P P P E E E E C C C C K K K K K K A A A R R R
+. . S S S S . O O . . . . . K K K K K K A A A . . .
+. . S S S S . O O . . . . . U U U U U U . . . . . .
+. . S S S S . . . . . . . . U U U U U U . . . . . .
+. . S S S S . . . . . . . . U U U U U U . . . . . .
+. . . . . . . . . . . . . . U U U U U U . . . . . .
 
-E=entrance  H=hall  L=library  D=dining  P=parlour  C=cloak  K=kitchen  A=pantry  S=study  U=scullery"""
+E=entrance  H=hall  L=library  D=dining  P=parlour  C=cloak  K=kitchen  A=pantry  S=study  U=scullery  O=porch  R=larder"""
 
 
 def test_manor_example_renders_to_golden() -> None:

@@ -19,6 +19,9 @@ _WALL_STROKE_FT = 0.5  # wall line thickness, in feet
 _LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
 _KEY_FONT_FT = 6  # key text size, in feet
 _KEY_LINE_FT = 8  # key line spacing, in feet
+_GRID_COLOUR = "#ddd"  # pale grey 5-ft grid
+_GRID_STROKE_FT = 0.1  # grid line thickness, in feet
+_DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
 def render_ascii(building: Building) -> str:
@@ -92,18 +95,39 @@ def render_svg(building: Building) -> str:
     view_x = min_x - _MARGIN_FT
     view_y = min_y - _MARGIN_FT
     view_w = (max_x - min_x) + 2 * _MARGIN_FT
-    view_h = (max_y - min_y) + 3 * _MARGIN_FT + len(building.rooms) * _KEY_LINE_FT
+    # plan margins (top, gap-to-key, bottom) plus a caption line and one key
+    # line per room.
+    view_h = (max_y - min_y) + 3 * _MARGIN_FT + (len(building.rooms) + 1) * _KEY_LINE_FT
 
     lines = [
-        f'<svg xmlns="{_SVG_NS}" width="{_num(view_w)}" height="{_num(view_h)}" '
+        f'<svg xmlns="{_SVG_NS}" '
+        f'width="{_num(view_w * _DISPLAY_SCALE)}" '
+        f'height="{_num(view_h * _DISPLAY_SCALE)}" '
         f'viewBox="{_num(view_x)} {_num(view_y)} {_num(view_w)} {_num(view_h)}">'
     ]
+
+    # 5-ft grid, drawn first so rooms and labels sit on top of it.
+    lines.append(
+        f'  <g stroke="{_GRID_COLOUR}" stroke-width="{_num(_GRID_STROKE_FT)}">'
+    )
+    for gx in range(min_x, max_x + 1, _GRID_FT):
+        lines.append(
+            f'    <line x1="{_num(gx)}" y1="{_num(min_y)}" '
+            f'x2="{_num(gx)}" y2="{_num(max_y)}" />'
+        )
+    for gy in range(min_y, max_y + 1, _GRID_FT):
+        lines.append(
+            f'    <line x1="{_num(min_x)}" y1="{_num(gy)}" '
+            f'x2="{_num(max_x)}" y2="{_num(gy)}" />'
+        )
+    lines.append("  </g>")
+
     for room, x, y in placed:
         font = min(room.width, room.height) * _LABEL_RATIO
         lines.append(
             f'  <rect data-room="{room.id}" x="{_num(x)}" y="{_num(y)}" '
             f'width="{_num(room.width)}" height="{_num(room.height)}" '
-            f'fill="white" stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" />'
+            f'fill="none" stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" />'
         )
         lines.append(
             f'  <text data-room="{room.id}" x="{_num(x + room.width / 2)}" '
@@ -113,11 +137,16 @@ def render_svg(building: Building) -> str:
         )
 
     key_top = max_y + _MARGIN_FT
+    lines.append(
+        f'  <text class="scale" x="{_num(min_x)}" '
+        f'y="{_num(key_top + _KEY_LINE_FT)}" '
+        f'font-size="{_num(_KEY_FONT_FT)}">1 square = {_GRID_FT} ft</text>'
+    )
     for i, room in enumerate(building.rooms):
         label = escape(f"{glyphs[room.id]}  {room.name}")
         lines.append(
             f'  <text class="key" x="{_num(min_x)}" '
-            f'y="{_num(key_top + (i + 1) * _KEY_LINE_FT)}" '
+            f'y="{_num(key_top + (i + 2) * _KEY_LINE_FT)}" '
             f'font-size="{_num(_KEY_FONT_FT)}">{label}</text>'
         )
 
@@ -136,7 +165,7 @@ def _placed_rooms(building: Building) -> list[tuple[Room, int, int]]:
     for room in building.rooms:
         if room.x is None or room.y is None:
             raise ValueError(
-                f"render_ascii needs a solved building; {room.id!r} is unplaced"
+                f"rendering needs a solved building; {room.id!r} is unplaced"
             )
         placed.append((room, room.x, room.y))
     return placed

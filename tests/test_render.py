@@ -109,6 +109,7 @@ def test_manor_example_renders_to_golden() -> None:
 
 SVG_NS = "http://www.w3.org/2000/svg"
 MARGIN = 10  # feet of padding around the plan (matches the renderer constant)
+SCALE = 10  # display scale (px per foot) applied to width/height
 
 TWO = 'room a "A" 20x20 root\nroom b "Bee" 10x10 right-of a'
 
@@ -144,13 +145,30 @@ def test_svg_root_is_svg_with_viewbox_and_matching_size() -> None:
     assert root.tag == tag("svg")
     view_box = root.get("viewBox")
     assert view_box is not None
-    min_x, min_y, width, height = (float(n) for n in view_box.split())
+    min_x, min_y, vbw, vbh = (float(n) for n in view_box.split())
     # TWO spans x[0,30], y[0,20]; viewBox starts a margin up-and-left of that.
     assert (min_x, min_y) == (-MARGIN, -MARGIN)
-    assert width == 30 + 2 * MARGIN
-    assert height >= 20 + 2 * MARGIN  # extra room below for the key
-    assert float(root.get("width", "0")) == width
-    assert float(root.get("height", "0")) == height
+    assert vbw == 30 + 2 * MARGIN
+    assert vbh >= 20 + 2 * MARGIN  # extra room below for the caption + key
+    # width/height are the viewBox extent scaled up for a usable default size.
+    assert float(root.get("width", "0")) == vbw * SCALE
+    assert float(root.get("height", "0")) == vbh * SCALE
+
+
+def test_room_rects_are_transparent_so_the_grid_shows_through() -> None:
+    root = ET.fromstring(svg_of(TWO))
+    assert all(rect.get("fill") == "none" for rect in root.iter(tag("rect")))
+
+
+def test_grid_has_a_line_every_five_feet_across_the_plan() -> None:
+    # TWO spans x[0,30] (7 verticals) and y[0,20] (5 horizontals).
+    root = ET.fromstring(svg_of(TWO))
+    assert sum(1 for _ in root.iter(tag("line"))) == 7 + 5
+
+
+def test_scale_caption_states_the_grid_size() -> None:
+    texts = " ".join(t.text or "" for t in ET.fromstring(svg_of(TWO)).iter(tag("text")))
+    assert "5 ft" in texts
 
 
 @pytest.mark.parametrize(

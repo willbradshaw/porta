@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1350" height="2062" viewBox="-40 -40 135 206.2">
-  <rect x="-40" y="-40" width="135" height="206.2" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1350" height="2254.762" viewBox="-40 -40 135 225.476">
+  <rect x="-40" y="-40" width="135" height="225.476" fill="white" />
   <g stroke="#bbb" stroke-width="0.15">
     <line x1="-30" y1="-30" x2="-30" y2="45" />
     <line x1="-25" y1="-30" x2="-25" y2="45" />
@@ -62,15 +62,15 @@
   <text data-room="study" x="-10" y="30" text-anchor="middle" dominant-baseline="central" font-size="12">S</text>
   <rect data-room="scullery" x="40" y="25" width="30" height="20" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="scullery" x="55" y="35" text-anchor="middle" dominant-baseline="central" font-size="12">U</text>
-  <text class="scale" x="-30" y="64.2" font-size="5.75">1 square = 5 ft</text>
-  <text class="key" x="-30" y="73.4" font-size="5.75">E  Entrance Hall  (20x20 ft)</text>
-  <text class="key" x="-30" y="82.6" font-size="5.75">H  Great Hall  (40x30 ft)</text>
-  <text class="key" x="-30" y="91.8" font-size="5.75">L  Library  (30x30 ft)</text>
-  <text class="key" x="-30" y="101" font-size="5.75">D  Dining Room  (30x30 ft)</text>
-  <text class="key" x="-30" y="110.2" font-size="5.75">P  Parlour  (20x20 ft)</text>
-  <text class="key" x="-30" y="119.4" font-size="5.75">C  Cloakroom  (20x20 ft)</text>
-  <text class="key" x="-30" y="128.6" font-size="5.75">K  Kitchen  (30x25 ft)</text>
-  <text class="key" x="-30" y="137.8" font-size="5.75">A  Pantry  (15x25 ft)</text>
-  <text class="key" x="-30" y="147" font-size="5.75">S  Study  (20x20 ft)</text>
-  <text class="key" x="-30" y="156.2" font-size="5.75">U  Scullery  (30x20 ft)</text>
+  <text class="scale" x="-30" y="65.952" font-size="6.845">1 square = 5 ft</text>
+  <text class="key" x="-30" y="76.905" font-size="6.845">E  Entrance Hall  (20x20 ft)</text>
+  <text class="key" x="-30" y="87.857" font-size="6.845">H  Great Hall  (40x30 ft)</text>
+  <text class="key" x="-30" y="98.81" font-size="6.845">L  Library  (30x30 ft)</text>
+  <text class="key" x="-30" y="109.762" font-size="6.845">D  Dining Room  (30x30 ft)</text>
+  <text class="key" x="-30" y="120.714" font-size="6.845">P  Parlour  (20x20 ft)</text>
+  <text class="key" x="-30" y="131.667" font-size="6.845">C  Cloakroom  (20x20 ft)</text>
+  <text class="key" x="-30" y="142.619" font-size="6.845">K  Kitchen  (30x25 ft)</text>
+  <text class="key" x="-30" y="153.571" font-size="6.845">A  Pantry  (15x25 ft)</text>
+  <text class="key" x="-30" y="164.524" font-size="6.845">S  Study  (20x20 ft)</text>
+  <text class="key" x="-30" y="175.476" font-size="6.845">U  Scullery  (30x20 ft)</text>
 </svg>

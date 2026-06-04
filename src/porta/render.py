@@ -17,10 +17,8 @@ _SVG_NS = "http://www.w3.org/2000/svg"
 _MARGIN_FT = 10  # padding around the plan, in feet
 _WALL_STROKE_FT = 0.5  # wall line thickness, in feet
 _LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
-_KEY_RATIO = 0.05  # key font as a fraction of the plan's larger side...
-_KEY_MIN_FT = 3.0  # ...with this floor so it stays readable on small plans
 _KEY_LINE_RATIO = 1.6  # key line spacing as a multiple of the key font
-_CHAR_W = 0.6  # rough average glyph width (fraction of font) for canvas fitting
+_CHAR_W = 0.6  # rough average glyph width (fraction of font); sizes the key to the plan
 _GRID_COLOUR = "#bbb"  # grey 5-ft grid
 _GRID_STROKE_FT = 0.15  # grid line thickness, in feet
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
@@ -97,22 +95,21 @@ def render_svg(building: Building) -> str:
     plan_w = max_x - min_x
     plan_h = max_y - min_y
 
-    # Chrome (caption + key) is sized to the drawing: scaled to the plan with a
-    # floor so it stays readable on small plans. The canvas widens to contain a
-    # key line longer than the plan.
-    key_font = max(max(plan_w, plan_h) * _KEY_RATIO, _KEY_MIN_FT)
-    key_line = key_font * _KEY_LINE_RATIO
     caption = f"1 square = {_GRID_FT} ft"
     entries = [
         f"{glyphs[room.id]}  {room.name}  ({room.width}x{room.height} ft)"
         for room in building.rooms
     ]
     chrome = [caption, *entries]
-    key_width = max(len(line) for line in chrome) * key_font * _CHAR_W
+    # Size the key so its longest line spans the plan width: readable, and the
+    # canvas stays exactly the plan width (no overflow, no dead space beside it).
+    longest = max(len(line) for line in chrome)
+    key_font = plan_w / (longest * _CHAR_W)
+    key_line = key_font * _KEY_LINE_RATIO
 
     view_x = min_x - _MARGIN_FT
     view_y = min_y - _MARGIN_FT
-    view_w = max(plan_w, key_width) + 2 * _MARGIN_FT
+    view_w = plan_w + 2 * _MARGIN_FT
     view_h = plan_h + 3 * _MARGIN_FT + len(chrome) * key_line
 
     lines = [

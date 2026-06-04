@@ -7,5 +7,3 @@ These carry no behaviour beyond holding parsed/solved state. See
 Stage 0: placeholder. The real dataclasses (``Room``, ``Relation``,
 ``Building``) land in Stage 1.
 """
-
-from __future__ import annotations

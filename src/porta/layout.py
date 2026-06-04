@@ -7,5 +7,3 @@ rooms, no overlap). Small, pure, unit-testable functions.
 
 Stage 0: placeholder. The propagation engine lands in Stage 2.
 """
-
-from __future__ import annotations

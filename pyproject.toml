@@ -27,7 +27,23 @@ addopts = "-q"
 
 # ruff infers its target Python from requires-python; no need to repeat it here.
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort (import ordering)
+    "N",   # pep8-naming
+    "UP",  # pyupgrade (modern syntax)
+    "B",   # flake8-bugbear (likely bugs)
+    "A",   # flake8-builtins (shadowing builtins)
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "RET", # flake8-return
+    "PIE", # flake8-pie (misc lints)
+    "PT",  # flake8-pytest-style
+    "PTH", # flake8-use-pathlib
+    "RUF", # ruff-specific rules
+]
 
 [tool.mypy]
 strict = true

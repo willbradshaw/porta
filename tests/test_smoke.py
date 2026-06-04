@@ -1,7 +1,5 @@
 """Stage 0 smoke tests: the package imports and the CLI parser is wired up."""
 
-from __future__ import annotations
-
 import porta
 from porta.cli import build_parser
 

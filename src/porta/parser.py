@@ -6,5 +6,3 @@ or raises.
 
 Stage 0: placeholder. The minimal grammar parser lands in Stage 1.
 """
-
-from __future__ import annotations

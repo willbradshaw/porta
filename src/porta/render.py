@@ -6,5 +6,3 @@ runtime dependencies).
 
 Stage 0: placeholder. The ascii rasterizer lands in Stage 2, SVG in Stage 4.
 """
-
-from __future__ import annotations

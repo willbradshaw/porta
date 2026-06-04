@@ -5,8 +5,6 @@ the result, and write/print it. Owns top-level error presentation and the
 process exit code.
 """
 
-from __future__ import annotations
-
 import argparse
 import sys
 

@@ -112,7 +112,7 @@ def render_svg(building: Building) -> str:
 
     center_x = (min_x + max_x) / 2
     view_w = max(plan_w, key_width) + 2 * _MARGIN_FT
-    view_h = plan_h + _MARGIN_FT + (len(chrome) + 1) * key_line
+    view_h = plan_h + _MARGIN_FT + (len(chrome) + 2) * key_line
     view_x = center_x - view_w / 2
     view_y = min_y - _MARGIN_FT
 
@@ -166,7 +166,7 @@ def render_svg(building: Building) -> str:
         css = "scale" if j == 0 else "key"
         lines.append(
             f'  <text class="{css}" x="{_num(key_left)}" '
-            f'y="{_num(max_y + (j + 1) * key_line)}" '
+            f'y="{_num(max_y + (j + 2) * key_line)}" '
             f'font-size="{_num(key_font)}">{escape(line)}</text>'
         )
 

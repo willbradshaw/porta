@@ -17,8 +17,8 @@ _SVG_NS = "http://www.w3.org/2000/svg"
 _MARGIN_FT = 10  # padding around the plan, in feet
 _WALL_STROKE_FT = 0.5  # wall line thickness, in feet
 _LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
+_KEY_FONT_FT = 6  # key/caption font, in feet (fixed, not tied to room sizes)
 _KEY_LINE_RATIO = 1.6  # key line spacing as a multiple of the key font
-_KEY_GLYPH_FRACTION = 0.4  # key font relative to the smallest room's shorter side
 _CHAR_W = 0.6  # rough average glyph width (fraction of font), for centring the key
 _GRID_COLOUR = "#bbb"  # grey 5-ft grid
 _GRID_STROKE_FT = 0.15  # grid line thickness, in feet
@@ -102,11 +102,10 @@ def render_svg(building: Building) -> str:
         for room in building.rooms
     ]
     chrome = [caption, *entries]
-    # Size the key relative to the rooms (like their labels) so it reads
-    # consistently at any map size. If a key line is wider than the plan, the
-    # canvas grows and both plan and key are centred (no lopsided dead space).
-    smallest = min(min(room.width, room.height) for room in building.rooms)
-    key_font = smallest * _KEY_GLYPH_FRACTION
+    # The key is a fixed readable size (not tied to room sizes — a single small
+    # room would otherwise shrink the whole key). If a key line is wider than
+    # the plan, the canvas grows and plan + key are centred (no dead space).
+    key_font = _KEY_FONT_FT
     key_line = key_font * _KEY_LINE_RATIO
     key_width = max(len(line) for line in chrome) * key_font * _CHAR_W
 

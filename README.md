@@ -9,27 +9,35 @@ another; `porta` solves the geometry and renders it. No mouse, no coordinates
 to hand-pack, diffable in git.
 
 ```
-# manor.floor — feet, 5-ft grid, north = up
+# manor.porta — feet, 5-ft grid, up = north
 room entrance "Entrance Hall"  20x20   root
-room kitchen  "Kitchen"        20x30   west-of entrance
-room hall     "Great Hall"     40x30   north-of entrance  east-of kitchen
+room kitchen  "Kitchen"        20x30   left-of entrance
+room hall     "Great Hall"     40x30   up-of entrance  right-of kitchen
 ```
 
 ```sh
-uv run porta draw manor.floor -o manor.svg
-uv run porta draw manor.floor --debug-ascii   # eyeball the solved layout
+uv run porta draw manor.porta -o manor.svg
+uv run porta draw manor.porta --debug-ascii   # eyeball the solved layout
 ```
+
+Rooms attach **flush** by one relation per axis (`up-of` / `down-of` /
+`left-of` / `right-of`); positions are derived, not authored. See
+[`examples/manor.porta`](examples/manor.porta) for a fuller example.
 
 ## Status
 
-Early scaffold. The DSL, layout engine, and renderer are stubs — see
-[`docs/design.md`](docs/design.md) for the full spec and build phasing.
+Working thin slice: parse → solve placement (with validation: one root, no
+cycles, no disconnected rooms, no overlaps) → render SVG (with a 5-ft grid)
+and an ASCII debug view. Not yet implemented (tracked as issues): alignment
+and spacing modifiers, doors/windows, non-rectangular rooms, multi-floor, and
+richer styling. See [`docs/design.md`](docs/design.md) for the full spec and
+phasing.
 
 ## Develop
 
 ```sh
 uv run porta --help
-uv run --with pytest pytest
+uv run --extra dev pytest
 ```
 
 ## Use as a dependency

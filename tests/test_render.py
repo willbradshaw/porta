@@ -145,14 +145,17 @@ def test_svg_root_is_svg_with_viewbox_and_matching_size() -> None:
     assert root.tag == tag("svg")
     view_box = root.get("viewBox")
     assert view_box is not None
-    min_x, min_y, vbw, vbh = (float(n) for n in view_box.split())
-    # TWO spans x[0,30], y[0,20]; viewBox starts a margin up-and-left of that.
-    assert (min_x, min_y) == (-MARGIN, -MARGIN)
-    assert vbw == 30 + 2 * MARGIN
+    vb_x, vb_y, vbw, vbh = (float(n) for n in view_box.split())
+    # TWO's plan spans x[0,30], y[0,20]; the viewBox encloses it with at least a
+    # margin on every side (it may be wider and centred to fit the key).
+    assert vb_y == -MARGIN
+    assert vb_x <= -MARGIN
+    assert vb_x + vbw >= 30 + MARGIN
     assert vbh >= 20 + 2 * MARGIN  # extra room below for the caption + key
-    # width/height are the viewBox extent scaled up for a usable default size.
-    assert float(root.get("width", "0")) == vbw * SCALE
-    assert float(root.get("height", "0")) == vbh * SCALE
+    # width/height are the viewBox extent scaled up for a usable default size
+    # (independent rounding of each makes the relation exact only to a tolerance).
+    assert float(root.get("width", "0")) == pytest.approx(vbw * SCALE, abs=0.05)
+    assert float(root.get("height", "0")) == pytest.approx(vbh * SCALE, abs=0.05)
 
 
 def test_has_a_white_background() -> None:
@@ -247,3 +250,16 @@ def test_manor_renders_to_golden_svg_fixture() -> None:
     source = Path("examples/manor.porta").read_text()
     expected = Path("tests/fixtures/manor.svg").read_text()
     assert render_svg(solve(parse(source))) == expected
+
+
+# A corpus of small, human-reviewed layouts: each tests/fixtures/layouts/
+# <case>.porta has a reviewed <case>.svg golden. Adding a case is just dropping
+# in the input/golden pair.
+_LAYOUT_CASES = sorted(Path("tests/fixtures/layouts").glob("*.porta"))
+
+
+@pytest.mark.parametrize("porta_file", _LAYOUT_CASES, ids=lambda p: p.stem)
+def test_layout_renders_to_svg_golden(porta_file: Path) -> None:
+    expected = porta_file.with_suffix(".svg").read_text()
+    actual = render_svg(solve(parse(porta_file.read_text())))
+    assert actual == expected

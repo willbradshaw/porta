@@ -1,0 +1,2 @@
+room a "Room A" 10x10 root
+room b "Room B" 20x10 down-of a

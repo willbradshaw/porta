@@ -5,11 +5,23 @@ the debug-ascii rasterizer below. SVG is built from stdlib string templating
 only (no runtime dependencies).
 """
 
+from xml.sax.saxutils import escape
+
 from porta.model import Building, Room
 
 _GRID_FT = 5
 _EMPTY = "."
 _FALLBACK_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+_SVG_NS = "http://www.w3.org/2000/svg"
+_MARGIN_FT = 10  # padding around the plan, in feet
+_WALL_STROKE_FT = 0.5  # wall line thickness, in feet
+_LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
+_KEY_FONT_FT = 6  # key text size, in feet
+_KEY_LINE_FT = 8  # key line spacing, in feet
+_GRID_COLOUR = "#bbb"  # grey 5-ft grid
+_GRID_STROKE_FT = 0.15  # grid line thickness, in feet
+_DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
 def render_ascii(building: Building) -> str:
@@ -52,13 +64,116 @@ def render_ascii(building: Building) -> str:
     return f"{body}\n\n{legend}"
 
 
+def render_svg(building: Building) -> str:
+    """Render a solved building as SVG.
+
+    Geometry is drawn directly in feet (1 user unit = 1 foot); no scaling or
+    y-flip is needed (the layout's x-east/y-south coordinates are already
+    SVG-native). The viewBox frames the room bounding box plus a margin, so
+    rooms are emitted at their literal (possibly negative) coordinates. Each
+    room is a bordered rectangle with a centered glyph; a key (glyph to name)
+    is drawn below the plan.
+
+    Args:
+        building: A building whose rooms have been placed by
+            :func:`~porta.layout.solve`.
+
+    Returns:
+        The SVG document as a string.
+
+    Raises:
+        ValueError: If any room has not been placed.
+    """
+    placed = _placed_rooms(building)
+    glyphs = _assign_glyphs(building.rooms)
+
+    min_x = min(x for _, x, _ in placed)
+    min_y = min(y for _, _, y in placed)
+    max_x = max(x + room.width for room, x, _ in placed)
+    max_y = max(y + room.height for room, _, y in placed)
+
+    view_x = min_x - _MARGIN_FT
+    view_y = min_y - _MARGIN_FT
+    view_w = (max_x - min_x) + 2 * _MARGIN_FT
+    # plan margins (top, gap-to-key, bottom) plus a caption line and one key
+    # line per room.
+    view_h = (max_y - min_y) + 3 * _MARGIN_FT + (len(building.rooms) + 1) * _KEY_LINE_FT
+
+    lines = [
+        f'<svg xmlns="{_SVG_NS}" '
+        f'width="{_num(view_w * _DISPLAY_SCALE)}" '
+        f'height="{_num(view_h * _DISPLAY_SCALE)}" '
+        f'viewBox="{_num(view_x)} {_num(view_y)} {_num(view_w)} {_num(view_h)}">'
+    ]
+
+    # White background so the drawing is legible on any viewer backdrop.
+    lines.append(
+        f'  <rect x="{_num(view_x)}" y="{_num(view_y)}" '
+        f'width="{_num(view_w)}" height="{_num(view_h)}" fill="white" />'
+    )
+
+    # 5-ft grid, drawn behind the rooms (over the background).
+    lines.append(
+        f'  <g stroke="{_GRID_COLOUR}" stroke-width="{_num(_GRID_STROKE_FT)}">'
+    )
+    for gx in range(min_x, max_x + 1, _GRID_FT):
+        lines.append(
+            f'    <line x1="{_num(gx)}" y1="{_num(min_y)}" '
+            f'x2="{_num(gx)}" y2="{_num(max_y)}" />'
+        )
+    for gy in range(min_y, max_y + 1, _GRID_FT):
+        lines.append(
+            f'    <line x1="{_num(min_x)}" y1="{_num(gy)}" '
+            f'x2="{_num(max_x)}" y2="{_num(gy)}" />'
+        )
+    lines.append("  </g>")
+
+    for room, x, y in placed:
+        font = min(room.width, room.height) * _LABEL_RATIO
+        lines.append(
+            f'  <rect data-room="{room.id}" x="{_num(x)}" y="{_num(y)}" '
+            f'width="{_num(room.width)}" height="{_num(room.height)}" '
+            f'fill="none" stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" />'
+        )
+        lines.append(
+            f'  <text data-room="{room.id}" x="{_num(x + room.width / 2)}" '
+            f'y="{_num(y + room.height / 2)}" text-anchor="middle" '
+            f'dominant-baseline="central" font-size="{_num(font)}">'
+            f"{glyphs[room.id]}</text>"
+        )
+
+    key_top = max_y + _MARGIN_FT
+    lines.append(
+        f'  <text class="scale" x="{_num(min_x)}" '
+        f'y="{_num(key_top + _KEY_LINE_FT)}" '
+        f'font-size="{_num(_KEY_FONT_FT)}">1 square = {_GRID_FT} ft</text>'
+    )
+    for i, room in enumerate(building.rooms):
+        label = escape(
+            f"{glyphs[room.id]}  {room.name}  ({room.width}x{room.height} ft)"
+        )
+        lines.append(
+            f'  <text class="key" x="{_num(min_x)}" '
+            f'y="{_num(key_top + (i + 2) * _KEY_LINE_FT)}" '
+            f'font-size="{_num(_KEY_FONT_FT)}">{label}</text>'
+        )
+
+    lines.append("</svg>")
+    return "\n".join(lines)
+
+
+def _num(value: float) -> str:
+    """Format a number for SVG: drop a trailing ``.0`` so 10.0 renders as ``10``."""
+    return str(int(value)) if value == int(value) else str(value)
+
+
 def _placed_rooms(building: Building) -> list[tuple[Room, int, int]]:
     """Return (room, x, y) triples, raising if any room is unplaced."""
     placed: list[tuple[Room, int, int]] = []
     for room in building.rooms:
         if room.x is None or room.y is None:
             raise ValueError(
-                f"render_ascii needs a solved building; {room.id!r} is unplaced"
+                f"rendering needs a solved building; {room.id!r} is unplaced"
             )
         placed.append((room, room.x, room.y))
     return placed

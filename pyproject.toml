@@ -3,7 +3,7 @@ name = "porta"
 version = "0.0.1"
 description = "A relational DSL for authoring TTRPG floor plans and rendering them to SVG."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 authors = [{ name = "Will Bradshaw" }]
 keywords = ["dnd", "ttrpg", "floorplan", "svg", "dsl", "cartography"]
 dependencies = []
@@ -12,7 +12,7 @@ dependencies = []
 porta = "porta.cli:main"
 
 [project.optional-dependencies]
-dev = ["pytest>=8"]
+dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11"]
 
 [build-system]
 requires = ["hatchling"]
@@ -24,3 +24,29 @@ packages = ["src/porta"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+
+# ruff infers its target Python from requires-python; no need to repeat it here.
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort (import ordering)
+    "N",   # pep8-naming
+    "UP",  # pyupgrade (modern syntax)
+    "B",   # flake8-bugbear (likely bugs)
+    "A",   # flake8-builtins (shadowing builtins)
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "RET", # flake8-return
+    "PIE", # flake8-pie (misc lints)
+    "PT",  # flake8-pytest-style
+    "PTH", # flake8-use-pathlib
+    "RUF", # ruff-specific rules
+]
+
+[tool.mypy]
+strict = true
+files = ["src", "tests"]
+mypy_path = "src"
+explicit_package_bases = true

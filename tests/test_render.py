@@ -155,9 +155,17 @@ def test_svg_root_is_svg_with_viewbox_and_matching_size() -> None:
     assert float(root.get("height", "0")) == vbh * SCALE
 
 
+def test_has_a_white_background() -> None:
+    root = ET.fromstring(svg_of(TWO))
+    background = next(r for r in root.iter(tag("rect")) if not r.get("data-room"))
+    assert background.get("fill") == "white"
+
+
 def test_room_rects_are_transparent_so_the_grid_shows_through() -> None:
     root = ET.fromstring(svg_of(TWO))
-    assert all(rect.get("fill") == "none" for rect in root.iter(tag("rect")))
+    room_rects = [r for r in root.iter(tag("rect")) if r.get("data-room")]
+    assert room_rects
+    assert all(r.get("fill") == "none" for r in room_rects)
 
 
 def test_grid_has_a_line_every_five_feet_across_the_plan() -> None:
@@ -192,7 +200,8 @@ def test_one_rect_per_room_at_literal_feet_coords(
 
 def test_svg_rect_count_matches_room_count() -> None:
     root = ET.fromstring(svg_of(DESIGN_MANOR))
-    assert sum(1 for _ in root.iter(tag("rect"))) == 3
+    room_rects = [r for r in root.iter(tag("rect")) if r.get("data-room")]
+    assert len(room_rects) == 3
 
 
 @pytest.mark.parametrize(

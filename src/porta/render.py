@@ -106,7 +106,13 @@ def render_svg(building: Building) -> str:
         f'viewBox="{_num(view_x)} {_num(view_y)} {_num(view_w)} {_num(view_h)}">'
     ]
 
-    # 5-ft grid, drawn first so rooms and labels sit on top of it.
+    # White background so the drawing is legible on any viewer backdrop.
+    lines.append(
+        f'  <rect x="{_num(view_x)}" y="{_num(view_y)}" '
+        f'width="{_num(view_w)}" height="{_num(view_h)}" fill="white" />'
+    )
+
+    # 5-ft grid, drawn behind the rooms (over the background).
     lines.append(
         f'  <g stroke="{_GRID_COLOUR}" stroke-width="{_num(_GRID_STROKE_FT)}">'
     )

@@ -134,6 +134,19 @@ def _validate_relations(rooms: list[Room], by_id: dict[str, Room]) -> None:
                     line=room.line,
                 )
             seen_axes.add(rel.direction.axis)
+        for rel in room.relations:
+            if rel.shift != 0 and _free_axis(rel.direction) in seen_axes:
+                raise LayoutError(
+                    f"room {room.id!r} cannot shift: both axes are constrained",
+                    line=rel.line,
+                )
+
+
+def _free_axis(direction: Direction) -> Axis:
+    """The axis a relation leaves free (the one its shift acts on)."""
+    if direction.axis is Axis.VERTICAL:
+        return Axis.HORIZONTAL
+    return Axis.VERTICAL
 
 
 def _place(room: Room, by_id: dict[str, Room]) -> None:
@@ -150,16 +163,16 @@ def _place(room: Room, by_id: dict[str, Room]) -> None:
         assert ay is not None
         if rel.direction is Direction.RIGHT:
             x = ax + anchor.width
-            y_fallback = ay
+            y_fallback = ay + rel.shift
         elif rel.direction is Direction.LEFT:
             x = ax - room.width
-            y_fallback = ay
+            y_fallback = ay + rel.shift
         elif rel.direction is Direction.DOWN:
             y = ay + anchor.height
-            x_fallback = ax
+            x_fallback = ax + rel.shift
         else:  # Direction.UP
             y = ay - room.height
-            x_fallback = ax
+            x_fallback = ax + rel.shift
 
     room.x = x if x is not None else x_fallback
     room.y = y if y is not None else y_fallback

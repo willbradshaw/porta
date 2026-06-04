@@ -137,7 +137,7 @@ def _parse_dimensions(text: str, lineno: int) -> tuple[int, int]:
 
 
 def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relation]]:
-    """Parse the trailing ``root`` flag and relations (in any order)."""
+    """Parse the trailing ``root`` flag and relations (with modifiers, any order)."""
     is_root = False
     relations: list[Relation] = []
     i = 0
@@ -151,12 +151,41 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
             continue
         direction = _KEYWORDS.get(value)
         if direction is None:
+            if value.startswith("shift="):
+                raise ParseError(f"{value!r} must follow a relation", line=lineno)
             raise ParseError(f"unknown relation or keyword {value!r}", line=lineno)
         if i + 1 >= len(tokens):
             raise ParseError(f"relation {value!r} needs an anchor room id", line=lineno)
         anchor, anchor_quoted = tokens[i + 1]
         if anchor_quoted or not _ID_RE.match(anchor):
             raise ParseError(f"invalid anchor id {anchor!r}", line=lineno)
-        relations.append(Relation(direction=direction, anchor=anchor, line=lineno))
         i += 2
+
+        shift = 0
+        while (
+            i < len(tokens) and not tokens[i][1] and tokens[i][0].startswith("shift=")
+        ):
+            shift = _parse_shift(tokens[i][0], lineno)
+            i += 1
+
+        relations.append(
+            Relation(direction=direction, anchor=anchor, line=lineno, shift=shift)
+        )
     return is_root, relations
+
+
+def _parse_shift(token: str, lineno: int) -> int:
+    """Parse a ``shift=N`` modifier into signed, grid-aligned feet."""
+    raw = token[len("shift=") :]
+    try:
+        value = int(raw)
+    except ValueError:
+        raise ParseError(
+            f"shift must be an integer, got {raw!r}", line=lineno
+        ) from None
+    if value % _GRID_FT != 0:
+        raise ParseError(
+            f"shift must be a multiple of {_GRID_FT} (the grid), got {value}",
+            line=lineno,
+        )
+    return value

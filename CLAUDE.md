@@ -39,3 +39,6 @@ working conventions.
   one line — so be liberal and keep coverage comprehensive (give each case a
   readable `id`). Reserve standalone test functions for genuinely distinct
   assertions.
+- Tests mirror the source: one `tests/test_<module>.py` per `src/porta/<module>.py`
+  (e.g. `test_layout.py` covers all of `layout.py`). Error types in `errors.py`
+  are tested where they're raised, not in a separate file.

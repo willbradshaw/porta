@@ -149,7 +149,9 @@ def render_svg(building: Building) -> str:
         f'font-size="{_num(_KEY_FONT_FT)}">1 square = {_GRID_FT} ft</text>'
     )
     for i, room in enumerate(building.rooms):
-        label = escape(f"{glyphs[room.id]}  {room.name}  {room.width}x{room.height} ft")
+        label = escape(
+            f"{glyphs[room.id]}  {room.name}  ({room.width}x{room.height} ft)"
+        )
         lines.append(
             f'  <text class="key" x="{_num(min_x)}" '
             f'y="{_num(key_top + (i + 2) * _KEY_LINE_FT)}" '

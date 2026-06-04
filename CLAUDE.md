@@ -1,0 +1,35 @@
+# porta
+
+A standalone Python package: a relational DSL for authoring D&D floor plans and
+rendering them to SVG. CLI-driven, zero runtime dependencies.
+
+**Read [`docs/design.md`](docs/design.md) first** — it is the canonical spec
+(placement model, validation rules, syntax, phasing). The body below is just
+working conventions.
+
+## Orientation
+
+- **What it does** — parse a `.floor` spec (rooms + relational placement) →
+  resolve geometry by DAG propagation → render SVG.
+- **Package layout** — `src/porta/`: `cli.py` (argparse entry), `parser.py`
+  (`.floor` → model), `model.py` (dataclasses), `layout.py` (relations →
+  coordinates, validation), `render.py` (model → SVG). Tests in `tests/`.
+- **Consumer** — the `isles` D&D vault (sibling repo) installs porta via
+  `uv add --editable ../porta`. The `.floor` sources and rendered SVGs live in
+  *that* repo, not here. porta knows nothing about isles.
+
+## Workflow
+
+- Run with **`uv`**: `uv run porta draw <in>.floor -o <out>.svg`.
+- Tests: `uv run --with pytest pytest`. CI runs them on push/PR.
+- Use **`python`**, never `python3`.
+- Use **relative paths** in shell/git commands.
+- When handing the user a path to open, avoid spaces in it.
+
+## Conventions
+
+- Modern type hints (`list[str]`, `X | None`); dataclasses for the model.
+- Google-style docstrings on public functions.
+- Keep the runtime dependency-free: SVG via stdlib string/XML templating.
+- Small, pure, testable functions — especially in `layout.py`, where geometry
+  resolution and overlap detection should be unit-tested on tiny inputs.

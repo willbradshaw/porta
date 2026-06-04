@@ -59,6 +59,9 @@ class Room:
     is_root: bool = False
     relations: list[Relation] = field(default_factory=list)
     line: int = 0
+    # Filled by the layout engine (top-left corner, in feet); None until solved.
+    x: int | None = None
+    y: int | None = None
 
 
 @dataclass

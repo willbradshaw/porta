@@ -1,4 +1,4 @@
-"""Stage 0 smoke tests: the package imports and the CLI parser is wired up."""
+"""Tests for ``cli.py``: the package imports and the CLI parser is wired up."""
 
 import porta
 from porta.cli import build_parser

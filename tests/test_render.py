@@ -1,5 +1,6 @@
-"""Stage 2: the debug-ascii rasterizer (and layout test oracle).
+"""Tests for ``render.py``: the debug-ascii rasterizer (and the SVG renderer).
 
+The ascii grid doubles as the layout test oracle.
 One character per 5-ft cell, space-separated, north at top; empty cells are
 ``.``. A blank line then a legend follows. Glyphs are mnemonic-first: the
 first unused letter of the room id (uppercased), falling back to a generic

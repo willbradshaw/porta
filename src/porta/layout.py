@@ -13,7 +13,7 @@ validation are tracked as separate issues.
 """
 
 from porta.errors import LayoutError, OverlapError
-from porta.model import Axis, Building, Direction, Room
+from porta.model import Axis, Building, Direction, Relation, Room
 
 # An axis-aligned rectangle as (x, y, width, height) in feet.
 Rect = tuple[int, int, int, int]
@@ -174,8 +174,38 @@ def _place(room: Room, by_id: dict[str, Room]) -> None:
             y = ay - room.height
             x_fallback = ax + rel.shift
 
-    room.x = x if x is not None else x_fallback
-    room.y = y if y is not None else y_fallback
+    rx = x if x is not None else x_fallback
+    ry = y if y is not None else y_fallback
+    assert rx is not None
+    assert ry is not None
+    room.x = rx
+    room.y = ry
+    for rel in room.relations:
+        # Only a shift can slide a room off its anchor. A non-shifted relation
+        # in a two-axis pin may legitimately only pin a coordinate (corner-touch).
+        if rel.shift != 0:
+            _check_attached(room, rx, ry, by_id[rel.anchor], rel)
+
+
+def _check_attached(room: Room, rx: int, ry: int, anchor: Room, rel: Relation) -> None:
+    """Raise if ``room`` shares no wall with ``anchor`` on the relation's free axis.
+
+    A shift large enough to slide the room off its anchor leaves them touching
+    at most at a corner; that detaches the relation and is rejected.
+    """
+    ax, ay = anchor.x, anchor.y
+    assert ax is not None
+    assert ay is not None
+    if _free_axis(rel.direction) is Axis.HORIZONTAL:
+        overlap = min(rx + room.width, ax + anchor.width) - max(rx, ax)
+    else:
+        overlap = min(ry + room.height, ay + anchor.height) - max(ry, ay)
+    if overlap <= 0:
+        raise LayoutError(
+            f"room {room.id!r} shift={rel.shift} detaches it from "
+            f"{anchor.id!r} (no shared wall)",
+            line=rel.line,
+        )
 
 
 def _raise_unplaceable(pending: list[Room]) -> None:

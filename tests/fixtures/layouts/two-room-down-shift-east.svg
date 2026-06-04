@@ -1,22 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="704" height="620" viewBox="-25.2 -10 70.4 62">
-  <rect x="-25.2" y="-10" width="70.4" height="62" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="704" height="620" viewBox="-27.7 -10 70.4 62">
+  <rect x="-27.7" y="-10" width="70.4" height="62" fill="white" />
   <g stroke="#bbb" stroke-width="0.15">
     <line x1="0" y1="0" x2="0" y2="20" />
     <line x1="5" y1="0" x2="5" y2="20" />
     <line x1="10" y1="0" x2="10" y2="20" />
     <line x1="15" y1="0" x2="15" y2="20" />
-    <line x1="20" y1="0" x2="20" y2="20" />
-    <line x1="0" y1="0" x2="20" y2="0" />
-    <line x1="0" y1="5" x2="20" y2="5" />
-    <line x1="0" y1="10" x2="20" y2="10" />
-    <line x1="0" y1="15" x2="20" y2="15" />
-    <line x1="0" y1="20" x2="20" y2="20" />
+    <line x1="0" y1="0" x2="15" y2="0" />
+    <line x1="0" y1="5" x2="15" y2="5" />
+    <line x1="0" y1="10" x2="15" y2="10" />
+    <line x1="0" y1="15" x2="15" y2="15" />
+    <line x1="0" y1="20" x2="15" y2="20" />
   </g>
   <rect data-room="a" x="0" y="0" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="a" x="5" y="5" text-anchor="middle" dominant-baseline="central" font-size="6">A</text>
-  <rect data-room="b" x="10" y="10" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="b" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="6">B</text>
-  <text class="scale" x="-15.2" y="32.8" font-size="4">1 square = 5 ft</text>
-  <text class="key" x="-15.2" y="39.2" font-size="4">A  Room A  (10x10 ft)</text>
-  <text class="key" x="-15.2" y="45.6" font-size="4">B  Room B  (10x10 ft)</text>
+  <rect data-room="b" x="5" y="10" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="b" x="10" y="15" text-anchor="middle" dominant-baseline="central" font-size="6">B</text>
+  <text class="scale" x="-17.7" y="32.8" font-size="4">1 square = 5 ft</text>
+  <text class="key" x="-17.7" y="39.2" font-size="4">A  Room A  (10x10 ft)</text>
+  <text class="key" x="-17.7" y="45.6" font-size="4">B  Room B  (10x10 ft)</text>
 </svg>

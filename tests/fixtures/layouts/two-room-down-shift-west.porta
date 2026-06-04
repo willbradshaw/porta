@@ -1,2 +1,2 @@
 room a "Room A" 10x10 root
-room b "Room B" 10x10 down-of a shift=-10
+room b "Room B" 10x10 down-of a shift=-5

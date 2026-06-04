@@ -83,7 +83,9 @@ def test_line_numbers_advance_past_interior_comments_and_blanks(
         pytest.param('room a "A" 10x10 up-of b right-of c', id="two-axis-relations"),
         pytest.param('room a "A" 10x10 left-of b right-of c', id="same-axis-relations"),
         pytest.param('room a "Two Word Name" 10x10 root', id="multi-word-name"),
-        pytest.param('room store_room-2 "S" 10x10 root', id="id-with-hyphen-underscore"),
+        pytest.param(
+            'room store_room-2 "S" 10x10 root', id="id-with-hyphen-underscore"
+        ),
         pytest.param('room a1 "S" 10x10 root', id="id-with-trailing-digit"),
         pytest.param('room a "A" 100x205 root', id="larger-grid-dims"),
         pytest.param('room   a    "A"    10x10    root', id="irregular-whitespace"),

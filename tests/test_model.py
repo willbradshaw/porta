@@ -19,5 +19,7 @@ from porta.model import Axis, Direction
         (Direction.RIGHT, Axis.HORIZONTAL),
     ],
 )
-def test_direction_maps_to_expected_axis(direction: Direction, expected_axis: Axis) -> None:
+def test_direction_maps_to_expected_axis(
+    direction: Direction, expected_axis: Axis
+) -> None:
     assert direction.axis is expected_axis

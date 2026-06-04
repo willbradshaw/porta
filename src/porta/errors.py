@@ -35,3 +35,26 @@ class LayoutError(PortaError):
     roots, references to unknown rooms, dependency cycles, disconnected rooms,
     and (for now) constructs not yet supported by the layout engine.
     """
+
+
+class OverlapError(LayoutError):
+    """Two solved rooms occupy overlapping space.
+
+    Carries the colliding room ids and the overlap rectangle structurally, so
+    the CLI can render the diagnostic without parsing the message.
+    """
+
+    def __init__(self, rooms: tuple[str, str], rect: tuple[int, int, int, int]) -> None:
+        """Initialise the error.
+
+        Args:
+            rooms: The ids of the two overlapping rooms (in source order).
+            rect: The overlap rectangle as ``(x, y, width, height)`` in feet.
+        """
+        a, b = rooms
+        x, y, w, h = rect
+        super().__init__(
+            f"rooms {a!r} and {b!r} overlap on a {w}x{h} area at ({x}, {y})"
+        )
+        self.rooms = rooms
+        self.rect = rect

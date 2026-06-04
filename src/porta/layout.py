@@ -12,8 +12,11 @@ Overlap detection is Stage 3; the alignment/spacing modifiers and snug-fit
 validation are tracked as separate issues.
 """
 
-from porta.errors import LayoutError
+from porta.errors import LayoutError, OverlapError
 from porta.model import Axis, Building, Direction, Room
+
+# An axis-aligned rectangle as (x, y, width, height) in feet.
+Rect = tuple[int, int, int, int]
 
 
 def solve(building: Building) -> Building:
@@ -51,7 +54,49 @@ def solve(building: Building) -> Building:
 
     if pending:
         _raise_unplaceable(pending)
+
+    overlaps = find_overlaps(building)
+    if overlaps:
+        first, second, rect = overlaps[0]
+        raise OverlapError((first.id, second.id), rect)
     return building
+
+
+def find_overlaps(building: Building) -> list[tuple[Room, Room, Rect]]:
+    """Return every pair of overlapping rooms with their intersection rectangle.
+
+    Pure: detection only, no raising. Flush-adjacent and corner-touching rooms
+    (zero-area intersection) do not count. Pairs are returned in source order.
+
+    Args:
+        building: A solved building (every room has coordinates).
+
+    Returns:
+        ``(room_a, room_b, (x, y, w, h))`` triples, one per colliding pair.
+    """
+    rooms = building.rooms
+    overlaps: list[tuple[Room, Room, Rect]] = []
+    for i, first in enumerate(rooms):
+        for second in rooms[i + 1 :]:
+            rect = _intersection(first, second)
+            if rect is not None:
+                overlaps.append((first, second, rect))
+    return overlaps
+
+
+def _intersection(a: Room, b: Room) -> Rect | None:
+    """The overlap rectangle of two placed rooms, or None if they don't overlap."""
+    ax, ay, bx, by = a.x, a.y, b.x, b.y
+    if ax is None or ay is None or bx is None or by is None:
+        raise ValueError("find_overlaps needs a solved building")
+    left = max(ax, bx)
+    top = max(ay, by)
+    right = min(ax + a.width, bx + b.width)
+    bottom = min(ay + a.height, by + b.height)
+    width, height = right - left, bottom - top
+    if width > 0 and height > 0:
+        return (left, top, width, height)
+    return None
 
 
 def _find_root(rooms: list[Room]) -> Room:

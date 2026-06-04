@@ -19,8 +19,8 @@ _WALL_STROKE_FT = 0.5  # wall line thickness, in feet
 _LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
 _KEY_FONT_FT = 6  # key text size, in feet
 _KEY_LINE_FT = 8  # key line spacing, in feet
-_GRID_COLOUR = "#ddd"  # pale grey 5-ft grid
-_GRID_STROKE_FT = 0.1  # grid line thickness, in feet
+_GRID_COLOUR = "#bbb"  # grey 5-ft grid
+_GRID_STROKE_FT = 0.15  # grid line thickness, in feet
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -149,7 +149,7 @@ def render_svg(building: Building) -> str:
         f'font-size="{_num(_KEY_FONT_FT)}">1 square = {_GRID_FT} ft</text>'
     )
     for i, room in enumerate(building.rooms):
-        label = escape(f"{glyphs[room.id]}  {room.name}")
+        label = escape(f"{glyphs[room.id]}  {room.name}  {room.width}x{room.height} ft")
         lines.append(
             f'  <text class="key" x="{_num(min_x)}" '
             f'y="{_num(key_top + (i + 2) * _KEY_LINE_FT)}" '

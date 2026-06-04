@@ -228,6 +228,14 @@ def test_svg_key_lists_each_room_name() -> None:
         assert name in key_text
 
 
+def test_key_includes_room_dimensions() -> None:
+    key_text = " ".join(
+        t.text or "" for t in ET.fromstring(svg_of(DESIGN_MANOR)).iter(tag("text"))
+    )
+    assert "20x20 ft" in key_text  # entrance
+    assert "40x30 ft" in key_text  # hall
+
+
 def test_special_characters_in_names_are_escaped() -> None:
     # Raw & or < would make the document malformed; fromstring proves escaping.
     root = ET.fromstring(svg_of('room a "Hall & Co <X>" 20x20 root'))

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1350" height="1930" viewBox="-40 -40 135 193">
   <rect x="-40" y="-40" width="135" height="193" fill="white" />
-  <g stroke="#ddd" stroke-width="0.1">
+  <g stroke="#bbb" stroke-width="0.15">
     <line x1="-30" y1="-30" x2="-30" y2="45" />
     <line x1="-25" y1="-30" x2="-25" y2="45" />
     <line x1="-20" y1="-30" x2="-20" y2="45" />
@@ -63,14 +63,14 @@
   <rect data-room="scullery" x="40" y="25" width="30" height="20" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="scullery" x="55" y="35" text-anchor="middle" dominant-baseline="central" font-size="12">U</text>
   <text class="scale" x="-30" y="63" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="-30" y="71" font-size="6">E  Entrance Hall</text>
-  <text class="key" x="-30" y="79" font-size="6">H  Great Hall</text>
-  <text class="key" x="-30" y="87" font-size="6">L  Library</text>
-  <text class="key" x="-30" y="95" font-size="6">D  Dining Room</text>
-  <text class="key" x="-30" y="103" font-size="6">P  Parlour</text>
-  <text class="key" x="-30" y="111" font-size="6">C  Cloakroom</text>
-  <text class="key" x="-30" y="119" font-size="6">K  Kitchen</text>
-  <text class="key" x="-30" y="127" font-size="6">A  Pantry</text>
-  <text class="key" x="-30" y="135" font-size="6">S  Study</text>
-  <text class="key" x="-30" y="143" font-size="6">U  Scullery</text>
+  <text class="key" x="-30" y="71" font-size="6">E  Entrance Hall  20x20 ft</text>
+  <text class="key" x="-30" y="79" font-size="6">H  Great Hall  40x30 ft</text>
+  <text class="key" x="-30" y="87" font-size="6">L  Library  30x30 ft</text>
+  <text class="key" x="-30" y="95" font-size="6">D  Dining Room  30x30 ft</text>
+  <text class="key" x="-30" y="103" font-size="6">P  Parlour  20x20 ft</text>
+  <text class="key" x="-30" y="111" font-size="6">C  Cloakroom  20x20 ft</text>
+  <text class="key" x="-30" y="119" font-size="6">K  Kitchen  30x25 ft</text>
+  <text class="key" x="-30" y="127" font-size="6">A  Pantry  15x25 ft</text>
+  <text class="key" x="-30" y="135" font-size="6">S  Study  20x20 ft</text>
+  <text class="key" x="-30" y="143" font-size="6">U  Scullery  30x20 ft</text>
 </svg>

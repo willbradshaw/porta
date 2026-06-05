@@ -89,11 +89,22 @@ class Room:
     y: int | None = None
 
 
+@dataclass(frozen=True)
+class Doorway:
+    """A standalone door between two adjacent rooms (any pair, not just anchors)."""
+
+    a: str
+    b: str
+    door: Door
+    line: int
+
+
 @dataclass
 class Building:
-    """An ordered collection of rooms with id lookup."""
+    """An ordered collection of rooms (with id lookup) and standalone doors."""
 
     rooms: list[Room] = field(default_factory=list)
+    doors: list[Doorway] = field(default_factory=list)
 
     def room(self, room_id: str) -> Room:
         """Return the room with ``room_id``.

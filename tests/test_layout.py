@@ -243,6 +243,36 @@ def test_default_doors_skip_walls_that_only_corner_touch() -> None:
     assert len(doors_of(text)) == 2
 
 
+def test_standalone_door_between_incidental_rooms() -> None:
+    # b and c are both below 'a' (not each other's anchor) but sit side by side,
+    # sharing the x=20 wall; a standalone door connects them.
+    text = (
+        'room a "A" 40x20 root\n'
+        'room b "B" 20x20 down-of a\n'
+        'room c "C" 20x20 down-of a shift=20\n'
+        "door b c"
+    )
+    assert (20, 25, 20, 30) in doors_of(text)
+
+
+def test_standalone_door_between_nonadjacent_rooms_raises() -> None:
+    # 'a' and 'c' only meet at a corner, so there is no wall to put a door on.
+    text = (
+        'room a "A" 10x10 root\n'
+        'room b "B" 10x10 right-of a\n'
+        'room c "C" 10x10 up-of b\n'
+        "door a c"
+    )
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
+def test_standalone_door_to_unknown_room_raises() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 right-of a\ndoor a ghost'
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
 # --- structural validation -------------------------------------------------
 
 

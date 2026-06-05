@@ -16,7 +16,7 @@ Reference resolution (does ``anchor`` exist? is there exactly one root?) is a
 import re
 
 from porta.errors import ParseError
-from porta.model import Align, Building, Direction, Door, Relation, Room
+from porta.model import Align, Building, Direction, Door, Doorway, Relation, Room
 
 # A token plus whether it was double-quoted in the source.
 Token = tuple[str, bool]
@@ -44,17 +44,37 @@ def parse(text: str) -> Building:
         ParseError: On the first syntax error, carrying its source line.
     """
     rooms: list[Room] = []
+    doors: list[Doorway] = []
     seen: set[str] = set()
     for lineno, raw in enumerate(text.splitlines(), start=1):
         tokens = _tokenize(raw, lineno)
         if not tokens:
             continue  # blank or comment-only line (its line number is still spent)
+        head, head_quoted = tokens[0]
+        if not head_quoted and head.startswith("door"):
+            doors.append(_parse_doorway(tokens, lineno))
+            continue
         room = _parse_room(tokens, lineno)
         if room.id in seen:
             raise ParseError(f"duplicate room id {room.id!r}", line=lineno)
         seen.add(room.id)
         rooms.append(room)
-    return Building(rooms)
+    return Building(rooms, doors)
+
+
+def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
+    """Parse a standalone ``door[=W][@O] <a> <b>`` line."""
+    spec = _parse_door(tokens[0][0], lineno)
+    rest = tokens[1:]
+    if len(rest) != 2:
+        raise ParseError("a door needs exactly two room ids", line=lineno)
+    for room_id, quoted in rest:
+        if quoted or not _ID_RE.match(room_id):
+            raise ParseError(f"invalid room id {room_id!r}", line=lineno)
+    a, b = rest[0][0], rest[1][0]
+    if a == b:
+        raise ParseError("a door needs two different rooms", line=lineno)
+    return Doorway(a=a, b=b, door=spec, line=lineno)
 
 
 def _tokenize(raw: str, lineno: int) -> list[Token]:

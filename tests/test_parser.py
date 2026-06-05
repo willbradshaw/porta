@@ -192,6 +192,11 @@ def test_each_relation_keyword_maps_to_its_direction(
         pytest.param('room r "R" 20x20 up-of a door=0', id="door-zero-width"),
         pytest.param('room r "R" 20x20 up-of a doorx', id="door-malformed"),
         pytest.param('room r "R" 20x20 no-door', id="no-door-without-relation"),
+        # standalone door statement
+        pytest.param("door a", id="standalone-door-one-id"),
+        pytest.param("door a b c", id="standalone-door-three-ids"),
+        pytest.param("door a a", id="standalone-door-self"),
+        pytest.param('door a "B"', id="standalone-door-quoted-id"),
     ],
 )
 def test_invalid_source_raises(source: str) -> None:
@@ -255,3 +260,18 @@ def test_door_is_parsed_onto_the_relation(
 def test_no_door_is_parsed_onto_the_relation() -> None:
     assert parse('room b "B" 10x10 up-of a no-door').room("b").relations[0].no_door
     assert not parse('room b "B" 10x10 up-of a').room("b").relations[0].no_door
+
+
+def test_standalone_door_is_parsed() -> None:
+    building = parse('room a "A" 10x10 root\nroom b "B" 10x10 right-of a\ndoor a b')
+    assert len(building.doors) == 1
+    doorway = building.doors[0]
+    assert (doorway.a, doorway.b) == ("a", "b")
+    assert doorway.door == Door(width=5, offset=None)
+
+
+def test_standalone_door_carries_width_and_offset() -> None:
+    building = parse(
+        'room a "A" 10x10 root\nroom b "B" 10x10 right-of a\ndoor=10@5 a b'
+    )
+    assert building.doors[0].door == Door(width=10, offset=5)

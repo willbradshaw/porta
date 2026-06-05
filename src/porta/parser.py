@@ -25,7 +25,7 @@ _ID_RE = re.compile(r"[A-Za-z][A-Za-z0-9_-]*\Z")
 _DIM_RE = re.compile(r"([0-9]+)x([0-9]+)\Z")
 _GRID_FT = 5
 _DEFAULT_DOOR_FT = 5
-_MODIFIERS = ("shift=", "align=", "door")  # relation-modifier token prefixes
+_MODIFIERS = ("shift=", "align=", "door", "no-door")  # relation-modifier prefixes
 _KEYWORDS: dict[str, Direction] = {
     direction.value: direction for direction in Direction
 }
@@ -166,6 +166,7 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
         align = Align.START
         shift = 0
         door: Door | None = None
+        no_door = False
         while (
             i < len(tokens) and not tokens[i][1] and tokens[i][0].startswith(_MODIFIERS)
         ):
@@ -174,6 +175,8 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
                 shift = _parse_shift(token, lineno)
             elif token.startswith("align="):
                 align = _parse_align(token, lineno)
+            elif token == "no-door":
+                no_door = True
             else:
                 door = _parse_door(token, lineno)
             i += 1
@@ -186,6 +189,7 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
                 align=align,
                 shift=shift,
                 door=door,
+                no_door=no_door,
             )
         )
     return is_root, relations

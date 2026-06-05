@@ -64,7 +64,10 @@ class Relation:
     line: int
     align: Align = Align.START  # free-axis alignment
     shift: int = 0  # feet to nudge along the free axis after aligning
-    door: Door | None = None  # optional door on the shared wall
+    # Door handling on the shared wall: a real wall gets a default door unless
+    # ``no_door`` suppresses it; ``door`` overrides the default width/position.
+    door: Door | None = None
+    no_door: bool = False
 
 
 @dataclass

@@ -221,6 +221,28 @@ def test_door_that_does_not_fit_raises(source: str) -> None:
         solve(parse(source))
 
 
+def test_a_shared_wall_gets_a_default_door() -> None:
+    # No 'door' modifier, but the shared wall gets a default 5-ft door.
+    assert doors_of('room a "A" 20x20 root\nroom b "B" 20x20 right-of a') == [
+        (20, 5, 20, 10)
+    ]
+
+
+def test_no_door_suppresses_the_default() -> None:
+    assert doors_of('room a "A" 20x20 root\nroom b "B" 20x20 right-of a no-door') == []
+
+
+def test_default_doors_skip_walls_that_only_corner_touch() -> None:
+    # 'hall right-of kitchen' only corner-touches, so no default door there (and
+    # no error); the two real walls (kitchen/entrance, hall/entrance) get one each.
+    text = (
+        'room entrance "E" 20x20 root\n'
+        'room kitchen "K" 20x30 left-of entrance\n'
+        'room hall "H" 40x30 up-of entrance right-of kitchen'
+    )
+    assert len(doors_of(text)) == 2
+
+
 # --- structural validation -------------------------------------------------
 
 

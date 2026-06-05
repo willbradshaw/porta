@@ -68,23 +68,32 @@ def solve(building: Building) -> Building:
 
 
 def door_segments(building: Building) -> list[Segment]:
-    """Return the door line ``(x1, y1, x2, y2)`` for every relation with a door.
+    """Return the door line ``(x1, y1, x2, y2)`` for every door in the building.
 
-    Validates each door (the relation must share a real wall, and the door must
-    fit it); raises :class:`~porta.errors.LayoutError` otherwise. Assumes a
-    solved building.
+    Doors are on by default: a relation with a real shared wall gets a default
+    door unless ``no_door`` suppresses it; an explicit ``door`` overrides its
+    width/position. Validates each door (raising on an explicit door that has no
+    wall or doesn't fit). Assumes a solved building.
     """
     by_id = {room.id: room for room in building.rooms}
     segments: list[Segment] = []
     for room in building.rooms:
         for rel in room.relations:
-            if rel.door is not None:
-                segments.append(_door_line(room, by_id[rel.anchor], rel, rel.door))
+            if rel.no_door:
+                continue
+            segment = _door_line(room, by_id[rel.anchor], rel)
+            if segment is not None:
+                segments.append(segment)
     return segments
 
 
-def _door_line(room: Room, anchor: Room, rel: Relation, door: Door) -> Segment:
-    """Endpoints of the door line on the wall ``room`` shares with ``anchor``."""
+def _door_line(room: Room, anchor: Room, rel: Relation) -> Segment | None:
+    """The door line on the wall ``room`` shares with ``anchor`` (None if no door).
+
+    A real shared wall gets a default 5-ft door; ``rel.door`` overrides it. An
+    *explicit* door on a relation with no wall (or too big to fit) raises; a
+    *default* door is simply absent when there is no wall (a coordinate-pin).
+    """
     rx, ry = room.x, room.y
     ax, ay = anchor.x, anchor.y
     assert rx is not None
@@ -100,10 +109,14 @@ def _door_line(room: Room, anchor: Room, rel: Relation, door: Door) -> Segment:
         length = min(ry + room.height, ay + anchor.height) - lo
 
     if length <= 0:
-        raise LayoutError(
-            f"door on room {room.id!r}: it shares no wall with {anchor.id!r}",
-            line=rel.line,
-        )
+        if rel.door is not None:
+            raise LayoutError(
+                f"door on room {room.id!r}: it shares no wall with {anchor.id!r}",
+                line=rel.line,
+            )
+        return None  # default door needs a real wall
+
+    door = rel.door if rel.door is not None else Door()
     if door.width > length:
         raise LayoutError(
             f"door on room {room.id!r} ({door.width} ft) is wider than the "

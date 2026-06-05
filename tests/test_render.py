@@ -174,9 +174,11 @@ def test_room_rects_are_transparent_so_the_grid_shows_through() -> None:
 
 
 def test_grid_has_a_line_every_five_feet_across_the_plan() -> None:
-    # TWO spans x[0,30] (7 verticals) and y[0,20] (5 horizontals).
+    # TWO spans x[0,30] (7 verticals) and y[0,20] (5 horizontals); door lines
+    # (class="door") are excluded.
     root = ET.fromstring(svg_of(TWO))
-    assert sum(1 for _ in root.iter(tag("line"))) == 7 + 5
+    grid = [ln for ln in root.iter(tag("line")) if ln.get("class") != "door"]
+    assert len(grid) == 7 + 5
 
 
 def test_scale_caption_states_the_grid_size() -> None:

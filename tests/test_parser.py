@@ -191,6 +191,7 @@ def test_each_relation_keyword_maps_to_its_direction(
         pytest.param('room r "R" 20x20 up-of a door@7', id="door-offset-off-grid"),
         pytest.param('room r "R" 20x20 up-of a door=0', id="door-zero-width"),
         pytest.param('room r "R" 20x20 up-of a doorx', id="door-malformed"),
+        pytest.param('room r "R" 20x20 no-door', id="no-door-without-relation"),
     ],
 )
 def test_invalid_source_raises(source: str) -> None:
@@ -249,3 +250,8 @@ def test_door_is_parsed_onto_the_relation(
     source: str, expected_door: Door | None
 ) -> None:
     assert parse(source).room("b").relations[0].door == expected_door
+
+
+def test_no_door_is_parsed_onto_the_relation() -> None:
+    assert parse('room b "B" 10x10 up-of a no-door').room("b").relations[0].no_door
+    assert not parse('room b "B" 10x10 up-of a').room("b").relations[0].no_door

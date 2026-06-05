@@ -436,6 +436,18 @@ def test_same_direction_colinear_borders_both() -> None:
     assert len(doors_of(text)) == 3
 
 
+def test_same_direction_auto_height_first_wins() -> None:
+    # Unlike the explicit case, '?' first-wins (fills to a only), so c does not
+    # reach b -> only a<->b and c<->a doors (union to cover both is #31).
+    text = (
+        'room a "A" 20x10 root\n'
+        'room b "B" 20x10 down-of a\n'
+        'room c "C" 10x? left-of a left-of b'
+    )
+    assert dims(text, "c") == (10, 10)
+    assert len(doors_of(text)) == 2
+
+
 def test_same_direction_not_aligned_raises() -> None:
     # b is shifted, so its left edge no longer lines up with a's -> the two
     # left-of relations disagree on where to put c.

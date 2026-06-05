@@ -414,6 +414,8 @@ def test_opposite_relations_snug_fit_explicit() -> None:
 def test_opposite_relations_snug_fit_auto_width() -> None:
     # '?' on the doubly-pinned axis solves to the gap.
     assert dims(SNUG.format(dims="?x20"), "c") == (10, 20)
+    # ?x? also resolves height via match-anchor (first-wins to b) -> 10x20.
+    assert dims(SNUG.format(dims="?x?"), "c") == (10, 20)
 
 
 def test_snug_fit_size_mismatch_raises() -> None:

@@ -135,6 +135,40 @@ def test_shift_that_detaches_from_the_anchor_raises() -> None:
         solve(parse(text))
 
 
+# --- align -----------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("relation", "expected"),
+    [
+        # Anchor 'a' is 20x20; 'b' is 10x10. align=end flushes the FAR edges,
+        # so b sits at a's east (up/down-of) or south (left/right-of) end.
+        ("up-of", (10, -10)),
+        ("down-of", (10, 20)),
+        ("left-of", (-10, 10)),
+        ("right-of", (20, 10)),
+    ],
+)
+def test_align_end_flushes_the_far_edge(
+    relation: str, expected: tuple[int, int]
+) -> None:
+    text = f'room a "A" 20x20 root\nroom b "B" 10x10 {relation} a align=end'
+    assert coords(text, "b") == expected
+
+
+def test_align_end_composes_with_shift() -> None:
+    # align=end puts b at the east edge (x=10), then shift nudges it west by 5.
+    text = 'room a "A" 20x20 root\nroom b "B" 10x10 up-of a align=end shift=-5'
+    assert coords(text, "b") == (5, -10)
+
+
+def test_align_end_with_both_axes_constrained_raises() -> None:
+    # align=end acts on x, but right-of already pins x -> no free axis.
+    text = 'room a "A" 20x20 root\nroom b "B" 10x10 up-of a align=end right-of a'
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
 # --- structural validation -------------------------------------------------
 
 

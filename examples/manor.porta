@@ -13,3 +13,5 @@ room study    "Study"         20x20 down-of parlour
 room scullery "Scullery"      30x20 down-of kitchen
 room porch    "Porch"         10x10 down-of entrance shift=5
 room larder   "Larder"        15x15 right-of pantry  shift=5
+room gallery  "Gallery"       20x10 up-of hall      align=end
+room turret   "Turret"        15x15 left-of library align=end shift=-5

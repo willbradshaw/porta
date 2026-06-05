@@ -13,7 +13,7 @@ validation are tracked as separate issues.
 """
 
 from porta.errors import LayoutError, OverlapError
-from porta.model import Axis, Building, Direction, Relation, Room
+from porta.model import Align, Axis, Building, Direction, Relation, Room
 
 # An axis-aligned rectangle as (x, y, width, height) in feet.
 Rect = tuple[int, int, int, int]
@@ -135,18 +135,26 @@ def _validate_relations(rooms: list[Room], by_id: dict[str, Room]) -> None:
                 )
             seen_axes.add(rel.direction.axis)
         for rel in room.relations:
-            if rel.shift != 0 and _free_axis(rel.direction) in seen_axes:
+            modifies_free_axis = rel.shift != 0 or rel.align is not Align.START
+            if modifies_free_axis and _free_axis(rel.direction) in seen_axes:
                 raise LayoutError(
-                    f"room {room.id!r} cannot shift: both axes are constrained",
+                    f"room {room.id!r} cannot align/shift: both axes are constrained",
                     line=rel.line,
                 )
 
 
 def _free_axis(direction: Direction) -> Axis:
-    """The axis a relation leaves free (the one its shift acts on)."""
+    """The axis a relation leaves free (the one align/shift act on)."""
     if direction.axis is Axis.VERTICAL:
         return Axis.HORIZONTAL
     return Axis.VERTICAL
+
+
+def _aligned(anchor_lo: int, anchor_dim: int, room_dim: int, align: Align) -> int:
+    """Free-axis base coordinate: near edge (START) or far edge (END) flush."""
+    if align is Align.END:
+        return anchor_lo + anchor_dim - room_dim
+    return anchor_lo
 
 
 def _place(room: Room, by_id: dict[str, Room]) -> None:
@@ -163,16 +171,16 @@ def _place(room: Room, by_id: dict[str, Room]) -> None:
         assert ay is not None
         if rel.direction is Direction.RIGHT:
             x = ax + anchor.width
-            y_fallback = ay + rel.shift
+            y_fallback = _aligned(ay, anchor.height, room.height, rel.align) + rel.shift
         elif rel.direction is Direction.LEFT:
             x = ax - room.width
-            y_fallback = ay + rel.shift
+            y_fallback = _aligned(ay, anchor.height, room.height, rel.align) + rel.shift
         elif rel.direction is Direction.DOWN:
             y = ay + anchor.height
-            x_fallback = ax + rel.shift
+            x_fallback = _aligned(ax, anchor.width, room.width, rel.align) + rel.shift
         else:  # Direction.UP
             y = ay - room.height
-            x_fallback = ax + rel.shift
+            x_fallback = _aligned(ax, anchor.width, room.width, rel.align) + rel.shift
 
     rx = x if x is not None else x_fallback
     ry = y if y is not None else y_fallback

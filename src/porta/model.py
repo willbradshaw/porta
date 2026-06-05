@@ -36,6 +36,13 @@ class Direction(Enum):
         return Axis.HORIZONTAL
 
 
+class Align(Enum):
+    """Free-axis alignment of a room against its anchor (default ``START``)."""
+
+    START = "start"  # near edges flush
+    END = "end"  # far edges flush
+
+
 @dataclass(frozen=True)
 class Relation:
     """A single placement relation: this room sits ``direction`` of ``anchor``."""
@@ -43,7 +50,8 @@ class Relation:
     direction: Direction
     anchor: str
     line: int
-    shift: int = 0  # feet to nudge along the free axis after align-start
+    align: Align = Align.START  # free-axis alignment
+    shift: int = 0  # feet to nudge along the free axis after aligning
 
 
 @dataclass

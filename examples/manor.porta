@@ -7,6 +7,7 @@ room cloak    "Cloakroom"     20x20 right-of entrance
 room kitchen  "Kitchen"       30x25 down-of dining
 room pantry   "Pantry"        15x?  right-of kitchen
 room study    "Study"         ?x20  down-of parlour
+room corridor "Corridor"      ?x?   down-of library left-of parlour left-of study
 room scullery "Scullery"      ?x20  down-of kitchen
 room porch    "Porch"         10x10 down-of entrance shift=5
 room passage  "Passage"       ?x10  right-of study left-of porch

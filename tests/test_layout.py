@@ -438,24 +438,66 @@ def test_same_direction_colinear_borders_both() -> None:
     assert len(doors_of(text)) == 3
 
 
-@pytest.mark.parametrize(
-    "dims",
-    [
-        # '?' first-wins fills only a, so c never reaches b -> left-of b is not
-        # flush (covering both needs an explicit size, or the union, #31).
-        pytest.param("10x?", id="auto-first-wins-misses-b"),
-        # an explicit size too short to span both is non-flush the same way.
-        pytest.param("10x10", id="explicit-too-short"),
-    ],
-)
-def test_same_direction_not_flush_raises(dims: str) -> None:
+def test_same_direction_explicit_too_short_raises() -> None:
+    # An explicit size too short to span both anchors is non-flush with b.
     text = (
         'room a "A" 20x10 root\n'
         'room b "B" 20x10 down-of a\n'
-        f'room c "C" {dims} left-of a left-of b'
+        'room c "C" 10x10 left-of a left-of b'
     )
     with pytest.raises(LayoutError):
         solve(parse(text))
+
+
+def test_same_direction_auto_spans_the_union() -> None:
+    # a (10 tall) over b (20 tall), colinear left edges; '?' height spans BOTH
+    # (the union, 30) and the near edge moves to the union's top.
+    text = (
+        'room a "A" 20x10 root\n'
+        'room b "B" 20x20 down-of a\n'
+        'room c "C" 10x? left-of a left-of b'
+    )
+    assert dims(text, "c") == (10, 30)
+    assert coords(text, "c") == (-10, 0)
+    assert len(doors_of(text)) == 3  # a<->b, c<->a, c<->b
+
+
+def test_union_size_is_independent_of_a_dim_axis_pin() -> None:
+    # 'down-of top' pins c's top edge, but the '?' still unions the two left-of
+    # walls to span both a and b (the pin lines up with the union's near edge).
+    text = (
+        'room a "A" 20x20 root\n'
+        'room b "B" 20x20 down-of a\n'
+        'room top "T" 10x10 up-of a\n'
+        'room c "C" 10x? down-of top left-of a left-of b'
+    )
+    assert dims(text, "c") == (10, 40)
+    assert coords(text, "c") == (-10, 0)
+
+
+def test_horizontal_union_spans_side_by_side_anchors() -> None:
+    # a and b sit side by side, colinear tops; c above both with '?' width unions
+    # them horizontally (20) and its near edge moves to the union's left.
+    text = (
+        'room a "A" 10x20 root\n'
+        'room b "B" 10x20 right-of a\n'
+        'room c "C" ?x10 up-of a up-of b'
+    )
+    assert dims(text, "c") == (20, 10)
+    assert coords(text, "c") == (0, -10)
+
+
+def test_corridor_pattern_is_fully_derived() -> None:
+    # The manor corridor in miniature: width match-anchors the library overhang
+    # (10), height unions the two stacked rooms (40), top pinned by down-of.
+    text = (
+        'room lib "L" 30x10 root\n'
+        'room a "A" 20x20 down-of lib shift=10\n'
+        'room b "B" 20x20 down-of a\n'
+        'room cor "C" ?x? down-of lib left-of a left-of b'
+    )
+    assert dims(text, "cor") == (10, 40)
+    assert coords(text, "cor") == (0, 10)
 
 
 def test_same_direction_not_aligned_raises() -> None:

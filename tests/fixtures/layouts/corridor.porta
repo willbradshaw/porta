@@ -1,0 +1,4 @@
+room lib "Library" 30x10 root
+room a   "Room A"  20x20 down-of lib shift=10
+room b   "Room B"  20x20 down-of a
+room cor "Corridor" ?x? down-of lib left-of a left-of b

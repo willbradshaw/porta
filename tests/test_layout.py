@@ -470,6 +470,58 @@ def test_same_direction_not_aligned_raises() -> None:
         solve(parse(text))
 
 
+# --- external doors --------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("side", "expected"),
+    [
+        # a 20x20 root; default 5-ft door centres (round down) to offset 5.
+        ("down", (5, 20, 10, 20)),
+        ("up", (5, 0, 10, 0)),
+        ("left", (0, 5, 0, 10)),
+        ("right", (20, 5, 20, 10)),
+    ],
+)
+def test_external_door_geometry(side: str, expected: tuple[int, int, int, int]) -> None:
+    text = f'room a "A" 20x20 root\ndoor a outside {side}'
+    assert doors_of(text) == [expected]
+
+
+def test_external_door_into_a_neighbour_raises() -> None:
+    # b is flush below a, so a's down edge is interior there, not exterior.
+    text = 'room a "A" 20x20 root\nroom b "B" 20x20 down-of a\ndoor a outside down'
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
+def test_external_door_on_the_exterior_part_is_fine() -> None:
+    # b covers only the right of a's bottom edge; the door sits on the open left.
+    # (no-door on the relation so only the external door is in the list.)
+    text = (
+        'room a "A" 20x20 root\n'
+        'room b "B" 20x20 down-of a shift=10 no-door\n'
+        "door=5@0 a outside down"
+    )
+    assert doors_of(text) == [(0, 20, 5, 20)]
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param(
+            'room a "A" 10x10 root\ndoor=20 a outside down', id="wider-than-edge"
+        ),
+        pytest.param(
+            'room a "A" 10x10 root\ndoor ghost outside down', id="unknown-room"
+        ),
+    ],
+)
+def test_invalid_external_door_raises(source: str) -> None:
+    with pytest.raises(LayoutError):
+        solve(parse(source))
+
+
 # --- structural validation -------------------------------------------------
 
 

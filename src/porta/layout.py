@@ -13,7 +13,17 @@ validation are tracked as separate issues.
 """
 
 from porta.errors import LayoutError, OverlapError
-from porta.model import Align, Axis, Building, Direction, Door, Doorway, Relation, Room
+from porta.model import (
+    Align,
+    Axis,
+    Building,
+    Direction,
+    Door,
+    Doorway,
+    ExternalDoor,
+    Relation,
+    Room,
+)
 
 _GRID_FT = 5
 # An axis-aligned rectangle as (x, y, width, height) in feet.
@@ -210,8 +220,65 @@ def door_segments(building: Building) -> list[Segment]:
                 segments.append(segment)
     for doorway in building.doors:
         segments.append(_doorway_door(doorway, by_id))
+    for external in building.external_doors:
+        segments.append(_external_door_line(external, by_id, building.rooms))
     _check_door_overlaps(segments)
     return segments
+
+
+def _external_door_line(
+    external: ExternalDoor, by_id: dict[str, Room], rooms: list[Room]
+) -> Segment:
+    """Door line on a room's exterior ``side`` edge; validates fit and that the
+    span is genuinely exterior (no room flush on the other side)."""
+    room = by_id.get(external.room)
+    if room is None:
+        raise LayoutError(
+            f"external door references unknown room {external.room!r}",
+            line=external.line,
+        )
+    horizontal, coord, lo, length = _edge(room, external.side)
+    segment = _door_on_wall(
+        external.door, horizontal, coord, lo, length, external.room, external.line
+    )
+    span = (segment[0], segment[2]) if horizontal else (segment[1], segment[3])
+    for other in rooms:
+        if other.id != room.id and _flush_outside(room, external.side, other, span):
+            raise LayoutError(
+                f"external door on {room.id!r} ({external.side.value}) is not "
+                f"exterior: {other.id!r} is on the other side",
+                line=external.line,
+            )
+    return segment
+
+
+def _edge(room: Room, side: Direction) -> _Wall:
+    """The room's ``side`` edge as (horizontal?, fixed coord, near end, length)."""
+    rx, ry = _axis_lo(room, Axis.HORIZONTAL), _axis_lo(room, Axis.VERTICAL)
+    if side is Direction.UP:
+        return True, ry, rx, room.width
+    if side is Direction.DOWN:
+        return True, ry + room.height, rx, room.width
+    if side is Direction.LEFT:
+        return False, rx, ry, room.height
+    return False, rx + room.width, ry, room.height  # RIGHT
+
+
+def _flush_outside(
+    room: Room, side: Direction, other: Room, span: tuple[int, int]
+) -> bool:
+    """Whether ``other`` sits flush against ``room``'s ``side`` over ``span``."""
+    wall = _perp(side.axis)
+    lo, hi = max(span[0], _axis_lo(other, wall)), min(span[1], _axis_hi(other, wall))
+    if hi <= lo:  # no overlap along the wall
+        return False
+    if side is Direction.UP:
+        return _axis_hi(other, Axis.VERTICAL) == _axis_lo(room, Axis.VERTICAL)
+    if side is Direction.DOWN:
+        return _axis_lo(other, Axis.VERTICAL) == _axis_hi(room, Axis.VERTICAL)
+    if side is Direction.LEFT:
+        return _axis_hi(other, Axis.HORIZONTAL) == _axis_lo(room, Axis.HORIZONTAL)
+    return _axis_lo(other, Axis.HORIZONTAL) == _axis_hi(room, Axis.HORIZONTAL)  # RIGHT
 
 
 def _check_door_overlaps(segments: list[Segment]) -> None:

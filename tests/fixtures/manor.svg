@@ -96,6 +96,7 @@
   <line class="door" x1="-30" y1="-15" x2="-30" y2="-10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="-15" y1="0" x2="-5" y2="0" stroke="black" stroke-width="1.5" />
   <line class="door" x1="30" y1="0" x2="35" y2="0" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="5" y1="30" x2="10" y2="30" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-22.9" y="64.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-22.9" y="73.8" font-size="6">E  Entrance Hall  (20x20 ft)</text>
   <text class="key" x="-22.9" y="83.4" font-size="6">H  Great Hall  (40x30 ft)</text>

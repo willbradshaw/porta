@@ -103,12 +103,23 @@ class Doorway:
     line: int
 
 
+@dataclass(frozen=True)
+class ExternalDoor:
+    """A door on a room's exterior ``side`` edge, opening to the outside."""
+
+    room: str
+    side: Direction
+    door: Door
+    line: int
+
+
 @dataclass
 class Building:
-    """An ordered collection of rooms (with id lookup) and standalone doors."""
+    """Rooms (with id lookup) plus standalone and external doors."""
 
     rooms: list[Room] = field(default_factory=list)
     doors: list[Doorway] = field(default_factory=list)
+    external_doors: list[ExternalDoor] = field(default_factory=list)
 
     def room(self, room_id: str) -> Room:
         """Return the room with ``room_id``.

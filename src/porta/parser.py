@@ -16,7 +16,16 @@ Reference resolution (does ``anchor`` exist? is there exactly one root?) is a
 import re
 
 from porta.errors import ParseError
-from porta.model import Align, Building, Direction, Door, Doorway, Relation, Room
+from porta.model import (
+    Align,
+    Building,
+    Direction,
+    Door,
+    Doorway,
+    ExternalDoor,
+    Relation,
+    Room,
+)
 
 # A token plus whether it was double-quoted in the source.
 Token = tuple[str, bool]
@@ -28,6 +37,10 @@ _DEFAULT_DOOR_FT = 5
 _MODIFIERS = ("shift=", "align=", "door", "no-door")  # relation-modifier prefixes
 _KEYWORDS: dict[str, Direction] = {
     direction.value: direction for direction in Direction
+}
+# Bare side words for external doors (the relation keywords drop their '-of').
+_SIDES: dict[str, Direction] = {
+    direction.value.removesuffix("-of"): direction for direction in Direction
 }
 
 
@@ -45,6 +58,7 @@ def parse(text: str) -> Building:
     """
     rooms: list[Room] = []
     doors: list[Doorway] = []
+    external_doors: list[ExternalDoor] = []
     seen: set[str] = set()
     for lineno, raw in enumerate(text.splitlines(), start=1):
         tokens = _tokenize(raw, lineno)
@@ -52,14 +66,18 @@ def parse(text: str) -> Building:
             continue  # blank or comment-only line (its line number is still spent)
         head, head_quoted = tokens[0]
         if not head_quoted and head.startswith("door"):
-            doors.append(_parse_doorway(tokens, lineno))
+            # '<room> outside <side>' is an external door; '<a> <b>' an internal one.
+            if len(tokens) >= 3 and not tokens[2][1] and tokens[2][0] == "outside":
+                external_doors.append(_parse_external_door(tokens, lineno))
+            else:
+                doors.append(_parse_doorway(tokens, lineno))
             continue
         room = _parse_room(tokens, lineno)
         if room.id in seen:
             raise ParseError(f"duplicate room id {room.id!r}", line=lineno)
         seen.add(room.id)
         rooms.append(room)
-    return Building(rooms, doors)
+    return Building(rooms, doors, external_doors)
 
 
 def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
@@ -75,6 +93,21 @@ def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
     if a == b:
         raise ParseError("a door needs two different rooms", line=lineno)
     return Doorway(a=a, b=b, door=spec, line=lineno)
+
+
+def _parse_external_door(tokens: list[Token], lineno: int) -> ExternalDoor:
+    """Parse ``door[=W][@O] <room> outside <side>`` (side = up/down/left/right)."""
+    spec = _parse_door(tokens[0][0], lineno)
+    rest = tokens[1:]
+    if len(rest) != 3:
+        raise ParseError("an external door needs '<room> outside <side>'", line=lineno)
+    (room, room_quoted), _outside, (side, side_quoted) = rest
+    if room_quoted or not _ID_RE.match(room):
+        raise ParseError(f"invalid room id {room!r}", line=lineno)
+    direction = _SIDES.get(side)
+    if side_quoted or direction is None:
+        raise ParseError(f"side must be up/down/left/right, got {side!r}", line=lineno)
+    return ExternalDoor(room=room, side=direction, door=spec, line=lineno)
 
 
 def _tokenize(raw: str, lineno: int) -> list[Token]:

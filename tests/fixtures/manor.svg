@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1650" height="2582" viewBox="-55 -50 165 258.2">
-  <rect x="-55" y="-50" width="165" height="258.2" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1650" height="2678" viewBox="-55 -50 165 267.8">
+  <rect x="-55" y="-50" width="165" height="267.8" fill="white" />
   <g stroke="#bbb" stroke-width="0.15">
     <line x1="-45" y1="-40" x2="-45" y2="45" />
     <line x1="-40" y1="-40" x2="-40" y2="45" />
@@ -72,10 +72,12 @@
   <text data-room="scullery" x="55" y="35" text-anchor="middle" dominant-baseline="central" font-size="12">U</text>
   <rect data-room="porch" x="5" y="20" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="porch" x="10" y="25" text-anchor="middle" dominant-baseline="central" font-size="6">O</text>
+  <rect data-room="passage" x="0" y="20" width="5" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="passage" x="2.5" y="25" text-anchor="middle" dominant-baseline="central" font-size="3">G</text>
   <rect data-room="larder" x="85" y="5" width="15" height="15" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="larder" x="92.5" y="12.5" text-anchor="middle" dominant-baseline="central" font-size="9">R</text>
   <rect data-room="gallery" x="20" y="-40" width="20" height="10" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="gallery" x="30" y="-35" text-anchor="middle" dominant-baseline="central" font-size="6">G</text>
+  <text data-room="gallery" x="30" y="-35" text-anchor="middle" dominant-baseline="central" font-size="6">Y</text>
   <rect data-room="turret" x="-45" y="-20" width="15" height="15" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="turret" x="-37.5" y="-12.5" text-anchor="middle" dominant-baseline="central" font-size="9">T</text>
   <line class="door" x1="5" y1="0" x2="10" y2="0" stroke="black" stroke-width="1.5" />
@@ -87,6 +89,8 @@
   <line class="door" x1="-15" y1="20" x2="-10" y2="20" stroke="black" stroke-width="1.5" />
   <line class="door" x1="50" y1="25" x2="55" y2="25" stroke="black" stroke-width="1.5" />
   <line class="door" x1="5" y1="20" x2="10" y2="20" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="0" y1="20" x2="0" y2="25" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="5" y1="20" x2="5" y2="25" stroke="black" stroke-width="1.5" />
   <line class="door" x1="85" y1="10" x2="85" y2="15" stroke="black" stroke-width="1.5" />
   <line class="door" x1="25" y1="-30" x2="30" y2="-30" stroke="black" stroke-width="1.5" />
   <line class="door" x1="-30" y1="-15" x2="-30" y2="-10" stroke="black" stroke-width="1.5" />
@@ -104,7 +108,8 @@
   <text class="key" x="-22.9" y="150.6" font-size="6">S  Study  (20x20 ft)</text>
   <text class="key" x="-22.9" y="160.2" font-size="6">U  Scullery  (30x20 ft)</text>
   <text class="key" x="-22.9" y="169.8" font-size="6">O  Porch  (10x10 ft)</text>
-  <text class="key" x="-22.9" y="179.4" font-size="6">R  Larder  (15x15 ft)</text>
-  <text class="key" x="-22.9" y="189" font-size="6">G  Gallery  (20x10 ft)</text>
-  <text class="key" x="-22.9" y="198.6" font-size="6">T  Turret  (15x15 ft)</text>
+  <text class="key" x="-22.9" y="179.4" font-size="6">G  Passage  (5x10 ft)</text>
+  <text class="key" x="-22.9" y="189" font-size="6">R  Larder  (15x15 ft)</text>
+  <text class="key" x="-22.9" y="198.6" font-size="6">Y  Gallery  (20x10 ft)</text>
+  <text class="key" x="-22.9" y="208.2" font-size="6">T  Turret  (15x15 ft)</text>
 </svg>

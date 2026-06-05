@@ -53,61 +53,65 @@ This is a scene-graph / CSS-flow shape, not Z3.
 
 ### 2.1 Relations pin one axis each
 
-- `north-of` / `south-of` pin the **vertical** relationship: the new room's
-  facing edge meets the anchor's facing edge, flush. The **horizontal**
-  position is left free.
-- `east-of` / `west-of` pin the **horizontal** relationship; the **vertical**
+- `up-of` / `down-of` pin the **vertical** relationship: the new room's facing
+  edge meets the anchor's facing edge, flush. The **horizontal** position is
+  left free.
+- `left-of` / `right-of` pin the **horizontal** relationship; the **vertical**
   position is left free.
 
 The two families are **orthogonal**. So
-`hall north-of entrance east-of kitchen` pins **both** axes directly — `y`
-from the north relation, `x` from the east relation — with no ambiguity.
+`hall up-of entrance right-of kitchen` pins **both** axes directly — `y` from
+the up relation, `x` from the right relation — with no ambiguity.
 
-Convention: **north = up** (smaller screen-`y`). Internally the renderer flips
-to SVG's y-down space.
+Relations are **page-relative**, not compass (`up`/`down`/`left`/`right`); the
+words `above`/`below` are reserved for future multi-floor stacking.
+Coordinates are integer feet, **x increasing east (right), y increasing south
+(down)** — SVG-native, so the renderer draws in feet with no axis flip. The
+root sits at the origin `(0, 0)`; each room's `(x, y)` is its top-left corner.
 
 ### 2.2 The free axis uses an alignment default
 
 When a room has a relation on only one axis, the perpendicular axis falls to a
-default. **Default = `align-start`**: the new room's north edge (for E/W
-relations) or west edge (for N/S relations) aligns flush with the anchor's same
-edge. Chosen for predictability — tiled rows form continuous walls.
+default. **Default = `align=start`**: the new room's top edge (for left/right
+relations) or left edge (for up/down relations) aligns flush with the anchor's
+same edge. Chosen for predictability — tiled rows form continuous walls.
 
-Overrides:
+Overrides on the free axis:
 
-- `align=center` / `align=end` — center or far-edge alignment on the free axis.
-- `align-with <room>` — share an edge line with a *third* room (deferred).
-- `gap=N` — insert N feet instead of a flush shared wall (corridor / yard).
-- `shift=N` — nudge N feet along the free axis after aligning.
+- `align=end` — far-edge alignment (shipped). `align=center` is deferred (#22):
+  it lands off the 5-ft grid.
+- `shift=N` — signed nudge of N feet along the free axis after aligning
+  (shipped); must keep a shared wall (no detaching).
+- `align-with <room>` — share an edge line with a *third* room (deferred, #6).
 
 ### 2.3 Same-axis pairs are a consistency check (snug-fit)
 
-Two relations on the **same** axis (`east-of kitchen west-of pantry`)
-over-determine that axis. `porta` then **validates that the room's dimension
-exactly fills the gap** and errors if it doesn't. Useful, but **nice-to-have**,
-not v1-blocking.
+Two relations on the **same** axis (`right-of kitchen left-of pantry`)
+over-determine that axis. `porta` should then **validate that the room's
+dimension exactly fills the gap** and error if it doesn't. Useful, but
+**nice-to-have** and not yet implemented (deferred, #4).
 
 ### 2.4 Worked example
 
 ```
-# feet, 5-ft grid, north = up
+# feet, 5-ft grid
 room entrance "Entrance Hall"  20x20   root
-room kitchen  "Kitchen"        20x30   west-of entrance
-room hall     "Great Hall"     40x30   north-of entrance  east-of kitchen
+room kitchen  "Kitchen"        20x30   left-of entrance
+room hall     "Great Hall"     40x30   up-of entrance  right-of kitchen
 ```
 
 - `entrance` — root, placed at origin.
-- `kitchen` — `west-of entrance` pins its east edge to entrance's west edge;
-  vertical free → `align-start` (north edges flush).
-- `hall` — `north-of entrance` pins `y`, `east-of kitchen` pins `x`. Fully
+- `kitchen` — `left-of entrance` pins its right edge to entrance's left edge;
+  vertical free → `align=start` (top edges flush).
+- `hall` — `up-of entrance` pins `y`, `right-of kitchen` pins `x`. Fully
   determined.
 
-Three-room subtlety (align-start propagates): with `drawing-room east-of hall`
-then `smoking-room east-of hall north-of drawing-room`, the smoking-room stacks
-*above* drawing-room — and because drawing-room align-started to hall's *top*,
-smoking-room ends up above the hall's roofline, leaving a gap east of hall's
-lower half. `south-of drawing-room` instead drops it into that gap for a tidy
-block. This "picture it / trust the solver" cost is why `--debug-ascii` exists.
+Three-room subtlety (`align=start` propagates): with `drawing right-of hall`
+then `smoking right-of hall up-of drawing`, smoking stacks *above* drawing —
+and because drawing aligned to hall's *top*, smoking ends up above the
+hall's roofline, leaving a gap to the right of hall's lower half.
+`down-of drawing` instead drops it into that gap for a tidy block. This
+"picture it / trust the solver" cost is why `--debug-ascii` exists.
 
 ---
 
@@ -116,59 +120,91 @@ block. This "picture it / trust the solver" cost is why `--debug-ascii` exists.
 Error-reporting quality is the main engineering effort, not layout. All errors
 carry the offending room id(s) and source line number.
 
-- **Exactly one root** (a room with `root`, or `at X,Y`). Zero or many → error.
-- **No dependency cycles** (`A north-of B`, `B north-of A`).
+- **Exactly one root** (a room with `root`; `at X,Y` is a deferred alternative,
+  #7). Zero or many → error.
+- **No dependency cycles** (`A up-of B`, `B up-of A`).
 - **No disconnected rooms** (every non-root room must resolve from the root).
 - **No overlap** — after solving, no two room rectangles may collide.
-  **Essential, v1.** Error reports both ids and the overlap rectangle.
-- **Over-constraint conflict** — same-axis relations that disagree (see snug-fit).
+  **Essential.** Error reports both ids and the overlap rectangle.
+- **Doors** — every door must lie on a real shared wall and fit within it; two
+  doors on the same wall may not overlap each other.
+- **Over-constraint conflict** — same-axis relations that disagree (see
+  snug-fit, deferred).
 
 `--debug-ascii` prints the *solved* grid so placement can be eyeballed without
 opening the SVG.
 
 ---
 
-## 4. Syntax (v1)
+## 4. Syntax
 
 One line per room:
 
 ```
-room <id> "<Name>" <W>x<H> [root | at X,Y] [<relation> ...] [type=<type>]
+room <id> "<Name>" <W>x<H> [root] [<relation> <anchor> [modifiers] ...]
 ```
 
 - Dimensions in **feet**, on a **5-ft grid** (multiples of 5).
-- Relations: `north-of <id>`, `south-of <id>`, `east-of <id>`, `west-of <id>`,
-  each optionally `align=…`, `gap=N`, `shift=N`.
-- Comments: `#` to end of line.
-- File extension: **`.floor`**.
+- Relations: `up-of <id>`, `down-of <id>`, `left-of <id>`, `right-of <id>`.
+- Per-relation modifiers: `align=start|end`, `shift=N`, and the door controls
+  below. (`at X,Y`, `type=<type>`, and `align=center` are deferred.)
+- Comments: `#` to end of line. File extension: **`.porta`**.
 
-Later directives (post-v1): `door <a> <b>`, `window <room> <side> ...`,
-`token "<name>" <room> ...`, `partition ...`, `floor "<name>"` blocks.
+### Doors
+
+Doors are **on by default**: every relation whose two rooms share a real wall
+gets a centred 5-ft door. Control them per relation:
+
+- `no-door` — suppress the default door on that relation.
+- `door[=W][@O]` — override it: width `W` ft, offset `O` ft from the wall's near
+  end (top for vertical walls, left for horizontal). Both multiples of 5;
+  default width 5, default offset centred (rounded down to the grid).
+
+A **standalone** door connects *any* two adjacent rooms, not just an anchor
+pair — e.g. two rooms placed against a common neighbour that end up side by
+side:
+
+```
+door[=W][@O] <a> <b>
+```
+
+Two doors between the same pair are allowed (a pair of openings); two doors that
+overlap each other are an error. Doors render as short thick lines and are
+omitted from the ASCII view.
+
+Later directives, not yet built: external/outside doors (#24), `window <room>
+<side> ...`, `token "<name>" <room> ...`, `partition ...`, `floor "<name>"`
+blocks.
 
 ---
 
-## 5. Output (v1)
+## 5. Output
 
 - **SVG only.** Source of truth, diffable. (Rasterizing to PNG for Obsidian
   embedding is the *consumer's* job, handled in the isles repo, not here.)
-- **Rooms** as rectangles with name labels and optional `type` styling.
-- **Walls** derived: shared boundary → interior wall; envelope edge → exterior.
-- **Outline** derived from the union of room rectangles (no authored envelope).
-- **Auto furniture:** 5-ft grid, scale bar, N compass, legend. Generated, not
-  authored.
+- **Rooms** as rectangles, each with a glyph label, plus a **key** mapping
+  glyphs to names and noting the scale.
+- **Doors** as short thick marks on the shared walls.
+- **A 5-ft grid** behind the plan; geometry is drawn in feet, framed by the
+  viewBox.
+- **Deferred:** distinguishing derived interior vs exterior (envelope) walls
+  (#17), `type=` style themes (#9), richer in-room name labels (#13), and nicer
+  key / scale-bar / compass furniture (#16).
 
 ---
 
 ## 6. Phasing
 
-- **v1** — rectangles only; relations + `align`/`gap`/`shift`; derived
-  walls + outline; auto grid/scale/compass/legend; SVG out; `--debug-ascii`;
-  solid validation (one-root, cycles, disconnected, **overlap**).
-- **v2** — doors (auto-placed at the shared wall the graph already knows about,
-  so `door hall entrance` needs no coordinates); then non-rectangular rooms;
-  snug-fit validation.
-- **v3** — windows, tokens, partitions/curtains, multi-floor on one image,
-  lot view (garden/fence/gates/paths/trees), furniture symbols.
+- **Shipped** — rectangular rooms; `up/down/left/right-of` relations with
+  `align=start|end` and `shift`; doors (default-on, `no-door`, `door=W@O`,
+  standalone `door a b`); 5-ft grid; glyph labels + key; SVG out;
+  `--debug-ascii`; validation (one root, cycles, disconnected, **overlap**,
+  door fit/adjacency/overlap).
+- **Next** — derived/stronger walls (interior vs exterior envelope, #17);
+  non-rectangular rooms (#11); snug-fit validation for same-axis pairs (#4).
+- **Later** — external doors (#24), windows, tokens, partitions/curtains,
+  multi-floor on one image, lot view (garden/fence/gates/paths/trees),
+  furniture symbols, `type=` style themes, richer labels.
 
 ---
 
@@ -176,11 +212,11 @@ Later directives (post-v1): `door <a> <b>`, `window <room> <side> ...`,
 
 - Standalone Python package, **zero runtime dependencies** (SVG via stdlib
   string/XML templating; the issue's `svgwrite` idea is optional and avoided
-  for now). Dev dep: `pytest`. Toolchain: `uv`.
-- CLI entry point: `porta draw <input>.floor -o <output>.svg [--debug-ascii]`.
+  for now). Dev deps: `pytest`, `ruff`, `mypy`. Toolchain: `uv`.
+- CLI entry point: `porta draw <input>.porta -o <output>.svg [--debug-ascii]`.
 - **isles consumes porta** as an editable local path dependency during
   development (`uv add --editable ../porta`), pinned to a tag/version once
-  stable. The `.floor` sources and rendered SVGs live **in the isles vault**
+  stable. The `.porta` sources and rendered SVGs live **in the isles vault**
   (a `maps/` dir, next to Location pages); the tool knows nothing about isles.
 
 ---

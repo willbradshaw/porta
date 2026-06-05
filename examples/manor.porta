@@ -1,6 +1,3 @@
-# manor.porta — a small manor house, ground floor.
-# Feet on a 5-ft grid; up = north. Names are illustrative.
-
 room entrance "Entrance Hall" 20x20 root
 room hall     "Great Hall"    40x30 up-of entrance
 room library  "Library"       30x30 left-of hall      no-door
@@ -16,5 +13,4 @@ room larder   "Larder"        15x15 right-of pantry  shift=5
 room gallery  "Gallery"       20x10 up-of hall      align=end
 room turret   "Turret"        15x15 left-of library align=end shift=-5
 
-# The library is entered from the parlour, not the great hall (see no-door above).
 door parlour library

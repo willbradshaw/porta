@@ -89,6 +89,7 @@
   <line class="door" x1="50" y1="0" x2="55" y2="0" stroke="black" stroke-width="1.5" />
   <line class="door" x1="70" y1="10" x2="70" y2="15" stroke="black" stroke-width="1.5" />
   <line class="door" x1="-15" y1="20" x2="-10" y2="20" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="-30" y1="0" x2="-25" y2="0" stroke="black" stroke-width="1.5" />
   <line class="door" x1="-20" y1="5" x2="-20" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="-20" y1="25" x2="-20" y2="30" stroke="black" stroke-width="1.5" />
   <line class="door" x1="50" y1="25" x2="55" y2="25" stroke="black" stroke-width="1.5" />

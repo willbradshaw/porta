@@ -209,14 +209,16 @@ def _union_bbox(
 ) -> tuple[int, int] | None:
     """The ``(near, far)`` a union ``?`` spans on ``axis``, or None if not a union.
 
-    A union applies when ``axis`` carries the room's auto dimension, has no
-    relation of its own (it is free), and is sized by *several* walls on the
-    perpendicular axis (a same-direction pair, or an opposite pair on the other
-    axis). The ``?`` then spans the bounding box of all those anchors — driving
-    both the size and, via :func:`_free_axis_position`, the near-edge position.
+    A union applies when ``axis`` carries the room's auto dimension and it is
+    sized by *several* walls on the perpendicular axis (a same-direction pair, or
+    an opposite pair on the other axis). The ``?`` then spans the bounding box of
+    all those anchors. This drives the *size* regardless of whether the axis is
+    also pinned — a pin on the axis only sets the position (and must line up with
+    the union's near edge, else the flush check rejects it); a free axis takes
+    its near edge from this bbox via :func:`_free_axis_position`.
     """
     auto = room.auto_width if axis is Axis.HORIZONTAL else room.auto_height
-    if not auto or any(rel.direction.axis is axis for rel in room.relations):
+    if not auto:
         return None
     sizing = [rel for rel in room.relations if rel.direction.axis is _perp(axis)]
     if len(sizing) < 2:

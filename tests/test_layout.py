@@ -462,6 +462,19 @@ def test_same_direction_auto_spans_the_union() -> None:
     assert len(doors_of(text)) == 3  # a<->b, c<->a, c<->b
 
 
+def test_union_size_is_independent_of_a_dim_axis_pin() -> None:
+    # 'down-of top' pins c's top edge, but the '?' still unions the two left-of
+    # walls to span both a and b (the pin lines up with the union's near edge).
+    text = (
+        'room a "A" 20x20 root\n'
+        'room b "B" 20x20 down-of a\n'
+        'room top "T" 10x10 up-of a\n'
+        'room c "C" 10x? down-of top left-of a left-of b'
+    )
+    assert dims(text, "c") == (10, 40)
+    assert coords(text, "c") == (-10, 0)
+
+
 def test_same_direction_not_aligned_raises() -> None:
     # b is shifted, so its left edge no longer lines up with a's -> the two
     # left-of relations disagree on where to put c.

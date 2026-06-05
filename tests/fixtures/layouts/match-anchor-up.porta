@@ -1,0 +1,3 @@
+room a "Room A" 10x30 root
+room b "Room B" 10x10 right-of a align=end
+room r "Room R" 10x? right-of a up-of b

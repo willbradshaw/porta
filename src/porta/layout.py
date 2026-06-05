@@ -74,22 +74,65 @@ def solve(building: Building) -> Building:
 
 
 def _resolve_auto_dims(room: Room, by_id: dict[str, Room]) -> None:
-    """Resolve a room's ``?`` dimensions from the anchor across the parallel wall.
+    """Resolve a room's ``?`` dimensions to fill the sizing anchor's wall.
 
     Called in topological order, so each anchor's own dimensions are already
-    resolved. ``up-of``/``down-of`` (a horizontal wall) sizes the *width*;
-    ``left-of``/``right-of`` (a vertical wall) sizes the *height*.
+    resolved. A ``?`` extends the room from whichever edge its placement has
+    fixed to the sizing anchor's matching edge, across the parallel shared wall
+    (``up/down-of`` sizes the *width*, ``left/right-of`` the *height*).
     """
     if room.auto_width:
-        rel = _sizing_relation(room, Axis.VERTICAL, "width", "up-of/down-of")
-        room.width = by_id[rel.anchor].width
+        room.width = _auto_extent(room, by_id, Axis.HORIZONTAL)
     if room.auto_height:
-        rel = _sizing_relation(room, Axis.HORIZONTAL, "height", "left-of/right-of")
-        room.height = by_id[rel.anchor].height
+        room.height = _auto_extent(room, by_id, Axis.VERTICAL)
+
+
+def _auto_extent(room: Room, by_id: dict[str, Room], dim_axis: Axis) -> int:
+    """Span from the room's fixed edge on ``dim_axis`` to the sizing anchor's edge."""
+    if dim_axis is Axis.HORIZONTAL:
+        dim_name, hint = "width", "up-of/down-of"
+    else:
+        dim_name, hint = "height", "left-of/right-of"
+    sizing = _sizing_relation(room, _perp(dim_axis), dim_name, hint)
+    anchor = by_id[sizing.anchor]
+    a_lo = _axis_lo(anchor, dim_axis)
+    a_hi = a_lo + _axis_dim(anchor, dim_axis)
+    fixed, is_far = _fixed_edge(room, by_id, dim_axis, sizing)
+    # Fill from the fixed edge to the anchor's opposite edge.
+    extent = (fixed - a_lo) if is_far else (a_hi - fixed)
+    if extent <= 0:
+        raise LayoutError(
+            f"room {room.id!r}: '?' {dim_name} resolves to {extent} ft "
+            f"(it does not reach across {anchor.id!r})",
+            line=room.line,
+        )
+    return extent
+
+
+def _fixed_edge(
+    room: Room, by_id: dict[str, Room], dim_axis: Axis, sizing: Relation
+) -> tuple[int, bool]:
+    """The room edge placement nails on ``dim_axis``: ``(coordinate, is_far_edge)``.
+
+    Always a constant (from anchor positions), never the room's own size — which
+    is why a ``?`` is never circular.
+    """
+    for rel in room.relations:
+        if rel.direction.axis is dim_axis:  # this relation positions the room here
+            anchor = by_id[rel.anchor]
+            lo = _axis_lo(anchor, dim_axis)
+            if rel.direction in (Direction.DOWN, Direction.RIGHT):
+                return lo + _axis_dim(anchor, dim_axis), False  # near edge at far side
+            return lo, True  # up/left-of: far edge at the anchor's near side
+    anchor = by_id[sizing.anchor]
+    lo = _axis_lo(anchor, dim_axis)
+    if sizing.align is Align.END:
+        return lo + _axis_dim(anchor, dim_axis) + sizing.shift, True
+    return lo + sizing.shift, False
 
 
 def _sizing_relation(room: Room, axis: Axis, dim: str, hint: str) -> Relation:
-    """The relation whose shared wall is parallel to ``dim`` (at most one)."""
+    """The sole relation whose shared wall is parallel to ``dim`` (else error)."""
     matches = [rel for rel in room.relations if rel.direction.axis is axis]
     if not matches:
         raise LayoutError(
@@ -97,6 +140,20 @@ def _sizing_relation(room: Room, axis: Axis, dim: str, hint: str) -> Relation:
             line=room.line,
         )
     return matches[0]
+
+
+def _perp(axis: Axis) -> Axis:
+    return Axis.VERTICAL if axis is Axis.HORIZONTAL else Axis.HORIZONTAL
+
+
+def _axis_lo(room: Room, axis: Axis) -> int:
+    value = room.x if axis is Axis.HORIZONTAL else room.y
+    assert value is not None
+    return value
+
+
+def _axis_dim(room: Room, axis: Axis) -> int:
+    return room.width if axis is Axis.HORIZONTAL else room.height
 
 
 def door_segments(building: Building) -> list[Segment]:

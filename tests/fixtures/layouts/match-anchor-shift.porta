@@ -1,0 +1,2 @@
+room a "Room A" 20x30 root
+room b "Room B" 10x? right-of a shift=10

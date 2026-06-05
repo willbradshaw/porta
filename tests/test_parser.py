@@ -15,7 +15,7 @@ import textwrap
 import pytest
 
 from porta.errors import ParseError
-from porta.model import Align, Building, Direction
+from porta.model import Align, Building, Direction, Door
 from porta.parser import parse
 
 # Lines: 1 blank, 2 comment, 3 entrance, 4 kitchen, 5 hall.
@@ -185,6 +185,18 @@ def test_each_relation_keyword_maps_to_its_direction(
         pytest.param('room r "R" 20x20 align=end', id="align-without-relation"),
         pytest.param('room r "R" 20x20 up-of a align=center', id="align-center"),
         pytest.param('room r "R" 20x20 up-of a align=bogus', id="align-bogus"),
+        # door modifier
+        pytest.param('room r "R" 20x20 door', id="door-without-relation"),
+        pytest.param('room r "R" 20x20 up-of a door=7', id="door-width-off-grid"),
+        pytest.param('room r "R" 20x20 up-of a door@7', id="door-offset-off-grid"),
+        pytest.param('room r "R" 20x20 up-of a door=0', id="door-zero-width"),
+        pytest.param('room r "R" 20x20 up-of a doorx', id="door-malformed"),
+        pytest.param('room r "R" 20x20 no-door', id="no-door-without-relation"),
+        # standalone door statement
+        pytest.param("door a", id="standalone-door-one-id"),
+        pytest.param("door a b c", id="standalone-door-three-ids"),
+        pytest.param("door a a", id="standalone-door-self"),
+        pytest.param('door a "B"', id="standalone-door-quoted-id"),
     ],
 )
 def test_invalid_source_raises(source: str) -> None:
@@ -227,3 +239,39 @@ def test_shift_is_parsed_onto_the_relation(source: str, expected_shift: int) -> 
 )
 def test_align_is_parsed_onto_the_relation(source: str, expected_align: Align) -> None:
     assert parse(source).room("b").relations[0].align == expected_align
+
+
+@pytest.mark.parametrize(
+    ("source", "expected_door"),
+    [
+        ('room b "B" 10x10 up-of a', None),  # no door
+        ('room b "B" 10x10 up-of a door', Door(width=5, offset=None)),
+        ('room b "B" 10x10 up-of a door=10', Door(width=10, offset=None)),
+        ('room b "B" 10x10 up-of a door@10', Door(width=5, offset=10)),
+        ('room b "B" 10x10 up-of a door=10@15', Door(width=10, offset=15)),
+    ],
+)
+def test_door_is_parsed_onto_the_relation(
+    source: str, expected_door: Door | None
+) -> None:
+    assert parse(source).room("b").relations[0].door == expected_door
+
+
+def test_no_door_is_parsed_onto_the_relation() -> None:
+    assert parse('room b "B" 10x10 up-of a no-door').room("b").relations[0].no_door
+    assert not parse('room b "B" 10x10 up-of a').room("b").relations[0].no_door
+
+
+def test_standalone_door_is_parsed() -> None:
+    building = parse('room a "A" 10x10 root\nroom b "B" 10x10 right-of a\ndoor a b')
+    assert len(building.doors) == 1
+    doorway = building.doors[0]
+    assert (doorway.a, doorway.b) == ("a", "b")
+    assert doorway.door == Door(width=5, offset=None)
+
+
+def test_standalone_door_carries_width_and_offset() -> None:
+    building = parse(
+        'room a "A" 10x10 root\nroom b "B" 10x10 right-of a\ndoor=10@5 a b'
+    )
+    assert building.doors[0].door == Door(width=10, offset=5)

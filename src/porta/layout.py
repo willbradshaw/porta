@@ -13,10 +13,13 @@ validation are tracked as separate issues.
 """
 
 from porta.errors import LayoutError, OverlapError
-from porta.model import Align, Axis, Building, Direction, Relation, Room
+from porta.model import Align, Axis, Building, Direction, Door, Doorway, Relation, Room
 
+_GRID_FT = 5
 # An axis-aligned rectangle as (x, y, width, height) in feet.
 Rect = tuple[int, int, int, int]
+# A line segment as (x1, y1, x2, y2) in feet.
+Segment = tuple[int, int, int, int]
 
 
 def solve(building: Building) -> Building:
@@ -59,7 +62,169 @@ def solve(building: Building) -> Building:
     if overlaps:
         first, second, rect = overlaps[0]
         raise OverlapError((first.id, second.id), rect)
+
+    door_segments(building)  # validates every door (raises on a bad one)
     return building
+
+
+def door_segments(building: Building) -> list[Segment]:
+    """Return the door line ``(x1, y1, x2, y2)`` for every door in the building.
+
+    Doors are on by default: a relation with a real shared wall gets a default
+    door unless ``no_door`` suppresses it; an explicit ``door`` overrides its
+    width/position. Validates each door (raising on an explicit door that has no
+    wall or doesn't fit). Assumes a solved building.
+    """
+    by_id = {room.id: room for room in building.rooms}
+    segments: list[Segment] = []
+    for room in building.rooms:
+        for rel in room.relations:
+            if rel.no_door:
+                continue
+            segment = _relation_door(room, by_id[rel.anchor], rel)
+            if segment is not None:
+                segments.append(segment)
+    for doorway in building.doors:
+        segments.append(_doorway_door(doorway, by_id))
+    _check_door_overlaps(segments)
+    return segments
+
+
+def _check_door_overlaps(segments: list[Segment]) -> None:
+    """Raise if two doors occupy overlapping space on the same wall line.
+
+    Two doors between the same rooms are fine (e.g. a pair of openings); two
+    that *overlap* are almost certainly a mistake.
+    """
+    for i, first in enumerate(segments):
+        for second in segments[i + 1 :]:
+            if _doors_overlap(first, second):
+                raise LayoutError(f"two doors overlap: {first} and {second}")
+
+
+def _doors_overlap(a: Segment, b: Segment) -> bool:
+    """Whether two door segments share interior space on a common wall line."""
+    ax1, ay1, ax2, ay2 = a
+    bx1, by1, bx2, by2 = b
+    if ay1 == ay2 and by1 == by2 and ay1 == by1:  # both horizontal, same y
+        return min(ax2, bx2) > max(ax1, bx1)
+    if ax1 == ax2 and bx1 == bx2 and ax1 == bx1:  # both vertical, same x
+        return min(ay2, by2) > max(ay1, by1)
+    return False
+
+
+# A wall as (horizontal?, fixed coordinate, near-end, length) in feet.
+_Wall = tuple[bool, int, int, int]
+
+
+def _relation_door(room: Room, anchor: Room, rel: Relation) -> Segment | None:
+    """Door line on the wall ``room`` shares with its ``anchor`` (None if no door).
+
+    A real shared wall gets a default 5-ft door; ``rel.door`` overrides it. An
+    *explicit* door on a relation with no wall (or too big to fit) raises; a
+    *default* door is simply absent when there is no wall (a coordinate-pin).
+    """
+    horizontal, coord, lo, length = _relation_wall(room, anchor, rel)
+    if length <= 0:
+        if rel.door is not None:
+            raise LayoutError(
+                f"door on room {room.id!r}: it shares no wall with {anchor.id!r}",
+                line=rel.line,
+            )
+        return None  # default door needs a real wall
+    door = rel.door if rel.door is not None else Door()
+    return _door_on_wall(door, horizontal, coord, lo, length, room.id, rel.line)
+
+
+def _doorway_door(doorway: Doorway, by_id: dict[str, Room]) -> Segment:
+    """Door line for a standalone ``door a b`` between two adjacent rooms."""
+    for room_id in (doorway.a, doorway.b):
+        if room_id not in by_id:
+            raise LayoutError(
+                f"door references unknown room {room_id!r}", line=doorway.line
+            )
+    wall = _shared_wall(by_id[doorway.a], by_id[doorway.b])
+    if wall is None:
+        raise LayoutError(
+            f"door: rooms {doorway.a!r} and {doorway.b!r} share no wall",
+            line=doorway.line,
+        )
+    horizontal, coord, lo, length = wall
+    return _door_on_wall(
+        doorway.door, horizontal, coord, lo, length, doorway.a, doorway.line
+    )
+
+
+def _relation_wall(room: Room, anchor: Room, rel: Relation) -> _Wall:
+    """The wall a relation puts ``room`` against (length <= 0 means corner-touch)."""
+    rx, ry = room.x, room.y
+    ax, ay = anchor.x, anchor.y
+    assert rx is not None
+    assert ry is not None
+    assert ax is not None
+    assert ay is not None
+    if _free_axis(rel.direction) is Axis.HORIZONTAL:
+        lo = max(rx, ax)
+        length = min(rx + room.width, ax + anchor.width) - lo
+        coord = ry + room.height if rel.direction is Direction.UP else ry
+        return True, coord, lo, length
+    lo = max(ry, ay)
+    length = min(ry + room.height, ay + anchor.height) - lo
+    coord = rx + room.width if rel.direction is Direction.LEFT else rx
+    return False, coord, lo, length
+
+
+def _shared_wall(a: Room, b: Room) -> _Wall | None:
+    """The wall two adjacent rooms share, or None if they are not wall-adjacent."""
+    ax, ay = a.x, a.y
+    bx, by = b.x, b.y
+    assert ax is not None
+    assert ay is not None
+    assert bx is not None
+    assert by is not None
+    if ax + a.width == bx or bx + b.width == ax:  # vertical shared edge
+        lo, hi = max(ay, by), min(ay + a.height, by + b.height)
+        if hi > lo:
+            coord = ax + a.width if ax + a.width == bx else ax
+            return False, coord, lo, hi - lo
+    if ay + a.height == by or by + b.height == ay:  # horizontal shared edge
+        lo, hi = max(ax, bx), min(ax + a.width, bx + b.width)
+        if hi > lo:
+            coord = ay + a.height if ay + a.height == by else ay
+            return True, coord, lo, hi - lo
+    return None
+
+
+def _door_on_wall(
+    door: Door,
+    horizontal: bool,
+    coord: int,
+    lo: int,
+    length: int,
+    label: str,
+    line: int,
+) -> Segment:
+    """Place ``door`` on a wall segment of ``length``; raise if it doesn't fit."""
+    if door.width > length:
+        raise LayoutError(
+            f"door on {label!r} ({door.width} ft) is wider than the wall ({length} ft)",
+            line=line,
+        )
+    offset = (
+        door.offset
+        if door.offset is not None
+        else ((length - door.width) // (2 * _GRID_FT)) * _GRID_FT
+    )
+    if offset < 0 or offset + door.width > length:
+        raise LayoutError(
+            f"door on {label!r} does not fit the wall "
+            f"(offset {offset} + width {door.width} > {length} ft)",
+            line=line,
+        )
+    start, end = lo + offset, lo + offset + door.width
+    if horizontal:
+        return (start, coord, end, coord)
+    return (coord, start, coord, end)
 
 
 def find_overlaps(building: Building) -> list[tuple[Room, Room, Rect]]:

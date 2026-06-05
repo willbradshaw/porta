@@ -7,6 +7,7 @@ only (no runtime dependencies).
 
 from xml.sax.saxutils import escape
 
+from porta.layout import door_segments
 from porta.model import Building, Room
 
 _GRID_FT = 5
@@ -22,6 +23,8 @@ _KEY_LINE_RATIO = 1.6  # key line spacing as a multiple of the key font
 _CHAR_W = 0.6  # rough average glyph width (fraction of font), for centring the key
 _GRID_COLOUR = "#bbb"  # grey 5-ft grid
 _GRID_STROKE_FT = 0.15  # grid line thickness, in feet
+_DOOR_COLOUR = "black"  # door marks
+_DOOR_STROKE_FT = 1.5  # door line thickness, in feet
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -156,6 +159,14 @@ def render_svg(building: Building) -> str:
             f'y="{_num(y + room.height / 2)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}">'
             f"{glyphs[room.id]}</text>"
+        )
+
+    # Doors: a thick coloured line along the shared wall, over the rooms.
+    for x1, y1, x2, y2 in door_segments(building):
+        lines.append(
+            f'  <line class="door" x1="{_num(x1)}" y1="{_num(y1)}" '
+            f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="{_DOOR_COLOUR}" '
+            f'stroke-width="{_num(_DOOR_STROKE_FT)}" />'
         )
 
     # Centre the key block but left-align the lines within it (a legend reads

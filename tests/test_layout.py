@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from porta.errors import LayoutError, OverlapError
-from porta.layout import find_overlaps, solve
+from porta.layout import door_segments, find_overlaps, solve
 from porta.model import Building, Room
 from porta.parser import parse
 
@@ -165,6 +165,129 @@ def test_align_end_composes_with_shift() -> None:
 def test_align_end_with_both_axes_constrained_raises() -> None:
     # align=end acts on x, but right-of already pins x -> no free axis.
     text = 'room a "A" 20x20 root\nroom b "B" 10x10 up-of a align=end right-of a'
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
+# --- doors -----------------------------------------------------------------
+
+
+def doors_of(text: str) -> list[tuple[int, int, int, int]]:
+    return door_segments(solve(parse(text)))
+
+
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        # b (10x10) against a (20x20); shared wall is 10 ft long.
+        # up-of: horizontal wall at y=0; 5-ft door centres (round down) to x[0,5].
+        ('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door', (0, 0, 5, 0)),
+        # door=10 fills the wall.
+        ('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door=10', (0, 0, 10, 0)),
+        # explicit offset.
+        ('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door=5@5', (5, 0, 10, 0)),
+        # right-of: vertical wall at x=20; door spans y[0,5].
+        ('room a "A" 20x20 root\nroom b "B" 10x10 right-of a door', (20, 0, 20, 5)),
+    ],
+)
+def test_door_line_geometry(source: str, expected: tuple[int, int, int, int]) -> None:
+    assert doors_of(source) == [expected]
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        # door wider than the shared wall
+        pytest.param(
+            'room a "A" 10x10 root\nroom b "B" 10x10 up-of a door=20',
+            id="door-wider-than-wall",
+        ),
+        # offset pushes the door past the wall
+        pytest.param(
+            'room a "A" 20x20 root\nroom b "B" 10x10 up-of a door=10@15',
+            id="door-past-the-wall",
+        ),
+        # the door's relation only corner-touches its anchor (no shared wall)
+        pytest.param(
+            'room a "A" 10x10 root\n'
+            'room b "B" 10x10 right-of a\n'
+            'room c "C" 10x10 up-of a right-of b door',
+            id="door-on-corner-touch",
+        ),
+    ],
+)
+def test_door_that_does_not_fit_raises(source: str) -> None:
+    with pytest.raises(LayoutError):
+        solve(parse(source))
+
+
+def test_a_shared_wall_gets_a_default_door() -> None:
+    # No 'door' modifier, but the shared wall gets a default 5-ft door.
+    assert doors_of('room a "A" 20x20 root\nroom b "B" 20x20 right-of a') == [
+        (20, 5, 20, 10)
+    ]
+
+
+def test_no_door_suppresses_the_default() -> None:
+    assert doors_of('room a "A" 20x20 root\nroom b "B" 20x20 right-of a no-door') == []
+
+
+def test_default_doors_skip_walls_that_only_corner_touch() -> None:
+    # 'hall right-of kitchen' only corner-touches, so no default door there (and
+    # no error); the two real walls (kitchen/entrance, hall/entrance) get one each.
+    text = (
+        'room entrance "E" 20x20 root\n'
+        'room kitchen "K" 20x30 left-of entrance\n'
+        'room hall "H" 40x30 up-of entrance right-of kitchen'
+    )
+    assert len(doors_of(text)) == 2
+
+
+def test_standalone_door_between_incidental_rooms() -> None:
+    # b and c are both below 'a' (not each other's anchor) but sit side by side,
+    # sharing the x=20 wall; a standalone door connects them.
+    text = (
+        'room a "A" 40x20 root\n'
+        'room b "B" 20x20 down-of a\n'
+        'room c "C" 20x20 down-of a shift=20\n'
+        "door b c"
+    )
+    assert (20, 25, 20, 30) in doors_of(text)
+
+
+def test_standalone_door_between_nonadjacent_rooms_raises() -> None:
+    # 'a' and 'c' only meet at a corner, so there is no wall to put a door on.
+    text = (
+        'room a "A" 10x10 root\n'
+        'room b "B" 10x10 right-of a\n'
+        'room c "C" 10x10 up-of b\n'
+        "door a c"
+    )
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
+def test_standalone_door_to_unknown_room_raises() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 right-of a\ndoor a ghost'
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
+def test_a_pair_can_have_two_doors() -> None:
+    # The relation gives a default door; a standalone door adds a second on the
+    # same wall -- deliberate, e.g. two openings between the rooms.
+    text = 'room a "A" 20x40 root\nroom b "B" 20x40 right-of a\ndoor@30 a b'
+    assert len(doors_of(text)) == 2
+
+
+def test_overlapping_doors_raise() -> None:
+    # Two doors on the same wall that overlap each other are a mistake.
+    text = (
+        'room a "A" 20x20 root\n'
+        'room b "B" 20x20 right-of a no-door\n'
+        "door=10@0 a b\n"
+        "door@5 a b"
+    )
     with pytest.raises(LayoutError):
         solve(parse(text))
 

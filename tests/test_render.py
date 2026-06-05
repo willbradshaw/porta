@@ -174,9 +174,11 @@ def test_room_rects_are_transparent_so_the_grid_shows_through() -> None:
 
 
 def test_grid_has_a_line_every_five_feet_across_the_plan() -> None:
-    # TWO spans x[0,30] (7 verticals) and y[0,20] (5 horizontals).
+    # TWO spans x[0,30] (7 verticals) and y[0,20] (5 horizontals); door lines
+    # (class="door") are excluded.
     root = ET.fromstring(svg_of(TWO))
-    assert sum(1 for _ in root.iter(tag("line"))) == 7 + 5
+    grid = [ln for ln in root.iter(tag("line")) if ln.get("class") != "door"]
+    assert len(grid) == 7 + 5
 
 
 def test_scale_caption_states_the_grid_size() -> None:
@@ -246,6 +248,14 @@ def test_special_characters_in_names_are_escaped() -> None:
     root = ET.fromstring(svg_of('room a "Hall & Co <X>" 20x20 root'))
     texts = [t.text for t in root.iter(tag("text"))]
     assert any(t is not None and "Hall & Co <X>" in t for t in texts)
+
+
+def test_door_renders_as_a_door_line() -> None:
+    root = ET.fromstring(svg_of('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door'))
+    door_lines = [ln for ln in root.iter(tag("line")) if ln.get("class") == "door"]
+    assert len(door_lines) == 1
+    got = tuple(float(door_lines[0].get(k, "")) for k in ("x1", "y1", "x2", "y2"))
+    assert got == (0.0, 0.0, 5.0, 0.0)
 
 
 def test_manor_renders_to_golden_svg_fixture() -> None:

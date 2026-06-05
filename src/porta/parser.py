@@ -16,7 +16,7 @@ Reference resolution (does ``anchor`` exist? is there exactly one root?) is a
 import re
 
 from porta.errors import ParseError
-from porta.model import Align, Building, Direction, Relation, Room
+from porta.model import Align, Building, Direction, Door, Doorway, Relation, Room
 
 # A token plus whether it was double-quoted in the source.
 Token = tuple[str, bool]
@@ -24,6 +24,8 @@ Token = tuple[str, bool]
 _ID_RE = re.compile(r"[A-Za-z][A-Za-z0-9_-]*\Z")
 _DIM_RE = re.compile(r"([0-9]+)x([0-9]+)\Z")
 _GRID_FT = 5
+_DEFAULT_DOOR_FT = 5
+_MODIFIERS = ("shift=", "align=", "door", "no-door")  # relation-modifier prefixes
 _KEYWORDS: dict[str, Direction] = {
     direction.value: direction for direction in Direction
 }
@@ -42,17 +44,37 @@ def parse(text: str) -> Building:
         ParseError: On the first syntax error, carrying its source line.
     """
     rooms: list[Room] = []
+    doors: list[Doorway] = []
     seen: set[str] = set()
     for lineno, raw in enumerate(text.splitlines(), start=1):
         tokens = _tokenize(raw, lineno)
         if not tokens:
             continue  # blank or comment-only line (its line number is still spent)
+        head, head_quoted = tokens[0]
+        if not head_quoted and head.startswith("door"):
+            doors.append(_parse_doorway(tokens, lineno))
+            continue
         room = _parse_room(tokens, lineno)
         if room.id in seen:
             raise ParseError(f"duplicate room id {room.id!r}", line=lineno)
         seen.add(room.id)
         rooms.append(room)
-    return Building(rooms)
+    return Building(rooms, doors)
+
+
+def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
+    """Parse a standalone ``door[=W][@O] <a> <b>`` line."""
+    spec = _parse_door(tokens[0][0], lineno)
+    rest = tokens[1:]
+    if len(rest) != 2:
+        raise ParseError("a door needs exactly two room ids", line=lineno)
+    for room_id, quoted in rest:
+        if quoted or not _ID_RE.match(room_id):
+            raise ParseError(f"invalid room id {room_id!r}", line=lineno)
+    a, b = rest[0][0], rest[1][0]
+    if a == b:
+        raise ParseError("a door needs two different rooms", line=lineno)
+    return Doorway(a=a, b=b, door=spec, line=lineno)
 
 
 def _tokenize(raw: str, lineno: int) -> list[Token]:
@@ -151,7 +173,7 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
             continue
         direction = _KEYWORDS.get(value)
         if direction is None:
-            if value.startswith(("shift=", "align=")):
+            if value.startswith(_MODIFIERS):
                 raise ParseError(f"{value!r} must follow a relation", line=lineno)
             raise ParseError(f"unknown relation or keyword {value!r}", line=lineno)
         if i + 1 >= len(tokens):
@@ -163,16 +185,20 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
 
         align = Align.START
         shift = 0
+        door: Door | None = None
+        no_door = False
         while (
-            i < len(tokens)
-            and not tokens[i][1]
-            and tokens[i][0].startswith(("shift=", "align="))
+            i < len(tokens) and not tokens[i][1] and tokens[i][0].startswith(_MODIFIERS)
         ):
             token = tokens[i][0]
             if token.startswith("shift="):
                 shift = _parse_shift(token, lineno)
-            else:
+            elif token.startswith("align="):
                 align = _parse_align(token, lineno)
+            elif token == "no-door":
+                no_door = True
+            else:
+                door = _parse_door(token, lineno)
             i += 1
 
         relations.append(
@@ -182,9 +208,46 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
                 line=lineno,
                 align=align,
                 shift=shift,
+                door=door,
+                no_door=no_door,
             )
         )
     return is_root, relations
+
+
+def _parse_door(token: str, lineno: int) -> Door:
+    """Parse a ``door[=W][@O]`` modifier (width default 5, offset default centred)."""
+    rest = token[len("door") :]
+    width = _DEFAULT_DOOR_FT
+    offset: int | None = None
+    if "@" in rest:
+        rest, _, raw = rest.partition("@")
+        offset = _door_dimension(raw, "door offset", lineno, allow_zero=True)
+    if rest.startswith("="):
+        width = _door_dimension(rest[1:], "door width", lineno, allow_zero=False)
+    elif rest:
+        raise ParseError(f"malformed door modifier {token!r}", line=lineno)
+    return Door(width=width, offset=offset)
+
+
+def _door_dimension(raw: str, label: str, lineno: int, *, allow_zero: bool) -> int:
+    """Parse a door width/offset: a grid-aligned, non-negative (or positive) int."""
+    try:
+        value = int(raw)
+    except ValueError:
+        raise ParseError(
+            f"{label} must be an integer, got {raw!r}", line=lineno
+        ) from None
+    if value % _GRID_FT != 0:
+        raise ParseError(
+            f"{label} must be a multiple of {_GRID_FT}, got {value}", line=lineno
+        )
+    minimum = 0 if allow_zero else _GRID_FT
+    if value < minimum:
+        raise ParseError(
+            f"{label} must be at least {minimum}, got {value}", line=lineno
+        )
+    return value
 
 
 def _parse_align(token: str, lineno: int) -> Align:

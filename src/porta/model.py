@@ -44,6 +44,18 @@ class Align(Enum):
 
 
 @dataclass(frozen=True)
+class Door:
+    """A door on the wall a relation's room shares with its anchor.
+
+    ``offset`` (feet from the wall's near end) defaults to ``None``, meaning
+    "centred" — the layout computes it.
+    """
+
+    width: int = 5
+    offset: int | None = None
+
+
+@dataclass(frozen=True)
 class Relation:
     """A single placement relation: this room sits ``direction`` of ``anchor``."""
 
@@ -52,6 +64,10 @@ class Relation:
     line: int
     align: Align = Align.START  # free-axis alignment
     shift: int = 0  # feet to nudge along the free axis after aligning
+    # Door handling on the shared wall: a real wall gets a default door unless
+    # ``no_door`` suppresses it; ``door`` overrides the default width/position.
+    door: Door | None = None
+    no_door: bool = False
 
 
 @dataclass
@@ -73,11 +89,22 @@ class Room:
     y: int | None = None
 
 
+@dataclass(frozen=True)
+class Doorway:
+    """A standalone door between two adjacent rooms (any pair, not just anchors)."""
+
+    a: str
+    b: str
+    door: Door
+    line: int
+
+
 @dataclass
 class Building:
-    """An ordered collection of rooms with id lookup."""
+    """An ordered collection of rooms (with id lookup) and standalone doors."""
 
     rooms: list[Room] = field(default_factory=list)
+    doors: list[Doorway] = field(default_factory=list)
 
     def room(self, room_id: str) -> Room:
         """Return the room with ``room_id``.

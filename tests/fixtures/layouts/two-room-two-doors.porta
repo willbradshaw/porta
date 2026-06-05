@@ -1,0 +1,3 @@
+room a "Room A" 20x40 root
+room b "Room B" 20x40 right-of a
+door@30 a b

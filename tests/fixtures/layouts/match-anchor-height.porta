@@ -1,0 +1,2 @@
+room a "Room A" 30x25 root
+room b "Room B" 20x? right-of a

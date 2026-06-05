@@ -22,7 +22,7 @@ from porta.model import Align, Building, Direction, Door, Doorway, Relation, Roo
 Token = tuple[str, bool]
 
 _ID_RE = re.compile(r"[A-Za-z][A-Za-z0-9_-]*\Z")
-_DIM_RE = re.compile(r"([0-9]+)x([0-9]+)\Z")
+_DIM_RE = re.compile(r"(\?|[0-9]+)x(\?|[0-9]+)\Z")
 _GRID_FT = 5
 _DEFAULT_DOOR_FT = 5
 _MODIFIERS = ("shift=", "align=", "door", "no-door")  # relation-modifier prefixes
@@ -127,7 +127,7 @@ def _parse_room(tokens: list[Token], lineno: int) -> Room:
     if not name_quoted:
         raise ParseError("room name must be wrapped in double quotes", line=lineno)
 
-    width, height = _parse_dimensions(tokens[3][0], lineno)
+    width, height, auto_width, auto_height = _parse_dimensions(tokens[3][0], lineno)
     is_root, relations = _parse_modifiers(tokens[4:], lineno)
 
     return Room(
@@ -135,27 +135,41 @@ def _parse_room(tokens: list[Token], lineno: int) -> Room:
         name=name,
         width=width,
         height=height,
+        auto_width=auto_width,
+        auto_height=auto_height,
         is_root=is_root,
         relations=relations,
         line=lineno,
     )
 
 
-def _parse_dimensions(text: str, lineno: int) -> tuple[int, int]:
-    """Parse a ``WxH`` dimension token into positive on-grid feet."""
+def _parse_dimensions(text: str, lineno: int) -> tuple[int, int, bool, bool]:
+    """Parse a ``WxH`` token into feet, where each side may be ``?`` (auto).
+
+    Returns ``(width, height, auto_width, auto_height)``; an auto side has its
+    value set to 0 for the layout to resolve.
+    """
     match = _DIM_RE.match(text)
     if match is None:
         raise ParseError(f"expected WxH dimensions in feet, got {text!r}", line=lineno)
-    width, height = int(match.group(1)), int(match.group(2))
-    for value, label in ((width, "width"), (height, "height")):
-        if value <= 0:
-            raise ParseError(f"{label} must be positive, got {value}", line=lineno)
-        if value % _GRID_FT != 0:
-            raise ParseError(
-                f"{label} must be a multiple of {_GRID_FT} (the grid), got {value}",
-                line=lineno,
-            )
-    return width, height
+    width, auto_width = _parse_dimension(match.group(1), "width", lineno)
+    height, auto_height = _parse_dimension(match.group(2), "height", lineno)
+    return width, height, auto_width, auto_height
+
+
+def _parse_dimension(raw: str, label: str, lineno: int) -> tuple[int, bool]:
+    """Parse one dimension: ``?`` (auto → 0) or a positive on-grid integer."""
+    if raw == "?":
+        return 0, True
+    value = int(raw)
+    if value <= 0:
+        raise ParseError(f"{label} must be positive, got {value}", line=lineno)
+    if value % _GRID_FT != 0:
+        raise ParseError(
+            f"{label} must be a multiple of {_GRID_FT} (the grid), got {value}",
+            line=lineno,
+        )
+    return value, False
 
 
 def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relation]]:

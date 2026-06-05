@@ -292,6 +292,109 @@ def test_overlapping_doors_raise() -> None:
         solve(parse(text))
 
 
+# --- auto dimensions (?) ---------------------------------------------------
+
+
+def dims(text: str, room_id: str) -> tuple[int, int]:
+    room = solve(parse(text)).room(room_id)
+    return room.width, room.height
+
+
+def test_auto_height_matches_a_left_right_anchor() -> None:
+    # right-of shares a vertical wall, so '?' height = the anchor's height.
+    text = 'room a "A" 30x25 root\nroom b "B" 20x? right-of a'
+    assert dims(text, "b") == (20, 25)
+
+
+def test_auto_width_matches_an_up_down_anchor() -> None:
+    # up-of shares a horizontal wall, so '?' width = the anchor's width.
+    text = 'room a "A" 40x20 root\nroom b "B" ?x15 up-of a'
+    assert dims(text, "b") == (40, 15)
+
+
+def test_auto_both_dims_from_two_perpendicular_anchors() -> None:
+    # right-of x sizes height, down-of y sizes width; r fills the corner under y
+    # and right of x's lower half -> 10x10 at (20,10), reaching x's bottom (20).
+    text = (
+        'room x "X" 20x20 root\n'
+        'room y "Y" 10x10 right-of x\n'
+        'room r "R" ?x? right-of x down-of y'
+    )
+    assert dims(text, "r") == (10, 10)
+    assert coords(text, "r") == (20, 10)
+
+
+def test_auto_dim_chains_through_an_auto_anchor() -> None:
+    # c matches b's height, which itself matched a's height -> resolved in order.
+    text = (
+        'room a "A" 30x25 root\nroom b "B" 20x? right-of a\nroom c "C" 15x? right-of b'
+    )
+    assert dims(text, "c") == (15, 25)
+
+
+def test_auto_height_shrinks_by_a_shift() -> None:
+    # shift fixes b's top 10 ft down a (20..30 stays 0..30); '?' fills to a's bottom.
+    text = 'room a "A" 20x30 root\nroom b "B" 10x? right-of a shift=10'
+    assert dims(text, "b") == (10, 20)
+    assert coords(text, "b") == (20, 10)
+
+
+def test_auto_fills_the_wall_below_a_neighbour() -> None:
+    # c is dropped below b by down-of b, then '?' fills the rest of a's east wall.
+    text = (
+        'room a "A" 20x40 root\n'
+        'room b "B" 20x10 right-of a\n'
+        'room c "C" 10x? right-of a down-of b'
+    )
+    assert dims(text, "c") == (10, 30)
+    assert coords(text, "c") == (20, 10)
+
+
+def test_auto_up_of_fills_toward_the_near_side() -> None:
+    # up-of b fixes r's BOTTOM at b's top; '?' fills upward to a's top.
+    text = (
+        'room a "A" 10x30 root\n'
+        'room b "B" 10x10 right-of a align=end\n'
+        'room r "R" 10x? right-of a up-of b'
+    )
+    assert dims(text, "r") == (10, 20)
+    assert coords(text, "r") == (10, 0)
+
+
+def test_auto_with_align_end_matches_the_anchor() -> None:
+    # align=end fixes the far edge at the anchor's far edge; '?' fills the wall.
+    text = 'room a "A" 20x30 root\nroom b "B" 10x? right-of a align=end'
+    assert dims(text, "b") == (10, 30)
+    assert coords(text, "b") == (20, 0)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        # '?' width needs an up/down relation; b only has a left/right one.
+        pytest.param(
+            'room a "A" 20x20 root\nroom b "B" ?x10 right-of a',
+            id="auto-width-no-updown-relation",
+        ),
+        # '?' height needs a left/right relation; b only has an up/down one.
+        pytest.param(
+            'room a "A" 20x20 root\nroom b "B" 10x? down-of a',
+            id="auto-height-no-leftright-relation",
+        ),
+        # the root has no anchor to size against.
+        pytest.param('room a "A" ?x20 root', id="auto-on-root"),
+        # shift slides the fixed edge to a's far edge -> nothing left to fill.
+        pytest.param(
+            'room a "A" 10x10 root\nroom b "B" 10x? right-of a shift=10',
+            id="auto-non-positive-span",
+        ),
+    ],
+)
+def test_unresolvable_auto_dim_raises(source: str) -> None:
+    with pytest.raises(LayoutError):
+        solve(parse(source))
+
+
 # --- structural validation -------------------------------------------------
 
 

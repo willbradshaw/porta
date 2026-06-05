@@ -78,18 +78,18 @@
   <text data-room="gallery" x="30" y="-35" text-anchor="middle" dominant-baseline="central" font-size="6">G</text>
   <rect data-room="turret" x="-45" y="-20" width="15" height="15" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="turret" x="-37.5" y="-12.5" text-anchor="middle" dominant-baseline="central" font-size="9">T</text>
-  <line class="door" x1="5" y1="0" x2="10" y2="0" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="0" y1="-20" x2="0" y2="-15" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="40" y1="-20" x2="40" y2="-15" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="0" y1="5" x2="0" y2="10" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="20" y1="5" x2="20" y2="10" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="50" y1="0" x2="55" y2="0" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="70" y1="10" x2="70" y2="15" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="-15" y1="20" x2="-10" y2="20" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="50" y1="25" x2="55" y2="25" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="5" y1="20" x2="10" y2="20" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="25" y1="-30" x2="30" y2="-30" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
-  <line class="door" x1="-30" y1="-15" x2="-30" y2="-10" stroke="#a0522d" stroke-width="1.5" stroke-linecap="square" />
+  <line class="door" x1="5" y1="0" x2="10" y2="0" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="0" y1="-20" x2="0" y2="-15" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="40" y1="-20" x2="40" y2="-15" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="0" y1="5" x2="0" y2="10" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="20" y1="5" x2="20" y2="10" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="50" y1="0" x2="55" y2="0" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="70" y1="10" x2="70" y2="15" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="-15" y1="20" x2="-10" y2="20" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="50" y1="25" x2="55" y2="25" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="5" y1="20" x2="10" y2="20" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="25" y1="-30" x2="30" y2="-30" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="-30" y1="-15" x2="-30" y2="-10" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-22.9" y="64.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-22.9" y="73.8" font-size="6">E  Entrance Hall  (20x20 ft)</text>
   <text class="key" x="-22.9" y="83.4" font-size="6">H  Great Hall  (40x30 ft)</text>

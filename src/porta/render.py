@@ -23,7 +23,7 @@ _KEY_LINE_RATIO = 1.6  # key line spacing as a multiple of the key font
 _CHAR_W = 0.6  # rough average glyph width (fraction of font), for centring the key
 _GRID_COLOUR = "#bbb"  # grey 5-ft grid
 _GRID_STROKE_FT = 0.15  # grid line thickness, in feet
-_DOOR_COLOUR = "#a0522d"  # door marks (sienna), distinct from walls/grid
+_DOOR_COLOUR = "black"  # door marks
 _DOOR_STROKE_FT = 1.5  # door line thickness, in feet
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
@@ -166,7 +166,7 @@ def render_svg(building: Building) -> str:
         lines.append(
             f'  <line class="door" x1="{_num(x1)}" y1="{_num(y1)}" '
             f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="{_DOOR_COLOUR}" '
-            f'stroke-width="{_num(_DOOR_STROKE_FT)}" stroke-linecap="square" />'
+            f'stroke-width="{_num(_DOOR_STROKE_FT)}" />'
         )
 
     # Centre the key block but left-align the lines within it (a legend reads

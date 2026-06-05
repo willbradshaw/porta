@@ -88,11 +88,21 @@ def _resolve_auto_dims(room: Room, by_id: dict[str, Room]) -> None:
 
 
 def _auto_extent(room: Room, by_id: dict[str, Room], dim_axis: Axis) -> int:
-    """Span from the room's fixed edge on ``dim_axis`` to the sizing anchor's edge."""
+    """Resolve a ``?`` on ``dim_axis``: the snug-fit gap if pinned on both sides,
+    else the span from the room's fixed edge to the sizing anchor's edge."""
     if dim_axis is Axis.HORIZONTAL:
         dim_name, hint = "width", "up-of/down-of"
     else:
         dim_name, hint = "height", "left-of/right-of"
+    gap = _opposite_gap(room, by_id, dim_axis)
+    if gap is not None:  # axis pinned on both sides -> fill the gap (snug-fit)
+        if gap <= 0:
+            raise LayoutError(
+                f"room {room.id!r}: '?' {dim_name} resolves to {gap} ft "
+                f"(its anchors overlap or are reversed)",
+                line=room.line,
+            )
+        return gap
     sizing = _sizing_relation(room, _perp(dim_axis), dim_name, hint)
     anchor = by_id[sizing.anchor]
     a_lo = _axis_lo(anchor, dim_axis)
@@ -154,6 +164,27 @@ def _axis_lo(room: Room, axis: Axis) -> int:
 
 def _axis_dim(room: Room, axis: Axis) -> int:
     return room.width if axis is Axis.HORIZONTAL else room.height
+
+
+def _opposite_gap(room: Room, by_id: dict[str, Room], axis: Axis) -> int | None:
+    """Gap between the anchors when ``axis`` is pinned on both sides, else None.
+
+    The positive direction (``right/down-of``) fixes the room's near edge at its
+    anchor's far edge; the negative (``left/up-of``) fixes the far edge at its
+    anchor's near edge. The room must exactly fill the space between them.
+    """
+    near = far = None
+    for rel in room.relations:
+        if rel.direction.axis is not axis:
+            continue
+        anchor = by_id[rel.anchor]
+        if rel.direction in (Direction.RIGHT, Direction.DOWN):
+            near = _axis_lo(anchor, axis) + _axis_dim(anchor, axis)
+        else:
+            far = _axis_lo(anchor, axis)
+    if near is None or far is None:
+        return None
+    return far - near
 
 
 def door_segments(building: Building) -> list[Segment]:
@@ -372,25 +403,21 @@ def _find_root(rooms: list[Room]) -> Room:
 
 
 def _validate_relations(rooms: list[Room], by_id: dict[str, Room]) -> None:
-    """Check anchors exist and that no room pins the same axis twice."""
+    """Check anchors exist and that align/shift act on a genuinely free axis.
+
+    Two relations on the *same* axis are allowed now (snug-fit / colinear); the
+    geometric agreement is checked during placement.
+    """
     for room in rooms:
-        seen_axes: set[Axis] = set()
+        axes = {rel.direction.axis for rel in room.relations}
         for rel in room.relations:
             if rel.anchor not in by_id:
                 raise LayoutError(
                     f"room {room.id!r} references unknown room {rel.anchor!r}",
                     line=rel.line,
                 )
-            if rel.direction.axis in seen_axes:
-                raise LayoutError(
-                    f"room {room.id!r} has two relations on the same "
-                    f"({rel.direction.axis.value}) axis (not yet supported)",
-                    line=room.line,
-                )
-            seen_axes.add(rel.direction.axis)
-        for rel in room.relations:
             modifies_free_axis = rel.shift != 0 or rel.align is not Align.START
-            if modifies_free_axis and _free_axis(rel.direction) in seen_axes:
+            if modifies_free_axis and _free_axis(rel.direction) in axes:
                 raise LayoutError(
                     f"room {room.id!r} cannot align/shift: both axes are constrained",
                     line=rel.line,
@@ -413,40 +440,69 @@ def _aligned(anchor_lo: int, anchor_dim: int, room_dim: int, align: Align) -> in
 
 def _place(room: Room, by_id: dict[str, Room]) -> None:
     """Set ``room``'s coordinates from its (already-placed) anchors."""
-    x: int | None = None
-    y: int | None = None
-    x_fallback: int | None = None
-    y_fallback: int | None = None
-
-    for rel in room.relations:
-        anchor = by_id[rel.anchor]
-        ax, ay = anchor.x, anchor.y
-        assert ax is not None  # anchors are placed before dependents
-        assert ay is not None
-        if rel.direction is Direction.RIGHT:
-            x = ax + anchor.width
-            y_fallback = _aligned(ay, anchor.height, room.height, rel.align) + rel.shift
-        elif rel.direction is Direction.LEFT:
-            x = ax - room.width
-            y_fallback = _aligned(ay, anchor.height, room.height, rel.align) + rel.shift
-        elif rel.direction is Direction.DOWN:
-            y = ay + anchor.height
-            x_fallback = _aligned(ax, anchor.width, room.width, rel.align) + rel.shift
-        else:  # Direction.UP
-            y = ay - room.height
-            x_fallback = _aligned(ax, anchor.width, room.width, rel.align) + rel.shift
-
-    rx = x if x is not None else x_fallback
-    ry = y if y is not None else y_fallback
-    assert rx is not None
-    assert ry is not None
-    room.x = rx
-    room.y = ry
+    rx = _axis_position(room, by_id, Axis.HORIZONTAL)
+    ry = _axis_position(room, by_id, Axis.VERTICAL)
+    room.x, room.y = rx, ry
     for rel in room.relations:
         # Only a shift can slide a room off its anchor. A non-shifted relation
         # in a two-axis pin may legitimately only pin a coordinate (corner-touch).
         if rel.shift != 0:
             _check_attached(room, rx, ry, by_id[rel.anchor], rel)
+
+
+def _axis_position(room: Room, by_id: dict[str, Room], axis: Axis) -> int:
+    """The room's low coordinate on ``axis`` from its relations on that axis.
+
+    Each relation on the axis derives the same low edge; they must agree (this is
+    where snug-fit and same-direction colinearity are enforced). With no relation
+    on the axis it falls to the free-axis alignment of the first perpendicular
+    relation.
+    """
+    rels = [rel for rel in room.relations if rel.direction.axis is axis]
+    dim = _axis_dim(room, axis)
+    if not rels:
+        return _free_axis_position(room, by_id, axis, dim)
+    los = []
+    for rel in rels:
+        anchor = by_id[rel.anchor]
+        if rel.direction in (Direction.RIGHT, Direction.DOWN):
+            los.append(_axis_lo(anchor, axis) + _axis_dim(anchor, axis))  # near at far
+        else:  # LEFT, UP: far edge meets the anchor's near edge
+            los.append(_axis_lo(anchor, axis) - dim)
+    if any(lo != los[0] for lo in los[1:]):
+        _raise_axis_conflict(room, by_id, axis, rels, dim)
+    return los[0]
+
+
+def _free_axis_position(
+    room: Room, by_id: dict[str, Room], axis: Axis, dim: int
+) -> int:
+    """Position on a free ``axis``: align/shift of the first perpendicular relation."""
+    for rel in room.relations:  # the first relation that leaves ``axis`` free
+        if rel.direction.axis is not axis:
+            anchor = by_id[rel.anchor]
+            a_lo, a_dim = _axis_lo(anchor, axis), _axis_dim(anchor, axis)
+            return _aligned(a_lo, a_dim, dim, rel.align) + rel.shift
+    raise AssertionError("a non-root room always has a relation")  # unreachable
+
+
+def _raise_axis_conflict(
+    room: Room, by_id: dict[str, Room], axis: Axis, rels: list[Relation], dim: int
+) -> None:
+    """Report disagreeing same-axis relations: snug-fit miss vs. unaligned pins."""
+    name = "width" if axis is Axis.HORIZONTAL else "height"
+    gap = _opposite_gap(room, by_id, axis)
+    if gap is not None:  # an opposite pair -> the room doesn't fill the gap
+        raise LayoutError(
+            f"room {room.id!r}: {name} {dim} does not fill the {gap} ft gap "
+            f"between its anchors",
+            line=room.line,
+        )
+    raise LayoutError(
+        f"room {room.id!r}: its same-direction anchors are not aligned, so the "
+        f"relations disagree on where to place it",
+        line=room.line,
+    )
 
 
 def _check_attached(room: Room, rx: int, ry: int, anchor: Room, rel: Relation) -> None:

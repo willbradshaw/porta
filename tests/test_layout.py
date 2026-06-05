@@ -395,6 +395,59 @@ def test_unresolvable_auto_dim_raises(source: str) -> None:
         solve(parse(source))
 
 
+# --- same-axis: snug-fit & same-direction ----------------------------------
+
+# 'c' fills the 10-ft gap between b (x[0,20]) and d (x[30,50]), both below a.
+SNUG = (
+    'room a "A" 40x20 root\n'
+    'room b "B" 20x20 down-of a\n'
+    'room d "D" 20x20 down-of a shift=30\n'
+    'room c "C" {dims} right-of b left-of d'
+)
+
+
+def test_opposite_relations_snug_fit_explicit() -> None:
+    assert dims(SNUG.format(dims="10x20"), "c") == (10, 20)
+    assert coords(SNUG.format(dims="10x20"), "c") == (20, 20)
+
+
+def test_opposite_relations_snug_fit_auto_width() -> None:
+    # '?' on the doubly-pinned axis solves to the gap.
+    assert dims(SNUG.format(dims="?x20"), "c") == (10, 20)
+
+
+def test_snug_fit_size_mismatch_raises() -> None:
+    # 15 != the 10-ft gap between the anchors.
+    with pytest.raises(LayoutError):
+        solve(parse(SNUG.format(dims="15x20")))
+
+
+def test_same_direction_colinear_borders_both() -> None:
+    # a and b are stacked with a common left edge; c is left of both and spans
+    # them, so it borders each (and gets a default door to each).
+    text = (
+        'room a "A" 20x10 root\n'
+        'room b "B" 20x10 down-of a\n'
+        'room c "C" 10x20 left-of a left-of b'
+    )
+    assert coords(text, "c") == (-10, 0)
+    assert dims(text, "c") == (10, 20)
+    # doors: a<->b (down-of), c<->a, c<->b.
+    assert len(doors_of(text)) == 3
+
+
+def test_same_direction_not_aligned_raises() -> None:
+    # b is shifted, so its left edge no longer lines up with a's -> the two
+    # left-of relations disagree on where to put c.
+    text = (
+        'room a "A" 20x10 root\n'
+        'room b "B" 10x10 down-of a shift=5\n'
+        'room c "C" 10x20 left-of a left-of b'
+    )
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
 # --- structural validation -------------------------------------------------
 
 

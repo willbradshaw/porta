@@ -87,13 +87,13 @@ T T T L L L L L L H H H H H H H H D D D D D D . . . . . .
 . . . . . P P P P E E E E C C C C K K K K K K A A A R R R
 . . . . . P P P P E E E E C C C C K K K K K K A A A R R R
 . . . . . P P P P E E E E C C C C K K K K K K A A A R R R
-. . . . . S S S S . O O . . . . . K K K K K K A A A . . .
-. . . . . S S S S . O O . . . . . U U U U U U . . . . . .
+. . . . . S S S S W O O . . . . . K K K K K K A A A . . .
+. . . . . S S S S W O O . . . . . U U U U U U . . . . . .
 . . . . . S S S S . . . . . . . . U U U U U U . . . . . .
 . . . . . S S S S . . . . . . . . U U U U U U . . . . . .
 . . . . . . . . . . . . . . . . . U U U U U U . . . . . .
 
-E=entrance  H=hall  L=library  D=dining  P=parlour  C=cloak  K=kitchen  A=pantry  S=study  U=scullery  O=porch  R=larder  G=gallery  T=turret"""
+E=entrance  H=hall  L=library  D=dining  P=parlour  C=cloak  K=kitchen  A=pantry  S=study  U=scullery  O=porch  W=wc  R=larder  G=gallery  T=turret"""
 
 
 def test_manor_example_renders_to_golden() -> None:

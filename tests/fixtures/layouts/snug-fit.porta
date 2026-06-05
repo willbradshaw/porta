@@ -1,0 +1,4 @@
+room a "Room A" 40x20 root
+room b "Room B" 20x20 down-of a
+room d "Room D" 20x20 down-of a shift=30
+room c "Room C" 10x20 right-of b left-of d

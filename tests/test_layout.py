@@ -292,6 +292,67 @@ def test_overlapping_doors_raise() -> None:
         solve(parse(text))
 
 
+# --- auto dimensions (?) ---------------------------------------------------
+
+
+def dims(text: str, room_id: str) -> tuple[int, int]:
+    room = solve(parse(text)).room(room_id)
+    return room.width, room.height
+
+
+def test_auto_height_matches_a_left_right_anchor() -> None:
+    # right-of shares a vertical wall, so '?' height = the anchor's height.
+    text = 'room a "A" 30x25 root\nroom b "B" 20x? right-of a'
+    assert dims(text, "b") == (20, 25)
+
+
+def test_auto_width_matches_an_up_down_anchor() -> None:
+    # up-of shares a horizontal wall, so '?' width = the anchor's width.
+    text = 'room a "A" 40x20 root\nroom b "B" ?x15 up-of a'
+    assert dims(text, "b") == (40, 15)
+
+
+def test_auto_both_dims_from_two_perpendicular_anchors() -> None:
+    # right-of x sizes height (=20), down-of y sizes width (=10); position pinned.
+    text = (
+        'room x "X" 20x20 root\n'
+        'room y "Y" 10x10 right-of x\n'
+        'room r "R" ?x? right-of x down-of y'
+    )
+    assert dims(text, "r") == (10, 20)
+    assert coords(text, "r") == (20, 10)
+
+
+def test_auto_dim_chains_through_an_auto_anchor() -> None:
+    # c matches b's height, which itself matched a's height -> resolved in order.
+    text = (
+        'room a "A" 30x25 root\nroom b "B" 20x? right-of a\nroom c "C" 15x? right-of b'
+    )
+    assert dims(text, "c") == (15, 25)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        # '?' width needs an up/down relation; b only has a left/right one.
+        pytest.param(
+            'room a "A" 20x20 root\nroom b "B" ?x10 right-of a',
+            id="auto-width-no-updown-relation",
+        ),
+        # '?' height needs a left/right relation; b only has an up/down one.
+        pytest.param(
+            'room a "A" 20x20 root\nroom b "B" 10x? down-of a',
+            id="auto-height-no-leftright-relation",
+        ),
+        # the root has no anchor to size against.
+        pytest.param('room a "A" ?x20 root', id="auto-on-root"),
+    ],
+)
+def test_unresolvable_auto_dim_raises(source: str) -> None:
+    with pytest.raises(LayoutError):
+        solve(parse(source))
+
+
 # --- structural validation -------------------------------------------------
 
 

@@ -112,6 +112,23 @@ def test_hash_inside_quotes_is_literal_not_a_comment() -> None:
     assert parse('room study "Room #3" 10x10 root').room("study").name == "Room #3"
 
 
+@pytest.mark.parametrize(
+    ("dims", "expected"),
+    [
+        # (width, height, auto_width, auto_height); auto sides hold 0.
+        ("20x10", (20, 10, False, False)),
+        ("?x10", (0, 10, True, False)),
+        ("20x?", (20, 0, False, True)),
+        ("?x?", (0, 0, True, True)),
+    ],
+)
+def test_auto_dimensions_are_parsed(
+    dims: str, expected: tuple[int, int, bool, bool]
+) -> None:
+    room = parse(f'room b "B" {dims} right-of a').room("b")
+    assert (room.width, room.height, room.auto_width, room.auto_height) == expected
+
+
 def test_root_and_relations_accepted_in_any_order() -> None:
     def rels(source: str) -> set[tuple[Direction, str]]:
         room = parse(source).room("h")
@@ -148,6 +165,7 @@ def test_each_relation_keyword_maps_to_its_direction(
     [
         # dimensions
         pytest.param('room r "R" 20', id="dim-no-x"),
+        pytest.param('room r "R" ?x7 right-of a', id="dim-auto-with-off-grid"),
         pytest.param('room r "R" 20x', id="dim-missing-height"),
         pytest.param('room r "R" x20', id="dim-missing-width"),
         pytest.param('room r "R" xx', id="dim-no-numbers"),

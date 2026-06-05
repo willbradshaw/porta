@@ -40,6 +40,11 @@ def solve(building: Building) -> Building:
 
     root = _find_root(rooms)
     _validate_relations(rooms, by_id)
+    if root.auto_width or root.auto_height:
+        raise LayoutError(
+            f"root {root.id!r} cannot use '?' (no anchor to size against)",
+            line=root.line,
+        )
 
     root.x, root.y = 0, 0
     placed: set[str] = {root.id}
@@ -50,6 +55,7 @@ def solve(building: Building) -> Building:
         progressed = False
         for room in list(pending):
             if room.relations and all(rel.anchor in placed for rel in room.relations):
+                _resolve_auto_dims(room, by_id)
                 _place(room, by_id)
                 placed.add(room.id)
                 pending.remove(room)
@@ -65,6 +71,32 @@ def solve(building: Building) -> Building:
 
     door_segments(building)  # validates every door (raises on a bad one)
     return building
+
+
+def _resolve_auto_dims(room: Room, by_id: dict[str, Room]) -> None:
+    """Resolve a room's ``?`` dimensions from the anchor across the parallel wall.
+
+    Called in topological order, so each anchor's own dimensions are already
+    resolved. ``up-of``/``down-of`` (a horizontal wall) sizes the *width*;
+    ``left-of``/``right-of`` (a vertical wall) sizes the *height*.
+    """
+    if room.auto_width:
+        rel = _sizing_relation(room, Axis.VERTICAL, "width", "up-of/down-of")
+        room.width = by_id[rel.anchor].width
+    if room.auto_height:
+        rel = _sizing_relation(room, Axis.HORIZONTAL, "height", "left-of/right-of")
+        room.height = by_id[rel.anchor].height
+
+
+def _sizing_relation(room: Room, axis: Axis, dim: str, hint: str) -> Relation:
+    """The relation whose shared wall is parallel to ``dim`` (at most one)."""
+    matches = [rel for rel in room.relations if rel.direction.axis is axis]
+    if not matches:
+        raise LayoutError(
+            f"room {room.id!r}: '?' {dim} needs a {hint} relation to size against",
+            line=room.line,
+        )
+    return matches[0]
 
 
 def door_segments(building: Building) -> list[Segment]:

@@ -86,7 +86,31 @@ def door_segments(building: Building) -> list[Segment]:
                 segments.append(segment)
     for doorway in building.doors:
         segments.append(_doorway_door(doorway, by_id))
+    _check_door_overlaps(segments)
     return segments
+
+
+def _check_door_overlaps(segments: list[Segment]) -> None:
+    """Raise if two doors occupy overlapping space on the same wall line.
+
+    Two doors between the same rooms are fine (e.g. a pair of openings); two
+    that *overlap* are almost certainly a mistake.
+    """
+    for i, first in enumerate(segments):
+        for second in segments[i + 1 :]:
+            if _doors_overlap(first, second):
+                raise LayoutError(f"two doors overlap: {first} and {second}")
+
+
+def _doors_overlap(a: Segment, b: Segment) -> bool:
+    """Whether two door segments share interior space on a common wall line."""
+    ax1, ay1, ax2, ay2 = a
+    bx1, by1, bx2, by2 = b
+    if ay1 == ay2 and by1 == by2 and ay1 == by1:  # both horizontal, same y
+        return min(ax2, bx2) > max(ax1, bx1)
+    if ax1 == ax2 and bx1 == bx2 and ax1 == bx1:  # both vertical, same x
+        return min(ay2, by2) > max(ay1, by1)
+    return False
 
 
 # A wall as (horizontal?, fixed coordinate, near-end, length) in feet.

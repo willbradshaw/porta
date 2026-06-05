@@ -280,6 +280,18 @@ def test_a_pair_can_have_two_doors() -> None:
     assert len(doors_of(text)) == 2
 
 
+def test_overlapping_doors_raise() -> None:
+    # Two doors on the same wall that overlap each other are a mistake.
+    text = (
+        'room a "A" 20x20 root\n'
+        'room b "B" 20x20 right-of a no-door\n'
+        "door=10@0 a b\n"
+        "door@5 a b"
+    )
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
 # --- structural validation -------------------------------------------------
 
 

@@ -15,7 +15,7 @@ import textwrap
 import pytest
 
 from porta.errors import ParseError
-from porta.model import Building, Direction
+from porta.model import Align, Building, Direction
 from porta.parser import parse
 
 # Lines: 1 blank, 2 comment, 3 entrance, 4 kitchen, 5 hall.
@@ -181,6 +181,10 @@ def test_each_relation_keyword_maps_to_its_direction(
         pytest.param('room r "R" 20x20 root shift=10', id="shift-after-root"),
         pytest.param('room r "R" 20x20 up-of a shift=7', id="shift-off-grid"),
         pytest.param('room r "R" 20x20 up-of a shift=x', id="shift-non-integer"),
+        # align modifier
+        pytest.param('room r "R" 20x20 align=end', id="align-without-relation"),
+        pytest.param('room r "R" 20x20 up-of a align=center', id="align-center"),
+        pytest.param('room r "R" 20x20 up-of a align=bogus', id="align-bogus"),
     ],
 )
 def test_invalid_source_raises(source: str) -> None:
@@ -211,3 +215,15 @@ def test_error_reports_the_offending_line_number() -> None:
 )
 def test_shift_is_parsed_onto_the_relation(source: str, expected_shift: int) -> None:
     assert parse(source).room("b").relations[0].shift == expected_shift
+
+
+@pytest.mark.parametrize(
+    ("source", "expected_align"),
+    [
+        ('room b "B" 10x10 up-of a', Align.START),  # default
+        ('room b "B" 10x10 up-of a align=start', Align.START),
+        ('room b "B" 10x10 up-of a align=end', Align.END),
+    ],
+)
+def test_align_is_parsed_onto_the_relation(source: str, expected_align: Align) -> None:
+    assert parse(source).room("b").relations[0].align == expected_align

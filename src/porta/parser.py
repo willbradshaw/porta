@@ -16,7 +16,7 @@ Reference resolution (does ``anchor`` exist? is there exactly one root?) is a
 import re
 
 from porta.errors import ParseError
-from porta.model import Building, Direction, Relation, Room
+from porta.model import Align, Building, Direction, Relation, Room
 
 # A token plus whether it was double-quoted in the source.
 Token = tuple[str, bool]
@@ -151,7 +151,7 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
             continue
         direction = _KEYWORDS.get(value)
         if direction is None:
-            if value.startswith("shift="):
+            if value.startswith(("shift=", "align=")):
                 raise ParseError(f"{value!r} must follow a relation", line=lineno)
             raise ParseError(f"unknown relation or keyword {value!r}", line=lineno)
         if i + 1 >= len(tokens):
@@ -161,17 +161,41 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
             raise ParseError(f"invalid anchor id {anchor!r}", line=lineno)
         i += 2
 
+        align = Align.START
         shift = 0
         while (
-            i < len(tokens) and not tokens[i][1] and tokens[i][0].startswith("shift=")
+            i < len(tokens)
+            and not tokens[i][1]
+            and tokens[i][0].startswith(("shift=", "align="))
         ):
-            shift = _parse_shift(tokens[i][0], lineno)
+            token = tokens[i][0]
+            if token.startswith("shift="):
+                shift = _parse_shift(token, lineno)
+            else:
+                align = _parse_align(token, lineno)
             i += 1
 
         relations.append(
-            Relation(direction=direction, anchor=anchor, line=lineno, shift=shift)
+            Relation(
+                direction=direction,
+                anchor=anchor,
+                line=lineno,
+                align=align,
+                shift=shift,
+            )
         )
     return is_root, relations
+
+
+def _parse_align(token: str, lineno: int) -> Align:
+    """Parse an ``align=start|end`` modifier."""
+    raw = token[len("align=") :]
+    try:
+        return Align(raw)
+    except ValueError:
+        raise ParseError(
+            f"align must be 'start' or 'end', got {raw!r}", line=lineno
+        ) from None
 
 
 def _parse_shift(token: str, lineno: int) -> int:

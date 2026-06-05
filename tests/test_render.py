@@ -75,6 +75,8 @@ def test_legend_lists_rooms_in_source_order() -> None:
 # --- the north-star manor (golden) ----------------------------------------
 
 MANOR_ASCII = """\
+. . . . . . . . . . G G G G . T T T T . . . . . . .
+. . . . . . . . . . G G G G . T T T T . . . . . . .
 L L L L L L H H H H H H H H D D D D D D . . . . . .
 L L L L L L H H H H H H H H D D D D D D . . . . . .
 L L L L L L H H H H H H H H D D D D D D . . . . . .
@@ -91,7 +93,7 @@ L L L L L L H H H H H H H H D D D D D D . . . . . .
 . . S S S S . . . . . . . . U U U U U U . . . . . .
 . . . . . . . . . . . . . . U U U U U U . . . . . .
 
-E=entrance  H=hall  L=library  D=dining  P=parlour  C=cloak  K=kitchen  A=pantry  S=study  U=scullery  O=porch  R=larder"""
+E=entrance  H=hall  L=library  D=dining  P=parlour  C=cloak  K=kitchen  A=pantry  S=study  U=scullery  O=porch  R=larder  G=gallery  T=turret"""
 
 
 def test_manor_example_renders_to_golden() -> None:

@@ -1,33 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="2290" viewBox="-40 -40 150 229">
-  <rect x="-40" y="-40" width="150" height="229" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1500" height="2582" viewBox="-40 -50 150 258.2">
+  <rect x="-40" y="-50" width="150" height="258.2" fill="white" />
   <g stroke="#bbb" stroke-width="0.15">
-    <line x1="-30" y1="-30" x2="-30" y2="45" />
-    <line x1="-25" y1="-30" x2="-25" y2="45" />
-    <line x1="-20" y1="-30" x2="-20" y2="45" />
-    <line x1="-15" y1="-30" x2="-15" y2="45" />
-    <line x1="-10" y1="-30" x2="-10" y2="45" />
-    <line x1="-5" y1="-30" x2="-5" y2="45" />
-    <line x1="0" y1="-30" x2="0" y2="45" />
-    <line x1="5" y1="-30" x2="5" y2="45" />
-    <line x1="10" y1="-30" x2="10" y2="45" />
-    <line x1="15" y1="-30" x2="15" y2="45" />
-    <line x1="20" y1="-30" x2="20" y2="45" />
-    <line x1="25" y1="-30" x2="25" y2="45" />
-    <line x1="30" y1="-30" x2="30" y2="45" />
-    <line x1="35" y1="-30" x2="35" y2="45" />
-    <line x1="40" y1="-30" x2="40" y2="45" />
-    <line x1="45" y1="-30" x2="45" y2="45" />
-    <line x1="50" y1="-30" x2="50" y2="45" />
-    <line x1="55" y1="-30" x2="55" y2="45" />
-    <line x1="60" y1="-30" x2="60" y2="45" />
-    <line x1="65" y1="-30" x2="65" y2="45" />
-    <line x1="70" y1="-30" x2="70" y2="45" />
-    <line x1="75" y1="-30" x2="75" y2="45" />
-    <line x1="80" y1="-30" x2="80" y2="45" />
-    <line x1="85" y1="-30" x2="85" y2="45" />
-    <line x1="90" y1="-30" x2="90" y2="45" />
-    <line x1="95" y1="-30" x2="95" y2="45" />
-    <line x1="100" y1="-30" x2="100" y2="45" />
+    <line x1="-30" y1="-40" x2="-30" y2="45" />
+    <line x1="-25" y1="-40" x2="-25" y2="45" />
+    <line x1="-20" y1="-40" x2="-20" y2="45" />
+    <line x1="-15" y1="-40" x2="-15" y2="45" />
+    <line x1="-10" y1="-40" x2="-10" y2="45" />
+    <line x1="-5" y1="-40" x2="-5" y2="45" />
+    <line x1="0" y1="-40" x2="0" y2="45" />
+    <line x1="5" y1="-40" x2="5" y2="45" />
+    <line x1="10" y1="-40" x2="10" y2="45" />
+    <line x1="15" y1="-40" x2="15" y2="45" />
+    <line x1="20" y1="-40" x2="20" y2="45" />
+    <line x1="25" y1="-40" x2="25" y2="45" />
+    <line x1="30" y1="-40" x2="30" y2="45" />
+    <line x1="35" y1="-40" x2="35" y2="45" />
+    <line x1="40" y1="-40" x2="40" y2="45" />
+    <line x1="45" y1="-40" x2="45" y2="45" />
+    <line x1="50" y1="-40" x2="50" y2="45" />
+    <line x1="55" y1="-40" x2="55" y2="45" />
+    <line x1="60" y1="-40" x2="60" y2="45" />
+    <line x1="65" y1="-40" x2="65" y2="45" />
+    <line x1="70" y1="-40" x2="70" y2="45" />
+    <line x1="75" y1="-40" x2="75" y2="45" />
+    <line x1="80" y1="-40" x2="80" y2="45" />
+    <line x1="85" y1="-40" x2="85" y2="45" />
+    <line x1="90" y1="-40" x2="90" y2="45" />
+    <line x1="95" y1="-40" x2="95" y2="45" />
+    <line x1="100" y1="-40" x2="100" y2="45" />
+    <line x1="-30" y1="-40" x2="100" y2="-40" />
+    <line x1="-30" y1="-35" x2="100" y2="-35" />
     <line x1="-30" y1="-30" x2="100" y2="-30" />
     <line x1="-30" y1="-25" x2="100" y2="-25" />
     <line x1="-30" y1="-20" x2="100" y2="-20" />
@@ -69,6 +71,10 @@
   <text data-room="porch" x="10" y="25" text-anchor="middle" dominant-baseline="central" font-size="6">O</text>
   <rect data-room="larder" x="85" y="5" width="15" height="15" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="larder" x="92.5" y="12.5" text-anchor="middle" dominant-baseline="central" font-size="9">R</text>
+  <rect data-room="gallery" x="20" y="-40" width="20" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="gallery" x="30" y="-35" text-anchor="middle" dominant-baseline="central" font-size="6">G</text>
+  <rect data-room="turret" x="45" y="-40" width="20" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="turret" x="55" y="-35" text-anchor="middle" dominant-baseline="central" font-size="6">T</text>
   <text class="scale" x="-15.4" y="64.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-15.4" y="73.8" font-size="6">E  Entrance Hall  (20x20 ft)</text>
   <text class="key" x="-15.4" y="83.4" font-size="6">H  Great Hall  (40x30 ft)</text>
@@ -82,4 +88,6 @@
   <text class="key" x="-15.4" y="160.2" font-size="6">U  Scullery  (30x20 ft)</text>
   <text class="key" x="-15.4" y="169.8" font-size="6">O  Porch  (10x10 ft)</text>
   <text class="key" x="-15.4" y="179.4" font-size="6">R  Larder  (15x15 ft)</text>
+  <text class="key" x="-15.4" y="189" font-size="6">G  Gallery  (20x10 ft)</text>
+  <text class="key" x="-15.4" y="198.6" font-size="6">T  Turret  (20x10 ft)</text>
 </svg>

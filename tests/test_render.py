@@ -83,17 +83,17 @@ T T T L L L L L L H H H H H H H H D D D D D D . . . . . .
 T T T L L L L L L H H H H H H H H D D D D D D . . . . . .
 T T T L L L L L L H H H H H H H H D D D D D D . . . . . .
 . . . L L L L L L H H H H H H H H D D D D D D . . . . . .
-. . . . . P P P P E E E E C C C C K K K K K K A A A . . .
-. . . . . P P P P E E E E C C C C K K K K K K A A A R R R
-. . . . . P P P P E E E E C C C C K K K K K K A A A R R R
-. . . . . P P P P E E E E C C C C K K K K K K A A A R R R
-. . . . . S S S S G O O . . . . . K K K K K K A A A . . .
-. . . . . S S S S G O O . . . . . U U U U U U . . . . . .
-. . . . . S S S S . . . . . . . . U U U U U U . . . . . .
-. . . . . S S S S . . . . . . . . U U U U U U . . . . . .
+. . . O O P P P P E E E E C C C C K K K K K K A A A . . .
+. . . O O P P P P E E E E C C C C K K K K K K A A A B B B
+. . . O O P P P P E E E E C C C C K K K K K K A A A B B B
+. . . O O P P P P E E E E C C C C K K K K K K A A A B B B
+. . . O O S S S S G R R . . . . . K K K K K K A A A . . .
+. . . O O S S S S G R R . . . . . U U U U U U . . . . . .
+. . . O O S S S S . . . . . . . . U U U U U U . . . . . .
+. . . O O S S S S . . . . . . . . U U U U U U . . . . . .
 . . . . . . . . . . . . . . . . . U U U U U U . . . . . .
 
-E=entrance  H=hall  L=library  D=dining  P=parlour  C=cloak  K=kitchen  A=pantry  S=study  U=scullery  O=porch  G=passage  R=larder  Y=gallery  T=turret"""
+E=entrance  H=hall  L=library  D=dining  P=parlour  C=cloak  K=kitchen  A=pantry  S=study  O=corridor  U=scullery  R=porch  G=passage  B=larder  Y=gallery  T=turret"""
 
 
 def test_manor_example_renders_to_golden() -> None:

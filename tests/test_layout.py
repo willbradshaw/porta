@@ -273,6 +273,13 @@ def test_standalone_door_to_unknown_room_raises() -> None:
         solve(parse(text))
 
 
+def test_a_pair_can_have_two_doors() -> None:
+    # The relation gives a default door; a standalone door adds a second on the
+    # same wall -- deliberate, e.g. two openings between the rooms.
+    text = 'room a "A" 20x40 root\nroom b "B" 20x40 right-of a\ndoor@30 a b'
+    assert len(doors_of(text)) == 2
+
+
 # --- structural validation -------------------------------------------------
 
 

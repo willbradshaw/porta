@@ -215,6 +215,10 @@ def test_each_relation_keyword_maps_to_its_direction(
         pytest.param("door a b c", id="standalone-door-three-ids"),
         pytest.param("door a a", id="standalone-door-self"),
         pytest.param('door a "B"', id="standalone-door-quoted-id"),
+        # external door statement
+        pytest.param("door a outside", id="external-door-missing-side"),
+        pytest.param("door a outside sideways", id="external-door-bad-side"),
+        pytest.param("door a outside down extra", id="external-door-too-many"),
     ],
 )
 def test_invalid_source_raises(source: str) -> None:
@@ -293,3 +297,16 @@ def test_standalone_door_carries_width_and_offset() -> None:
         'room a "A" 10x10 root\nroom b "B" 10x10 right-of a\ndoor=10@5 a b'
     )
     assert building.doors[0].door == Door(width=10, offset=5)
+
+
+def test_external_door_is_parsed() -> None:
+    building = parse('room a "A" 20x20 root\ndoor a outside down')
+    assert len(building.external_doors) == 1
+    ext = building.external_doors[0]
+    assert (ext.room, ext.side, ext.door) == ("a", Direction.DOWN, Door(5, None))
+
+
+def test_external_door_carries_side_and_spec() -> None:
+    building = parse('room a "A" 20x20 root\ndoor=10@5 a outside left')
+    ext = building.external_doors[0]
+    assert (ext.room, ext.side, ext.door) == ("a", Direction.LEFT, Door(10, 5))

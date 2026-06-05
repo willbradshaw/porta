@@ -15,3 +15,7 @@ room gallery  "Gallery"       20x10 up-of hall      align=end
 room turret   "Turret"        15x15 left-of library align=end shift=-5
 door=10 parlour library
 door@10 cloak hall
+door porch outside down
+door turret outside left
+door scullery outside right
+door dining outside up

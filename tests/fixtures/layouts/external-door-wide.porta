@@ -1,0 +1,2 @@
+room a "Room A" 20x20 root
+door=10 a outside right

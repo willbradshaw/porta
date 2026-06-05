@@ -113,6 +113,9 @@ def _auto_extent(room: Room, by_id: dict[str, Room], dim_axis: Axis) -> int:
                 line=room.line,
             )
         return gap
+    union = _union_bbox(room, by_id, dim_axis)
+    if union is not None:  # several sizing walls -> span all of them
+        return union[1] - union[0]
     sizing = _sizing_relation(room, _perp(dim_axis), dim_name, hint)
     anchor = by_id[sizing.anchor]
     a_lo = _axis_lo(anchor, dim_axis)
@@ -199,6 +202,28 @@ def _opposite_gap(room: Room, by_id: dict[str, Room], axis: Axis) -> int | None:
     if near is None or far is None:
         return None
     return far - near
+
+
+def _union_bbox(
+    room: Room, by_id: dict[str, Room], axis: Axis
+) -> tuple[int, int] | None:
+    """The ``(near, far)`` a union ``?`` spans on ``axis``, or None if not a union.
+
+    A union applies when ``axis`` carries the room's auto dimension, has no
+    relation of its own (it is free), and is sized by *several* walls on the
+    perpendicular axis (a same-direction pair, or an opposite pair on the other
+    axis). The ``?`` then spans the bounding box of all those anchors — driving
+    both the size and, via :func:`_free_axis_position`, the near-edge position.
+    """
+    auto = room.auto_width if axis is Axis.HORIZONTAL else room.auto_height
+    if not auto or any(rel.direction.axis is axis for rel in room.relations):
+        return None
+    sizing = [rel for rel in room.relations if rel.direction.axis is _perp(axis)]
+    if len(sizing) < 2:
+        return None
+    near = min(_axis_lo(by_id[rel.anchor], axis) for rel in sizing)
+    far = max(_axis_hi(by_id[rel.anchor], axis) for rel in sizing)
+    return near, far
 
 
 def door_segments(building: Building) -> list[Segment]:
@@ -574,7 +599,15 @@ def _axis_position(room: Room, by_id: dict[str, Room], axis: Axis) -> int:
 def _free_axis_position(
     room: Room, by_id: dict[str, Room], axis: Axis, dim: int
 ) -> int:
-    """Position on a free ``axis``: align/shift of the first perpendicular relation."""
+    """Position on a free ``axis``.
+
+    For a union ``?`` the near edge is the union's near edge (so the room spans
+    every sizing anchor); otherwise it is the align/shift of the first
+    perpendicular relation.
+    """
+    union = _union_bbox(room, by_id, axis)
+    if union is not None:
+        return union[0]
     for rel in room.relations:  # the first relation that leaves ``axis`` free
         if rel.direction.axis is not axis:
             anchor = by_id[rel.anchor]

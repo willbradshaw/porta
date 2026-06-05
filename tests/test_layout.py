@@ -10,7 +10,7 @@ from pathlib import Path
 import pytest
 
 from porta.errors import LayoutError, OverlapError
-from porta.layout import find_overlaps, solve
+from porta.layout import door_segments, find_overlaps, solve
 from porta.model import Building, Room
 from porta.parser import parse
 
@@ -167,6 +167,58 @@ def test_align_end_with_both_axes_constrained_raises() -> None:
     text = 'room a "A" 20x20 root\nroom b "B" 10x10 up-of a align=end right-of a'
     with pytest.raises(LayoutError):
         solve(parse(text))
+
+
+# --- doors -----------------------------------------------------------------
+
+
+def doors_of(text: str) -> list[tuple[int, int, int, int]]:
+    return door_segments(solve(parse(text)))
+
+
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        # b (10x10) against a (20x20); shared wall is 10 ft long.
+        # up-of: horizontal wall at y=0; 5-ft door centres (round down) to x[0,5].
+        ('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door', (0, 0, 5, 0)),
+        # door=10 fills the wall.
+        ('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door=10', (0, 0, 10, 0)),
+        # explicit offset.
+        ('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door=5@5', (5, 0, 10, 0)),
+        # right-of: vertical wall at x=20; door spans y[0,5].
+        ('room a "A" 20x20 root\nroom b "B" 10x10 right-of a door', (20, 0, 20, 5)),
+    ],
+)
+def test_door_line_geometry(source: str, expected: tuple[int, int, int, int]) -> None:
+    assert doors_of(source) == [expected]
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        # door wider than the shared wall
+        pytest.param(
+            'room a "A" 10x10 root\nroom b "B" 10x10 up-of a door=20',
+            id="door-wider-than-wall",
+        ),
+        # offset pushes the door past the wall
+        pytest.param(
+            'room a "A" 20x20 root\nroom b "B" 10x10 up-of a door=10@15',
+            id="door-past-the-wall",
+        ),
+        # the door's relation only corner-touches its anchor (no shared wall)
+        pytest.param(
+            'room a "A" 10x10 root\n'
+            'room b "B" 10x10 right-of a\n'
+            'room c "C" 10x10 up-of a right-of b door',
+            id="door-on-corner-touch",
+        ),
+    ],
+)
+def test_door_that_does_not_fit_raises(source: str) -> None:
+    with pytest.raises(LayoutError):
+        solve(parse(source))
 
 
 # --- structural validation -------------------------------------------------

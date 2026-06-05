@@ -248,6 +248,14 @@ def test_special_characters_in_names_are_escaped() -> None:
     assert any(t is not None and "Hall & Co <X>" in t for t in texts)
 
 
+def test_door_renders_as_a_door_line() -> None:
+    root = ET.fromstring(svg_of('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door'))
+    door_lines = [ln for ln in root.iter(tag("line")) if ln.get("class") == "door"]
+    assert len(door_lines) == 1
+    got = tuple(float(door_lines[0].get(k, "")) for k in ("x1", "y1", "x2", "y2"))
+    assert got == (0.0, 0.0, 5.0, 0.0)
+
+
 def test_manor_renders_to_golden_svg_fixture() -> None:
     source = Path("examples/manor.porta").read_text()
     expected = Path("tests/fixtures/manor.svg").read_text()

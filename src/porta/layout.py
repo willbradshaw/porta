@@ -13,10 +13,13 @@ validation are tracked as separate issues.
 """
 
 from porta.errors import LayoutError, OverlapError
-from porta.model import Align, Axis, Building, Direction, Relation, Room
+from porta.model import Align, Axis, Building, Direction, Door, Relation, Room
 
+_GRID_FT = 5
 # An axis-aligned rectangle as (x, y, width, height) in feet.
 Rect = tuple[int, int, int, int]
+# A line segment as (x1, y1, x2, y2) in feet.
+Segment = tuple[int, int, int, int]
 
 
 def solve(building: Building) -> Building:
@@ -59,7 +62,74 @@ def solve(building: Building) -> Building:
     if overlaps:
         first, second, rect = overlaps[0]
         raise OverlapError((first.id, second.id), rect)
+
+    door_segments(building)  # validates every door (raises on a bad one)
     return building
+
+
+def door_segments(building: Building) -> list[Segment]:
+    """Return the door line ``(x1, y1, x2, y2)`` for every relation with a door.
+
+    Validates each door (the relation must share a real wall, and the door must
+    fit it); raises :class:`~porta.errors.LayoutError` otherwise. Assumes a
+    solved building.
+    """
+    by_id = {room.id: room for room in building.rooms}
+    segments: list[Segment] = []
+    for room in building.rooms:
+        for rel in room.relations:
+            if rel.door is not None:
+                segments.append(_door_line(room, by_id[rel.anchor], rel, rel.door))
+    return segments
+
+
+def _door_line(room: Room, anchor: Room, rel: Relation, door: Door) -> Segment:
+    """Endpoints of the door line on the wall ``room`` shares with ``anchor``."""
+    rx, ry = room.x, room.y
+    ax, ay = anchor.x, anchor.y
+    assert rx is not None
+    assert ry is not None
+    assert ax is not None
+    assert ay is not None
+
+    if _free_axis(rel.direction) is Axis.HORIZONTAL:
+        lo = max(rx, ax)
+        length = min(rx + room.width, ax + anchor.width) - lo
+    else:
+        lo = max(ry, ay)
+        length = min(ry + room.height, ay + anchor.height) - lo
+
+    if length <= 0:
+        raise LayoutError(
+            f"door on room {room.id!r}: it shares no wall with {anchor.id!r}",
+            line=rel.line,
+        )
+    if door.width > length:
+        raise LayoutError(
+            f"door on room {room.id!r} ({door.width} ft) is wider than the "
+            f"shared wall ({length} ft)",
+            line=rel.line,
+        )
+    offset = (
+        door.offset
+        if door.offset is not None
+        else ((length - door.width) // (2 * _GRID_FT)) * _GRID_FT
+    )
+    if offset < 0 or offset + door.width > length:
+        raise LayoutError(
+            f"door on room {room.id!r} does not fit the shared wall "
+            f"(offset {offset} + width {door.width} > {length} ft)",
+            line=rel.line,
+        )
+
+    start, end = lo + offset, lo + offset + door.width
+    if rel.direction is Direction.UP:
+        return (start, ry + room.height, end, ry + room.height)
+    if rel.direction is Direction.DOWN:
+        return (start, ry, end, ry)
+    if rel.direction is Direction.LEFT:
+        return (rx + room.width, start, rx + room.width, end)
+    return (rx, start, rx, end)  # Direction.RIGHT
 
 
 def find_overlaps(building: Building) -> list[tuple[Room, Room, Rect]]:

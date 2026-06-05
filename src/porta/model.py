@@ -44,6 +44,18 @@ class Align(Enum):
 
 
 @dataclass(frozen=True)
+class Door:
+    """A door on the wall a relation's room shares with its anchor.
+
+    ``offset`` (feet from the wall's near end) defaults to ``None``, meaning
+    "centred" — the layout computes it.
+    """
+
+    width: int = 5
+    offset: int | None = None
+
+
+@dataclass(frozen=True)
 class Relation:
     """A single placement relation: this room sits ``direction`` of ``anchor``."""
 
@@ -52,6 +64,7 @@ class Relation:
     line: int
     align: Align = Align.START  # free-axis alignment
     shift: int = 0  # feet to nudge along the free axis after aligning
+    door: Door | None = None  # optional door on the shared wall
 
 
 @dataclass

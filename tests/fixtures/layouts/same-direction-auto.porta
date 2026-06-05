@@ -1,3 +1,0 @@
-room a "Room A" 20x10 root
-room b "Room B" 20x10 down-of a
-room c "Room C" 10x? left-of a left-of b

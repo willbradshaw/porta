@@ -166,6 +166,10 @@ def _axis_dim(room: Room, axis: Axis) -> int:
     return room.width if axis is Axis.HORIZONTAL else room.height
 
 
+def _axis_hi(room: Room, axis: Axis) -> int:
+    return _axis_lo(room, axis) + _axis_dim(room, axis)
+
+
 def _opposite_gap(room: Room, by_id: dict[str, Room], axis: Axis) -> int | None:
     """Gap between the anchors when ``axis`` is pinned on both sides, else None.
 
@@ -448,6 +452,32 @@ def _place(room: Room, by_id: dict[str, Room]) -> None:
         # in a two-axis pin may legitimately only pin a coordinate (corner-touch).
         if rel.shift != 0:
             _check_attached(room, rx, ry, by_id[rel.anchor], rel)
+    _check_same_axis_flush(room, by_id)
+
+
+def _check_same_axis_flush(room: Room, by_id: dict[str, Room]) -> None:
+    """When two relations share an axis, each must produce a real shared wall.
+
+    A sole-axis relation may legitimately just pin a coordinate (corner-touch),
+    but a relation that shares its axis isn't load-bearing for position — so its
+    only purpose is the wall, and it must be flush.
+    """
+    for axis in (Axis.HORIZONTAL, Axis.VERTICAL):
+        rels = [rel for rel in room.relations if rel.direction.axis is axis]
+        if len(rels) < 2:
+            continue
+        wall = _perp(axis)
+        for rel in rels:
+            anchor = by_id[rel.anchor]
+            overlap = min(_axis_hi(room, wall), _axis_hi(anchor, wall)) - max(
+                _axis_lo(room, wall), _axis_lo(anchor, wall)
+            )
+            if overlap <= 0:
+                raise LayoutError(
+                    f"room {room.id!r}: {rel.direction.value} {rel.anchor!r} is "
+                    f"not flush (they share no wall)",
+                    line=rel.line,
+                )
 
 
 def _axis_position(room: Room, by_id: dict[str, Room], axis: Axis) -> int:

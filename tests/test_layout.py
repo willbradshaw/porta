@@ -475,6 +475,31 @@ def test_union_size_is_independent_of_a_dim_axis_pin() -> None:
     assert coords(text, "c") == (-10, 0)
 
 
+def test_horizontal_union_spans_side_by_side_anchors() -> None:
+    # a and b sit side by side, colinear tops; c above both with '?' width unions
+    # them horizontally (20) and its near edge moves to the union's left.
+    text = (
+        'room a "A" 10x20 root\n'
+        'room b "B" 10x20 right-of a\n'
+        'room c "C" ?x10 up-of a up-of b'
+    )
+    assert dims(text, "c") == (20, 10)
+    assert coords(text, "c") == (0, -10)
+
+
+def test_corridor_pattern_is_fully_derived() -> None:
+    # The manor corridor in miniature: width match-anchors the library overhang
+    # (10), height unions the two stacked rooms (40), top pinned by down-of.
+    text = (
+        'room lib "L" 30x10 root\n'
+        'room a "A" 20x20 down-of lib shift=10\n'
+        'room b "B" 20x20 down-of a\n'
+        'room cor "C" ?x? down-of lib left-of a left-of b'
+    )
+    assert dims(text, "cor") == (10, 40)
+    assert coords(text, "cor") == (0, 10)
+
+
 def test_same_direction_not_aligned_raises() -> None:
     # b is shifted, so its left edge no longer lines up with a's -> the two
     # left-of relations disagree on where to put c.

@@ -257,6 +257,32 @@ def test_reserved_word_is_not_a_valid_anchor() -> None:
         parse('room a "A" 10x10 root\nroom b "B" 10x10 right-of shift')
 
 
+@pytest.mark.parametrize(
+    "name",
+    [
+        pytest.param("", id="empty"),
+        pytest.param("   ", id="blank"),
+        pytest.param("A\tB", id="unprintable-tab"),
+        pytest.param("x" * 41, id="too-long"),
+    ],
+)
+def test_invalid_room_name_raises(name: str) -> None:
+    with pytest.raises(ParseError):
+        parse(f'room a "{name}" 10x10 root')
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        pytest.param("Café", id="accented"),
+        pytest.param("x" * 40, id="max-length"),
+        pytest.param("Great Hall", id="with-space"),
+    ],
+)
+def test_valid_room_name_accepted(name: str) -> None:
+    assert parse(f'room a "{name}" 10x10 root').room("a").name == name
+
+
 def test_duplicate_id_raises() -> None:
     with pytest.raises(ParseError):
         parse('room a "A" 10x10 root\nroom a "B" 10x10 right-of a')

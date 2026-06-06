@@ -7,13 +7,13 @@ the [root](#the-root), each room is positioned relative to one or more
 [resolves rooms](#how-positions-are-resolved) outward from the root until
 every room is placed.
 
-```porta docs/img/overview.svg
+```porta img/overview.svg
 room hall    "Hall"    30x20 root
 room parlour "Parlour" 20x20 left-of hall
 room kitchen "Kitchen" 20x20 right-of hall
 ```
 
-<img alt="Three rooms in a row" src="docs/img/overview.svg" width="70%">
+<img alt="Three rooms in a row" src="img/overview.svg" width="70%">
 
 > [!NOTE]
 > The short black marks on the shared walls are **doors**, which are
@@ -82,7 +82,7 @@ indicate width and height respectively. Each of `W` and `H` must either:
 2. Be `?`, prompting `porta` to set that dimension [automatically](#auto-dimensions)
 if possible.
 
-> [!INFO]
+> [!NOTE]
 > Valid dimension declarations include `30x40`, `10x?`, `?x50`, `?x?`.
 
 ### Relations
@@ -109,49 +109,45 @@ fixed point against which all other rooms are measured. `porta` puts
 the top-left corner of the root room at the origin of its coordinate
 system and grows the plan outward from there.
 
-```porta docs/img/root.svg
+```porta img/root.svg
 room root_room "Root room" 40x30 root
 ```
 
-<img alt="A single root room" src="docs/img/root.svg" width="70%">
+<img alt="A single root room" src="img/root.svg" width="70%">
 
 A plan with zero roots, or more than one, is invalid and will
 raise an error.
 
 ### Adjacency
 
-A spatial relation places a room flush against its anchor.
+A spatial relation places a room flush against its anchor:
 
-```porta docs/img/adjacency.png
+```porta img/adjacency.svg
 room root_room "Root room" 20x20 root
-room left_room "Left room" 30x20 left-of root
-room right_room "Right room" 30x20 right-of root
-room up_room "Up room" 20x30 up-of root
-room down_room "Down room" 20x30 down-of root
+room left_room "Left room" 30x20 left-of root_room
+room right_room "Right room" 30x20 right-of root_room
+room up_room "Up room" 20x30 up-of root_room
+room down_room "Down room" 20x30 down-of root_room
 ```
 
-<img alt="Five rooms arranged in a cross shape" src="docs/img/root.svg" width="70%">
+<img alt="Five rooms arranged in a cross shape" src="img/adjacency.svg" width="70%">
 
+Each adjacency declaration pins one end of one axis; the room's dimension
+declaration sets the other. `up-of` and `down-of` pin the room's vertical
+position; `left-of` and `right-of` pin its horizontal position.
 
-## Relations
+A room can have multiple adjacency relations. The simplest case is to pin
+the room on two axes:
 
-### The four relations
-
-A relation places a room flush against another — its **anchor**. There are
-four, and they are page-relative, not compass:
-
-- `up-of` / `down-of` — above / below the anchor
-- `left-of` / `right-of` — beside the anchor
-
-```porta img/one-relation.svg
-room hall    "Hall"    30x20 root
-room kitchen "Kitchen" 20x20 right-of hall
+```porta img/corner.svg
+room root_room "Root room" 20x20 root
+room right_room "Right room" 30x20 right-of root_room
+room down_room "Down room" 20x30 down-of root_room
+room corner_room "Corner room" 20x20 right-of down_room down-of right_room
 ```
 
-<img alt="Kitchen to the right of the hall" src="img/one-relation.svg" width="70%">
+<img alt="Four rooms arranged in a square" src="img/corner.svg" width="70%">
 
-The kitchen's left wall meets the hall's right wall, flush — no gap, no overlap,
-and no coordinates from you.
 
 ### One relation pins one axis
 

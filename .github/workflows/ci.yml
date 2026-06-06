@@ -21,7 +21,7 @@ jobs:
           - { name: lint, cmd: "ruff check ." }
           - { name: format, cmd: "ruff format --check ." }
           - { name: types, cmd: "mypy" }
-          - { name: docs, cmd: "python docs/build_figures.py && git diff --exit-code" }
+          - { name: docs, cmd: "python src/build_figures.py && git diff --exit-code" }
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6

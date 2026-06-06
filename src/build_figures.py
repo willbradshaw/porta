@@ -12,7 +12,7 @@ or stale example fails the build. When the fence carries a path —
 path lives in the fence, which GitHub doesn't render, so the reader sees only
 the code and the separate ``![](img/snug-fit.svg)`` image.
 
-    uv run python docs/build_figures.py
+    uv run python src/build_figures.py
 """
 
 import re
@@ -32,7 +32,8 @@ _BACKGROUND = "#e0e0e0"
 
 
 def main() -> None:
-    for md in sorted(Path(__file__).parent.glob("*.md")):
+    docs = Path(__file__).parent.parent / "docs"
+    for md in sorted(docs.glob("*.md")):
         for block in _BLOCK.finditer(md.read_text()):
             building = solve(parse(block["body"]))  # raises on a bad example
             path = block["path"]

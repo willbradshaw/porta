@@ -30,14 +30,14 @@
   </g>
   <rect data-room="entrance" x="0" y="0" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="entrance" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">E</text>
-  <rect data-room="kitchen" x="-20" y="0" width="20" height="30" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="kitchen" x="-10" y="15" text-anchor="middle" dominant-baseline="central" font-size="12">K</text>
   <rect data-room="hall" x="0" y="-30" width="40" height="30" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="hall" x="20" y="-15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
+  <rect data-room="kitchen" x="-20" y="0" width="20" height="30" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="kitchen" x="-10" y="15" text-anchor="middle" dominant-baseline="central" font-size="12">K</text>
   <line class="door" x1="0" y1="5" x2="0" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="5" y1="0" x2="10" y2="0" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-35" y="49.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-35" y="58.8" font-size="6">E  Entrance  (20x20 ft)</text>
-  <text class="key" x="-35" y="68.4" font-size="6">K  Kitchen  (20x30 ft)</text>
-  <text class="key" x="-35" y="78" font-size="6">H  Great Hall  (40x30 ft)</text>
+  <text class="key" x="-35" y="68.4" font-size="6">H  Great Hall  (40x30 ft)</text>
+  <text class="key" x="-35" y="78" font-size="6">K  Kitchen  (20x30 ft)</text>
 </svg>

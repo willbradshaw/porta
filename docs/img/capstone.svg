@@ -30,24 +30,24 @@
     <line x1="-20" y1="45" x2="60" y2="45" />
     <line x1="-20" y1="50" x2="60" y2="50" />
   </g>
-  <rect data-room="hall" x="0" y="0" width="40" height="30" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="hall" x="20" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
-  <rect data-room="parlour" x="-20" y="0" width="20" height="30" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="parlour" x="-10" y="15" text-anchor="middle" dominant-baseline="central" font-size="12">P</text>
-  <rect data-room="kitchen" x="40" y="0" width="20" height="30" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="kitchen" x="50" y="15" text-anchor="middle" dominant-baseline="central" font-size="12">K</text>
-  <rect data-room="porch" x="20" y="30" width="20" height="10" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="porch" x="30" y="35" text-anchor="middle" dominant-baseline="central" font-size="6">O</text>
   <rect data-room="cellar" x="-20" y="30" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="cellar" x="-10" y="40" text-anchor="middle" dominant-baseline="central" font-size="12">C</text>
-  <line class="door" x1="0" y1="10" x2="0" y2="15" stroke="black" stroke-width="1.5" />
-  <line class="door" x1="40" y1="10" x2="40" y2="15" stroke="black" stroke-width="1.5" />
-  <line class="door" x1="25" y1="30" x2="30" y2="30" stroke="black" stroke-width="1.5" />
+  <rect data-room="hall" x="0" y="0" width="40" height="30" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="hall" x="20" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
+  <rect data-room="kitchen" x="40" y="0" width="20" height="30" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="kitchen" x="50" y="15" text-anchor="middle" dominant-baseline="central" font-size="12">K</text>
+  <rect data-room="parlour" x="-20" y="0" width="20" height="30" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="parlour" x="-10" y="15" text-anchor="middle" dominant-baseline="central" font-size="12">P</text>
+  <rect data-room="porch" x="20" y="30" width="20" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="porch" x="30" y="35" text-anchor="middle" dominant-baseline="central" font-size="6">O</text>
   <line class="door" x1="-15" y1="30" x2="-10" y2="30" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="0" y1="10" x2="0" y2="15" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="25" y1="30" x2="30" y2="30" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="40" y1="10" x2="40" y2="15" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-19.6" y="69.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="-19.6" y="78.8" font-size="6">H  Hall  (40x30 ft)</text>
-  <text class="key" x="-19.6" y="88.4" font-size="6">P  Parlour  (20x30 ft)</text>
+  <text class="key" x="-19.6" y="78.8" font-size="6">C  Cellar  (20x20 ft)</text>
+  <text class="key" x="-19.6" y="88.4" font-size="6">H  Hall  (40x30 ft)</text>
   <text class="key" x="-19.6" y="98" font-size="6">K  Kitchen  (20x30 ft)</text>
   <text class="key" x="-19.6" y="107.6" font-size="6">O  Porch  (20x10 ft)</text>
-  <text class="key" x="-19.6" y="117.2" font-size="6">C  Cellar  (20x20 ft)</text>
+  <text class="key" x="-19.6" y="117.2" font-size="6">P  Parlour  (20x30 ft)</text>
 </svg>

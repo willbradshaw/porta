@@ -24,14 +24,14 @@
   </g>
   <rect data-room="hall" x="0" y="0" width="30" height="20" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="hall" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>
-  <rect data-room="parlour" x="-20" y="0" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="parlour" x="-10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">P</text>
   <rect data-room="kitchen" x="30" y="0" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="kitchen" x="40" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">K</text>
+  <rect data-room="parlour" x="-20" y="0" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="parlour" x="-10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">P</text>
   <line class="door" x1="0" y1="5" x2="0" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="30" y1="5" x2="30" y2="10" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-24.6" y="39.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-24.6" y="48.8" font-size="6">H  Hall  (30x20 ft)</text>
-  <text class="key" x="-24.6" y="58.4" font-size="6">P  Parlour  (20x20 ft)</text>
-  <text class="key" x="-24.6" y="68" font-size="6">K  Kitchen  (20x20 ft)</text>
+  <text class="key" x="-24.6" y="58.4" font-size="6">K  Kitchen  (20x20 ft)</text>
+  <text class="key" x="-24.6" y="68" font-size="6">P  Parlour  (20x20 ft)</text>
 </svg>

@@ -30,7 +30,7 @@ from porta.model import (
 # A token plus whether it was double-quoted in the source.
 Token = tuple[str, bool]
 
-_ID_RE = re.compile(r"[A-Za-z][A-Za-z0-9_-]*\Z")
+_ID_RE = re.compile(r"[a-z][a-z0-9_-]*\Z")
 _DIM_RE = re.compile(r"(\?|[0-9]+)x(\?|[0-9]+)\Z")
 _GRID_FT = 5
 _DEFAULT_DOOR_FT = 5
@@ -42,6 +42,10 @@ _KEYWORDS: dict[str, Direction] = {
 _SIDES: dict[str, Direction] = {
     direction.value.removesuffix("-of"): direction for direction in Direction
 }
+# Words that are part of the syntax, so they cannot double as room ids.
+_RESERVED: frozenset[str] = frozenset(
+    {"root", "door", "no-door", "outside", "shift", "align", *_KEYWORDS}
+)
 
 
 def parse(text: str) -> Building:
@@ -80,6 +84,14 @@ def parse(text: str) -> Building:
     return Building(rooms, doors, external_doors)
 
 
+def _validate_id(value: str, quoted: bool, lineno: int) -> None:
+    """Check a token is a usable room id: bare, matching the pattern, not reserved."""
+    if quoted or not _ID_RE.match(value):
+        raise ParseError(f"invalid room id {value!r}", line=lineno)
+    if value in _RESERVED:
+        raise ParseError(f"{value!r} is a reserved word, not a room id", line=lineno)
+
+
 def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
     """Parse a standalone ``door[=W][@O] <a> <b>`` line."""
     spec = _parse_door(tokens[0][0], lineno)
@@ -87,8 +99,7 @@ def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
     if len(rest) != 2:
         raise ParseError("a door needs exactly two room ids", line=lineno)
     for room_id, quoted in rest:
-        if quoted or not _ID_RE.match(room_id):
-            raise ParseError(f"invalid room id {room_id!r}", line=lineno)
+        _validate_id(room_id, quoted, lineno)
     a, b = rest[0][0], rest[1][0]
     if a == b:
         raise ParseError("a door needs two different rooms", line=lineno)
@@ -102,8 +113,7 @@ def _parse_external_door(tokens: list[Token], lineno: int) -> ExternalDoor:
     if len(rest) != 3:
         raise ParseError("an external door needs '<room> outside <side>'", line=lineno)
     (room, room_quoted), _outside, (side, side_quoted) = rest
-    if room_quoted or not _ID_RE.match(room):
-        raise ParseError(f"invalid room id {room!r}", line=lineno)
+    _validate_id(room, room_quoted, lineno)
     direction = _SIDES.get(side)
     if side_quoted or direction is None:
         raise ParseError(f"side must be up/down/left/right, got {side!r}", line=lineno)
@@ -153,8 +163,7 @@ def _parse_room(tokens: list[Token], lineno: int) -> Room:
         )
 
     room_id, id_quoted = tokens[1]
-    if id_quoted or not _ID_RE.match(room_id):
-        raise ParseError(f"invalid room id {room_id!r}", line=lineno)
+    _validate_id(room_id, id_quoted, lineno)
 
     name, name_quoted = tokens[2]
     if not name_quoted:
@@ -226,8 +235,7 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
         if i + 1 >= len(tokens):
             raise ParseError(f"relation {value!r} needs an anchor room id", line=lineno)
         anchor, anchor_quoted = tokens[i + 1]
-        if anchor_quoted or not _ID_RE.match(anchor):
-            raise ParseError(f"invalid anchor id {anchor!r}", line=lineno)
+        _validate_id(anchor, anchor_quoted, lineno)
         i += 2
 
         align = Align.START

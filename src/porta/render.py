@@ -32,8 +32,8 @@ def render_ascii(building: Building) -> str:
     """Render a solved building as an ASCII grid plus a glyph legend.
 
     One character per 5-ft cell, space-separated, north at the top; empty
-    cells are ``.``. A blank line then a ``glyph=id`` legend (in source order)
-    follows.
+    cells are ``.``. A blank line then a ``glyph=name`` legend (ordered by
+    glyph) follows.
 
     Args:
         building: A building whose rooms have been placed by
@@ -65,7 +65,7 @@ def render_ascii(building: Building) -> str:
 
     body = "\n".join(" ".join(cell for cell in row) for row in grid)
     ordered = sorted(building.rooms, key=lambda r: glyphs[r.id])
-    legend = "  ".join(f"{glyphs[room.id]}={room.id}" for room in ordered)
+    legend = "  ".join(f"{glyphs[room.id]}={room.name}" for room in ordered)
     return f"{body}\n\n{legend}"
 
 
@@ -207,21 +207,22 @@ def _placed_rooms(building: Building) -> list[tuple[Room, int, int]]:
 def _assign_glyphs(rooms: list[Room]) -> dict[str, str]:
     """Assign each room a single display glyph (mnemonic-first, then a pool).
 
-    Rooms are processed in id order, so contention for a letter resolves
-    alphabetically and the result is independent of statement order.
+    The glyph is drawn from the room's *name* — what the reader sees in the key —
+    not its id. Rooms are processed in (name, id) order, so contention for a
+    letter resolves deterministically and independently of statement order.
     """
     used: set[str] = set()
     glyphs: dict[str, str] = {}
-    for room in sorted(rooms, key=lambda r: r.id):
-        chosen = _pick_glyph(room.id, used)
+    for room in sorted(rooms, key=lambda r: (r.name, r.id)):
+        chosen = _pick_glyph(room.name, used)
         used.add(chosen)
         glyphs[room.id] = chosen
     return glyphs
 
 
-def _pick_glyph(room_id: str, used: set[str]) -> str:
-    """First unused uppercased alphanumeric of ``room_id``, else from the pool."""
-    for char in room_id:
+def _pick_glyph(name: str, used: set[str]) -> str:
+    """First unused uppercased alphanumeric of ``name``, else from the pool."""
+    for char in name:
         glyph = char.upper()
         if glyph.isalnum() and glyph not in used:
             return glyph

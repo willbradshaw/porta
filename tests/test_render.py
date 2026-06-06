@@ -3,8 +3,8 @@
 The ascii grid doubles as the layout test oracle.
 One character per 5-ft cell, space-separated, north at top; empty cells are
 ``.``. A blank line then a legend follows. Glyphs are mnemonic-first: the
-first unused letter of the room id (uppercased), falling back to a generic
-pool; ties are broken by source order.
+first unused letter of the room name (uppercased), falling back to a generic
+pool; ties are broken alphabetically by name.
 """
 
 import xml.etree.ElementTree as ET
@@ -21,9 +21,9 @@ def ascii_of(text: str) -> str:
     return render_ascii(solve(parse(text)))
 
 
-# Confidently hand-derived: entrance(E)/kitchen(K)/hall(H) on an 8x12 grid.
-# 'hall' is pinned on both axes (x from right-of kitchen, y from down-of
-# entrance) and shares a real wall with each.
+# Confidently hand-derived on an 8x12 grid; glyphs come from the names, so
+# 'Great Hall' is G. 'hall' is pinned on both axes (x from right-of kitchen,
+# y from down-of entrance) and shares a real wall with each.
 DESIGN_MANOR = (
     'room entrance "Entrance Hall" 40x20 root\n'
     'room kitchen  "Kitchen"       20x40 down-of entrance\n'
@@ -35,16 +35,16 @@ E E E E E E E E
 E E E E E E E E
 E E E E E E E E
 E E E E E E E E
-K K K K H H H H
-K K K K H H H H
-K K K K H H H H
-K K K K H H H H
+K K K K G G G G
+K K K K G G G G
+K K K K G G G G
+K K K K G G G G
 K K K K . . . .
 K K K K . . . .
 K K K K . . . .
 K K K K . . . .
 
-E=entrance  H=hall  K=kitchen"""
+E=Entrance Hall  G=Great Hall  K=Kitchen"""
 
 
 def test_design_manor_renders_to_expected_grid() -> None:
@@ -60,19 +60,19 @@ def test_empty_cells_use_dots() -> None:
 
 
 def test_glyphs_are_mnemonic_first_with_tie_breaking() -> None:
-    # Both want K; contention resolves by id order, so kennel takes K and kitchen
-    # falls to its next letter, I — regardless of statement order.
+    # Both names want K; contention resolves by name order, so Kennel takes K and
+    # Kitchen falls to its next letter, I — regardless of statement order.
     text = (
         'room kitchen "Kitchen" 10x10 root\nroom kennel "Kennel" 10x10 right-of kitchen'
     )
     legend = ascii_of(text).split("\n\n")[1]
-    assert "K=kennel" in legend
-    assert "I=kitchen" in legend
+    assert "K=Kennel" in legend
+    assert "I=Kitchen" in legend
 
 
 def test_legend_is_sorted_by_glyph() -> None:
     legend = ascii_of(DESIGN_MANOR).split("\n\n")[1]
-    assert legend == "E=entrance  H=hall  K=kitchen"
+    assert legend == "E=Entrance Hall  G=Great Hall  K=Kitchen"
 
 
 def test_render_is_independent_of_statement_order() -> None:
@@ -97,23 +97,23 @@ def test_render_is_independent_of_statement_order() -> None:
 MANOR_ASCII = """\
 . . . . . . . . . . . . . G G G G . . . . . . . . . . . .
 . . . . . . . . . . . . . G G G G . . . . . . . . . . . .
-. . . I I I I I I H H H H H H H H D D D D D D . . . . . .
-. . . I I I I I I H H H H H H H H D D D D D D . . . . . .
-B B B I I I I I I H H H H H H H H D D D D D D . . . . . .
-B B B I I I I I I H H H H H H H H D D D D D D . . . . . .
-B B B I I I I I I H H H H H H H H D D D D D D . . . . . .
-. . . I I I I I I H H H H H H H H D D D D D D . . . . . .
+. . . I I I I I I R R R R R R R R D D D D D D . . . . . .
+. . . I I I I I I R R R R R R R R D D D D D D . . . . . .
+B B B I I I I I I R R R R R R R R D D D D D D . . . . . .
+B B B I I I I I I R R R R R R R R D D D D D D . . . . . .
+B B B I I I I I I R R R R R R R R D D D D D D . . . . . .
+. . . I I I I I I R R R R R R R R D D D D D D . . . . . .
 . . . O O A A A A E E E E C C C C K K K K K K P P P . . .
 . . . O O A A A A E E E E C C C C K K K K K K P P P L L L
 . . . O O A A A A E E E E C C C C K K K K K K P P P L L L
 . . . O O A A A A E E E E C C C C K K K K K K P P P L L L
-. . . O O T T T T S R R . . . . . K K K K K K P P P . . .
-. . . O O T T T T S R R . . . . . U U U U U U . . . . . .
+. . . O O T T T T S H H . . . . . K K K K K K P P P . . .
+. . . O O T T T T S H H . . . . . U U U U U U . . . . . .
 . . . O O T T T T . . . . . . . . U U U U U U . . . . . .
 . . . O O T T T T . . . . . . . . U U U U U U . . . . . .
 . . . . . . . . . . . . . . . . . U U U U U U . . . . . .
 
-A=parlour  B=turret  C=cloak  D=dining  E=entrance  G=gallery  H=hall  I=library  K=kitchen  L=larder  O=corridor  P=pantry  R=porch  S=passage  T=study  U=scullery"""
+A=Parlour  B=Turret  C=Cloakroom  D=Dining Room  E=Entrance Hall  G=Gallery  H=Porch  I=Library  K=Kitchen  L=Larder  O=Corridor  P=Pantry  R=Great Hall  S=Passage  T=Study  U=Scullery"""
 
 
 def test_manor_example_renders_to_golden() -> None:
@@ -236,7 +236,7 @@ def test_svg_rect_count_matches_room_count() -> None:
     [
         ("entrance", "E", (20.0, 10.0)),
         ("kitchen", "K", (10.0, 40.0)),
-        ("hall", "H", (30.0, 30.0)),
+        ("hall", "G", (30.0, 30.0)),
     ],
 )
 def test_each_room_is_lettered_at_its_centre(

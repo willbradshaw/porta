@@ -61,7 +61,7 @@
   <rect data-room="gallery" x="20" y="-40" width="20" height="10" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="gallery" x="30" y="-35" text-anchor="middle" dominant-baseline="central" font-size="6">G</text>
   <rect data-room="hall" x="0" y="-30" width="40" height="30" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="hall" x="20" y="-15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
+  <text data-room="hall" x="20" y="-15" text-anchor="middle" dominant-baseline="central" font-size="18">R</text>
   <rect data-room="kitchen" x="40" y="0" width="30" height="25" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="kitchen" x="55" y="12.5" text-anchor="middle" dominant-baseline="central" font-size="15">K</text>
   <rect data-room="larder" x="85" y="5" width="15" height="15" fill="none" stroke="black" stroke-width="0.5" />
@@ -75,7 +75,7 @@
   <rect data-room="passage" x="0" y="20" width="5" height="10" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="passage" x="2.5" y="25" text-anchor="middle" dominant-baseline="central" font-size="3">S</text>
   <rect data-room="porch" x="5" y="20" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="porch" x="10" y="25" text-anchor="middle" dominant-baseline="central" font-size="6">R</text>
+  <text data-room="porch" x="10" y="25" text-anchor="middle" dominant-baseline="central" font-size="6">H</text>
   <rect data-room="scullery" x="40" y="25" width="30" height="20" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="scullery" x="55" y="35" text-anchor="middle" dominant-baseline="central" font-size="12">U</text>
   <rect data-room="study" x="-20" y="20" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
@@ -112,13 +112,13 @@
   <text class="key" x="-22.9" y="102.6" font-size="6">D  Dining Room  (30x30 ft)</text>
   <text class="key" x="-22.9" y="112.2" font-size="6">E  Entrance Hall  (20x20 ft)</text>
   <text class="key" x="-22.9" y="121.8" font-size="6">G  Gallery  (20x10 ft)</text>
-  <text class="key" x="-22.9" y="131.4" font-size="6">H  Great Hall  (40x30 ft)</text>
+  <text class="key" x="-22.9" y="131.4" font-size="6">H  Porch  (10x10 ft)</text>
   <text class="key" x="-22.9" y="141" font-size="6">I  Library  (30x30 ft)</text>
   <text class="key" x="-22.9" y="150.6" font-size="6">K  Kitchen  (30x25 ft)</text>
   <text class="key" x="-22.9" y="160.2" font-size="6">L  Larder  (15x15 ft)</text>
   <text class="key" x="-22.9" y="169.8" font-size="6">O  Corridor  (10x40 ft)</text>
   <text class="key" x="-22.9" y="179.4" font-size="6">P  Pantry  (15x25 ft)</text>
-  <text class="key" x="-22.9" y="189" font-size="6">R  Porch  (10x10 ft)</text>
+  <text class="key" x="-22.9" y="189" font-size="6">R  Great Hall  (40x30 ft)</text>
   <text class="key" x="-22.9" y="198.6" font-size="6">S  Passage  (5x10 ft)</text>
   <text class="key" x="-22.9" y="208.2" font-size="6">T  Study  (20x20 ft)</text>
   <text class="key" x="-22.9" y="217.8" font-size="6">U  Scullery  (30x20 ft)</text>

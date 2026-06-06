@@ -264,6 +264,8 @@ def test_reserved_word_is_not_a_valid_anchor() -> None:
         pytest.param("   ", id="blank"),
         pytest.param("A\tB", id="unprintable-tab"),
         pytest.param("x" * 41, id="too-long"),
+        pytest.param(" Hall", id="leading-space"),
+        pytest.param("Hall ", id="trailing-space"),
     ],
 )
 def test_invalid_room_name_raises(name: str) -> None:

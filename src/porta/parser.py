@@ -94,7 +94,7 @@ def _validate_id(value: str, quoted: bool, lineno: int) -> None:
 
 
 def _validate_name(value: str, quoted: bool, lineno: int) -> None:
-    """Check a room name: double-quoted, 1-N printable, non-blank characters."""
+    """Check a room name: double-quoted, 1-N printable, non-blank, untrimmed."""
     if not quoted:
         raise ParseError("room name must be wrapped in double quotes", line=lineno)
     if not 1 <= len(value) <= _MAX_NAME:
@@ -104,6 +104,8 @@ def _validate_name(value: str, quoted: bool, lineno: int) -> None:
         )
     if not value.strip():
         raise ParseError("room name cannot be blank", line=lineno)
+    if value != value.strip():
+        raise ParseError("room name cannot start or end with whitespace", line=lineno)
     if not value.isprintable():
         raise ParseError("room name has unprintable characters", line=lineno)
 

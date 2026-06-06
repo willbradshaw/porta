@@ -36,31 +36,40 @@ Each `room` statement consists of the following components:
 
 1. A literal **`room` declaration** designating what follows as a `room` statement (as opposed to another type of statement, such as [`door`](door.md)).
 2. An **ID string** used to point to that room elsewhere in the plan. Must match `[a-z][a-z0-9_-]*` and not match any of `porta`'s [reserved words](#reserved-words).
-3. A **name string** used to indicate the room in the rendered map key.
+3. A **name string**, the label shown in the rendered map's key. Must be 1–40 printable characters in double quotes, and not blank (see [room name](#room-name)).
 4. A **dimension declaration** of the form `WxH`, where `W` and `H` are both integer multiples of five.
 5. One or more **relation declarations** (see [below](#relations)).
 
 ## Room ID
 
-Each `room` declaration is followed by a 
+The id is the handle other rooms — and [doors](door.md) — use to refer to a
+room. It never appears on the drawing; that is the name's job. An id must match
+`[a-z][a-z0-9_-]*`: a lowercase letter, then any of lowercase letters, digits,
+hyphens, or underscores (`hall`, `store_room-2`). Uppercase is rejected, each id
+must be unique within a plan, and an id can't be one of the
+[reserved words](#reserved-words).
 
-One room per line:
+## Room name
 
-```text
-room <id> "<Name>" <W>x<H> [root] [<relation> <anchor> [modifiers] …]
-```
+The name is the label shown in the rendered map's key. It is wrapped in double
+quotes so it can contain spaces, and must be **1–40 characters**, **not blank**,
+and **printable** — accents, CJK, and emoji are fine, but control characters are
+not. Two further limits come from the syntax itself: a name can't contain a
+literal `"` (there is no escape character), and it can't span a line.
 
-### Id and name
+## Reserved words
 
-`<id>` is how other rooms refer to this one: letters, digits, hyphens and
-underscores, starting with a letter (`hall`, `store_room-2`). It is never drawn.
-`"<Name>"` is the label shown on the plan, in double quotes so it can contain
-spaces.
+A few words are part of porta's syntax, so they can't double as room ids:
 
-### Dimensions
+`root`, `door`, `no-door`, `outside`, `shift`, `align`, `up-of`, `down-of`,
+`left-of`, `right-of`
 
-`<W>x<H>` is the width and height in feet, so `40x30` is forty wide and thirty
-tall. porta works on a 5-foot grid, so both numbers are multiples of 5.
+## Dimensions
+
+`<W>x<H>` is the room's width and height in feet, so `40x30` is forty wide and
+thirty tall. porta works on a 5-foot grid, so both are multiples of 5. A
+dimension can also be `?`, which lets a neighbour set it — see
+[auto dimensions](#auto-dimensions).
 
 ```porta img/dimensions.svg
 room hall "Great Hall" 40x30 root

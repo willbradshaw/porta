@@ -35,10 +35,10 @@ room <id> "<name>" <dimensions> <relations>
 Each `room` statement consists of the following components:
 
 1. A literal **`room` declaration** designating what follows as a `room` statement (as opposed to another type of statement, such as [`door`](door.md)).
-2. An **ID string** used to point to that room elsewhere in the plan. Must match `[a-z][a-z0-9_-]*` and not match any of `porta`'s [reserved words](#reserved-words).
-3. A **name string**, the label shown in the rendered map's key. Must be 1–40 printable characters in double quotes, and not blank (see [room name](#room-name)).
-4. A **dimension declaration** of the form `WxH`, where `W` and `H` are both integer multiples of five.
-5. One or more **relation declarations** (see [below](#relations)).
+2. An **ID string** used to point to that room elsewhere in the plan (see [Room ID](#room-id)).
+3. A **name string**, the label shown in the rendered map's key (see [Room name](#room-name)).
+4. A **dimension declaration** of the form `WxH` (see [Dimensions](#dimensions)).
+5. One or more **relation declarations** (see [Relations](#relations)).
 
 ## Room ID
 

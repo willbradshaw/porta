@@ -151,8 +151,8 @@ A room can also be pinned on either side of the same axis:
 
 ```porta img/flank.svg
 room root_room "Root room" 10x10 root
-room left_room "Left room" 10x20 left-of root_room
-room right_room "Right room" 10x20 right-of root_room
+room left_room "Left room" 10x15 left-of root_room
+room right_room "Right room" 10x15 right-of root_room
 room left_down_room "Left-down room" 10x10 down-of left_room
 room right_down_room "Right-down room" 10x10 down-of right_room
 room flanked "Flanked room" 10x10 right-of left_down_room left-of right_down_room

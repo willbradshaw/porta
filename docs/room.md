@@ -7,13 +7,13 @@ the [root](#the-root), each room is positioned relative to one or more
 [resolves rooms](#how-positions-are-resolved) outward from the root until
 every room is placed.
 
-```porta img/overview.svg
+```porta docs/img/overview.svg
 room hall    "Hall"    30x20 root
 room parlour "Parlour" 20x20 left-of hall
 room kitchen "Kitchen" 20x20 right-of hall
 ```
 
-<img alt="Three rooms in a row" src="img/overview.svg" width="70%">
+<img alt="Three rooms in a row" src="docs/img/overview.svg" width="70%">
 
 > [!NOTE]
 > The short black marks on the shared walls are **doors**, which are
@@ -109,14 +109,29 @@ fixed point against which all other rooms are measured. `porta` puts
 the top-left corner of the root room at the origin of its coordinate
 system and grows the plan outward from there.
 
-```porta img/dimensions.svg
-room hall "Great Hall" 40x30 root
+```porta docs/img/root.svg
+room root_room "Root room" 40x30 root
 ```
 
-<img alt="A single room" src="img/dimensions.svg" width="70%">
+<img alt="A single root room" src="docs/img/root.svg" width="70%">
 
 A plan with zero roots, or more than one, is invalid and will
 raise an error.
+
+### Adjacency
+
+A spatial relation places a room flush against its anchor.
+
+```porta docs/img/adjacency.png
+room root_room "Root room" 20x20 root
+room left_room "Left room" 30x20 left-of root
+room right_room "Right room" 30x20 right-of root
+room up_room "Up room" 20x30 up-of root
+room down_room "Down room" 20x30 down-of root
+```
+
+<img alt="Five rooms arranged in a cross shape" src="docs/img/root.svg" width="70%">
+
 
 ## Relations
 

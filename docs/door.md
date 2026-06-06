@@ -1,10 +1,25 @@
 # Doors
 
-A `porta` plan draws a **door** on every wall that two rooms share, so a plan
-is connected without any extra work. You write a door directive only to change a
-default door — remove it, resize it, move it — or to add one the defaults don't
-give you: between two rooms that aren't anchored to each other, or onto the
-outside.
+By default, `porta` draws a **door* on every wall between a declared
+[room](room.md) and its anchor. Explicit [door declarations](...) and
+[statements](...) are needed only to change a door from its default
+settings (remove it, resize it, move it) or to add an additional door
+in a non-default location.
+
+> [!NOTE]
+> Doors are draws as thick black marks straddling the walls between
+> the rooms they connect. They only appear in rendered SVG; the
+> ASCII debug view (`porta draw <plan>.porta --debug-ascii`) 
+> shows the room layout without them.
+
+## Default doors
+
+Every [relation](room.md#relations) connecting two rooms is given a
+door by default. These default doors are 5 feet wide and positioned
+as close to the centre of the wall as possible. If they cannot be placed
+fully centrally due to the 5-foot wall grid, they are positioned
+immediately above (for vertical walls) or to the left of the center
+(for horizontal walls).
 
 ```porta img/door-overview.svg
 room hall    "Hall"    20x20 root
@@ -14,67 +29,26 @@ room study   "Study"   20x20 down-of hall
 
 <img alt="Three rooms with a default door on each shared wall" src="img/door-overview.svg" width="70%">
 
-The short black marks straddling the walls are the default doors — one on each
-shared wall.
+## Door declarations
 
-> [!NOTE]
-> Doors appear only in the rendered SVG. The ASCII debug view
-> (`porta draw <plan>.porta --debug-ascii`) shows the room layout without them.
+The door drawn by a [relation](room.md#relations) can be modified by
+a **door declaration** added to the end of that relation. There are two
+types of door declaration:
 
-## Default doors
+- A `no-door` declaration suppresses the default door on that relation.
+- A `door*` declaration changes the **width** and/or **offset** of the
+  door: `door=W` sets the door width to `W` feet, `door@O` sets the
+  start of the door to `O` feet from the start of the wall, and
+  `door=W@O` sets both.
 
-Every [relation](room.md#relations) whose two rooms meet along a real shared
-wall gets a single door, 5 feet wide and centred on that wall:
-
-```porta img/door-default.svg
-room a "Room A" 20x20 root
-room b "Room B" 20x20 right-of a
+```porta img/door-declarations.svg
+room r "Root" 20x20 root
+room a "Room A" 20x20 right-of r no-door
+room b "Room B" 20x20 down-of r door=10
+room c "Room C" 20x20 right-of b door@15
 ```
 
-<img alt="Two rooms with a centred default door" src="img/door-default.svg" width="70%">
-
-A door needs a real wall — at least 5 feet of shared edge. Rooms that meet only
-at a corner get no door (and asking for one there is an [error](#invalid-doors)).
-
-## Door modifiers
-
-A door can be controlled from the [relation](room.md#relations) that creates the
-shared wall, by adding a modifier after the anchor.
-
-### Removing a door: `no-door`
-
-`no-door` suppresses the default door on that relation:
-
-```porta img/door-no-door.svg
-room a "Room A" 20x20 root
-room b "Room B" 20x20 right-of a no-door
-```
-
-<img alt="Two rooms with no door on their shared wall" src="img/door-no-door.svg" width="70%">
-
-### Sizing and placing a door: `door=W@O`
-
-`door` overrides the default. Its width and offset can each be set or left to
-default:
-
-- `door=W` — set the width to `W` feet (default 5).
-- `door@O` — set the offset to `O` feet from the wall's **near end**: the top
-  for a vertical wall (`left-of` / `right-of`), the left for a horizontal wall
-  (`up-of` / `down-of`). The default offset centres the door.
-- `door=W@O` — set both.
-
-`W` and `O` are multiples of 5, with `W` at least 5 and `O` at least 0.
-
-```porta img/door-sized.svg
-room a "Room A" 20x40 root
-room b "Room B" 20x20 right-of a door=15
-room c "Room C" 20x20 right-of a align=end door=5@5
-```
-
-<img alt="A wide door and a small offset door on the same room" src="img/door-sized.svg" width="70%">
-
-`b` gets a wide 15-foot door; `c` a narrow one set 5 feet down from the top of
-its wall.
+<img alt="Four rooms with various modifications to their doors" src="img/door-declarations.svg" width="70%">
 
 ## The door statement
 

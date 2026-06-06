@@ -27,7 +27,7 @@
   <rect data-room="west" x="20" y="20" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="west" x="30" y="30" text-anchor="middle" dominant-baseline="central" font-size="12">W</text>
   <line class="door" x1="5" y1="20" x2="10" y2="20" stroke="black" stroke-width="1.5" />
-  <line class="door" x1="20" y1="25" x2="20" y2="30" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="20" y1="20" x2="20" y2="30" stroke="black" stroke-width="1.5" />
   <line class="door" x1="25" y1="20" x2="30" y2="20" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-14.2" y="59.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-14.2" y="68.8" font-size="6">E  East  (20x20 ft)</text>

@@ -1,9 +1,9 @@
 # Doors
 
-By default, `porta` draws a **door* on every wall between a declared
-[room](room.md) and its anchor. Explicit [door declarations](...) and
-[statements](...) are needed only to change a door from its default
-settings (remove it, resize it, move it) or to add an additional door
+By default, `porta` draws a **door** on every wall between a declared
+[room](room.md) and its anchor. Explicit [door declarations](#door-declarations)
+and [statements](#the-door-statement) are needed only to change a door from
+its default settings (remove it, resize it, move it) or to add an additional door
 in a non-default location.
 
 > [!NOTE]
@@ -50,34 +50,36 @@ room c "Room C" 20x20 right-of b door@15
 
 <img alt="Four rooms with various modifications to their doors" src="img/door-declarations.svg" width="70%">
 
-## The door statement
+## The `door` statement
 
 Some doors aren't tied to a positioning relation. A standalone **`door`
 statement**, on its own line, adds one.
 
 ### Between two rooms: `door <a> <b>`
 
-Two rooms can share a wall without either being the other's anchor — for
-instance when both hang off a common neighbour. A `door` statement connects
-them:
+Two rooms can share a wall without either being the other's anchor. A
+`door` statement connects them, following the same width and offset
+syntax as [door declarations](#door-declarations):
 
 ```porta img/door-standalone.svg
 room hall "Hall" 40x20 root
 room east "East" 20x20 down-of hall
 room west "West" 20x20 down-of hall shift=20
-door east west
+door=10@0 east west
 ```
 
 <img alt="Two rooms below a hall, joined by a standalone door" src="img/door-standalone.svg" width="70%">
 
-`east` and `west` are both placed below the hall and meet along a wall, but
-neither anchors the other, so there's no default door between them — `door east
-west` adds it. A door statement takes the same `=W@O` controls as a modifier
-(`door=10@5 east west`).
+`door` statements can also be used to add additional doors to walls that
+already have them, as long as the doors do not overlap:
 
-> [!NOTE]
-> Two doors may share a wall as long as they don't overlap — a pair of separate
-> openings is fine. Two that overlap are an [error](#invalid-doors).
+```porta img/door-multi.svg
+room r "Root" 20x20 root
+room a "Room A" 20x20 right-of r door@5
+door@15 r a
+```
+
+<img alt="A pair of rooms linked by two doors" src="img/door-multi.svg" width="70%">
 
 ### To the outside: `door <room> outside <side>`
 

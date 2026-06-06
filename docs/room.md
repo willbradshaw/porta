@@ -10,7 +10,7 @@ room parlour "Parlour" 20x20 left-of hall
 room kitchen "Kitchen" 20x20 right-of hall
 ```
 
-<p align="center"><img alt="Three rooms in a row" src="img/overview.svg" width="70%"></p>
+<img alt="Three rooms in a row" src="img/overview.svg" width="70%">
 
 That's the whole idea: one `root` room to start from, and relations
 (`left-of`, `right-of`, and so on) to hang the rest off. The short black marks
@@ -41,7 +41,7 @@ tall. porta works on a 5-foot grid, so both numbers are multiples of 5.
 room hall "Great Hall" 40x30 root
 ```
 
-<p align="center"><img alt="A single room" src="img/dimensions.svg" width="70%"></p>
+<img alt="A single room" src="img/dimensions.svg" width="70%">
 
 ## The root
 
@@ -64,7 +64,7 @@ room hall    "Hall"    30x20 root
 room kitchen "Kitchen" 20x20 right-of hall
 ```
 
-<p align="center"><img alt="Kitchen to the right of the hall" src="img/one-relation.svg" width="70%"></p>
+<img alt="Kitchen to the right of the hall" src="img/one-relation.svg" width="70%">
 
 The kitchen's left wall meets the hall's right wall, flush — no gap, no overlap,
 and no coordinates from you.
@@ -85,7 +85,7 @@ room hall  "Hall"  20x40 root
 room study "Study" 20x20 right-of hall
 ```
 
-<p align="center"><img alt="A short room aligned to the top of a tall one" src="img/free-axis.svg" width="70%"></p>
+<img alt="A short room aligned to the top of a tall one" src="img/free-axis.svg" width="70%">
 
 The study is shorter than the hall, so their tops sit flush and the south-east
 corner is left open. That default — flush near edges — is `align=start`, and you
@@ -107,7 +107,7 @@ room hall  "Hall"  20x40 root
 room study "Study" 20x20 right-of hall align=end
 ```
 
-<p align="center"><img alt="A short room aligned to the bottom of a tall one" src="img/align-end.svg" width="70%"></p>
+<img alt="A short room aligned to the bottom of a tall one" src="img/align-end.svg" width="70%">
 
 Now the study drops to the hall's foot.
 
@@ -121,7 +121,7 @@ room hall  "Hall"  20x40 root
 room study "Study" 20x20 right-of hall shift=10
 ```
 
-<p align="center"><img alt="A room shifted ten feet down" src="img/shift.svg" width="70%"></p>
+<img alt="A room shifted ten feet down" src="img/shift.svg" width="70%">
 
 A shift has to leave the rooms sharing some wall. Slide a room clear off its
 anchor and porta complains, because the relation no longer means anything.
@@ -136,7 +136,7 @@ room kitchen  "Kitchen"    20x30 left-of entrance
 room hall     "Great Hall" 40x30 up-of entrance right-of kitchen
 ```
 
-<p align="center"><img alt="A hall pinned above the entrance and right of the kitchen" src="img/both-axes.svg" width="70%"></p>
+<img alt="A hall pinned above the entrance and right of the kitchen" src="img/both-axes.svg" width="70%">
 
 The hall's `y` comes from `up-of entrance` and its `x` from `right-of kitchen`.
 
@@ -165,7 +165,7 @@ room d "D" 20x20 down-of a shift=30
 room c "C" 10x20 right-of b left-of d
 ```
 
-<p align="center"><img alt="A room filling the gap between two others" src="img/snug-fit.svg" width="70%"></p>
+<img alt="A room filling the gap between two others" src="img/snug-fit.svg" width="70%">
 
 `c` drops into the ten-foot gap between `b` and `d`. You don't have to work the
 width out yourself, either — see `?` below.
@@ -181,7 +181,7 @@ room b "B" 20x10 down-of a
 room c "C" 10x20 left-of a left-of b
 ```
 
-<p align="center"><img alt="A room beside two stacked rooms" src="img/same-direction.svg" width="70%"></p>
+<img alt="A room beside two stacked rooms" src="img/same-direction.svg" width="70%">
 
 `c` runs down the left of both `a` and `b`. If their left edges didn't line up,
 that's an error — and unlike the corner-touch above, a same-axis relation does
@@ -202,7 +202,7 @@ room hall  "Hall"  20x40 root
 room study "Study" 20x? right-of hall
 ```
 
-<p align="center"><img alt="A study as tall as the hall" src="img/match-anchor.svg" width="70%"></p>
+<img alt="A study as tall as the hall" src="img/match-anchor.svg" width="70%">
 
 `20x?` makes the study as tall as the hall — compare [the free-axis
 example](#the-free-axis), where a fixed `20x20` left a gap. (More precisely, the
@@ -225,7 +225,7 @@ room b "B" 20x20 down-of a
 room c "C" 10x? left-of a left-of b
 ```
 
-<p align="center"><img alt="A room spanning two rooms of different heights" src="img/union.svg" width="70%"></p>
+<img alt="A room spanning two rooms of different heights" src="img/union.svg" width="70%">
 
 `a` is ten tall and `b` is twenty; `c` comes out thirty, the two together.
 
@@ -308,7 +308,7 @@ room porch   "Porch"   20x10 down-of hall align=end
 room cellar  "Cellar"  ?x20  down-of parlour
 ```
 
-<p align="center"><img alt="A small house plan" src="img/capstone.svg" width="70%"></p>
+<img alt="A small house plan" src="img/capstone.svg" width="70%">
 
 A hall with two wings, a porch tucked under its east end with `align=end`, and a
 cellar that takes the parlour's width with `?`. For a larger plan — once you've

@@ -170,7 +170,58 @@ room span_room "Span room" 10x20 right-of root_room right-of down_room
 
 <img alt="A room pinned to two rooms on its left-hand side" src="img/span.svg" width="70%">
 
+In all cases, **a room must share at least 5 feet of wall with all of its anchors**.
+If a room statement declares an anchor, but the dimensions of the room do not allow
+it to sit flush with that room while meeting its other constraints, the plan is
+invalid.
 
+### Alignment
+
+By default, a room is anchored to the start of the corresponding edge of its
+anchor room: top for vertical edges, left for horizontal edges.
+
+```porta img/align_default.svg
+room root_room "Root room" 20x20 root
+room left_room "Left room" 10x10 left-of root_room
+room right_room "Right room" 10x10 right-of root_room
+```
+
+<img alt="Two rooms anchored to root with start-aligned positions" src="img/align_default.svg" width="70%">
+
+> [!NOTE]
+> `porta` follows the same coordinate system as the SVG standard, so vertical
+> position is measured from the top of the page, not the bottom.
+
+Rooms can instead be aligned to the *end* of their anchor edges by adding an
+`align=end` argument to the relevant relation.
+
+```porta img/align_end.svg
+room root_room "Root room" 20x20 root
+room left_room "Left room" 10x10 left-of root_room align=end
+room right_room "Right room" 10x10 right-of root_room align=end
+```
+
+<img alt="Two rooms anchored to root with end-aligned positions" src="img/align_end.svg" width="70%">
+
+If desired, a start-aligned anchor can be declared explicitly with an
+`align=start` argument; this produces the same result as the default.
+
+```porta img/align_start.svg
+room root_room "Root room" 20x20 root
+room left_room "Left room" 10x10 left-of root_room align=start
+room right_room "Right room" 10x10 right-of root_room align=start
+```
+
+<img alt="Two rooms anchored to root with start-aligned positions" src="img/align_start.svg" width="70%">
+
+These arguments can be used in multi-relation room statements:
+
+```porta img/flank_align.svg
+room root_room "Root room" 10x10 root
+room left_room "Left room" 10x25 left-of root_room
+room right_room "Right room" 10x25 right-of root_room
+room flanked "Flanked room" 10x10 right-of left_room align=end left-of right_room
+```
 
 ### One relation pins one axis
 

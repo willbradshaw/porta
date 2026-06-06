@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="1214" viewBox="-59 -10 128 121.4">
+  <rect x="-59" y="-10" width="128" height="121.4" fill="#e0e0e0" />
+  <g stroke="#bbb" stroke-width="0.15">
+    <line x1="-10" y1="0" x2="-10" y2="25" />
+    <line x1="-5" y1="0" x2="-5" y2="25" />
+    <line x1="0" y1="0" x2="0" y2="25" />
+    <line x1="5" y1="0" x2="5" y2="25" />
+    <line x1="10" y1="0" x2="10" y2="25" />
+    <line x1="15" y1="0" x2="15" y2="25" />
+    <line x1="20" y1="0" x2="20" y2="25" />
+    <line x1="-10" y1="0" x2="20" y2="0" />
+    <line x1="-10" y1="5" x2="20" y2="5" />
+    <line x1="-10" y1="10" x2="20" y2="10" />
+    <line x1="-10" y1="15" x2="20" y2="15" />
+    <line x1="-10" y1="20" x2="20" y2="20" />
+    <line x1="-10" y1="25" x2="20" y2="25" />
+  </g>
+  <rect data-room="a" x="-10" y="0" width="10" height="15" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="a" x="-5" y="7.5" text-anchor="middle" dominant-baseline="central" font-size="6">A</text>
+  <rect data-room="b" x="10" y="0" width="10" height="15" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="b" x="15" y="7.5" text-anchor="middle" dominant-baseline="central" font-size="6">B</text>
+  <rect data-room="c" x="-10" y="15" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="c" x="-5" y="20" text-anchor="middle" dominant-baseline="central" font-size="6">C</text>
+  <rect data-room="d" x="10" y="15" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="d" x="15" y="20" text-anchor="middle" dominant-baseline="central" font-size="6">D</text>
+  <rect data-room="e" x="0" y="15" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="e" x="5" y="20" text-anchor="middle" dominant-baseline="central" font-size="6">E</text>
+  <rect data-room="r" x="0" y="0" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="r" x="5" y="5" text-anchor="middle" dominant-baseline="central" font-size="6">R</text>
+  <line class="door" x1="-10" y1="15" x2="-5" y2="15" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="0" y1="0" x2="0" y2="5" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="0" y1="15" x2="0" y2="20" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="10" y1="0" x2="10" y2="5" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="10" y1="15" x2="10" y2="20" stroke="black" stroke-width="1.5" />
+  <line class="door" x1="10" y1="15" x2="15" y2="15" stroke="black" stroke-width="1.5" />
+  <text class="scale" x="-49" y="44.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="-49" y="53.8" font-size="6">A  Left room  (10x15 ft)</text>
+  <text class="key" x="-49" y="63.4" font-size="6">B  Right room  (10x15 ft)</text>
+  <text class="key" x="-49" y="73" font-size="6">C  Left-down room  (10x10 ft)</text>
+  <text class="key" x="-49" y="82.6" font-size="6">D  Right-down room  (10x10 ft)</text>
+  <text class="key" x="-49" y="92.2" font-size="6">E  Flanked room  (10x10 ft)</text>
+  <text class="key" x="-49" y="101.8" font-size="6">R  Root room  (10x10 ft)</text>
+</svg>

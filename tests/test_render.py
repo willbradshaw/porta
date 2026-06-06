@@ -278,6 +278,12 @@ def test_door_renders_as_a_door_line() -> None:
     assert got == (0.0, 0.0, 5.0, 0.0)
 
 
+def test_background_is_configurable() -> None:
+    assert 'fill="white"' in svg_of('room a "A" 20x20 root')  # default
+    custom = render_svg(solve(parse('room a "A" 20x20 root')), background="#f0f0f0")
+    assert 'fill="#f0f0f0"' in custom
+
+
 def test_manor_renders_to_golden_svg_fixture() -> None:
     source = Path("examples/manor.porta").read_text()
     expected = Path("tests/fixtures/manor.svg").read_text()

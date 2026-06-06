@@ -158,6 +158,9 @@ room right_down_room "Right-down room" 10x20 down-of right_room
 room flanked "Flanked room" 20x10 right-of left_down_room left-of right_down_room
 ```
 
+<img alt="A room anchored in both horizontal directions" src="img/flank.svg" width="70%">
+
+
 ### One relation pins one axis
 
 `right-of hall` settles where the kitchen sits *horizontally*: its left edge is

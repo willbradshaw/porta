@@ -133,10 +133,11 @@ room down_room "Down room" 10x15 down-of root_room
 
 Each adjacency declaration pins one end of one axis; the room's dimension
 declaration sets the other. `up-of` and `down-of` pin the room's vertical
-position; `left-of` and `right-of` pin its horizontal position.
+position; `left-of` and `right-of` pin its horizontal position. The axis
+pinned by a relation is the **pinned axis**; the other is the **free axis**.
 
 A room can have multiple adjacency relations. The simplest case is to pin
-the room on two axes:
+the room on both axes, leaving no free axis at all:
 
 ```porta img/corner.svg
 room root_room "Root room" 10x10 root
@@ -225,62 +226,30 @@ room flanked "Flanked room" 10x10 right-of left_room align=end left-of right_roo
 
 <img alt="A room anchored in both horizontal directions, end-aligned" src="img/flank_align.svg" width="70%">
 
-### One relation pins one axis
+For alignment to have an effect, the room to be aligned must have a free axis
+along which its position can be modified. If both axes of a room are pinned,
+alignment arguments will raise errors.
 
-`right-of hall` settles where the kitchen sits *horizontally*: its left edge is
-the hall's right edge. It says nothing about the vertical, so porta has to fill
-that in.
+### Shifting
 
-### The free axis
-
-The axis a relation leaves open is the **free axis**. By default porta lines up
-the near edges. For a left/right relation that means the tops:
-
-```porta img/free-axis.svg
-room hall  "Hall"  20x40 root
-room study "Study" 20x20 right-of hall
-```
-
-<img alt="A short room aligned to the top of a tall one" src="img/free-axis.svg" width="70%">
-
-The study is shorter than the hall, so their tops sit flush and the south-east
-corner is left open. That default — flush near edges — is `align=start`, and you
-can override it.
-
-## Alignment
-
-### `align=start`
-
-The default: near edges flush (tops for left/right relations, left edges for
-up/down). Tiled rooms form a continuous wall, which is usually what you want.
-
-### `align=end`
-
-Flush the *far* edges instead — bottoms, or right edges:
-
-```porta img/align-end.svg
-room hall  "Hall"  20x40 root
-room study "Study" 20x20 right-of hall align=end
-```
-
-<img alt="A short room aligned to the bottom of a tall one" src="img/align-end.svg" width="70%">
-
-Now the study drops to the hall's foot.
-
-## Shifting
-
-`shift=N` nudges a room along its free axis after aligning. Positive is down
-(for left/right relations) or right (for up/down), measured in feet on the grid:
+Like alignment, shifting modifies the position of a room along its free axis.
+Applying a `shift=N` argument to a relation nudges the room `N` feet in the
+positive direction (right/down); `shift=-N` nudges it `N` feet in the
+negative direction (left/up). Shifting is applied **after alignment**.
 
 ```porta img/shift.svg
-room hall  "Hall"  20x40 root
-room study "Study" 20x20 right-of hall shift=10
+room root_room "Root room" 20x20 root
+room right_room "Right room" 10x10 right-of root_room shift=5
+room left_room "Left room" 10x10 left-of root_room shift=-5
+room down_room "Down room" 10x10 down-of root_room align=end shift=-5
+room up_room "Up room" 10x10 up-of root_room align=end shift=5
 ```
 
-<img alt="A room shifted ten feet down" src="img/shift.svg" width="70%">
+<img alt="Several rooms shifted in different directionss" src="img/shift.svg" width="70%">
 
-A shift has to leave the rooms sharing some wall. Slide a room clear off its
-anchor and porta complains, because the relation no longer means anything.
+As always, a room must share at least 5 feet of wall with each of its anchors
+after shifting. Shifting a room fully off of its anchor produces an
+invalid plan.
 
 ## Pinning both axes
 

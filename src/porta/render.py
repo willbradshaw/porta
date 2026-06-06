@@ -64,7 +64,8 @@ def render_ascii(building: Building) -> str:
                 grid[r][c] = glyphs[room.id]
 
     body = "\n".join(" ".join(cell for cell in row) for row in grid)
-    legend = "  ".join(f"{glyphs[room.id]}={room.id}" for room in building.rooms)
+    ordered = sorted(building.rooms, key=lambda r: glyphs[r.id])
+    legend = "  ".join(f"{glyphs[room.id]}={room.id}" for room in ordered)
     return f"{body}\n\n{legend}"
 
 
@@ -103,7 +104,7 @@ def render_svg(building: Building, *, background: str = "white") -> str:
     caption = f"1 square = {_GRID_FT} ft"
     entries = [
         f"{glyphs[room.id]}  {room.name}  ({room.width}x{room.height} ft)"
-        for room in building.rooms
+        for room in sorted(building.rooms, key=lambda r: glyphs[r.id])
     ]
     chrome = [caption, *entries]
     # The key is a fixed readable size (not tied to room sizes — a single small
@@ -148,7 +149,7 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         )
     lines.append("  </g>")
 
-    for room, x, y in placed:
+    for room, x, y in sorted(placed, key=lambda t: t[0].id):
         font = min(room.width, room.height) * _LABEL_RATIO
         lines.append(
             f'  <rect data-room="{room.id}" x="{_num(x)}" y="{_num(y)}" '
@@ -163,7 +164,8 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         )
 
     # Doors: a thick coloured line along the shared wall, over the rooms.
-    for x1, y1, x2, y2 in door_segments(building):
+    # Sorted so the output is independent of statement order.
+    for x1, y1, x2, y2 in sorted(door_segments(building)):
         lines.append(
             f'  <line class="door" x1="{_num(x1)}" y1="{_num(y1)}" '
             f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="{_DOOR_COLOUR}" '
@@ -204,10 +206,14 @@ def _placed_rooms(building: Building) -> list[tuple[Room, int, int]]:
 
 
 def _assign_glyphs(rooms: list[Room]) -> dict[str, str]:
-    """Assign each room a single display glyph (mnemonic-first, then a pool)."""
+    """Assign each room a single display glyph (mnemonic-first, then a pool).
+
+    Rooms are processed in id order, so contention for a letter resolves
+    alphabetically and the result is independent of statement order.
+    """
     used: set[str] = set()
     glyphs: dict[str, str] = {}
-    for room in rooms:
+    for room in sorted(rooms, key=lambda r: r.id):
         chosen = _pick_glyph(room.id, used)
         used.add(chosen)
         glyphs[room.id] = chosen

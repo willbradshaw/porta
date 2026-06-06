@@ -42,7 +42,7 @@ K K K K E E E E . . . .
 K K K K . . . . . . . .
 K K K K . . . . . . . .
 
-E=entrance  K=kitchen  H=hall"""
+E=entrance  H=hall  K=kitchen"""
 
 
 def test_design_manor_renders_to_expected_grid() -> None:
@@ -58,42 +58,60 @@ def test_empty_cells_use_dots() -> None:
 
 
 def test_glyphs_are_mnemonic_first_with_tie_breaking() -> None:
-    # kitchen -> K; kennel -> K taken -> E (second letter).
+    # Both want K; contention resolves by id order, so kennel takes K and kitchen
+    # falls to its next letter, I — regardless of statement order.
     text = (
         'room kitchen "Kitchen" 10x10 root\nroom kennel "Kennel" 10x10 right-of kitchen'
     )
     legend = ascii_of(text).split("\n\n")[1]
-    assert "K=kitchen" in legend
-    assert "E=kennel" in legend
+    assert "K=kennel" in legend
+    assert "I=kitchen" in legend
 
 
-def test_legend_lists_rooms_in_source_order() -> None:
+def test_legend_is_sorted_by_glyph() -> None:
     legend = ascii_of(DESIGN_MANOR).split("\n\n")[1]
-    assert legend == "E=entrance  K=kitchen  H=hall"
+    assert legend == "E=entrance  H=hall  K=kitchen"
+
+
+def test_render_is_independent_of_statement_order() -> None:
+    # Same rooms, shuffled and with the root written last, render identically:
+    # placement is a DAG and the labels are alphabetical, so order can't matter.
+    plan = (
+        'room hall "Hall" 20x20 root\n'
+        'room kitchen "Kitchen" 20x20 right-of hall\n'
+        'room study "Study" 20x20 down-of hall'
+    )
+    shuffled = (
+        'room study "Study" 20x20 down-of hall\n'
+        'room kitchen "Kitchen" 20x20 right-of hall\n'
+        'room hall "Hall" 20x20 root'
+    )
+    assert ascii_of(shuffled) == ascii_of(plan)
+    assert svg_of(shuffled) == svg_of(plan)
 
 
 # --- the north-star manor (golden) ----------------------------------------
 
 MANOR_ASCII = """\
-. . . . . . . . . . . . . Y Y Y Y . . . . . . . . . . . .
-. . . . . . . . . . . . . Y Y Y Y . . . . . . . . . . . .
-. . . L L L L L L H H H H H H H H D D D D D D . . . . . .
-. . . L L L L L L H H H H H H H H D D D D D D . . . . . .
-T T T L L L L L L H H H H H H H H D D D D D D . . . . . .
-T T T L L L L L L H H H H H H H H D D D D D D . . . . . .
-T T T L L L L L L H H H H H H H H D D D D D D . . . . . .
-. . . L L L L L L H H H H H H H H D D D D D D . . . . . .
-. . . O O P P P P E E E E C C C C K K K K K K A A A . . .
-. . . O O P P P P E E E E C C C C K K K K K K A A A B B B
-. . . O O P P P P E E E E C C C C K K K K K K A A A B B B
-. . . O O P P P P E E E E C C C C K K K K K K A A A B B B
-. . . O O S S S S G R R . . . . . K K K K K K A A A . . .
-. . . O O S S S S G R R . . . . . U U U U U U . . . . . .
-. . . O O S S S S . . . . . . . . U U U U U U . . . . . .
-. . . O O S S S S . . . . . . . . U U U U U U . . . . . .
+. . . . . . . . . . . . . G G G G . . . . . . . . . . . .
+. . . . . . . . . . . . . G G G G . . . . . . . . . . . .
+. . . I I I I I I H H H H H H H H D D D D D D . . . . . .
+. . . I I I I I I H H H H H H H H D D D D D D . . . . . .
+B B B I I I I I I H H H H H H H H D D D D D D . . . . . .
+B B B I I I I I I H H H H H H H H D D D D D D . . . . . .
+B B B I I I I I I H H H H H H H H D D D D D D . . . . . .
+. . . I I I I I I H H H H H H H H D D D D D D . . . . . .
+. . . O O A A A A E E E E C C C C K K K K K K P P P . . .
+. . . O O A A A A E E E E C C C C K K K K K K P P P L L L
+. . . O O A A A A E E E E C C C C K K K K K K P P P L L L
+. . . O O A A A A E E E E C C C C K K K K K K P P P L L L
+. . . O O T T T T S R R . . . . . K K K K K K P P P . . .
+. . . O O T T T T S R R . . . . . U U U U U U . . . . . .
+. . . O O T T T T . . . . . . . . U U U U U U . . . . . .
+. . . O O T T T T . . . . . . . . U U U U U U . . . . . .
 . . . . . . . . . . . . . . . . . U U U U U U . . . . . .
 
-E=entrance  H=hall  L=library  D=dining  P=parlour  C=cloak  K=kitchen  A=pantry  S=study  O=corridor  U=scullery  R=porch  G=passage  B=larder  Y=gallery  T=turret"""
+A=parlour  B=turret  C=cloak  D=dining  E=entrance  G=gallery  H=hall  I=library  K=kitchen  L=larder  O=corridor  P=pantry  R=porch  S=passage  T=study  U=scullery"""
 
 
 def test_manor_example_renders_to_golden() -> None:

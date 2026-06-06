@@ -315,68 +315,41 @@ room c "Span room" 10x? left-of a left-of b
 In all cases, a `?` needs something to measure against. `porta` will reject
 auto dimensions when there is no wall to size from.
 
-## How positions are resolved
+## Resolution
 
-### Propagation from the root (a graph, not a solver)
+In `porta`, rooms are placed into the coordinate system by building and
+traversing a dependency graph. The root is placed at the origin, rooms
+anchored to the root are placed in relation to it, rooms anchored to
+*those* rooms are placed, and so on until no rooms are left. Cycles,
+disconnected components, and irresolvable placements raise errors as
+invalid plans. Because of this directed acyclic structure, the whole
+plan can be resolved in a single pass, and no constraint solver is needed.
 
-You might expect a tool like this to run a constraint solver. It doesn't, and it
-doesn't need to. Because every room carries its own size and attaches flush,
-there is nothing numerical to search for: once you know where a room's anchor
-is, the room's own position follows straight away.
+The coordinate system is measured in feet, with the `x`-axis increasing
+to the right and the `y`-axis increasing downward. The top-left corner
+of the root is placed at `(0,0)`; rooms above or to the left of the root
+have negative coordinates. Each room is defined by the coordinates of its
+top-left corner plus its dimensions.
 
-So porta places the root at the origin, then keeps placing any room whose
-anchors are already down, until none are left. It is a single pass over a
-dependency graph — a room depends on its anchors, they depend on theirs, back to
-the root. A room that depends on itself (directly or round a loop) is a cycle,
-and a room that never connects back to the root is disconnected. Both are
-errors.
+Auto-dimensions (`?`) are resolved just before each room is placed, at which
+point the position and dimensions of its anchors are already known. As a
+result, a `?` dimension can be anchored relative to another `?` dimension,
+as long as the chain eventually resolves to an explicit value.
 
-### The coordinate system
+## Invalid plans
 
-Coordinates are in feet. `x` increases to the right (east) and `y` increases
-*downward* (south), matching the screen, so nothing is flipped behind the
-scenes. A room's position is its top-left (north-west) corner, and the root's is
-`(0, 0)`. Rooms placed `up-of` or `left-of` the root get negative coordinates,
-which is expected.
+The DAG-traversal approach adopted by `porta` requires each room to be fully
+defined at the time of its placement, and for each room to share at least
+5 feet of wall with each of its anchors. The following are all invalid
+under this schema and will raise errors:
 
-### Resolution order, and how `?` fits in
-
-`?` dimensions are solved in the same pass, just before each room is placed, so
-by the time porta needs a room's size its anchors — and *their* sizes — are
-already known. A `?` can even point at another `?`: the chain resolves in order,
-with no special handling.
-
-### Eyeballing with `--debug-ascii`
-
-The relational style is compact, but the cost is that you can't always picture
-the result. `porta draw plan.porta --debug-ascii` prints the solved layout as a
-grid of letters, one glyph per room, so you can check the shape without opening
-the SVG:
-
-```text
-H H H H H H K K K K
-H H H H H H K K K K
-H H H H H H K K K K
-H H H H H H K K K K
-
-H=hall  K=kitchen
-```
-
-## What porta rejects
-
-porta would rather stop than guess, so each of these is an error, reported with
-the room and line at fault:
-
-- **No single root** — zero rooms marked `root`, or several.
-- **Unknown anchor** — a relation naming a room id that doesn't exist.
-- **A cycle** — rooms whose placement depends on one another.
-- **A disconnected room** — one that doesn't trace back to the root.
-- **Overlap** — two rooms covering the same ground.
-- **A non-flush same-axis relation** — two relations on one axis where the room
-  fails to meet one of its anchors.
-- **A snug-fit mismatch** — a room whose size doesn't fill the gap it's pinned
-  into.
-- **An unsolvable `?`** — nothing for it to size against.
+- 0 or multiple roots
+- Non-existent anchors
+- Cyclic room dependencies
+- Disconnected rooms
+- Overlaps between rooms
+- Gaps between a room and its anchor
+- Unsolvable `?` dimensions
 
 ## Putting it together
 

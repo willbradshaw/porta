@@ -16,17 +16,17 @@
     <line x1="-10" y1="25" x2="20" y2="25" />
     <line x1="-10" y1="30" x2="20" y2="30" />
   </g>
-  <rect data-room="a" x="0" y="0" width="20" height="10" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="a" x="10" y="5" text-anchor="middle" dominant-baseline="central" font-size="6">A</text>
-  <rect data-room="b" x="0" y="10" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="b" x="10" y="20" text-anchor="middle" dominant-baseline="central" font-size="12">B</text>
-  <rect data-room="c" x="-10" y="0" width="10" height="30" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="c" x="-5" y="15" text-anchor="middle" dominant-baseline="central" font-size="6">C</text>
+  <rect data-room="down_room" x="0" y="10" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="down_room" x="10" y="20" text-anchor="middle" dominant-baseline="central" font-size="12">D</text>
+  <rect data-room="root_room" x="0" y="0" width="20" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="root_room" x="10" y="5" text-anchor="middle" dominant-baseline="central" font-size="6">R</text>
+  <rect data-room="span_room" x="-10" y="0" width="10" height="30" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="span_room" x="-5" y="15" text-anchor="middle" dominant-baseline="central" font-size="6">S</text>
   <line class="door" x1="0" y1="0" x2="0" y2="5" stroke="black" stroke-width="1.5" />
   <line class="door" x1="0" y1="15" x2="0" y2="20" stroke="black" stroke-width="1.5" />
   <line class="door" x1="5" y1="10" x2="10" y2="10" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-38.2" y="49.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="-38.2" y="58.8" font-size="6">A  Root room  (20x10 ft)</text>
-  <text class="key" x="-38.2" y="68.4" font-size="6">B  Down room  (20x20 ft)</text>
-  <text class="key" x="-38.2" y="78" font-size="6">C  Span room  (10x30 ft)</text>
+  <text class="key" x="-38.2" y="58.8" font-size="6">D  Down room  (20x20 ft)</text>
+  <text class="key" x="-38.2" y="68.4" font-size="6">R  Root room  (20x10 ft)</text>
+  <text class="key" x="-38.2" y="78" font-size="6">S  Span room  (10x30 ft)</text>
 </svg>

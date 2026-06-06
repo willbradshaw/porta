@@ -3,8 +3,8 @@
 The core of a `porta` plan is a list of [rooms](#the-room-statement), linked by 
 [relations](#relations) into a floorplan. With the exception of
 the [root](#the-root), each room is positioned relative to one or more
-**anchors** defined previously in the plan. `porta`
-[resolves rooms](#how-positions-are-resolved) outward from the root until
+**[anchors](#adjacency)** defined previously in the plan. `porta`
+[resolves rooms](#resolution) outward from the root until
 every room is placed.
 
 ```porta img/overview.svg
@@ -55,8 +55,9 @@ within a plan, and can't match any of `porta`'s reserved keywords.
 > `left-of`, `right-of`
 
 > [!NOTE]
-> Examples of valid IDs in `porta`: ...
-> Examples of invalid IDs: ...
+> Valid IDs: `hall`, `store_room-2`, `wc1`.
+> Invalid IDs: `Hall` (uppercase), `2nd_room` (leading digit),
+> `dining room` (space), `left-of` (reserved keyword).
 
 ### Room name
 
@@ -80,7 +81,7 @@ indicate width and height respectively. Each of `W` and `H` must either:
 
 1. Be an integer positive multiple of 5 (`5`, `10`, `15`, etc.); or
 2. Be `?`, prompting `porta` to set that dimension [automatically](#auto-dimensions)
-if possible.
+   if possible.
 
 > [!NOTE]
 > Examples of valid dimension declarations: `30x40`, `10x?`, `?x50`, `?x?`
@@ -95,8 +96,9 @@ followed by zero or more **arguments**. Valid relation keywords are
 
 Each direction keyword takes a [room ID](#room-id) as its first 
 argument, indicating the **anchor room** relative to which the 
-new room must be positioned; subsequent arguments can refine the
-relative positioning of the new room versus its anchor.
+new room must be positioned; subsequent arguments — [alignment](#alignment)
+and [shifting](#shifting) — can refine the relative positioning of the new
+room versus its anchor.
 
 For more on relation syntax, see [below](#positioning-rooms).
 
@@ -171,7 +173,7 @@ room span_room "Span room" 10x20 right-of root_room right-of down_room
 
 <img alt="A room pinned to two rooms on its left-hand side" src="img/span.svg" width="70%">
 
-In all cases, **a room must share at least 5 feet of wall with all of its anchors**.
+In all cases, **a room must [share at least 5 feet of wall](#invalid-plans) with all of its anchors**.
 If a room statement declares an anchor, but the dimensions of the room do not allow
 it to sit flush with that room while meeting its other constraints, the plan is
 invalid.
@@ -246,9 +248,9 @@ room up_room "Up room" 10x10 up-of root_room align=end shift=5
 room outer_room "Outer room" 10x10 right-of right_room shift=-5
 ```
 
-<img alt="Several rooms shifted in different directionss" src="img/shift.svg" width="70%">
+<img alt="Several rooms shifted in different directions" src="img/shift.svg" width="70%">
 
-As always, a room must share at least 5 feet of wall with each of its anchors
+As always, a room must [share at least 5 feet of wall](#invalid-plans) with each of its anchors
 after shifting. Shifting a room fully off of its anchor produces an
 invalid plan.
 
@@ -277,17 +279,6 @@ room down_room "Down room" ?x20 down-of root_room shift=-5
 
 <img alt="A grid of shifted rooms with auto-derived dimensions" src="img/auto-shift.svg" width="70%">
 
-If extension is blocked by another room, `?` will extend the new room up to the barrier, then stop:
-
-```porta img/auto-block.svg
-room root_room "Root room" 20x20 root
-room right_room "Right room" 20x? right-of root_room
-room corner_room "Corner room" 20x20 down-of right_room shift=-5
-room down_room "Down room" ?x? down-of root_room left-of corner_room
-```
-
-<img alt="A grid of shifted rooms with auto-derived dimensions" src="img/auto-block.svg" width="70%">
-
 Special behavior is needed when a room has two anchors on the same axis. If these are on 
 opposite sides, `?` will extend the new room to snugly fit between them:
 
@@ -305,9 +296,9 @@ room flanked "Flanked room" ?x? right-of left_down_room left-of right_down_room
 If there are two anchors on the same side, `?` will extend the new room to cover both:
 
 ```porta img/auto-union.svg
-room a "Root room" 20x10 root
-room b "Down room" 20x20 down-of a
-room c "Span room" 10x? left-of a left-of b
+room root_room "Root room" 20x10 root
+room down_room "Down room" 20x20 down-of root_room
+room span_room "Span room" 10x? left-of root_room left-of down_room
 ```
 
 <img alt="A room spanning two rooms of different heights" src="img/auto-union.svg" width="70%">
@@ -349,6 +340,7 @@ under this schema and will raise errors:
 - Disconnected rooms
 - Overlaps between rooms
 - Gaps between a room and its anchor
+- Corner-only anchor contact
 - Unsolvable `?` dimensions
 
 ## Putting it together

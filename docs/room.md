@@ -360,8 +360,3 @@ room passage  "Passage"       ?x10  right-of porch left-of scullery
 ```
 
 <img alt="A manor ground floor exercising every placement feature" src="img/capstone.svg" width="70%">
-
-A manor ground floor that brings the chapter together — `align`, `shift`, all
-three [double-anchor](#adjacency) forms, and [auto `?`
-dimensions](#auto-dimensions). For a fuller plan, once you've met
-[doors](door.md), see [`examples/manor.porta`](../examples/manor.porta).

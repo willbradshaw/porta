@@ -21,26 +21,28 @@ def ascii_of(text: str) -> str:
     return render_ascii(solve(parse(text)))
 
 
-# Confidently hand-derived: entrance(E)/kitchen(K)/hall(H) on a 12x12 grid.
+# Confidently hand-derived: entrance(E)/kitchen(K)/hall(H) on an 8x12 grid.
+# 'hall' is pinned on both axes (x from right-of kitchen, y from down-of
+# entrance) and shares a real wall with each.
 DESIGN_MANOR = (
-    'room entrance "Entrance Hall" 20x20 root\n'
-    'room kitchen  "Kitchen"       20x30 left-of entrance\n'
-    'room hall     "Great Hall"    40x30 up-of entrance right-of kitchen'
+    'room entrance "Entrance Hall" 40x20 root\n'
+    'room kitchen  "Kitchen"       20x40 down-of entrance\n'
+    'room hall     "Great Hall"    20x20 right-of kitchen down-of entrance'
 )
 
 DESIGN_MANOR_ASCII = """\
-. . . . H H H H H H H H
-. . . . H H H H H H H H
-. . . . H H H H H H H H
-. . . . H H H H H H H H
-. . . . H H H H H H H H
-. . . . H H H H H H H H
-K K K K E E E E . . . .
-K K K K E E E E . . . .
-K K K K E E E E . . . .
-K K K K E E E E . . . .
-K K K K . . . . . . . .
-K K K K . . . . . . . .
+E E E E E E E E
+E E E E E E E E
+E E E E E E E E
+E E E E E E E E
+K K K K H H H H
+K K K K H H H H
+K K K K H H H H
+K K K K H H H H
+K K K K . . . .
+K K K K . . . .
+K K K K . . . .
+K K K K . . . .
 
 E=entrance  H=hall  K=kitchen"""
 
@@ -232,9 +234,9 @@ def test_svg_rect_count_matches_room_count() -> None:
 @pytest.mark.parametrize(
     ("room_id", "glyph", "center"),
     [
-        ("entrance", "E", (10.0, 10.0)),
-        ("kitchen", "K", (-10.0, 15.0)),
-        ("hall", "H", (20.0, -15.0)),
+        ("entrance", "E", (20.0, 10.0)),
+        ("kitchen", "K", (10.0, 40.0)),
+        ("hall", "H", (30.0, 30.0)),
     ],
 )
 def test_each_room_is_lettered_at_its_centre(
@@ -257,8 +259,8 @@ def test_key_includes_room_dimensions() -> None:
     key_text = " ".join(
         t.text or "" for t in ET.fromstring(svg_of(DESIGN_MANOR)).iter(tag("text"))
     )
-    assert "(20x20 ft)" in key_text  # entrance
-    assert "(40x30 ft)" in key_text  # hall
+    assert "(40x20 ft)" in key_text  # entrance
+    assert "(20x40 ft)" in key_text  # kitchen
 
 
 def test_special_characters_in_names_are_escaped() -> None:

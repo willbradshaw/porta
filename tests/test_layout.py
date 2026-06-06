@@ -54,9 +54,9 @@ def test_single_relation_edge_math_and_align_start(
 
 # The design-note manor: two relations pin both axes of 'hall' directly.
 DESIGN_MANOR = (
-    'room entrance "Entrance Hall" 20x20 root\n'
-    'room kitchen  "Kitchen"       20x30 left-of entrance\n'
-    'room hall     "Great Hall"    40x30 up-of entrance right-of kitchen'
+    'room entrance "Entrance Hall" 40x20 root\n'
+    'room kitchen  "Kitchen"       20x40 down-of entrance\n'
+    'room hall     "Great Hall"    20x20 right-of kitchen down-of entrance'
 )
 
 
@@ -64,25 +64,25 @@ DESIGN_MANOR = (
     ("room_id", "expected"),
     [
         ("entrance", (0, 0)),
-        ("kitchen", (-20, 0)),  # left-of entrance; tops flush
-        ("hall", (0, -30)),  # y from up-of entrance, x from right-of kitchen
+        ("kitchen", (0, 20)),  # down-of entrance; left edges flush
+        ("hall", (20, 20)),  # x from right-of kitchen, y from down-of entrance
     ],
 )
 def test_two_relations_pin_both_axes(room_id: str, expected: tuple[int, int]) -> None:
     assert coords(DESIGN_MANOR, room_id) == expected
 
 
-def test_align_start_propagates_to_create_a_gap() -> None:
-    # 'smoking' is east of the tall hall and north of 'drawing'; because
-    # 'drawing' align-started to hall's top, 'smoking' rises above the hall's
-    # roofline, leaving the south-east corner empty (the spec's §2.4 surprise).
+def test_corner_touch_relation_is_rejected() -> None:
+    # 'smoking' is east of the tall hall and above 'drawing'; 'up-of drawing'
+    # lifts it above the hall's top, so 'right-of hall' meets the hall only at a
+    # corner — no shared wall. A relation must share a wall, so this is rejected.
     text = (
         'room hall    "Hall"    20x40 root\n'
         'room drawing "Drawing" 20x20 right-of hall\n'
         'room smoking "Smoking" 20x20 right-of hall up-of drawing'
     )
-    assert coords(text, "drawing") == (20, 0)
-    assert coords(text, "smoking") == (20, -20)
+    with pytest.raises(LayoutError):
+        solve(parse(text))
 
 
 # --- shift -----------------------------------------------------------------
@@ -207,13 +207,6 @@ def test_door_line_geometry(source: str, expected: tuple[int, int, int, int]) ->
             'room a "A" 20x20 root\nroom b "B" 10x10 up-of a door=10@15',
             id="door-past-the-wall",
         ),
-        # the door's relation only corner-touches its anchor (no shared wall)
-        pytest.param(
-            'room a "A" 10x10 root\n'
-            'room b "B" 10x10 right-of a\n'
-            'room c "C" 10x10 up-of a right-of b door',
-            id="door-on-corner-touch",
-        ),
     ],
 )
 def test_door_that_does_not_fit_raises(source: str) -> None:
@@ -230,17 +223,6 @@ def test_a_shared_wall_gets_a_default_door() -> None:
 
 def test_no_door_suppresses_the_default() -> None:
     assert doors_of('room a "A" 20x20 root\nroom b "B" 20x20 right-of a no-door') == []
-
-
-def test_default_doors_skip_walls_that_only_corner_touch() -> None:
-    # 'hall right-of kitchen' only corner-touches, so no default door there (and
-    # no error); the two real walls (kitchen/entrance, hall/entrance) get one each.
-    text = (
-        'room entrance "E" 20x20 root\n'
-        'room kitchen "K" 20x30 left-of entrance\n'
-        'room hall "H" 40x30 up-of entrance right-of kitchen'
-    )
-    assert len(doors_of(text)) == 2
 
 
 def test_standalone_door_between_incidental_rooms() -> None:
@@ -460,19 +442,6 @@ def test_same_direction_auto_spans_the_union() -> None:
     assert dims(text, "c") == (10, 30)
     assert coords(text, "c") == (-10, 0)
     assert len(doors_of(text)) == 3  # a<->b, c<->a, c<->b
-
-
-def test_union_size_is_independent_of_a_dim_axis_pin() -> None:
-    # 'down-of top' pins c's top edge, but the '?' still unions the two left-of
-    # walls to span both a and b (the pin lines up with the union's near edge).
-    text = (
-        'room a "A" 20x20 root\n'
-        'room b "B" 20x20 down-of a\n'
-        'room top "T" 10x10 up-of a\n'
-        'room c "C" 10x? down-of top left-of a left-of b'
-    )
-    assert dims(text, "c") == (10, 40)
-    assert coords(text, "c") == (-10, 0)
 
 
 def test_horizontal_union_spans_side_by_side_anchors() -> None:

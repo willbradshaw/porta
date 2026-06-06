@@ -1,6 +1,6 @@
 # Rooms
 
-The core of a `porta` plan is a list of **rooms**, linked by 
+The core of a `porta` plan is a list of [rooms](#the-room-statement), linked by 
 [relations](#relations) into a floorplan. With the exception of
 the [root](#the-root), each room is positioned relative to one or more
 **anchors** defined previously in the plan. `porta`
@@ -18,13 +18,31 @@ room kitchen "Kitchen" 20x20 right-of hall
 > [!NOTE]
 > The short black marks on the shared walls are **doors**, which are
 > added by default between adjoining rooms. Door syntax is described
-> [here](door.md).
+> separately [here](door.md).
 
 > [!WARNING]
 > At the time of writing, **only rectangular rooms are supported** in
 > `porta`. Non-rectangular rooms are planned for a future release.
 
 ## The `room` statement
+
+A room is declared in a `porta` plan as follows:
+
+```text
+room <id> "<name>" <dimensions> <relations>
+```
+
+Each `room` statement consists of the following components
+
+1. A literal **`room` declaration** designating what follows as a `room` statemest (as opposed to another type of statement, such as [`door`](door.md)).
+2. An **ID string** used to point to that room elsewhere in the plan.
+3. A **name string** used to indicate the room in the rendered map key.
+4. A **dimension declaration** of the form `WxH`, where `W` and `H` are both integer multiples of five.
+5. One or more **relation declarations** (see [below](#relations)).
+
+## Room ID
+
+Each `room` declaration is followed by a 
 
 One room per line:
 

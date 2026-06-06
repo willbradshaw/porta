@@ -27,6 +27,9 @@ _BLOCK = re.compile(
     re.MULTILINE | re.DOTALL,
 )
 
+# Light grey reads more gently than white on a dark page (tweak to taste).
+_BACKGROUND = "#f0f0f0"
+
 
 def main() -> None:
     for md in sorted(Path(__file__).parent.glob("*.md")):
@@ -37,7 +40,7 @@ def main() -> None:
                 continue
             target = md.parent / path
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(render_svg(building))
+            target.write_text(render_svg(building, background=_BACKGROUND))
             print(f"{md.name}: wrote {path}")
 
 

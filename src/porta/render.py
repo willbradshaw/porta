@@ -68,7 +68,7 @@ def render_ascii(building: Building) -> str:
     return f"{body}\n\n{legend}"
 
 
-def render_svg(building: Building) -> str:
+def render_svg(building: Building, *, background: str = "white") -> str:
     """Render a solved building as SVG.
 
     Geometry is drawn directly in feet (1 user unit = 1 foot); no scaling or
@@ -81,6 +81,7 @@ def render_svg(building: Building) -> str:
     Args:
         building: A building whose rooms have been placed by
             :func:`~porta.layout.solve`.
+        background: Fill for the SVG backdrop (default ``"white"``).
 
     Returns:
         The SVG document as a string.
@@ -125,10 +126,10 @@ def render_svg(building: Building) -> str:
         f'viewBox="{_num(view_x)} {_num(view_y)} {_num(view_w)} {_num(view_h)}">'
     ]
 
-    # White background so the drawing is legible on any viewer backdrop.
+    # Opaque background so the drawing is legible on any viewer backdrop.
     lines.append(
         f'  <rect x="{_num(view_x)}" y="{_num(view_y)}" '
-        f'width="{_num(view_w)}" height="{_num(view_h)}" fill="white" />'
+        f'width="{_num(view_w)}" height="{_num(view_h)}" fill="{background}" />'
     )
 
     # 5-ft grid, drawn behind the rooms (over the background).

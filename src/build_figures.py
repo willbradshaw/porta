@@ -1,3 +1,4 @@
+#!/usr/bin/env -S uv run python
 """Build (and check) the figures embedded in the docs.
 
 Every fenced ``porta`` block in ``docs/*.md`` is parsed and solved, so a broken
@@ -12,12 +13,15 @@ or stale example fails the build. When the fence carries a path —
 path lives in the fence, which GitHub doesn't render, so the reader sees only
 the code and the separate ``![](img/snug-fit.svg)`` image.
 
-    uv run python src/build_figures.py
+    uv run python src/build_figures.py           # render the figures
+    uv run python src/build_figures.py --check   # just validate the snippets
 """
 
+import argparse
 import re
 from pathlib import Path
 
+from porta.errors import PortaError
 from porta.layout import solve
 from porta.parser import parse
 from porta.render import render_svg
@@ -32,12 +36,27 @@ _BACKGROUND = "#e0e0e0"
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--check",
+        action="store_true",
+        help="validate every snippet but don't write any figures",
+    )
+    args = parser.parse_args()
+
     docs = Path(__file__).parent.parent / "docs"
     for md in sorted(docs.glob("*.md")):
         for block in _BLOCK.finditer(md.read_text()):
-            building = solve(parse(block["body"]))  # raises on a bad example
+            try:
+                building = solve(parse(block["body"]))
+            except PortaError as err:
+                first = block["body"].splitlines()[0]
+                raise SystemExit(f"{md.name}: in example '{first}': {err}") from None
             path = block["path"]
-            if path is None:
+            if path is None or args.check:
                 continue
             target = md.parent / path
             target.parent.mkdir(parents=True, exist_ok=True)

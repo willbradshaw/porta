@@ -243,6 +243,7 @@ room right_room "Right room" 10x10 right-of root_room shift=5
 room left_room "Left room" 10x10 left-of root_room shift=-5
 room down_room "Down room" 10x10 down-of root_room align=end shift=-5
 room up_room "Up room" 10x10 up-of root_room align=end shift=5
+room outer_room "Outer room" 10x10 right-of right_room shift=-5
 ```
 
 <img alt="Several rooms shifted in different directionss" src="img/shift.svg" width="70%">
@@ -251,114 +252,68 @@ As always, a room must share at least 5 feet of wall with each of its anchors
 after shifting. Shifting a room fully off of its anchor produces an
 invalid plan.
 
-## Pinning both axes
+## Auto dimensions (`?`)
 
-Give a room a relation on each axis and both are fixed, with no free axis left:
+A dimension of `?` in a room statement instructs `porta` to derive that dimension
+from the room's anchors. In the simplest case, the auto-derived dimension
+simply matches the corresponding dimension of the anchor:
 
-```porta img/both-axes.svg
-room entrance "Entrance"   20x20 root
-room kitchen  "Kitchen"    20x30 left-of entrance
-room hall     "Great Hall" 40x30 up-of entrance right-of kitchen
+```porta img/auto-single.svg
+room root_room "Root room" 20x20 root
+room right_room "Right room" 20x? right-of root_room
+room down_room "Down room" ?x20 down-of root_room
+room corner_room "Corner room" ?x? right-of down_room down-of right_room
 ```
 
-<img alt="A hall pinned above the entrance and right of the kitchen" src="img/both-axes.svg" width="70%">
+<img alt="A square of rooms with auto-derived dimensions" src="img/auto-single.svg" width="70%">
 
-The hall's `y` comes from `up-of entrance` and its `x` from `right-of kitchen`.
+If a room is shifted, `?` will extend it to the end of the anchor wall:
 
-### Coordinate-only pins
-
-Notice where the hall meets the kitchen: they touch only at a corner.
-`right-of kitchen` still did its job — it pinned the hall's horizontal position
-— but the two rooms don't actually share a wall. That is fine, and often what
-you want: a relation can carry a position without forming a shared wall. (Two
-relations on the *same* axis are stricter; see the next section.)
-
-## Same-axis relations
-
-Two relations on the same axis box a room in from both sides.
-
-### Opposite directions: snug-fit
-
-Put a room `right-of` one and `left-of` another and it has to fill the space
-between them exactly. porta checks the width against the gap and errors if they
-disagree:
-
-```porta img/snug-fit.svg
-room a "A" 40x20 root
-room b "B" 20x20 down-of a
-room d "D" 20x20 down-of a shift=30
-room c "C" 10x20 right-of b left-of d
+```porta img/auto-shift.svg
+room root_room "Root room" 20x20 root
+room right_room "Right room" 20x? right-of root_room shift=5
+room down_room "Down room" ?x20 down-of root_room shift=-5
 ```
 
-<img alt="A room filling the gap between two others" src="img/snug-fit.svg" width="70%">
+<img alt="A grid of shifted rooms with auto-derived dimensions" src="img/auto-shift.svg" width="70%">
 
-`c` drops into the ten-foot gap between `b` and `d`. You don't have to work the
-width out yourself, either — see `?` below.
+If extension is blocked by another room, `?` will extend the new room up to the barrier, then stop:
 
-### Same direction: a shared edge
-
-`left-of` two rooms at once puts the room beside both. The two anchors have to
-present the same edge, or there would be nowhere consistent to put it:
-
-```porta img/same-direction.svg
-room a "A" 20x10 root
-room b "B" 20x10 down-of a
-room c "C" 10x20 left-of a left-of b
+```porta img/auto-block.svg
+room root_room "Root room" 20x20 root
+room right_room "Right room" 20x? right-of root_room
+room corner_room "Corner room" 20x20 down-of right_room shift=-5
+room down_room "Down room" ?x? down-of root_room left-of corner_room
 ```
 
-<img alt="A room beside two stacked rooms" src="img/same-direction.svg" width="70%">
+<img alt="A grid of shifted rooms with auto-derived dimensions" src="img/auto-block.svg" width="70%">
 
-`c` runs down the left of both `a` and `b`. If their left edges didn't line up,
-that's an error — and unlike the corner-touch above, a same-axis relation does
-have to form a real shared wall.
+Special behavior is needed when a room has two anchors on the same axis. If these are on 
+opposite sides, `?` will extend the new room to snugly fit between them:
 
-## Auto dimensions: `?`
-
-Often a room's size is really dictated by its neighbours, and spelling the
-number out is just a chance to get it wrong. Write `?` in place of a dimension
-and porta solves it.
-
-### Match an anchor's wall
-
-A `?` grows the room to fill the wall it shares with its anchor:
-
-```porta img/match-anchor.svg
-room hall  "Hall"  20x40 root
-room study "Study" 20x? right-of hall
+```porta img/auto-flank.svg
+room root_room "Root room" 10x10 root
+room left_room "Left room" 10x15 left-of root_room
+room right_room "Right room" 10x15 right-of root_room
+room left_down_room "Left-down room" ?x10 down-of left_room
+room right_down_room "Right-down room" ?x10 down-of right_room
+room flanked "Flanked room" ?x? right-of left_down_room left-of right_down_room
 ```
 
-<img alt="A study as tall as the hall" src="img/match-anchor.svg" width="70%">
+<img alt="A room anchored in both horizontal directions with auto-derived dimensions" src="img/auto-flank.svg" width="70%">
 
-`20x?` makes the study as tall as the hall — compare [the free-axis
-example](#the-free-axis), where a fixed `20x20` left a gap. (More precisely, the
-`?` runs from whichever edge the room is already pinned by out to the anchor's
-far edge, so a shifted or part-placed room fills only what is left.)
+If there are two anchors on the same side, `?` will extend the new room to cover both:
 
-### Fill a snug-fit gap
-
-On an axis pinned from both sides, a `?` *is* the gap — the snug-fit width,
-computed for you. The `c` in the snug-fit example could just as well be `?x20`.
-
-### Union: span several walls
-
-When more than one wall sizes the same `?`, the room spans all of them. Make the
-`c` from before `10x?` and it stretches to cover both `a` and `b`:
-
-```porta img/union.svg
-room a "A" 20x10 root
-room b "B" 20x20 down-of a
-room c "C" 10x? left-of a left-of b
+```porta img/auto-union.svg
+room a "Root room" 20x10 root
+room b "Down room" 20x20 down-of a
+room c "Span room" 10x? left-of a left-of b
 ```
 
-<img alt="A room spanning two rooms of different heights" src="img/union.svg" width="70%">
+<img alt="A room spanning two rooms of different heights" src="img/auto-union.svg" width="70%">
 
-`a` is ten tall and `b` is twenty; `c` comes out thirty, the two together.
-
-### When a `?` can't be solved
-
-A `?` needs something to measure against. porta rejects one with no wall to size
-from (a root, or an axis with no relation), and one that resolves to nothing (a
-shift that has pushed the room clear of its anchor).
+In all cases, a `?` needs something to measure against. `porta` will reject
+auto dimensions when there is no wall to size from.
 
 ## How positions are resolved
 

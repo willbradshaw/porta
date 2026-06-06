@@ -155,7 +155,7 @@ room left_room "Left room" 20x20 left-of root_room
 room right_room "Right room" 20x20 right-of root_room
 room left_down_room "Left-down room" 10x20 down-of left_room
 room right_down_room "Right-down room" 10x20 down-of right_room
-room flanked "Flanked room" 10x10 right-of left_room left-of right_room
+room flanked "Flanked room" 20x10 right-of left_down_room left-of right_down_room
 ```
 
 ### One relation pins one axis

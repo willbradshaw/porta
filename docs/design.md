@@ -95,23 +95,23 @@ dimension exactly fills the gap** and error if it doesn't. Useful, but
 
 ```
 # feet, 5-ft grid
-room entrance "Entrance Hall"  20x20   root
-room kitchen  "Kitchen"        20x30   left-of entrance
-room hall     "Great Hall"     40x30   up-of entrance  right-of kitchen
+room entrance "Entrance Hall"  40x20   root
+room kitchen  "Kitchen"        20x40   down-of entrance
+room hall     "Great Hall"     20x20   right-of kitchen  down-of entrance
 ```
 
 - `entrance` — root, placed at origin.
-- `kitchen` — `left-of entrance` pins its right edge to entrance's left edge;
-  vertical free → `align=start` (top edges flush).
-- `hall` — `up-of entrance` pins `y`, `right-of kitchen` pins `x`. Fully
-  determined.
+- `kitchen` — `down-of entrance` pins its top edge to entrance's bottom edge;
+  horizontal free → `align=start` (left edges flush).
+- `hall` — `right-of kitchen` pins `x`, `down-of entrance` pins `y`. Fully
+  determined, and it shares a real wall with each anchor.
 
-Three-room subtlety (`align=start` propagates): with `drawing right-of hall`
-then `smoking right-of hall up-of drawing`, smoking stacks *above* drawing —
-and because drawing aligned to hall's *top*, smoking ends up above the
-hall's roofline, leaving a gap to the right of hall's lower half.
-`down-of drawing` instead drops it into that gap for a tidy block. This
-"picture it / trust the solver" cost is why `--debug-ascii` exists.
+Every relation must form a real shared wall (§3). A relation that ends up
+meeting its anchor only at a corner is rejected, not silently accepted as a
+coordinate-only pin: e.g. `smoking right-of hall up-of drawing`, where
+`up-of drawing` lifts smoking clear above the tall hall's top, so `right-of
+hall` touches only at a corner. Picturing two-axis placements is still the
+tricky part, which is why `--debug-ascii` exists.
 
 ---
 
@@ -126,6 +126,9 @@ carry the offending room id(s) and source line number.
 - **No disconnected rooms** (every non-root room must resolve from the root).
 - **No overlap** — after solving, no two room rectangles may collide.
   **Essential.** Error reports both ids and the overlap rectangle.
+- **Shared walls** — every relation must share at least 5 ft of wall with its
+  anchor. A relation that meets its anchor only at a corner (often because the
+  other axis pushed the room past it), or a shift that detaches it, is rejected.
 - **Doors** — every door must lie on a real shared wall and fit within it; two
   doors on the same wall may not overlap each other.
 - **Over-constraint conflict** — same-axis relations that disagree (see

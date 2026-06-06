@@ -538,40 +538,31 @@ def _aligned(anchor_lo: int, anchor_dim: int, room_dim: int, align: Align) -> in
 
 def _place(room: Room, by_id: dict[str, Room]) -> None:
     """Set ``room``'s coordinates from its (already-placed) anchors."""
-    rx = _axis_position(room, by_id, Axis.HORIZONTAL)
-    ry = _axis_position(room, by_id, Axis.VERTICAL)
-    room.x, room.y = rx, ry
-    for rel in room.relations:
-        # Only a shift can slide a room off its anchor. A non-shifted relation
-        # in a two-axis pin may legitimately only pin a coordinate (corner-touch).
-        if rel.shift != 0:
-            _check_attached(room, rx, ry, by_id[rel.anchor], rel)
-    _check_same_axis_flush(room, by_id)
+    room.x = _axis_position(room, by_id, Axis.HORIZONTAL)
+    room.y = _axis_position(room, by_id, Axis.VERTICAL)
+    _check_shared_walls(room, by_id)
 
 
-def _check_same_axis_flush(room: Room, by_id: dict[str, Room]) -> None:
-    """When two relations share an axis, each must produce a real shared wall.
+def _check_shared_walls(room: Room, by_id: dict[str, Room]) -> None:
+    """Every relation must form a real shared wall (>= 5 ft) with its anchor.
 
-    A sole-axis relation may legitimately just pin a coordinate (corner-touch),
-    but a relation that shares its axis isn't load-bearing for position — so its
-    only purpose is the wall, and it must be flush.
+    A relation that meets its anchor only at a corner (or, after a shift, not at
+    all) carries a position but no wall — usually because the room's placement on
+    the *other* axis pushed it past the anchor. porta rejects that: a relation
+    must share a wall, not just a point.
     """
-    for axis in (Axis.HORIZONTAL, Axis.VERTICAL):
-        rels = [rel for rel in room.relations if rel.direction.axis is axis]
-        if len(rels) < 2:
-            continue
-        wall = _perp(axis)
-        for rel in rels:
-            anchor = by_id[rel.anchor]
-            overlap = min(_axis_hi(room, wall), _axis_hi(anchor, wall)) - max(
-                _axis_lo(room, wall), _axis_lo(anchor, wall)
+    for rel in room.relations:
+        anchor = by_id[rel.anchor]
+        wall = _perp(rel.direction.axis)
+        overlap = min(_axis_hi(room, wall), _axis_hi(anchor, wall)) - max(
+            _axis_lo(room, wall), _axis_lo(anchor, wall)
+        )
+        if overlap < _GRID_FT:
+            raise LayoutError(
+                f"room {room.id!r}: {rel.direction.value} {rel.anchor!r} shares "
+                f"{max(overlap, 0)} ft of wall (needs at least {_GRID_FT} ft)",
+                line=rel.line,
             )
-            if overlap <= 0:
-                raise LayoutError(
-                    f"room {room.id!r}: {rel.direction.value} {rel.anchor!r} is "
-                    f"not flush (they share no wall)",
-                    line=rel.line,
-                )
 
 
 def _axis_position(room: Room, by_id: dict[str, Room], axis: Axis) -> int:
@@ -635,27 +626,6 @@ def _raise_axis_conflict(
         f"relations disagree on where to place it",
         line=room.line,
     )
-
-
-def _check_attached(room: Room, rx: int, ry: int, anchor: Room, rel: Relation) -> None:
-    """Raise if ``room`` shares no wall with ``anchor`` on the relation's free axis.
-
-    A shift large enough to slide the room off its anchor leaves them touching
-    at most at a corner; that detaches the relation and is rejected.
-    """
-    ax, ay = anchor.x, anchor.y
-    assert ax is not None
-    assert ay is not None
-    if _free_axis(rel.direction) is Axis.HORIZONTAL:
-        overlap = min(rx + room.width, ax + anchor.width) - max(rx, ax)
-    else:
-        overlap = min(ry + room.height, ay + anchor.height) - max(ry, ay)
-    if overlap <= 0:
-        raise LayoutError(
-            f"room {room.id!r} shift={rel.shift} detaches it from "
-            f"{anchor.id!r} (no shared wall)",
-            line=rel.line,
-        )
 
 
 def _raise_unplaceable(pending: list[Room]) -> None:

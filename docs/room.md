@@ -54,7 +54,7 @@ within a plan, and can't match any of `porta`'s reserved keywords.
 > `root`, `door`, `no-door`, `outside`, `shift`, `align`, `up-of`, `down-of`,
 > `left-of`, `right-of`
 
-> [!INFO]
+> [!NOTE]
 > Examples of valid IDs in `porta`: ...
 > Examples of invalid IDs: ...
 
@@ -82,7 +82,7 @@ indicate width and height respectively. Each of `W` and `H` must either:
 2. Be `?`, prompting `porta` to set that dimension [automatically](#auto-dimensions)
 if possible.
 
-> [!NOTE]
+> [!NOTE] Valid dimensions
 > Valid dimension declarations include `30x40`, `10x?`, `?x50`, `?x?`.
 
 ### Relations

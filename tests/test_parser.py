@@ -226,6 +226,37 @@ def test_invalid_source_raises(source: str) -> None:
         parse(source)
 
 
+def test_uppercase_id_is_rejected() -> None:
+    # Ids are lowercase only (the name carries any display capitalisation).
+    with pytest.raises(ParseError):
+        parse('room Hall "Hall" 10x10 root')
+
+
+@pytest.mark.parametrize(
+    "word",
+    [
+        "root",
+        "door",
+        "no-door",
+        "outside",
+        "shift",
+        "align",
+        "up-of",
+        "down-of",
+        "left-of",
+        "right-of",
+    ],
+)
+def test_reserved_word_is_not_a_valid_id(word: str) -> None:
+    with pytest.raises(ParseError):
+        parse(f'room {word} "X" 10x10 root')
+
+
+def test_reserved_word_is_not_a_valid_anchor() -> None:
+    with pytest.raises(ParseError):
+        parse('room a "A" 10x10 root\nroom b "B" 10x10 right-of shift')
+
+
 def test_duplicate_id_raises() -> None:
     with pytest.raises(ParseError):
         parse('room a "A" 10x10 root\nroom a "B" 10x10 right-of a')

@@ -1,8 +1,11 @@
 # Rooms
 
-A `porta` plan is a list of rooms. Each room is a rectangle with a size, and
-rather than give it coordinates you say how it sits against the rooms around it.
-porta works out where everything lands.
+The core of a `porta` plan is a list of **rooms**, linked by 
+[relations](#relations) into a floorplan. With the exception of
+the [root](#the-root), each room is positioned relative to one or more
+**anchors** defined previously in the plan. `porta`
+[resolves rooms](#how-positions-are-resolved) outward from the root until
+every room is placed.
 
 ```porta img/overview.svg
 room hall    "Hall"    30x20 root
@@ -12,10 +15,14 @@ room kitchen "Kitchen" 20x20 right-of hall
 
 <img alt="Three rooms in a row" src="img/overview.svg" width="70%">
 
-That's the whole idea: one `root` room to start from, and relations
-(`left-of`, `right-of`, and so on) to hang the rest off. The short black marks
-on the shared walls are doors, which porta adds for you. They have their own
-page, [doors](door.md) — ignore them here.
+> [!NOTE] Doors
+> The short black marks on the shared walls are **doors**, which are
+> added by default between adjoining rooms. Door syntax is described
+> [here](door.md).
+
+> [!WARNING] Room shapes
+> At the time of writing, **only rectangular rooms are supported** in
+> `porta`. Non-rectangular rooms are planned for a future release.
 
 ## The `room` statement
 
@@ -49,7 +56,7 @@ Every plan needs exactly one room marked `root`. It is the fixed point
 everything else is measured from: porta puts its top-left corner at the origin
 and grows the plan outward. Zero roots, or more than one, is an error.
 
-## Relations: attaching rooms
+## Relations
 
 ### The four relations
 

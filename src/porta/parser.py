@@ -34,6 +34,7 @@ _ID_RE = re.compile(r"[a-z][a-z0-9_-]*\Z")
 _DIM_RE = re.compile(r"(\?|[0-9]+)x(\?|[0-9]+)\Z")
 _GRID_FT = 5
 _DEFAULT_DOOR_FT = 5
+_MAX_NAME = 40  # room name length cap (the name drives the rendered key's width)
 _MODIFIERS = ("shift=", "align=", "door", "no-door")  # relation-modifier prefixes
 _KEYWORDS: dict[str, Direction] = {
     direction.value: direction for direction in Direction
@@ -90,6 +91,21 @@ def _validate_id(value: str, quoted: bool, lineno: int) -> None:
         raise ParseError(f"invalid room id {value!r}", line=lineno)
     if value in _RESERVED:
         raise ParseError(f"{value!r} is a reserved word, not a room id", line=lineno)
+
+
+def _validate_name(value: str, quoted: bool, lineno: int) -> None:
+    """Check a room name: double-quoted, 1-N printable, non-blank characters."""
+    if not quoted:
+        raise ParseError("room name must be wrapped in double quotes", line=lineno)
+    if not 1 <= len(value) <= _MAX_NAME:
+        raise ParseError(
+            f"room name must be 1-{_MAX_NAME} characters, got {len(value)}",
+            line=lineno,
+        )
+    if not value.strip():
+        raise ParseError("room name cannot be blank", line=lineno)
+    if not value.isprintable():
+        raise ParseError("room name has unprintable characters", line=lineno)
 
 
 def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
@@ -166,8 +182,7 @@ def _parse_room(tokens: list[Token], lineno: int) -> Room:
     _validate_id(room_id, id_quoted, lineno)
 
     name, name_quoted = tokens[2]
-    if not name_quoted:
-        raise ParseError("room name must be wrapped in double quotes", line=lineno)
+    _validate_name(name, name_quoted, lineno)
 
     width, height, auto_width, auto_height = _parse_dimensions(tokens[3][0], lineno)
     is_root, relations = _parse_modifiers(tokens[4:], lineno)

@@ -32,44 +32,82 @@ A room is declared in a `porta` plan as follows:
 room <id> "<name>" <dimensions> <relations>
 ```
 
-Each `room` statement consists of the following components:
+Each `room` statement consists of the following components in order:
 
-1. A literal **`room` declaration** designating what follows as a `room` statement (as opposed to another type of statement, such as [`door`](door.md)).
-2. An **ID string** used to point to that room elsewhere in the plan (see [Room ID](#room-id)).
-3. A **name string**, the label shown in the rendered map's key (see [Room name](#room-name)).
-4. A **dimension declaration** of the form `WxH` (see [Dimensions](#dimensions)).
-5. One or more **relation declarations** (see [Relations](#relations)).
+1. A literal `room` keyword;
+2. A [room ID](#room-id) used to point to that room elsewhere in the plan;
+3. A [room name](#room-name) shown in the rendered map key;
+4. A [dimension declaration](#dimensions) of the form `WxH`;
+5. One or more [relations](#relations).
 
-## Room ID
+### Room ID
 
-The id is the handle other rooms — and [doors](door.md) — use to refer to a
-room. It never appears on the drawing; that is the name's job. An id must match
-`[a-z][a-z0-9_-]*`: a lowercase letter, then any of lowercase letters, digits,
-hyphens, or underscores (`hall`, `store_room-2`). Uppercase is rejected, each id
-must be unique within a plan, and an id can't be one of the
-[reserved words](#reserved-words).
+A room ID is the handle other parts of the `porta` plan use to refer to that
+room. It never appears in the rendered map. An ID must match
+`[a-z][a-z0-9_-]*`: a lowercase letter to start, followed by any number of
+lowercase letters, digits, hyphens, or underscores. Each ID must be unique
+within a plan, and can't match any of `porta`'s reserved keywords.
 
-## Room name
+> [!WARNING]
+> At the time of writing, the following keywords are **reserved** in `porta`
+> plans and cannot be used for room IDs:
+> `root`, `door`, `no-door`, `outside`, `shift`, `align`, `up-of`, `down-of`,
+> `left-of`, `right-of`
 
-The name is the label shown in the rendered map's key. It is wrapped in double
-quotes so it can contain spaces, and must be **1–40 characters**, **not blank**,
-and **printable** — accents, CJK, and emoji are fine, but control characters are
-not. Two further limits come from the syntax itself: a name can't contain a
-literal `"` (there is no escape character), and it can't span a line.
+> [!INFO]
+> Examples of valid IDs in `porta`: ...
+> Examples of invalid IDs: ...
 
-## Reserved words
+### Room name
 
-A few words are part of porta's syntax, so they can't double as room ids:
+A room name is the label given to that room in the rendered map generated
+from a `porta` plan. A valid name must meet the following criteria:
 
-`root`, `door`, `no-door`, `outside`, `shift`, `align`, `up-of`, `down-of`,
-`left-of`, `right-of`
+- A single double-quoted string 1-40 characters long;
+- Contains no double-quotes (literal `"`) internally;
+- Contains only printable Unicode characters (no control characters);
+- Starts and ends with non-whitespace printable characters;
+- Fits on a single line – no linebreaks.
 
-## Dimensions
+Names are interpreted literally, without escapes. All printable Unicode
+is valid within a name, subject to the restrictions above.
 
-`<W>x<H>` is the room's width and height in feet, so `40x30` is forty wide and
-thirty tall. porta works on a 5-foot grid, so both are multiples of 5. A
-dimension can also be `?`, which lets a neighbour set it — see
-[auto dimensions](#auto-dimensions).
+### Dimensions
+
+The dimensions of a room statement defines that room's width and height
+in feet. A dimension declaration takes the form `WxH`, where `W` and `H`
+indicate width and height respectively. Each of `W` and `H` must either:
+
+1. Be an integer positive multiple of 5 (`5`, `10`, `15`, etc.); or
+2. Be `?`, prompting `porta` to set that dimension [automatically](#auto-dimensions)
+if possible.
+
+> [!INFO]
+> Valid dimension declarations include `30x40`, `10x?`, `?x50`, `?x?`.
+
+### Relations
+
+A room's relations define its positioning relative to other rooms in
+a `porta` plan. Each relation begins with a **relation keyword**, 
+followed by zero or more **arguments**. Valid relation keywords are
+`root` (which takes no arguments) and the four **direction keywords**:
+`up-of`, `right-of`, `left-of` and `down-of`.
+
+Each direction keyword takes a [room ID](#room-id) as its first 
+argument, indicating the **anchor room** relative to which the 
+new room must be positioned; subsequent arguments can refine the
+relative positioning of the new room versus its anchor.
+
+For more on relation syntax, see [below](#positioning-rooms).
+
+## Positioning rooms
+
+### The root
+
+Every `porta` plan must have exactly one `root` room, defining the
+fixed point against which all other rooms are measured. `porta` puts
+the top-left corner of the root room at the origin of its coordinate
+system and grows the plan outward from there.
 
 ```porta img/dimensions.svg
 room hall "Great Hall" 40x30 root
@@ -77,11 +115,8 @@ room hall "Great Hall" 40x30 root
 
 <img alt="A single room" src="img/dimensions.svg" width="70%">
 
-## The root
-
-Every plan needs exactly one room marked `root`. It is the fixed point
-everything else is measured from: porta puts its top-left corner at the origin
-and grows the plan outward. Zero roots, or more than one, is an error.
+A plan with zero roots, or more than one, is invalid and will
+raise an error.
 
 ## Relations
 

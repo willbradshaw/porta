@@ -18,8 +18,8 @@
     <line x1="0" y1="25" x2="40" y2="25" />
     <line x1="0" y1="30" x2="40" y2="30" />
   </g>
-  <rect data-room="root_room" x="0" y="0" width="40" height="30" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="root_room" x="20" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">R</text>
+  <rect data-room="r" x="0" y="0" width="40" height="30" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="r" x="20" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">R</text>
   <text class="scale" x="-23.2" y="49.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-23.2" y="58.8" font-size="6">R  Root room  (40x30 ft)</text>
 </svg>

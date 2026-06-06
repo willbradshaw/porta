@@ -43,10 +43,12 @@ Each `room` statement consists of the following components in order:
 ### Room ID
 
 A room ID is the handle other parts of the `porta` plan use to refer to that
-room. It never appears in the rendered map. An ID must match
-`[a-z][a-z0-9_-]*`: a lowercase letter to start, followed by any number of
-lowercase letters, digits, hyphens, or underscores. Each ID must be unique
-within a plan, and can't match any of `porta`'s reserved keywords.
+room. Its first available letter is also the room's **key letter** on the
+rendered map (the key maps letters back to names); the id is otherwise not
+shown. An ID must match `[a-z][a-z0-9_-]*`: a lowercase letter to start,
+followed by any number of lowercase letters, digits, hyphens, or underscores.
+Each ID must be unique within a plan, and can't match any of `porta`'s
+reserved keywords.
 
 > [!WARNING]
 > At the time of writing, the following keywords are **reserved** in `porta`
@@ -113,7 +115,7 @@ the top-left corner of the root room at the origin of its coordinate
 system and grows the plan outward from there.
 
 ```porta img/root.svg
-room root_room "Root room" 40x30 root
+room r "Root room" 40x30 root
 ```
 
 <img alt="A single root room" src="img/root.svg" width="70%">
@@ -124,11 +126,11 @@ A spatial relation places a room flush against its anchor in the
 specified direction:
 
 ```porta img/adjacency.svg
-room root_room "Root room" 10x10 root
-room left_room "Left room" 15x10 left-of root_room
-room right_room "Right room" 15x10 right-of root_room
-room up_room "Up room" 10x15 up-of root_room
-room down_room "Down room" 10x15 down-of root_room
+room r "Root room" 10x10 root
+room a "Left room" 15x10 left-of r
+room b "Right room" 15x10 right-of r
+room c "Up room" 10x15 up-of r
+room d "Down room" 10x15 down-of r
 ```
 
 <img alt="Five rooms arranged in a cross shape" src="img/adjacency.svg" width="70%">
@@ -142,10 +144,10 @@ A room can have multiple adjacency relations. The simplest case is to pin
 the room on both axes, leaving no free axis at all:
 
 ```porta img/corner.svg
-room root_room "Root room" 10x10 root
-room right_room "Right room" 15x10 right-of root_room
-room down_room "Down room" 10x15 down-of root_room
-room corner_room "Corner room" 10x10 right-of down_room down-of right_room
+room r "Root room" 10x10 root
+room a "Right room" 15x10 right-of r
+room b "Down room" 10x15 down-of r
+room c "Corner room" 10x10 right-of b down-of a
 ```
 
 <img alt="Four rooms arranged in a square" src="img/corner.svg" width="70%">
@@ -153,12 +155,12 @@ room corner_room "Corner room" 10x10 right-of down_room down-of right_room
 A room can also be pinned on either side of the same axis:
 
 ```porta img/flank.svg
-room root_room "Root room" 10x10 root
-room left_room "Left room" 10x15 left-of root_room
-room right_room "Right room" 10x15 right-of root_room
-room left_down_room "Left-down room" 10x10 down-of left_room
-room right_down_room "Right-down room" 10x10 down-of right_room
-room flanked "Flanked room" 10x10 right-of left_down_room left-of right_down_room
+room r "Root room" 10x10 root
+room a "Left room" 10x15 left-of r
+room b "Right room" 10x15 right-of r
+room c "Left-down room" 10x10 down-of a
+room d "Right-down room" 10x10 down-of b
+room e "Flanked room" 10x10 right-of c left-of d
 ```
 
 <img alt="A room anchored in both horizontal directions" src="img/flank.svg" width="70%">
@@ -166,9 +168,9 @@ room flanked "Flanked room" 10x10 right-of left_down_room left-of right_down_roo
 Finally, a room can be pinned to multiple rooms on the same side:
 
 ```porta img/span.svg
-room root_room "Root room" 10x10 root
-room down_room "Down room" 10x10 down-of root_room
-room span_room "Span room" 10x20 right-of root_room right-of down_room
+room r "Root room" 10x10 root
+room a "Down room" 10x10 down-of r
+room b "Span room" 10x20 right-of r right-of a
 ```
 
 <img alt="A room pinned to two rooms on its left-hand side" src="img/span.svg" width="70%">
@@ -184,9 +186,9 @@ By default, a room is anchored to the start of the corresponding edge of its
 anchor room: top for vertical edges, left for horizontal edges.
 
 ```porta img/align_default.svg
-room root_room "Root room" 20x20 root
-room left_room "Left room" 10x10 left-of root_room
-room right_room "Right room" 10x10 right-of root_room
+room r "Root room" 20x20 root
+room a "Left room" 10x10 left-of r
+room b "Right room" 10x10 right-of r
 ```
 
 <img alt="Two rooms anchored to root with start-aligned positions" src="img/align_default.svg" width="70%">
@@ -199,9 +201,9 @@ Rooms can instead be aligned to the *end* of their anchor edges by adding an
 `align=end` argument to the relevant relation.
 
 ```porta img/align_end.svg
-room root_room "Root room" 20x20 root
-room left_room "Left room" 10x10 left-of root_room align=end
-room right_room "Right room" 10x10 right-of root_room align=end
+room r "Root room" 20x20 root
+room a "Left room" 10x10 left-of r align=end
+room b "Right room" 10x10 right-of r align=end
 ```
 
 <img alt="Two rooms anchored to root with end-aligned positions" src="img/align_end.svg" width="70%">
@@ -210,9 +212,9 @@ If desired, a start-aligned anchor can be declared explicitly with an
 `align=start` argument; this produces the same result as the default.
 
 ```porta img/align_start.svg
-room root_room "Root room" 20x20 root
-room left_room "Left room" 10x10 left-of root_room align=start
-room right_room "Right room" 10x10 right-of root_room align=start
+room r "Root room" 20x20 root
+room a "Left room" 10x10 left-of r align=start
+room b "Right room" 10x10 right-of r align=start
 ```
 
 <img alt="Two rooms anchored to root with start-aligned positions" src="img/align_start.svg" width="70%">
@@ -220,10 +222,10 @@ room right_room "Right room" 10x10 right-of root_room align=start
 These arguments can be used in multi-relation room statements:
 
 ```porta img/flank_align.svg
-room root_room "Root room" 10x10 root
-room left_room "Left room" 10x25 left-of root_room
-room right_room "Right room" 10x25 right-of root_room
-room flanked "Flanked room" 10x10 right-of left_room align=end left-of right_room
+room r "Root room" 10x10 root
+room a "Left room" 10x25 left-of r
+room b "Right room" 10x25 right-of r
+room c "Flanked room" 10x10 right-of a align=end left-of b
 ```
 
 <img alt="A room anchored in both horizontal directions, end-aligned" src="img/flank_align.svg" width="70%">
@@ -240,12 +242,12 @@ positive direction (right/down); `shift=-N` nudges it `N` feet in the
 negative direction (left/up). Shifting is applied **after alignment**.
 
 ```porta img/shift.svg
-room root_room "Root room" 20x20 root
-room right_room "Right room" 10x10 right-of root_room shift=5
-room left_room "Left room" 10x10 left-of root_room shift=-5
-room down_room "Down room" 10x10 down-of root_room align=end shift=-5
-room up_room "Up room" 10x10 up-of root_room align=end shift=5
-room outer_room "Outer room" 10x10 right-of right_room shift=-5
+room r "Root room" 20x20 root
+room a "Right room" 10x10 right-of r shift=5
+room b "Left room" 10x10 left-of r shift=-5
+room c "Down room" 10x10 down-of r align=end shift=-5
+room d "Up room" 10x10 up-of r align=end shift=5
+room e "Outer room" 10x10 right-of a shift=-5
 ```
 
 <img alt="Several rooms shifted in different directions" src="img/shift.svg" width="70%">
@@ -261,10 +263,10 @@ from the room's anchors. In the simplest case, the auto-derived dimension
 simply matches the corresponding dimension of the anchor:
 
 ```porta img/auto-single.svg
-room root_room "Root room" 20x20 root
-room right_room "Right room" 20x? right-of root_room
-room down_room "Down room" ?x20 down-of root_room
-room corner_room "Corner room" ?x? right-of down_room down-of right_room
+room r "Root room" 20x20 root
+room a "Right room" 20x? right-of r
+room b "Down room" ?x20 down-of r
+room c "Corner room" ?x? right-of b down-of a
 ```
 
 <img alt="A square of rooms with auto-derived dimensions" src="img/auto-single.svg" width="70%">
@@ -272,9 +274,9 @@ room corner_room "Corner room" ?x? right-of down_room down-of right_room
 If a room is shifted, `?` will extend it to the end of the anchor wall:
 
 ```porta img/auto-shift.svg
-room root_room "Root room" 20x20 root
-room right_room "Right room" 20x? right-of root_room shift=5
-room down_room "Down room" ?x20 down-of root_room shift=-5
+room r "Root room" 20x20 root
+room a "Right room" 20x? right-of r shift=5
+room b "Down room" ?x20 down-of r shift=-5
 ```
 
 <img alt="A grid of shifted rooms with auto-derived dimensions" src="img/auto-shift.svg" width="70%">
@@ -283,12 +285,12 @@ Special behavior is needed when a room has two anchors on the same axis. If thes
 opposite sides, `?` will extend the new room to snugly fit between them:
 
 ```porta img/auto-flank.svg
-room root_room "Root room" 10x10 root
-room left_room "Left room" 10x15 left-of root_room
-room right_room "Right room" 10x15 right-of root_room
-room left_down_room "Left-down room" ?x10 down-of left_room
-room right_down_room "Right-down room" ?x10 down-of right_room
-room flanked "Flanked room" ?x? right-of left_down_room left-of right_down_room
+room r "Root room" 10x10 root
+room a "Left room" 10x15 left-of r
+room b "Right room" 10x15 right-of r
+room c "Left-down room" ?x10 down-of a
+room d "Right-down room" ?x10 down-of b
+room e "Flanked room" ?x? right-of c left-of d
 ```
 
 <img alt="A room anchored in both horizontal directions with auto-derived dimensions" src="img/auto-flank.svg" width="70%">
@@ -296,9 +298,9 @@ room flanked "Flanked room" ?x? right-of left_down_room left-of right_down_room
 If there are two anchors on the same side, `?` will extend the new room to cover both:
 
 ```porta img/auto-union.svg
-room root_room "Root room" 20x10 root
-room down_room "Down room" 20x20 down-of root_room
-room span_room "Span room" 10x? left-of root_room left-of down_room
+room r "Root room" 20x10 root
+room a "Down room" 20x20 down-of r
+room b "Span room" 10x? left-of r left-of a
 ```
 
 <img alt="A room spanning two rooms of different heights" src="img/auto-union.svg" width="70%">

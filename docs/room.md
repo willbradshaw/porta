@@ -348,15 +348,35 @@ under this schema and will raise errors:
 ## Putting it together
 
 ```porta img/capstone.svg
-room hall    "Hall"    40x30 root
-room parlour "Parlour" 20x30 left-of hall
-room kitchen "Kitchen" 20x30 right-of hall
-room porch   "Porch"   20x10 down-of hall align=end
-room cellar  "Cellar"  ?x20  down-of parlour
+room hall      "Hall"      20x40 root
+room cellar    "Cellar"    20x10 left-of hall align=end
+room larder    "Larder"    20x10 left-of hall shift=15
+room kitchen   "Kitchen"   30x20 right-of hall
+room pantry    "Pantry"    30x20 right-of hall align=end
+room sunroom   "Sunroom"   10x?  right-of kitchen right-of pantry
+room boot      "Boot Room" 20x15 down-of hall
+room mudroom   "Mudroom"   ?x?   down-of cellar left-of boot
+room washroom  "Washroom"  15x15 down-of pantry align=end
+room vestibule "Vestibule" ?x15  right-of boot left-of washroom
 ```
 
-<img alt="A small house plan" src="img/capstone.svg" width="70%">
+<img alt="A manor ground floor exercising every placement feature" src="img/capstone.svg" width="70%">
 
-A hall with two wings, a porch tucked under its east end with `align=end`, and a
-cellar that takes the parlour's width with `?`. For a larger plan — once you've
-met [doors](door.md) — see [`examples/manor.porta`](../examples/manor.porta).
+A manor ground floor that puts everything together. `hall` is the root.
+`kitchen` and `pantry` stack to its right — the first takes the default
+[`align=start`](#alignment), the second [`align=end`](#alignment). `cellar` is
+pinned to the hall's foot with `align=end`, while `larder` is nudged down its
+wall by [`shift=15`](#shifting).
+
+All three [double-anchor](#adjacency) forms appear, each with an
+[auto dimension](#auto-dimensions):
+
+- `sunroom` is `right-of` **both** `kitchen` and `pantry` (same side); its `?`
+  height spans the two.
+- `mudroom` is pinned on **both axes** (`down-of cellar left-of boot`); its
+  `?x?` takes its width from `cellar` and its height from `boot`.
+- `vestibule` slots between `boot` and `washroom` (**opposite sides**); its `?`
+  width fills the gap exactly.
+
+For a fuller plan — once you've met [doors](door.md) — see
+[`examples/manor.porta`](../examples/manor.porta).

@@ -28,7 +28,7 @@ _BLOCK = re.compile(
 )
 
 # Light grey reads more gently than white on a dark page (tweak to taste).
-_BACKGROUND = "#f0f0f0"
+_BACKGROUND = "#e0e0e0"
 
 
 def main() -> None:

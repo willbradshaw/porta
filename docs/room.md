@@ -348,35 +348,20 @@ under this schema and will raise errors:
 ## Putting it together
 
 ```porta img/capstone.svg
-room hall      "Hall"      20x40 root
-room cellar    "Cellar"    20x10 left-of hall align=end
-room larder    "Larder"    20x10 left-of hall shift=15
-room kitchen   "Kitchen"   30x20 right-of hall
-room pantry    "Pantry"    30x20 right-of hall align=end
-room sunroom   "Sunroom"   10x?  right-of kitchen right-of pantry
-room boot      "Boot Room" 20x15 down-of hall
-room mudroom   "Mudroom"   ?x?   down-of cellar left-of boot
-room washroom  "Washroom"  15x15 down-of pantry align=end
-room vestibule "Vestibule" ?x15  right-of boot left-of washroom
+room hall     "Hall"          20x40 root
+room drawing  "Drawing Room"  30x40 left-of hall
+room dining   "Dining Room"   30x20 right-of hall
+room kitchen  "Kitchen"       30x20 right-of hall align=end
+room pantry   "Pantry"        10x?  right-of dining right-of kitchen
+room porch    "Porch"         20x10 down-of hall
+room cloak    "Cloakroom"     10x10 down-of drawing left-of porch
+room scullery "Scullery"      15x10 down-of kitchen align=end shift=-5
+room passage  "Passage"       ?x10  right-of porch left-of scullery
 ```
 
 <img alt="A manor ground floor exercising every placement feature" src="img/capstone.svg" width="70%">
 
-A manor ground floor that puts everything together. `hall` is the root.
-`kitchen` and `pantry` stack to its right — the first takes the default
-[`align=start`](#alignment), the second [`align=end`](#alignment). `cellar` is
-pinned to the hall's foot with `align=end`, while `larder` is nudged down its
-wall by [`shift=15`](#shifting).
-
-All three [double-anchor](#adjacency) forms appear, each with an
-[auto dimension](#auto-dimensions):
-
-- `sunroom` is `right-of` **both** `kitchen` and `pantry` (same side); its `?`
-  height spans the two.
-- `mudroom` is pinned on **both axes** (`down-of cellar left-of boot`); its
-  `?x?` takes its width from `cellar` and its height from `boot`.
-- `vestibule` slots between `boot` and `washroom` (**opposite sides**); its `?`
-  width fills the gap exactly.
-
-For a fuller plan — once you've met [doors](door.md) — see
-[`examples/manor.porta`](../examples/manor.porta).
+A manor ground floor that brings the chapter together — `align`, `shift`, all
+three [double-anchor](#adjacency) forms, and [auto `?`
+dimensions](#auto-dimensions). For a fuller plan, once you've met
+[doors](door.md), see [`examples/manor.porta`](../examples/manor.porta).

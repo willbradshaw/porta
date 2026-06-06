@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="980" viewBox="-26 -10 92 98">
+  <rect x="-26" y="-10" width="92" height="98" fill="white" />
+  <g stroke="#bbb" stroke-width="0.15">
+    <line x1="0" y1="0" x2="0" y2="40" />
+    <line x1="5" y1="0" x2="5" y2="40" />
+    <line x1="10" y1="0" x2="10" y2="40" />
+    <line x1="15" y1="0" x2="15" y2="40" />
+    <line x1="20" y1="0" x2="20" y2="40" />
+    <line x1="25" y1="0" x2="25" y2="40" />
+    <line x1="30" y1="0" x2="30" y2="40" />
+    <line x1="35" y1="0" x2="35" y2="40" />
+    <line x1="40" y1="0" x2="40" y2="40" />
+    <line x1="0" y1="0" x2="40" y2="0" />
+    <line x1="0" y1="5" x2="40" y2="5" />
+    <line x1="0" y1="10" x2="40" y2="10" />
+    <line x1="0" y1="15" x2="40" y2="15" />
+    <line x1="0" y1="20" x2="40" y2="20" />
+    <line x1="0" y1="25" x2="40" y2="25" />
+    <line x1="0" y1="30" x2="40" y2="30" />
+    <line x1="0" y1="35" x2="40" y2="35" />
+    <line x1="0" y1="40" x2="40" y2="40" />
+  </g>
+  <rect data-room="hall" x="0" y="0" width="20" height="40" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="hall" x="10" y="20" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>
+  <rect data-room="study" x="20" y="10" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="study" x="30" y="20" text-anchor="middle" dominant-baseline="central" font-size="12">S</text>
+  <line class="door" x1="20" y1="15" x2="20" y2="20" stroke="black" stroke-width="1.5" />
+  <text class="scale" x="-16" y="59.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="-16" y="68.8" font-size="6">H  Hall  (20x40 ft)</text>
+  <text class="key" x="-16" y="78.4" font-size="6">S  Study  (20x20 ft)</text>
+</svg>

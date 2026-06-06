@@ -160,6 +160,17 @@ room flanked "Flanked room" 10x10 right-of left_down_room left-of right_down_roo
 
 <img alt="A room anchored in both horizontal directions" src="img/flank.svg" width="70%">
 
+Finally, a room can be pinned to multiple rooms on the same side:
+
+```porta img/span.svg
+room root_room "Root room" 10x10 root
+room down_room "Down room" 10x10 down-of root_room
+room span_room "Span room" 10x20 right-of root_room right-of down_room
+```
+
+<img alt="A room pinned to two rooms on its left-hand side" src="img/span.svg" width="70%">
+
+
 
 ### One relation pins one axis
 

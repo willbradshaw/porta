@@ -15,12 +15,12 @@ room kitchen "Kitchen" 20x20 right-of hall
 
 <img alt="Three rooms in a row" src="img/overview.svg" width="70%">
 
-> [!NOTE] Doors
+> [!NOTE]
 > The short black marks on the shared walls are **doors**, which are
 > added by default between adjoining rooms. Door syntax is described
 > [here](door.md).
 
-> [!WARNING] Room shapes
+> [!WARNING]
 > At the time of writing, **only rectangular rooms are supported** in
 > `porta`. Non-rectangular rooms are planned for a future release.
 

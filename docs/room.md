@@ -82,8 +82,8 @@ indicate width and height respectively. Each of `W` and `H` must either:
 2. Be `?`, prompting `porta` to set that dimension [automatically](#auto-dimensions)
 if possible.
 
-> [!NOTE] Valid dimensions
-> Valid dimension declarations include `30x40`, `10x?`, `?x50`, `?x?`.
+> [!NOTE]
+> Examples of valid dimension declarations: `30x40`, `10x?`, `?x50`, `?x?`
 
 ### Relations
 
@@ -105,7 +105,8 @@ For more on relation syntax, see [below](#positioning-rooms).
 ### The root
 
 Every `porta` plan must have exactly one `root` room, defining the
-fixed point against which all other rooms are measured. `porta` puts
+fixed point against which all other rooms are measured. Plans with
+zero roots, or more than one, are invalid. `porta` puts
 the top-left corner of the root room at the origin of its coordinate
 system and grows the plan outward from there.
 
@@ -115,19 +116,17 @@ room root_room "Root room" 40x30 root
 
 <img alt="A single root room" src="img/root.svg" width="70%">
 
-A plan with zero roots, or more than one, is invalid and will
-raise an error.
-
 ### Adjacency
 
-A spatial relation places a room flush against its anchor:
+A spatial relation places a room flush against its anchor in the
+specified direction:
 
 ```porta img/adjacency.svg
-room root_room "Root room" 20x20 root
-room left_room "Left room" 30x20 left-of root_room
-room right_room "Right room" 30x20 right-of root_room
-room up_room "Up room" 20x30 up-of root_room
-room down_room "Down room" 20x30 down-of root_room
+room root_room "Root room" 10x10 root
+room left_room "Left room" 15x10 left-of root_room
+room right_room "Right room" 15x10 right-of root_room
+room up_room "Up room" 10x15 up-of root_room
+room down_room "Down room" 10x15 down-of root_room
 ```
 
 <img alt="Five rooms arranged in a cross shape" src="img/adjacency.svg" width="70%">
@@ -140,14 +139,24 @@ A room can have multiple adjacency relations. The simplest case is to pin
 the room on two axes:
 
 ```porta img/corner.svg
-room root_room "Root room" 20x20 root
-room right_room "Right room" 30x20 right-of root_room
-room down_room "Down room" 20x30 down-of root_room
-room corner_room "Corner room" 20x20 right-of down_room down-of right_room
+room root_room "Root room" 10x10 root
+room right_room "Right room" 15x10 right-of root_room
+room down_room "Down room" 10x15 down-of root_room
+room corner_room "Corner room" 10x10 right-of down_room down-of right_room
 ```
 
 <img alt="Four rooms arranged in a square" src="img/corner.svg" width="70%">
 
+A room can also be pinned on either side of the same axis:
+
+```porta img/flank.svg
+room root_room "Root room" 10x10 root
+room left_room "Left room" 20x20 left-of root_room
+room right_room "Right room" 20x20 right-of root_room
+room left_down_room "Left-down room" 10x20 down-of left_room
+room right_down_room "Right-down room" 10x20 down-of right_room
+room flanked "Flanked room" 10x10 right-of left_room left-of right_room
+```
 
 ### One relation pins one axis
 

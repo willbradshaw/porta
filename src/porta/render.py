@@ -169,12 +169,14 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         )
 
     # Blocks: the union boundary as wall lines (internal walls dropped), then one
-    # glyph at the block's glyph member's centre.
+    # glyph at the block's glyph member's centre. Square caps extend each segment
+    # by half its width so perpendicular segments meet in a clean corner.
     for x1, y1, x2, y2 in sorted(block_wall_segments(building)):
         lines.append(
             f'  <line x1="{_num(x1)}" y1="{_num(y1)}" '
             f'x2="{_num(x2)}" y2="{_num(y2)}" '
-            f'stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" />'
+            f'stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" '
+            f'stroke-linecap="square" />'
         )
     for block in sorted(building.blocks, key=lambda b: b.id):
         member = by_id[block.glyph_member or block.members[0]]

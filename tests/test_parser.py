@@ -376,3 +376,50 @@ def test_external_door_carries_side_and_spec() -> None:
     building = parse('room a "A" 20x20 root\ndoor=10@5 a outside left')
     ext = building.external_doors[0]
     assert (ext.room, ext.side, ext.door) == ("a", Direction.LEFT, Door(10, 5))
+
+
+# --- block statements ------------------------------------------------------
+
+
+def test_block_is_parsed() -> None:
+    building = parse(
+        'room a 10x10 root\nroom b 10x10 right-of a\nblock hall "Great Hall" a b'
+    )
+    assert len(building.blocks) == 1
+    block = building.blocks[0]
+    assert (block.id, block.name, block.members) == ("hall", "Great Hall", ["a", "b"])
+    assert block.glyph_member is None
+
+
+def test_block_name_is_optional() -> None:
+    block = parse("room a 10x10 root\nblock hall a").blocks[0]
+    assert block.name is None
+    assert block.members == ["a"]
+
+
+def test_block_glyph_member_is_parsed() -> None:
+    source = 'room a 10x10 root\nroom b 10x10 right-of a\nblock hall "H" a b glyph=b'
+    block = parse(source).blocks[0]
+    assert block.glyph_member == "b"
+    assert block.members == ["a", "b"]
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param("block hall", id="block-no-members"),
+        pytest.param('block hall "H"', id="block-name-no-members"),
+        pytest.param("block hall a a", id="block-duplicate-member"),
+        pytest.param('block hall a "b"', id="block-quoted-member"),
+        pytest.param("block Hall a", id="block-uppercase-id"),
+        pytest.param("block root a", id="block-reserved-id"),
+    ],
+)
+def test_invalid_block_raises(source: str) -> None:
+    with pytest.raises(ParseError):
+        parse(source)
+
+
+def test_block_id_colliding_with_a_room_raises() -> None:
+    with pytest.raises(ParseError):
+        parse("room a 10x10 root\nblock a a")

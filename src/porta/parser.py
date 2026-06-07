@@ -20,6 +20,7 @@ import re
 from porta.errors import ParseError
 from porta.model import (
     Align,
+    Block,
     Building,
     Direction,
     Door,
@@ -66,6 +67,7 @@ def parse(text: str) -> Building:
     rooms: list[Room] = []
     doors: list[Doorway] = []
     external_doors: list[ExternalDoor] = []
+    blocks: list[Block] = []
     seen: set[str] = set()
     for lineno, raw in enumerate(text.splitlines(), start=1):
         tokens = _tokenize(raw, lineno)
@@ -79,12 +81,19 @@ def parse(text: str) -> Building:
             else:
                 doors.append(_parse_doorway(tokens, lineno))
             continue
+        if not head_quoted and head == "block":
+            block = _parse_block(tokens, lineno)
+            if block.id in seen:
+                raise ParseError(f"duplicate id {block.id!r}", line=lineno)
+            seen.add(block.id)
+            blocks.append(block)
+            continue
         room = _parse_room(tokens, lineno)
         if room.id in seen:
             raise ParseError(f"duplicate room id {room.id!r}", line=lineno)
         seen.add(room.id)
         rooms.append(room)
-    return Building(rooms, doors, external_doors)
+    return Building(rooms, doors, external_doors, blocks=blocks)
 
 
 def _validate_id(value: str, quoted: bool, lineno: int) -> None:
@@ -136,6 +145,42 @@ def _parse_external_door(tokens: list[Token], lineno: int) -> ExternalDoor:
     if side_quoted or direction is None:
         raise ParseError(f"side must be up/down/left/right, got {side!r}", line=lineno)
     return ExternalDoor(room=room, side=direction, door=spec, line=lineno)
+
+
+def _parse_block(tokens: list[Token], lineno: int) -> Block:
+    """Parse a ``block <id> ["<name>"] [glyph=<member>] <member-id>...`` line.
+
+    Whether the members exist, the glyph target is one of them, and the union is
+    contiguous are *semantic* checks left to the layout stage.
+    """
+    if len(tokens) < 3:
+        raise ParseError("a block needs an id and at least one member", line=lineno)
+    block_id, id_quoted = tokens[1]
+    _validate_id(block_id, id_quoted, lineno)
+
+    name: str | None = None
+    rest = tokens[2:]
+    if rest[0][1]:  # a quoted token directly after the id is the block name
+        name = rest[0][0]
+        _validate_name(name, lineno)
+        rest = rest[1:]
+
+    members: list[str] = []
+    glyph_member: str | None = None
+    for value, quoted in rest:
+        if not quoted and value.startswith("glyph="):
+            glyph_member = value[len("glyph=") :]
+            _validate_id(glyph_member, False, lineno)
+        else:
+            _validate_id(value, quoted, lineno)
+            members.append(value)
+    if not members:
+        raise ParseError("a block needs at least one member room", line=lineno)
+    if len(members) != len(set(members)):
+        raise ParseError("a block lists a member more than once", line=lineno)
+    return Block(
+        id=block_id, name=name, members=members, glyph_member=glyph_member, line=lineno
+    )
 
 
 def _tokenize(raw: str, lineno: int) -> list[Token]:

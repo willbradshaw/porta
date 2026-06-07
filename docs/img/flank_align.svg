@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1172" height="1022" viewBox="-53.6 -10 117.2 102.2">
-  <rect x="-53.6" y="-10" width="117.2" height="102.2" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="1022" viewBox="-32 -10 74 102.2">
+  <rect x="-32" y="-10" width="74" height="102.2" fill="#e0e0e0" />
   <g stroke="#bbb" stroke-width="0.15">
     <line x1="-10" y1="0" x2="-10" y2="25" />
     <line x1="-5" y1="0" x2="-5" y2="25" />
@@ -27,9 +27,9 @@
   <line class="door" x1="0" y1="15" x2="0" y2="20" stroke="black" stroke-width="1.5" />
   <line class="door" x1="10" y1="0" x2="10" y2="5" stroke="black" stroke-width="1.5" />
   <line class="door" x1="10" y1="15" x2="10" y2="20" stroke="black" stroke-width="1.5" />
-  <text class="scale" x="-43.6" y="44.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="-43.6" y="53.8" font-size="6">A  Left room  (10x25 ft)</text>
-  <text class="key" x="-43.6" y="63.4" font-size="6">B  Right room  (10x25 ft)</text>
-  <text class="key" x="-43.6" y="73" font-size="6">C  Flanked room  (10x10 ft)</text>
-  <text class="key" x="-43.6" y="82.6" font-size="6">R  Root room  (10x10 ft)</text>
+  <text class="scale" x="-22" y="44.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="-22" y="53.8" font-size="6">A  Left room</text>
+  <text class="key" x="-22" y="63.4" font-size="6">B  Right room</text>
+  <text class="key" x="-22" y="73" font-size="6">C  Flanked room</text>
+  <text class="key" x="-22" y="82.6" font-size="6">R  Root room</text>
 </svg>

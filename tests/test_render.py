@@ -255,22 +255,18 @@ def test_svg_key_lists_each_room_name() -> None:
         assert name in key_text
 
 
-def test_key_includes_room_dimensions() -> None:
+def test_key_shows_names_not_dimensions() -> None:
     key_text = " ".join(
         t.text or "" for t in ET.fromstring(svg_of(DESIGN_MANOR)).iter(tag("text"))
     )
-    assert "(40x20 ft)" in key_text  # entrance
-    assert "(20x40 ft)" in key_text  # kitchen
+    assert "Entrance Hall" in key_text  # names are shown
+    assert "ft)" not in key_text  # per-room dimensions are not
 
 
-def test_key_shows_dimensions_when_a_room_has_no_name() -> None:
-    texts = [
-        t.text or ""
-        for t in ET.fromstring(svg_of('room a "" 20x30 root')).iter(tag("text"))
-    ]
-    key_text = " ".join(texts)
-    assert "(20x30 ft)" in key_text
-    assert "None" not in key_text  # the missing name is omitted, not stringified
+def test_unnamed_room_keys_as_just_its_glyph() -> None:
+    root = ET.fromstring(svg_of('room a "" 20x30 root'))
+    key_lines = [t.text for t in root.iter(tag("text")) if t.get("class") == "key"]
+    assert key_lines == ["A"]  # glyph only: no name, no dimensions
 
 
 def test_special_characters_in_names_are_escaped() -> None:

@@ -7,8 +7,11 @@ Notable changes per release, newest first.
 - Add this changelog.
 - Add a workflow that drafts a GitHub release from the changelog on a version bump.
 - Require a CHANGELOG update on every PR (CI check).
-- Optional room names: an empty name slot (`""`) leaves a room unlabelled, and
-  the key shows its dimensions instead of a name.
+- Optional room names: an empty name slot (`""`) leaves a room unlabelled (the
+  key then lists it by glyph alone).
+- The map key lists rooms and blocks by glyph and name only — per-room
+  dimensions are no longer shown (rectangular and non-rectangular rooms read
+  the same way).
 - Non-fatal warnings: solving collects advisories that the CLI prints to stderr
   (the run still succeeds with exit 0).
 - Non-rectangular rooms via `block <id> ["<name>"] [glyph=<member>] <member>...`:

@@ -2,7 +2,7 @@
 
 Plain dataclasses passed between the parser, layout engine, and renderers.
 These carry no behaviour beyond holding parsed/solved state. See
-``docs/design.md`` for the placement model these structures encode.
+``docs/room.md`` and ``docs/door.md`` for the model these structures encode.
 
 Relations are stored axis-first: a :class:`Direction` knows its :class:`Axis`,
 so the four surface keywords (and any future compass or floor-axis aliases)
@@ -78,7 +78,7 @@ class Room:
     """
 
     id: str
-    name: str
+    name: str | None
     width: int
     height: int
     is_root: bool = False

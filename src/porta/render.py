@@ -103,7 +103,7 @@ def render_svg(building: Building, *, background: str = "white") -> str:
 
     caption = f"1 square = {_GRID_FT} ft"
     entries = [
-        f"{glyphs[room.id]}  {room.name}  ({room.width}x{room.height} ft)"
+        _key_entry(room, glyphs[room.id])
         for room in sorted(building.rooms, key=lambda r: glyphs[r.id])
     ]
     chrome = [caption, *entries]
@@ -185,6 +185,14 @@ def render_svg(building: Building, *, background: str = "white") -> str:
 
     lines.append("</svg>")
     return "\n".join(lines)
+
+
+def _key_entry(room: Room, glyph: str) -> str:
+    """One key line: ``glyph  name  (WxH ft)``, or ``glyph  (WxH ft)`` when unnamed."""
+    size = f"({room.width}x{room.height} ft)"
+    if room.name is None:
+        return f"{glyph}  {size}"
+    return f"{glyph}  {room.name}  {size}"
 
 
 def _num(value: float) -> str:

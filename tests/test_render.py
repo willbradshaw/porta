@@ -263,6 +263,16 @@ def test_key_includes_room_dimensions() -> None:
     assert "(20x40 ft)" in key_text  # kitchen
 
 
+def test_key_shows_dimensions_when_a_room_has_no_name() -> None:
+    texts = [
+        t.text or ""
+        for t in ET.fromstring(svg_of('room a "" 20x30 root')).iter(tag("text"))
+    ]
+    key_text = " ".join(texts)
+    assert "(20x30 ft)" in key_text
+    assert "None" not in key_text  # the missing name is omitted, not stringified
+
+
 def test_special_characters_in_names_are_escaped() -> None:
     # Raw & or < would make the document malformed; fromstring proves escaping.
     root = ET.fromstring(svg_of('room a "Hall & Co <X>" 20x20 root'))

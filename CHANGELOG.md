@@ -7,6 +7,8 @@ Notable changes per release, newest first.
 - Add this changelog.
 - Add a workflow that drafts a GitHub release from the changelog on a version bump.
 - Require a CHANGELOG update on every PR (CI check).
+- Optional room names: an empty name slot (`""`) leaves a room unlabelled, and
+  the key shows its dimensions instead of a name.
 
 ## 1.0.1 (2026-06-07)
 

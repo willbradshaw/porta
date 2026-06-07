@@ -6,8 +6,10 @@ or raises :class:`~porta.errors.ParseError`.
 
 One line per room::
 
-    room <id> "<Name>" <W>x<H> [root] [<relation> <anchor> ...]
+    room <id> ["<Name>"] <W>x<H> [root] [<relation> <anchor> ...]
     relation = up-of | down-of | left-of | right-of
+
+The name is optional; omit it for a room labelled only by its glyph + size.
 
 Reference resolution (does ``anchor`` exist? is there exactly one root?) is a
 *layout* concern and is deliberately not checked here.
@@ -93,10 +95,8 @@ def _validate_id(value: str, quoted: bool, lineno: int) -> None:
         raise ParseError(f"{value!r} is a reserved word, not a room id", line=lineno)
 
 
-def _validate_name(value: str, quoted: bool, lineno: int) -> None:
-    """Check a room name: double-quoted, 1-N printable, non-blank, untrimmed."""
-    if not quoted:
-        raise ParseError("room name must be wrapped in double quotes", line=lineno)
+def _validate_name(value: str, lineno: int) -> None:
+    """Check a room name (when given): 1-N printable, non-blank, untrimmed."""
     if not 1 <= len(value) <= _MAX_NAME:
         raise ParseError(
             f"room name must be 1-{_MAX_NAME} characters, got {len(value)}",
@@ -170,24 +170,32 @@ def _tokenize(raw: str, lineno: int) -> list[Token]:
 
 
 def _parse_room(tokens: list[Token], lineno: int) -> Room:
-    """Turn a tokenised ``room`` line into a :class:`~porta.model.Room`."""
+    """Turn a tokenised ``room`` line into a :class:`~porta.model.Room`.
+
+    The name is optional: a quoted token after the id is taken as the name,
+    otherwise the dimensions follow the id directly.
+    """
     if tokens[0][0] != "room":
         raise ParseError(
             f"unknown directive {tokens[0][0]!r}; expected 'room'", line=lineno
         )
-    if len(tokens) < 4:
-        raise ParseError(
-            "a room needs an id, a quoted name, and WxH dimensions", line=lineno
-        )
+    if len(tokens) < 3:
+        raise ParseError("a room needs an id and WxH dimensions", line=lineno)
 
     room_id, id_quoted = tokens[1]
     _validate_id(room_id, id_quoted, lineno)
 
-    name, name_quoted = tokens[2]
-    _validate_name(name, name_quoted, lineno)
+    name: str | None = None
+    rest = tokens[2:]
+    if rest[0][1]:  # a quoted token directly after the id is the name
+        name = rest[0][0]
+        _validate_name(name, lineno)
+        rest = rest[1:]
 
-    width, height, auto_width, auto_height = _parse_dimensions(tokens[3][0], lineno)
-    is_root, relations = _parse_modifiers(tokens[4:], lineno)
+    if not rest:
+        raise ParseError("a room needs WxH dimensions", line=lineno)
+    width, height, auto_width, auto_height = _parse_dimensions(rest[0][0], lineno)
+    is_root, relations = _parse_modifiers(rest[1:], lineno)
 
     return Room(
         id=room_id,

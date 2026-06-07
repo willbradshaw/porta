@@ -43,6 +43,12 @@ def test_room_scalar_fields_are_captured() -> None:
     assert entrance.relations == []
 
 
+def test_name_is_optional() -> None:
+    rooms = parse('room a 10x10 root\nroom b "B" 10x10 right-of a').rooms
+    assert rooms[0].name is None
+    assert rooms[1].name == "B"
+
+
 def test_relations_are_captured_per_axis() -> None:
     hall = parse(MANOR).room("hall")
     assert hall.is_root is False
@@ -91,6 +97,8 @@ def test_line_numbers_advance_past_interior_comments_and_blanks(
         pytest.param('room   a    "A"    10x10    root', id="irregular-whitespace"),
         pytest.param('room a "A" 10x10 root  # trailing comment', id="inline-comment"),
         pytest.param('room a "A" 10x10 up-of nonesuch', id="unknown-anchor-deferred"),
+        pytest.param("room a 10x10 root", id="no-name"),
+        pytest.param("room a 10x10 up-of b", id="no-name-with-relation"),
     ],
 )
 def test_valid_source_parses_without_error(source: str) -> None:
@@ -181,7 +189,6 @@ def test_each_relation_keyword_maps_to_its_direction(
         pytest.param('room r "R" 20by20', id="dim-wrong-separator"),
         # name
         pytest.param('room r "Kitchen 20x20 root', id="name-unterminated-quote"),
-        pytest.param("room r 20x20 root", id="name-missing"),
         # required pieces
         pytest.param('room r "R" root', id="dims-missing"),
         pytest.param("room", id="bare-room-keyword"),

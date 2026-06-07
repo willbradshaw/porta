@@ -673,3 +673,73 @@ def test_solve_raises_overlap_error_with_rooms_and_rectangle() -> None:
         solve(parse(OVERLAPPING))
     assert exc.value.rooms == ("a", "d")
     assert exc.value.rect == (20, 0, 20, 20)
+
+
+# --- blocks ----------------------------------------------------------------
+
+TWO_ADJACENT = "room a 20x20 root\nroom b 20x20 right-of a"
+
+
+def test_block_drops_the_internal_default_door() -> None:
+    assert len(door_segments(solve(parse(TWO_ADJACENT)))) == 1  # the default door
+    blocked = solve(parse(TWO_ADJACENT + '\nblock h "Hall" a b'))
+    assert door_segments(blocked) == []  # internal wall: door dropped
+
+
+def test_valid_block_solves_without_warnings() -> None:
+    src = 'room a 20x20 root\nroom b 20x20 down-of a\nblock h "H" a b'
+    building = solve(parse(src))
+    assert building.warnings == []
+
+
+def test_member_name_is_suppressed_with_a_warning() -> None:
+    building = solve(parse('room a "Kept" 20x20 root\nblock h "Hall" a'))
+    assert any("suppressed" in w and "'a'" in w for w in building.warnings)
+
+
+def test_explicit_internal_door_is_dropped_with_a_warning() -> None:
+    src = 'room a 20x20 root\nroom b 20x20 right-of a door=10\nblock h "H" a b'
+    building = solve(parse(src))
+    assert door_segments(building) == []
+    assert any("explicit door" in w for w in building.warnings)
+
+
+def test_standalone_internal_door_is_dropped_with_a_warning() -> None:
+    src = 'room a 20x20 root\nroom b 20x20 right-of a\nblock h "H" a b\ndoor a b'
+    building = solve(parse(src))
+    assert door_segments(building) == []
+    assert any("same block" in w for w in building.warnings)
+
+
+def test_block_keeps_doors_to_rooms_outside_it() -> None:
+    # 'c' is outside the block; its wall with member 'b' still gets a door.
+    src = (
+        "room a 20x20 root\nroom b 20x20 right-of a\n"
+        'room c 20x20 right-of b\nblock h "H" a b'
+    )
+    assert len(door_segments(solve(parse(src)))) == 1  # only the b|c door survives
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param('room a 20x20 root\nblock h "H" a nonesuch', id="unknown-member"),
+        pytest.param(
+            'room a 20x20 root\nroom b 20x20 right-of a\nblock h "H" a glyph=b',
+            id="glyph-not-a-member",
+        ),
+        pytest.param(
+            "room a 20x20 root\nroom b 20x20 right-of a\n"
+            'room c 20x20 right-of b\nblock h "H" a c',
+            id="non-contiguous",
+        ),
+        pytest.param(
+            "room a 20x20 root\nroom b 20x20 right-of a\n"
+            'block h "H" a b\nblock g "G" a',
+            id="room-in-two-blocks",
+        ),
+    ],
+)
+def test_invalid_block_layout_raises(source: str) -> None:
+    with pytest.raises(LayoutError):
+        solve(parse(source))

@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="740" height="1080" viewBox="-17 -10 74 108">
-  <rect x="-17" y="-10" width="74" height="108" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="984" viewBox="-17 -10 74 98.4">
+  <rect x="-17" y="-10" width="74" height="98.4" fill="#e0e0e0" />
   <g stroke="#bbb" stroke-width="0.15">
     <line x1="0" y1="0" x2="0" y2="50" />
     <line x1="5" y1="0" x2="5" y2="50" />
@@ -22,18 +22,17 @@
     <line x1="0" y1="45" x2="40" y2="45" />
     <line x1="0" y1="50" x2="40" y2="50" />
   </g>
-  <rect data-room="annexe" x="30" y="30" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="annexe" x="35" y="35" text-anchor="middle" dominant-baseline="central" font-size="6">A</text>
   <line x1="0" y1="0" x2="0" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line x1="0" y1="0" x2="40" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line x1="0" y1="30" x2="0" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line x1="0" y1="50" x2="20" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line x1="20" y1="30" x2="20" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line x1="20" y1="30" x2="40" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="20" y1="30" x2="30" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="30" y1="30" x2="30" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="30" y1="40" x2="40" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line x1="40" y1="0" x2="40" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="40" y1="30" x2="40" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-block="hall" x="20" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
-  <line class="door" x1="30" y1="30" x2="35" y2="30" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-7" y="69.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="-7" y="78.8" font-size="6">A</text>
-  <text class="key" x="-7" y="88.4" font-size="6">H  Great Hall</text>
+  <text class="key" x="-7" y="78.8" font-size="6">H  Great Hall</text>
 </svg>

@@ -8,7 +8,7 @@ spaces in the rendered SVG map:
 room main "" 40x30 root
 room wing "" 20x20 down-of main
 room annexe "" 10x10 down-of main align=end
-block hall "Great Hall" main wing
+block hall "Great Hall" main wing annexe
 ```
 
 <img alt="An L-shaped room built from two rectangles" src="img/block-l.svg" width="70%">
@@ -24,8 +24,8 @@ level.
 block <id> "<name>" [glyph=<member-id>] <member-id>...
 ```
 
-- **`<id>`**: the block's own id; its first letter is the union's glyph. Same
-  rules as a [room id](room.md#room-id), in the same namespace (unique across
+- **`<id>`**: the block's own ID; its first letter is the union's glyph. Same
+  rules as a [room ID](room.md#room-id), in the same namespace (unique across
   all rooms and blocks).
 - **`"<name>"`**: labels the union in the key, with the same rules as a
   [room name](room.md#room-name). As for a room, the slot is **required** but
@@ -71,7 +71,7 @@ been dropped.
 
 `porta` rejects a block it can't form:
 
-- A member id that isn't a room.
+- A member ID that isn't a room.
 - A room listed in more than one block.
 - A `glyph=` target that isn't one of the members.
 - Members that don't form a single contiguous region.

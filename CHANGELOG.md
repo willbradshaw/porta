@@ -4,22 +4,17 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
-- Add this changelog.
-- Add a workflow that drafts a GitHub release from the changelog on a version bump.
-- Require a CHANGELOG update on every PR (CI check).
-- Optional room names: an empty name slot (`""`) leaves a room unlabelled (the
-  key then lists it by glyph alone).
-- The map key lists rooms and blocks by glyph and name only — per-room
-  dimensions are no longer shown (rectangular and non-rectangular rooms read
-  the same way).
-- Non-fatal warnings: solving collects advisories that the CLI prints to stderr
-  (the run still succeeds with exit 0).
-- Non-rectangular rooms via `block <id> "<name>" [glyph=<member>] <member>...`:
-  group rooms into one space, dropping the walls and doors they share with each
-  other; the union renders with a single outline, glyph, and key entry.
-  Validates membership and contiguity, and warns on suppressed names/doors.
-- Add a Blocks guide (`docs/block.md`), linked from the README and the room and
-  door guides.
+## 1.1.0 (2026-06-07)
+
+- Implement non-rectangular spaces via `block` statements, representing
+  unions of rectangular rooms (see `docs/block.md`).
+- Makes room (and block) names optional by permitting empty (`""`) name entries.
+- Remove per-room dimensions from map keys.
+- Add non-fatal warnings for explicit doors or non-empty names on walls
+  suppressed by `block` statements.
+- Added `CHANGELOG.md`, plus CI to ensure it's updated on every PR.
+- Added a workflow to auto-draft GitHub releases whenever the package 
+  version is updated in `pyproject.toml`.
 
 ## 1.0.1 (2026-06-07)
 

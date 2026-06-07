@@ -14,7 +14,7 @@ Notable changes per release, newest first.
   the same way).
 - Non-fatal warnings: solving collects advisories that the CLI prints to stderr
   (the run still succeeds with exit 0).
-- Non-rectangular rooms via `block <id> ["<name>"] [glyph=<member>] <member>...`:
+- Non-rectangular rooms via `block <id> "<name>" [glyph=<member>] <member>...`:
   group rooms into one space, dropping the walls and doors they share with each
   other; the union renders with a single outline, glyph, and key entry.
   Validates membership and contiguity, and warns on suppressed names/doors.

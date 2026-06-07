@@ -393,8 +393,8 @@ def test_block_is_parsed() -> None:
     assert block.glyph_member is None
 
 
-def test_block_name_is_optional() -> None:
-    block = parse('room a "" 10x10 root\nblock hall a').blocks[0]
+def test_block_name_may_be_empty() -> None:
+    block = parse('room a "" 10x10 root\nblock hall "" a').blocks[0]
     assert block.name is None
     assert block.members == ["a"]
 
@@ -411,12 +411,13 @@ def test_block_glyph_member_is_parsed() -> None:
 @pytest.mark.parametrize(
     "source",
     [
-        pytest.param("block hall", id="block-no-members"),
+        pytest.param('block hall ""', id="block-no-members"),
         pytest.param('block hall "H"', id="block-name-no-members"),
-        pytest.param("block hall a a", id="block-duplicate-member"),
-        pytest.param('block hall a "b"', id="block-quoted-member"),
-        pytest.param("block Hall a", id="block-uppercase-id"),
-        pytest.param("block root a", id="block-reserved-id"),
+        pytest.param("block hall a", id="block-name-unquoted"),
+        pytest.param('block hall "H" a a', id="block-duplicate-member"),
+        pytest.param('block hall "H" a "b"', id="block-quoted-member"),
+        pytest.param('block Hall "" a', id="block-uppercase-id"),
+        pytest.param('block root "" a', id="block-reserved-id"),
     ],
 )
 def test_invalid_block_raises(source: str) -> None:
@@ -426,4 +427,4 @@ def test_invalid_block_raises(source: str) -> None:
 
 def test_block_id_colliding_with_a_room_raises() -> None:
     with pytest.raises(ParseError):
-        parse('room a "" 10x10 root\nblock a a')
+        parse('room a "" 10x10 root\nblock a "" b')

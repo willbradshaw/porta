@@ -11,6 +11,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from porta import __version__
 from porta.errors import PortaError
 from porta.layout import solve
 from porta.parser import parse
@@ -26,6 +27,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="porta",
         description="Render relational floor-plan specs (.porta) to SVG.",
+    )
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s {__version__}",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 

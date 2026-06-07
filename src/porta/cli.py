@@ -83,12 +83,20 @@ def _draw(input_path: str, output_path: str | None, debug_ascii: bool) -> int:
         print(_format_diagnostic(input_path, exc), file=sys.stderr)
         return 1
 
+    _emit_warnings(input_path, building.warnings)
+
     output = render_ascii(building) if debug_ascii else render_svg(building)
     if output_path is None:
         print(output)
     else:
         Path(output_path).write_text(output)
     return 0
+
+
+def _emit_warnings(source_name: str, warnings: list[str]) -> None:
+    """Print non-fatal warnings to stderr; the run still succeeds (exit 0)."""
+    for message in warnings:
+        print(f"{source_name}: warning: {message}", file=sys.stderr)
 
 
 def _format_diagnostic(source_name: str, error: PortaError) -> str:

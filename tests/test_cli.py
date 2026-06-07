@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 import porta
-from porta.cli import build_parser, main
+from porta.cli import _emit_warnings, build_parser, main
 from porta.layout import solve
 from porta.parser import parse
 from porta.render import render_ascii, render_svg
@@ -40,6 +40,19 @@ def test_version_flag_prints_version(capsys: pytest.CaptureFixture[str]) -> None
         main(["--version"])
     assert exc.value.code == 0
     assert porta.__version__ in capsys.readouterr().out
+
+
+def test_clean_build_has_no_warnings() -> None:
+    assert solve(parse(Path(MANOR).read_text())).warnings == []
+
+
+def test_warnings_print_to_stderr_without_failing(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    _emit_warnings("plan.porta", ["alpha suppressed", "beta suppressed"])
+    err = capsys.readouterr().err
+    assert "plan.porta: warning: alpha suppressed" in err
+    assert "plan.porta: warning: beta suppressed" in err
 
 
 def test_draw_subcommand_parses() -> None:

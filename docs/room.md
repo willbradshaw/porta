@@ -64,8 +64,7 @@ reserved keywords.
 ### Room name
 
 A room name is the label given to that room in the rendered map's key. The name
-slot is **required**, but may be left **empty** with `""` — handy for
-[block](block.md) members, which take their label from the block.
+slot is **required**, but may be left **empty** with `""`.
 
 A non-empty name must meet the following criteria:
 

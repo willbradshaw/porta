@@ -21,9 +21,6 @@ fully centrally due to the 5-foot wall grid, they are positioned
 immediately above (for vertical walls) or to the left of the center
 (for horizontal walls).
 
-The exception is a wall *inside* a [block](block.md): the door between two
-members of the same block is dropped along with the wall.
-
 ```porta img/door-overview.svg
 room hall    "Hall"    20x20 root
 room kitchen "Kitchen" 20x20 right-of hall
@@ -31,6 +28,10 @@ room study   "Study"   20x20 down-of hall
 ```
 
 <img alt="Three rooms with a default door on each shared wall" src="img/door-overview.svg" width="70%">
+
+An important exception to this behavior is doors within [blocks](block.md).
+If two rooms are members of the same block, any default doors between them
+will be suppressed along with their adjoining walls.
 
 ## Door declarations
 

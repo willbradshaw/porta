@@ -1,6 +1,6 @@
 [project]
 name = "porta"
-version = "1.0.0"
+version = "1.0.1"
 description = "A relational DSL for authoring and rendering SVG floorplans."
 readme = "README.md"
 license = "MIT"

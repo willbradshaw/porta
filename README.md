@@ -6,14 +6,12 @@
 2. A **software package** for deterministically converting a floorplan into
    a clean SVG map.
 
-```porta docs/img/readme.svg
+```porta
 room hall    "Great Hall" 40x20 root
 room parlour "Parlour"    20x20 left-of hall
 room kitchen "Kitchen"    20x20 right-of hall
 room study   "Study"      ?x20  down-of parlour
 ```
-
-<img alt="Four rooms rendered to an SVG floor plan" src="docs/img/readme.svg" width="60%">
 
 ## The `porta` DSL
 

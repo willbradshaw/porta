@@ -115,11 +115,16 @@ class ExternalDoor:
 
 @dataclass
 class Building:
-    """Rooms (with id lookup) plus standalone and external doors."""
+    """Rooms (with id lookup) plus standalone and external doors.
+
+    ``warnings`` collects non-fatal advisories raised while solving (e.g. a
+    suppressed name or door); the CLI prints them but the run still succeeds.
+    """
 
     rooms: list[Room] = field(default_factory=list)
     doors: list[Doorway] = field(default_factory=list)
     external_doors: list[ExternalDoor] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
 
     def room(self, room_id: str) -> Room:
         """Return the room with ``room_id``.

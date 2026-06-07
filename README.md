@@ -6,17 +6,12 @@
 2. A **software package** for deterministically converting a floorplan into
    a clean SVG map.
 
-```porta docs/img/readme.svg
+```porta
 room hall    "Great Hall" 40x20 root
 room parlour "Parlour"    20x20 left-of hall
 room kitchen "Kitchen"    20x20 right-of hall
 room study   "Study"      ?x20  down-of parlour
 ```
-
-<!-- PyPI can't render SVG, so the README shows a PNG raster of docs/img/readme.svg
-via an absolute URL. If the example above changes, regenerate the PNG from the SVG
-with inkscape (export to PNG at width 1000). -->
-<img alt="Four rooms rendered to an SVG floor plan" src="https://raw.githubusercontent.com/willbradshaw/porta/main/docs/img/readme.png" width="60%">
 
 ## The `porta` DSL
 

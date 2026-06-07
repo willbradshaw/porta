@@ -7,7 +7,7 @@ its default settings (remove it, resize it, move it) or to add an additional doo
 in a non-default location.
 
 > [!NOTE]
-> Doors are draws as thick black marks straddling the walls between
+> Doors are drawn as thick black marks straddling the walls between
 > the rooms they connect. They only appear in rendered SVG; the
 > ASCII debug view (`porta draw <plan>.porta --debug-ascii`) 
 > shows the room layout without them.

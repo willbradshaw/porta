@@ -11,6 +11,10 @@ Notable changes per release, newest first.
   the key shows its dimensions instead of a name.
 - Non-fatal warnings: solving collects advisories that the CLI prints to stderr
   (the run still succeeds with exit 0).
+- Non-rectangular rooms via `block <id> ["<name>"] [glyph=<member>] <member>...`:
+  group rooms into one space, dropping the walls and doors they share with each
+  other; the union renders with a single outline, glyph, and key entry.
+  Validates membership and contiguity, and warns on suppressed names/doors.
 
 ## 1.0.1 (2026-06-07)
 

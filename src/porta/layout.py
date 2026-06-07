@@ -16,6 +16,7 @@ from porta.errors import LayoutError, OverlapError
 from porta.model import (
     Align,
     Axis,
+    Block,
     Building,
     Direction,
     Door,
@@ -79,8 +80,162 @@ def solve(building: Building) -> Building:
         first, second, rect = overlaps[0]
         raise OverlapError((first.id, second.id), rect)
 
+    _validate_blocks(building, by_id)
+    building.warnings.extend(_block_warnings(building, by_id, _block_of(building)))
+
     door_segments(building)  # validates every door (raises on a bad one)
     return building
+
+
+def _block_of(building: Building) -> dict[str, str]:
+    """Map each block member's room id to the id of the block it belongs to."""
+    return {member: block.id for block in building.blocks for member in block.members}
+
+
+def _same_block(a: str, b: str, block_of: dict[str, str]) -> bool:
+    """Whether rooms ``a`` and ``b`` are members of the same block."""
+    return a in block_of and block_of.get(a) == block_of.get(b)
+
+
+def _validate_blocks(building: Building, by_id: dict[str, Room]) -> None:
+    """Check each block: members exist, no room in two blocks, the glyph target is
+    a member, and the union of members is contiguous. Assumes placed rooms.
+    """
+    member_block: dict[str, str] = {}
+    for block in building.blocks:
+        for member in block.members:
+            if member not in by_id:
+                raise LayoutError(
+                    f"block {block.id!r} references unknown room {member!r}",
+                    line=block.line,
+                )
+            if member in member_block:
+                raise LayoutError(
+                    f"room {member!r} is in two blocks "
+                    f"({member_block[member]!r} and {block.id!r})",
+                    line=block.line,
+                )
+            member_block[member] = block.id
+        if block.glyph_member is not None and block.glyph_member not in block.members:
+            raise LayoutError(
+                f"block {block.id!r}: glyph member {block.glyph_member!r} is not "
+                f"one of its members",
+                line=block.line,
+            )
+        _check_block_contiguous(block, by_id)
+
+
+def _check_block_contiguous(block: Block, by_id: dict[str, Room]) -> None:
+    """Raise unless the block's members form one wall-connected region."""
+    members = [by_id[m] for m in block.members]
+    adjacency: dict[str, set[str]] = {room.id: set() for room in members}
+    for i, first in enumerate(members):
+        for second in members[i + 1 :]:
+            if _shared_wall(first, second) is not None:
+                adjacency[first.id].add(second.id)
+                adjacency[second.id].add(first.id)
+    reached = {members[0].id}
+    stack = [members[0].id]
+    while stack:
+        for neighbour in adjacency[stack.pop()]:
+            if neighbour not in reached:
+                reached.add(neighbour)
+                stack.append(neighbour)
+    if len(reached) != len(members):
+        raise LayoutError(
+            f"block {block.id!r} is not contiguous: its members do not all "
+            f"connect by shared walls",
+            line=block.line,
+        )
+
+
+def _block_warnings(
+    building: Building, by_id: dict[str, Room], block_of: dict[str, str]
+) -> list[str]:
+    """Advisories: a block suppresses its members' names and any door between them."""
+    warnings: list[str] = []
+    for block in building.blocks:
+        for member in block.members:
+            name = by_id[member].name
+            if name is not None:
+                warnings.append(
+                    f"room {member!r}: name {name!r} is suppressed inside "
+                    f"block {block.id!r}"
+                )
+    for room in building.rooms:
+        for rel in room.relations:
+            if rel.door is not None and _same_block(room.id, rel.anchor, block_of):
+                warnings.append(
+                    f"explicit door from {room.id!r} to {rel.anchor!r} is "
+                    f"suppressed (same block)"
+                )
+    for doorway in building.doors:
+        if _same_block(doorway.a, doorway.b, block_of):
+            warnings.append(
+                f"door between {doorway.a!r} and {doorway.b!r} is suppressed "
+                f"(same block)"
+            )
+    return warnings
+
+
+def block_wall_segments(building: Building) -> list[Segment]:
+    """Wall segments tracing each block's outer boundary (internal walls dropped).
+
+    For every block member, each of its four edges is emitted only over the parts
+    not shared with another member of the same block, so the union renders as one
+    outline rather than separate rectangles. Assumes a solved building.
+    """
+    by_id = {room.id: room for room in building.rooms}
+    segments: list[Segment] = []
+    for block in building.blocks:
+        members = [by_id[m] for m in block.members]
+        for member in members:
+            segments.extend(_member_boundary(member, members))
+    return segments
+
+
+def _member_boundary(member: Room, members: list[Room]) -> list[Segment]:
+    """The parts of ``member``'s four edges not shared with a sibling member.
+
+    Members never overlap, so any sibling edge lying on one of ``member``'s edge
+    lines (with overlap) must be the abutting member on the other side — i.e. an
+    internal wall to drop.
+    """
+    mx, my = _axis_lo(member, Axis.HORIZONTAL), _axis_lo(member, Axis.VERTICAL)
+    mw, mh = member.width, member.height
+    others = [n for n in members if n is not member]
+    segments: list[Segment] = []
+    for at_y in (my, my + mh):  # top, then bottom
+        blocked = [
+            (_axis_lo(n, Axis.HORIZONTAL), _axis_hi(n, Axis.HORIZONTAL))
+            for n in others
+            if at_y in (_axis_lo(n, Axis.VERTICAL), _axis_hi(n, Axis.VERTICAL))
+        ]
+        segments += [(x0, at_y, x1, at_y) for x0, x1 in _exposed(mx, mx + mw, blocked)]
+    for at_x in (mx, mx + mw):  # left, then right
+        blocked = [
+            (_axis_lo(n, Axis.VERTICAL), _axis_hi(n, Axis.VERTICAL))
+            for n in others
+            if at_x in (_axis_lo(n, Axis.HORIZONTAL), _axis_hi(n, Axis.HORIZONTAL))
+        ]
+        segments += [(at_x, y0, at_x, y1) for y0, y1 in _exposed(my, my + mh, blocked)]
+    return segments
+
+
+def _exposed(lo: int, hi: int, blocked: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    """Sub-intervals of ``[lo, hi]`` left uncovered by the ``blocked`` intervals."""
+    cuts = sorted(
+        (max(lo, b0), min(hi, b1)) for b0, b1 in blocked if min(hi, b1) > max(lo, b0)
+    )
+    result: list[tuple[int, int]] = []
+    cursor = lo
+    for b0, b1 in cuts:
+        if b0 > cursor:
+            result.append((cursor, b0))
+        cursor = max(cursor, b1)
+    if cursor < hi:
+        result.append((cursor, hi))
+    return result
 
 
 def _resolve_auto_dims(room: Room, by_id: dict[str, Room]) -> None:
@@ -237,15 +392,18 @@ def door_segments(building: Building) -> list[Segment]:
     wall or doesn't fit). Assumes a solved building.
     """
     by_id = {room.id: room for room in building.rooms}
+    block_of = _block_of(building)
     segments: list[Segment] = []
     for room in building.rooms:
         for rel in room.relations:
-            if rel.no_door:
-                continue
+            if rel.no_door or _same_block(room.id, rel.anchor, block_of):
+                continue  # ``no_door``, or an internal wall of a block (dropped)
             segment = _relation_door(room, by_id[rel.anchor], rel)
             if segment is not None:
                 segments.append(segment)
     for doorway in building.doors:
+        if _same_block(doorway.a, doorway.b, block_of):
+            continue  # internal wall of a block (dropped)
         segments.append(_doorway_door(doorway, by_id))
     for external in building.external_doors:
         segments.append(_external_door_line(external, by_id, building.rooms))

@@ -215,26 +215,19 @@ def render_svg(building: Building, *, background: str = "white") -> str:
     return "\n".join(lines)
 
 
-def _key_entry(room: Room, glyph: str) -> str:
-    """One key line: ``glyph  name  (WxH ft)``, or ``glyph  (WxH ft)`` when unnamed."""
-    size = f"({room.width}x{room.height} ft)"
-    if room.name is None:
-        return f"{glyph}  {size}"
-    return f"{glyph}  {room.name}  {size}"
-
-
 def _key_line(
     building: Building, by_id: dict[str, Room], entity_id: str, glyph: str
 ) -> str:
-    """Key line for a non-member room (glyph + name/size) or a block (glyph + name).
+    """One key line: ``glyph  name``, or just ``glyph`` when there is no name.
 
-    A block has no single ``WxH``, so a name-less block keys as just its glyph.
+    Applies the same way to rooms and blocks (each is named or not).
     """
     room = by_id.get(entity_id)
     if room is not None:
-        return _key_entry(room, glyph)
-    block = next(block for block in building.blocks if block.id == entity_id)
-    return f"{glyph}  {block.name}" if block.name is not None else glyph
+        name = room.name
+    else:
+        name = next(block.name for block in building.blocks if block.id == entity_id)
+    return f"{glyph}  {name}" if name else glyph
 
 
 def _num(value: float) -> str:

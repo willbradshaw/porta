@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="956" height="1176" viewBox="-22.8 -10 95.6 117.6">
-  <rect x="-22.8" y="-10" width="95.6" height="117.6" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1176" viewBox="-20 -10 90 117.6">
+  <rect x="-20" y="-10" width="90" height="117.6" fill="white" />
   <g stroke="#bbb" stroke-width="0.15">
     <line x1="-10" y1="0" x2="-10" y2="50" />
     <line x1="-5" y1="0" x2="-5" y2="50" />
@@ -45,8 +45,8 @@
   <text data-block="hall" x="20" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
   <line class="door" x1="20" y1="35" x2="20" y2="40" stroke="black" stroke-width="1.5" />
   <line class="door" x1="40" y1="5" x2="40" y2="10" stroke="black" stroke-width="1.5" />
-  <text class="scale" x="-12.8" y="69.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="-12.8" y="78.8" font-size="6">C  Chapel  (20x20 ft)</text>
-  <text class="key" x="-12.8" y="88.4" font-size="6">H  Great Hall</text>
-  <text class="key" x="-12.8" y="98" font-size="6">S  Study  (20x20 ft)</text>
+  <text class="scale" x="-2" y="69.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="-2" y="78.8" font-size="6">C  Chapel</text>
+  <text class="key" x="-2" y="88.4" font-size="6">H  Great Hall</text>
+  <text class="key" x="-2" y="98" font-size="6">S  Study</text>
 </svg>

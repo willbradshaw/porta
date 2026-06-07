@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1172" height="1752" viewBox="-43.6 -10 117.2 175.2">
-  <rect x="-43.6" y="-10" width="117.2" height="175.2" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1752" viewBox="-40 -10 110 175.2">
+  <rect x="-40" y="-10" width="110" height="175.2" fill="#e0e0e0" />
   <g stroke="#bbb" stroke-width="0.15">
     <line x1="-30" y1="0" x2="-30" y2="50" />
     <line x1="-25" y1="0" x2="-25" y2="50" />
@@ -65,14 +65,14 @@
   <line class="door" x1="35" y1="40" x2="40" y2="40" stroke="black" stroke-width="1.5" />
   <line class="door" x1="50" y1="5" x2="50" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="50" y1="25" x2="50" y2="30" stroke="black" stroke-width="1.5" />
-  <text class="scale" x="-33.6" y="69.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="-33.6" y="78.8" font-size="6">A  Passage  (10x10 ft)</text>
-  <text class="key" x="-33.6" y="88.4" font-size="6">C  Cloakroom  (10x10 ft)</text>
-  <text class="key" x="-33.6" y="98" font-size="6">D  Dining Room  (30x20 ft)</text>
-  <text class="key" x="-33.6" y="107.6" font-size="6">H  Hall  (20x40 ft)</text>
-  <text class="key" x="-33.6" y="117.2" font-size="6">K  Kitchen  (30x20 ft)</text>
-  <text class="key" x="-33.6" y="126.8" font-size="6">O  Porch  (20x10 ft)</text>
-  <text class="key" x="-33.6" y="136.4" font-size="6">P  Pantry  (10x40 ft)</text>
-  <text class="key" x="-33.6" y="146" font-size="6">R  Drawing Room  (30x40 ft)</text>
-  <text class="key" x="-33.6" y="155.6" font-size="6">S  Scullery  (15x10 ft)</text>
+  <text class="scale" x="-12" y="69.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="-12" y="78.8" font-size="6">A  Passage</text>
+  <text class="key" x="-12" y="88.4" font-size="6">C  Cloakroom</text>
+  <text class="key" x="-12" y="98" font-size="6">D  Dining Room</text>
+  <text class="key" x="-12" y="107.6" font-size="6">H  Hall</text>
+  <text class="key" x="-12" y="117.2" font-size="6">K  Kitchen</text>
+  <text class="key" x="-12" y="126.8" font-size="6">O  Porch</text>
+  <text class="key" x="-12" y="136.4" font-size="6">P  Pantry</text>
+  <text class="key" x="-12" y="146" font-size="6">R  Drawing Room</text>
+  <text class="key" x="-12" y="155.6" font-size="6">S  Scullery</text>
 </svg>

@@ -33,7 +33,9 @@ def build_parser() -> argparse.ArgumentParser:
         action="version",
         version=f"%(prog)s {__version__}",
     )
-    sub = parser.add_subparsers(dest="command", required=True)
+    sub = parser.add_subparsers(
+        dest="command", required=True, metavar="<command>", title="commands"
+    )
 
     draw = sub.add_parser("draw", help="Render a .porta file to SVG.")
     draw.add_argument("input", help="Path to the input .porta file.")

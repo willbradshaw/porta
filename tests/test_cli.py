@@ -55,6 +55,12 @@ def test_debug_ascii_flag_parses() -> None:
     assert args.debug_ascii is True
 
 
+def test_help_uses_a_command_metavar() -> None:
+    help_text = build_parser().format_help()
+    assert "{draw}" not in help_text
+    assert "<command>" in help_text
+
+
 # --- end-to-end: SVG -------------------------------------------------------
 
 

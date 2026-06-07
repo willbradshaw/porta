@@ -36,7 +36,7 @@ Each `room` statement consists of the following components in order:
 
 1. A literal `room` keyword;
 2. A [room ID](#room-id) used to point to that room elsewhere in the plan;
-3. A [room name](#room-name) shown in the rendered map key;
+3. A [room name](#room-name) shown in the rendered map key (may be empty);
 4. A [dimension declaration](#dimensions) of the form `WxH`;
 5. One or more [relations](#relations).
 
@@ -63,8 +63,20 @@ reserved keywords.
 
 ### Room name
 
-A room name is the label given to that room in the rendered map generated
-from a `porta` plan. A valid name must meet the following criteria:
+A room name is the label given to that room in the rendered map's key. The name
+slot is **required**, but may be left **empty** with `""`, for a room you'd
+rather not label — the key then shows the room's dimensions in place of a name.
+(This is mainly useful for rooms grouped into a larger room, where the label
+comes from the group.)
+
+```text
+room store "" 10x10 right-of hall   # no name; the key shows "S  (10x10 ft)"
+```
+
+A bare, unquoted name is an error (`name must be in double quotes`), so a
+forgotten name reports clearly rather than being mistaken for the dimensions.
+
+A non-empty name must meet the following criteria:
 
 - A single double-quoted string 1-40 characters long;
 - Contains no double-quotes (literal `"`) internally;

@@ -9,6 +9,9 @@ One line per room::
     room <id> "<Name>" <W>x<H> [root] [<relation> <anchor> ...]
     relation = up-of | down-of | left-of | right-of
 
+The name slot is required but may be empty (``""``) for a room labelled only by
+its glyph and size.
+
 Reference resolution (does ``anchor`` exist? is there exactly one root?) is a
 *layout* concern and is deliberately not checked here.
 """
@@ -94,9 +97,13 @@ def _validate_id(value: str, quoted: bool, lineno: int) -> None:
 
 
 def _validate_name(value: str, quoted: bool, lineno: int) -> None:
-    """Check a room name: double-quoted, 1-N printable, non-blank, untrimmed."""
+    """Check a room name: a required, double-quoted slot; ``""`` means no name."""
     if not quoted:
-        raise ParseError("room name must be wrapped in double quotes", line=lineno)
+        raise ParseError(
+            'room name must be in double quotes (use "" for no name)', line=lineno
+        )
+    if value == "":
+        return  # empty quotes: no name
     if not 1 <= len(value) <= _MAX_NAME:
         raise ParseError(
             f"room name must be 1-{_MAX_NAME} characters, got {len(value)}",
@@ -170,21 +177,27 @@ def _tokenize(raw: str, lineno: int) -> list[Token]:
 
 
 def _parse_room(tokens: list[Token], lineno: int) -> Room:
-    """Turn a tokenised ``room`` line into a :class:`~porta.model.Room`."""
+    """Turn a tokenised ``room`` line into a :class:`~porta.model.Room`.
+
+    The name slot is required but may be empty (``""``) for a room labelled only
+    by its glyph and size.
+    """
     if tokens[0][0] != "room":
         raise ParseError(
             f"unknown directive {tokens[0][0]!r}; expected 'room'", line=lineno
         )
     if len(tokens) < 4:
         raise ParseError(
-            "a room needs an id, a quoted name, and WxH dimensions", line=lineno
+            'a room needs an id, a name (use "" for none), and WxH dimensions',
+            line=lineno,
         )
 
     room_id, id_quoted = tokens[1]
     _validate_id(room_id, id_quoted, lineno)
 
-    name, name_quoted = tokens[2]
-    _validate_name(name, name_quoted, lineno)
+    name_value, name_quoted = tokens[2]
+    _validate_name(name_value, name_quoted, lineno)
+    name = name_value or None  # "" -> no name
 
     width, height, auto_width, auto_height = _parse_dimensions(tokens[3][0], lineno)
     is_root, relations = _parse_modifiers(tokens[4:], lineno)

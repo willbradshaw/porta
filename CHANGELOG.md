@@ -5,15 +5,16 @@ Notable changes per release, newest first.
 ## Unreleased
 
 - Add this changelog.
+- Add a workflow that drafts a GitHub release from the changelog on a version bump.
 
-## 1.0.1 — 2026-06-07
+## 1.0.1 (2026-06-07)
 
 - Drop the README's embedded figure (PyPI doesn't render SVG); the Rooms and
   Doors guides still carry figures.
 - Add a PyPI Trusted Publishing workflow (releases publish via GitHub Actions).
 - Fix a typo in the doors guide.
 
-## 1.0.0 — 2026-06-07
+## 1.0.0 (2026-06-07)
 
 - Initial release.
 - Relational `.porta` DSL: rooms placed by `up-of` / `down-of` / `left-of` /

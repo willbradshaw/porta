@@ -95,10 +95,6 @@ door b outside down
 
 <img alt="Two rooms with external doors on their outer walls" src="img/door-outside.svg" width="70%">
 
-The side must be genuinely exterior: if another room sits flush against that
-stretch of wall, the door is an [error](#invalid-doors) — use a `door <a> <b>`
-between the two rooms instead.
-
 ## Invalid doors
 
 `porta` rejects a door it can't place:
@@ -114,21 +110,17 @@ between the two rooms instead.
 ```porta img/door-capstone.svg
 room hall     "Hall"          20x40 root
 room drawing  "Drawing Room"  30x40 left-of hall door=20
-room dining   "Dining Room"   30x20 right-of hall
-room kitchen  "Kitchen"       30x20 right-of hall align=end no-door
+room dining   "Dining Room"   30x20 right-of hall door@10
+room kitchen  "Kitchen"       30x20 right-of hall align=end
 room pantry   "Pantry"        10x?  right-of dining right-of kitchen
 room porch    "Porch"         20x10 down-of hall
 room cloak    "Cloakroom"     10x10 down-of drawing left-of porch
 room scullery "Scullery"      15x10 down-of kitchen align=end shift=-5
 room passage  "Passage"       ?x10  right-of porch left-of scullery
-door dining kitchen
+door=10@5 dining kitchen
 door porch outside down
+door dining outside up
+door drawing outside left
 ```
 
 <img alt="The manor ground floor with its doors controlled" src="img/door-capstone.svg" width="70%">
-
-The [manor from the rooms guide](room.md#putting-it-together), now with its
-doors controlled: a wide opening into the Drawing Room (`door=20`), no direct
-door from the hall into the Kitchen (`no-door`), a serving door between the
-Dining Room and Kitchen (`door dining kitchen`), and the front door onto the
-Porch (`door porch outside down`).

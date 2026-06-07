@@ -29,6 +29,10 @@ room study   "Study"   20x20 down-of hall
 
 <img alt="Three rooms with a default door on each shared wall" src="img/door-overview.svg" width="70%">
 
+An important exception to this behavior is doors within [blocks](block.md).
+If two rooms are members of the same block, any default doors between them
+will be suppressed along with their adjoining walls.
+
 ## Door declarations
 
 The door drawn by a [relation](room.md#relations) can be modified by

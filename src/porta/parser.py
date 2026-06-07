@@ -155,26 +155,27 @@ def _parse_external_door(tokens: list[Token], lineno: int) -> ExternalDoor:
 
 
 def _parse_block(tokens: list[Token], lineno: int) -> Block:
-    """Parse a ``block <id> ["<name>"] [glyph=<member>] <member-id>...`` line.
+    """Parse a ``block <id> "<name>" [glyph=<member>] <member-id>...`` line.
 
-    Whether the members exist, the glyph target is one of them, and the union is
-    contiguous are *semantic* checks left to the layout stage.
+    The id and name follow the same rules as a room's: the name slot is required
+    but may be empty (``""``). Whether the members exist, the glyph target is one
+    of them, and the union is contiguous are *semantic* checks left to layout.
     """
-    if len(tokens) < 3:
-        raise ParseError("a block needs an id and at least one member", line=lineno)
+    if len(tokens) < 4:
+        raise ParseError(
+            'a block needs an id, a name (use "" for none), and a member',
+            line=lineno,
+        )
     block_id, id_quoted = tokens[1]
     _validate_id(block_id, id_quoted, lineno)
 
-    name: str | None = None
-    rest = tokens[2:]
-    if rest[0][1]:  # a quoted token directly after the id is the block name
-        _validate_name(rest[0][0], True, lineno)
-        name = rest[0][0] or None  # "" -> no name
-        rest = rest[1:]
+    name_value, name_quoted = tokens[2]
+    _validate_name(name_value, name_quoted, lineno)
+    name = name_value or None  # "" -> no name
 
     members: list[str] = []
     glyph_member: str | None = None
-    for value, quoted in rest:
+    for value, quoted in tokens[3:]:
         if not quoted and value.startswith("glyph="):
             glyph_member = value[len("glyph=") :]
             _validate_id(glyph_member, False, lineno)

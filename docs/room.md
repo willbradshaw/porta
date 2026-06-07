@@ -64,18 +64,7 @@ reserved keywords.
 ### Room name
 
 A room name is the label given to that room in the rendered map's key. The name
-slot is **required**, but may be left **empty** with `""`, for a room you'd
-rather not label — the key then shows the room's dimensions in place of a name.
-(This is mainly useful for rooms grouped into a larger room, where the label
-comes from the group.)
-
-```text
-room store "" 10x10 right-of hall   # no name; the key shows "S  (10x10 ft)"
-```
-
-A bare, unquoted name is an error (`name must be in double quotes`), so a
-forgotten name reports clearly rather than being mistaken for the dimensions.
-
+slot is **required**, but may be left **empty** with `""`. 
 A non-empty name must meet the following criteria:
 
 - A single double-quoted string 1-40 characters long;

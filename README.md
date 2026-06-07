@@ -1,49 +1,71 @@
 # porta
 
-A small CLI that turns a concise, **relational** textual spec of a building's
+A small CLI that turns a concise, **relational** text spec of a building's
 layout into a clean, printable **SVG** floor plan — for tabletop-RPG session
 prep.
 
-You describe rooms by their dimensions and how they sit relative to one
-another; `porta` solves the geometry and renders it. No mouse, no coordinates
-to hand-pack, diffable in git.
+You describe rooms by their size and how they sit against one another; `porta`
+solves the geometry and renders it. No mouse, no coordinates to hand-pack,
+diffable in git.
 
+```porta docs/img/readme.svg
+room hall    "Great Hall" 40x20 root
+room parlour "Parlour"    20x20 left-of hall
+room kitchen "Kitchen"    20x20 right-of hall
+room study   "Study"      ?x20  down-of parlour
 ```
-# feet, 5-ft grid
-room entrance "Entrance Hall"  20x20   root
-room kitchen  "Kitchen"        20x30   left-of entrance
-room hall     "Great Hall"     40x30   up-of entrance  right-of kitchen
-```
+
+<img alt="Four rooms rendered to an SVG floor plan" src="docs/img/readme.svg" width="60%">
+
+Rooms attach **flush**, one relation per axis (`up-of` / `down-of` / `left-of` /
+`right-of`); positions are derived, not authored. A dimension can be `?` to let
+a neighbour decide it, and a door is drawn on every shared wall by default.
+
+## Installation
+
+`porta` will be published to PyPI with its first release:
 
 ```sh
-uv run porta draw manor.porta -o manor.svg
-uv run porta draw manor.porta --debug-ascii   # eyeball the solved layout
+pip install porta      # or: uvx porta draw plan.porta -o plan.svg
 ```
 
-Rooms attach **flush** by one relation per axis (`up-of` / `down-of` /
-`left-of` / `right-of`); positions are derived, not authored. See
-[`examples/manor.porta`](examples/manor.porta) for a fuller example.
+Until then — or to work on a local checkout — install it from source with
+[uv](https://docs.astral.sh/uv/):
 
-## Status
+```sh
+uv add --editable path/to/porta   # depend on it from another project
+```
 
-Working: parse → solve placement (validation: one root, no cycles, no
-disconnected rooms, no overlaps) → render SVG (5-ft grid, glyph labels + key)
-and an ASCII debug view. Relations take `align=start|end` and `shift`, and
-**doors are on by default** (`no-door` to suppress, `door=W@O` to size/place,
-standalone `door a b` between any adjacent pair). Not yet implemented (tracked
-as issues): derived interior/exterior walls, non-rectangular rooms,
-external/outside doors, windows, multi-floor, and richer styling. See
-[`docs/design.md`](docs/design.md) for the full spec and phasing.
+## Usage
+
+```sh
+porta draw plan.porta -o plan.svg    # render to an SVG file (omit -o for stdout)
+porta draw plan.porta --debug-ascii  # print the solved layout as an ASCII grid
+```
+
+From a source checkout, prefix with `uv run` (e.g. `uv run porta draw …`).
+
+A plan that can't be solved — an unknown anchor, an overlap, a room that shares
+no wall with its anchor — is reported as `file:line: error: …` with a non-zero
+exit code.
+
+## Documentation
+
+- [**Rooms**](docs/room.md) — the `room` statement: ids, names, dimensions,
+  relations, alignment, shifting, and auto-dimensions (`?`).
+- [**Doors**](docs/door.md) — the default doors, and how to resize, move,
+  remove, and add them.
+- [**Design note**](docs/design.md) — the canonical spec and the reasoning
+  behind it.
+- [`examples/manor.porta`](examples/manor.porta) — a fuller worked plan.
+
+Not yet supported (tracked as issues): non-rectangular rooms, windows,
+multi-floor plans, and richer styling. See the design note for scope and
+phasing.
 
 ## Develop
 
 ```sh
 uv run porta --help
 uv run --extra dev pytest
-```
-
-## Use as a dependency
-
-```sh
-uv add --editable ../porta   # from a consuming project, during development
 ```

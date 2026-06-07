@@ -1,7 +1,7 @@
 name: changelog
 
-# Require every PR that changes non-documentation files to update CHANGELOG.md,
-# so the Unreleased section always reflects what's landed.
+# Require every PR to update CHANGELOG.md, so the Unreleased section always
+# reflects what's landed (documentation changes included).
 on:
   pull_request:
 
@@ -13,16 +13,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Detect non-documentation changes
-        uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          filters: |
-            non_docs:
-              - '**'
-              - '!**/*.md'
-              - '!docs/**'
-
       - name: Detect a CHANGELOG update
         uses: dorny/paths-filter@v3
         id: changelog
@@ -32,8 +22,8 @@ jobs:
               - 'CHANGELOG.md'
 
       - name: Require a CHANGELOG update
-        if: steps.filter.outputs.non_docs == 'true' && steps.changelog.outputs.updated != 'true'
+        if: steps.changelog.outputs.updated != 'true'
         run: |
-          echo "::error::This PR changes non-documentation files but does not update CHANGELOG.md"
+          echo "::error::This PR does not update CHANGELOG.md"
           echo "Add an entry under '## Unreleased' in CHANGELOG.md describing the change."
           exit 1

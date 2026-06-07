@@ -1,2 +1,2 @@
-room hall  "Hall" 20x20 root
+room hall  "" 20x20 root
 room store "" 10x10 right-of hall

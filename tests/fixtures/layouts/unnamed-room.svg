@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="884" height="780" viewBox="-29.2 -10 88.4 78">
-  <rect x="-29.2" y="-10" width="88.4" height="78" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="780" viewBox="-22 -10 74 78">
+  <rect x="-22" y="-10" width="74" height="78" fill="white" />
   <g stroke="#bbb" stroke-width="0.15">
     <line x1="0" y1="0" x2="0" y2="20" />
     <line x1="5" y1="0" x2="5" y2="20" />
@@ -19,7 +19,7 @@
   <rect data-room="store" x="20" y="0" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="store" x="25" y="5" text-anchor="middle" dominant-baseline="central" font-size="6">S</text>
   <line class="door" x1="20" y1="0" x2="20" y2="5" stroke="black" stroke-width="1.5" />
-  <text class="scale" x="-19.2" y="39.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="-19.2" y="48.8" font-size="6">H  Hall  (20x20 ft)</text>
-  <text class="key" x="-19.2" y="58.4" font-size="6">S  (10x10 ft)</text>
+  <text class="scale" x="-12" y="39.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="-12" y="48.8" font-size="6">H  (20x20 ft)</text>
+  <text class="key" x="-12" y="58.4" font-size="6">S  (10x10 ft)</text>
 </svg>

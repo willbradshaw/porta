@@ -13,7 +13,10 @@ room kitchen "Kitchen"    20x20 right-of hall
 room study   "Study"      ?x20  down-of parlour
 ```
 
-<img alt="Four rooms rendered to an SVG floor plan" src="docs/img/readme.svg" width="60%">
+<!-- PyPI doesn't render SVG, so the README shows a PNG raster of docs/img/readme.svg
+via an absolute URL. If the example above changes, regenerate it:
+inkscape docs/img/readme.svg --export-type=png --export-filename=docs/img/readme.png --export-width=1000 -->
+<img alt="Four rooms rendered to an SVG floor plan" src="https://raw.githubusercontent.com/willbradshaw/porta/main/docs/img/readme.png" width="60%">
 
 ## The `porta` DSL
 

@@ -21,6 +21,9 @@ fully centrally due to the 5-foot wall grid, they are positioned
 immediately above (for vertical walls) or to the left of the center
 (for horizontal walls).
 
+The exception is a wall *inside* a [block](block.md): the door between two
+members of the same block is dropped along with the wall.
+
 ```porta img/door-overview.svg
 room hall    "Hall"    20x20 root
 room kitchen "Kitchen" 20x20 right-of hall

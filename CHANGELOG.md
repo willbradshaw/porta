@@ -18,7 +18,8 @@ Notable changes per release, newest first.
   group rooms into one space, dropping the walls and doors they share with each
   other; the union renders with a single outline, glyph, and key entry.
   Validates membership and contiguity, and warns on suppressed names/doors.
-- Add a Blocks guide (`docs/block.md`), linked from the README.
+- Add a Blocks guide (`docs/block.md`), linked from the README and the room and
+  door guides.
 
 ## 1.0.1 (2026-06-07)
 

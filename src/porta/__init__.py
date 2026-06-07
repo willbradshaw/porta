@@ -1,6 +1,9 @@
-"""porta — a relational DSL for authoring D&D floor plans and rendering to SVG.
+"""porta — a relational DSL for defining and rendering SVG floorplans.
 
-See docs/design.md for the canonical spec.
+See docs/room.md and docs/door.md for the guides.
 """
 
-__version__ = "0.0.1"
+from importlib.metadata import version
+
+# The package version is declared in pyproject.toml; re-export it here.
+__version__ = version("porta")

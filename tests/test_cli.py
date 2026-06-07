@@ -35,6 +35,13 @@ def test_version_is_present() -> None:
     assert porta.__version__
 
 
+def test_version_flag_prints_version(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit) as exc:
+        main(["--version"])
+    assert exc.value.code == 0
+    assert porta.__version__ in capsys.readouterr().out
+
+
 def test_draw_subcommand_parses() -> None:
     args = build_parser().parse_args(["draw", "manor.porta", "-o", "manor.svg"])
     assert args.command == "draw"

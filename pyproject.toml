@@ -1,12 +1,30 @@
 [project]
 name = "porta"
-version = "0.0.1"
-description = "A relational DSL for authoring TTRPG floor plans and rendering them to SVG."
+version = "1.0.0"
+description = "A relational DSL for authoring and rendering SVG floorplans."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.14"
 authors = [{ name = "Will Bradshaw" }]
 keywords = ["dnd", "ttrpg", "floorplan", "svg", "dsl", "cartography"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Games/Entertainment :: Role-Playing",
+    "Topic :: Multimedia :: Graphics",
+    "Typing :: Typed",
+]
 dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/willbradshaw/porta"
+Repository = "https://github.com/willbradshaw/porta"
+Issues = "https://github.com/willbradshaw/porta/issues"
 
 [project.scripts]
 porta = "porta.cli:main"

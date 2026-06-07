@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from porta.layout import solve
+from porta.layout import block_wall_segments, solve
 from porta.parser import parse
 from porta.render import render_ascii, render_svg
 
@@ -292,6 +292,47 @@ def test_background_is_configurable() -> None:
     assert 'fill="white"' in svg_of('room a "A" 20x20 root')  # default
     custom = render_svg(solve(parse('room a "A" 20x20 root')), background="#f0f0f0")
     assert 'fill="#f0f0f0"' in custom
+
+
+# --- blocks ----------------------------------------------------------------
+
+L_BLOCK = (
+    'room main "" 40x30 root\n'
+    'room wing "" 20x20 down-of main\n'
+    'block hall "Great Hall" main wing'
+)
+
+
+def test_block_members_are_not_drawn_as_separate_rects() -> None:
+    root = ET.fromstring(svg_of(L_BLOCK))
+    ids = {r.get("data-room") for r in root.iter(tag("rect")) if r.get("data-room")}
+    assert ids == set()  # members render as one outline, not per-room rects
+
+
+def test_block_draws_one_glyph_from_the_block_id() -> None:
+    root = ET.fromstring(svg_of(L_BLOCK))
+    block_glyphs = [t for t in root.iter(tag("text")) if t.get("data-block") == "hall"]
+    assert [t.text for t in block_glyphs] == ["H"]
+
+
+def test_block_outline_drops_the_internal_wall() -> None:
+    segments = set(block_wall_segments(solve(parse(L_BLOCK))))
+    assert (0, 30, 20, 30) not in segments  # the shared main|wing wall is gone
+    assert (20, 30, 40, 30) in segments  # the exposed part of main's bottom stays
+
+
+def test_block_legend_and_key_use_the_block_not_its_members() -> None:
+    assert ascii_of(L_BLOCK).split("\n\n")[1] == "H=hall"
+    root = ET.fromstring(svg_of(L_BLOCK))
+    key_text = " ".join(t.text or "" for t in root.iter(tag("text")))
+    assert "Great Hall" in key_text
+
+
+def test_block_cells_carry_the_block_glyph_in_ascii() -> None:
+    grid = ascii_of(L_BLOCK).split("\n\n")[0]
+    assert "H" in grid
+    assert "M" not in grid
+    assert "W" not in grid
 
 
 def test_manor_renders_to_golden_svg_fixture() -> None:

@@ -3,9 +3,10 @@
 A standalone Python package: a relational DSL for authoring D&D floor plans and
 rendering them to SVG. CLI-driven, zero runtime dependencies.
 
-**Read [`docs/design.md`](docs/design.md) first** — it is the canonical spec
-(placement model, validation rules, syntax, phasing). The body below is just
-working conventions.
+The user-facing reference is [`docs/room.md`](docs/room.md) (rooms, placement,
+auto-dimensions, validation) and [`docs/door.md`](docs/door.md) (doors); for
+exact behaviour the code is the source of truth. The body below is just working
+conventions.
 
 ## Orientation
 

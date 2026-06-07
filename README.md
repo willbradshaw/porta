@@ -1,12 +1,10 @@
-# porta
+# `porta`
 
-A small CLI that turns a concise, **relational** text spec of a building's
-layout into a clean, printable **SVG** floor plan — for tabletop-RPG session
-prep.
+`porta` is two things:
 
-You describe rooms by their size and how they sit against one another; `porta`
-solves the geometry and renders it. No mouse, no coordinates to hand-pack,
-diffable in git.
+1. A **DSL** for concisely defining a relational floorplan; and
+2. A **software package** for deterministically converting a floorplan into
+   a clean SVG map.
 
 ```porta docs/img/readme.svg
 room hall    "Great Hall" 40x20 root
@@ -17,55 +15,90 @@ room study   "Study"      ?x20  down-of parlour
 
 <img alt="Four rooms rendered to an SVG floor plan" src="docs/img/readme.svg" width="60%">
 
-Rooms attach **flush**, one relation per axis (`up-of` / `down-of` / `left-of` /
-`right-of`); positions are derived, not authored. A dimension can be `?` to let
-a neighbour decide it, and a door is drawn on every shared wall by default.
+## The `porta` DSL
+
+`porta` floorplans are defined in `.porta` files adhering to a strict specification.
+Each room is defined in a single line relative to one or more anchor rooms,
+forming a dependency graph all the way back to the initial root room. This model
+creates a 1-to-1 correspondence between the floorplan and the final SVG map it
+produces, allowing `porta` to rapidly and deterministically generate one from
+the other.
+
+Files are read line by line: a `#` starts a comment that runs to the end of the
+line (a `#` inside a quoted name is literal), and blank lines are ignored.
+
+For more on the `porta` DSL specification, see the following documentation:
+
+- [**Rooms**](docs/room.md) — the `room` statement, room positioning,
+  auto-dimensions (`?`), and the layout resolution procedure.
+- [**Doors**](docs/door.md) — default doors & how to modify them, and
+  the `door` statement for explicitly adding non-default doors.
+
+## The `porta` tool
+
+Once a valid floorplan has been written, `porta draw` converts it into an
+SVG map in a two-step process. First, the dependency graph is traversed
+and the relations in the floorplan are converted into a coordinate system.
+Second, that coordinate system is used to deterministically generate an
+SVG file.
+
+```sh
+porta draw plan.porta -o plan.svg
+```
+
+The solved coordinate system can also be viewed and debugged directly
+as an ASCII grid:
+
+```sh
+porta draw plan.porta --debug-ascii
+```
+
+A plan that can't be solved (due to overlaps, missing anchors, gaps
+between a room and its anchor, etc) will fail and raise an error.
 
 ## Installation
 
-`porta` will be published to PyPI with its first release:
+`porta` is published on PyPI and can be installed with `pip`:
 
 ```sh
-pip install porta      # or: uvx porta draw plan.porta -o plan.svg
+pip install porta
 ```
 
-Until then — or to work on a local checkout — install it from source with
-[uv](https://docs.astral.sh/uv/):
+Alternatively, install it from a checkout of this repo. Add the `[dev]` extra
+to pull in the test and lint tools as well:
 
 ```sh
-uv add --editable path/to/porta   # depend on it from another project
+pip install -e .          # editable install
+pip install -e ".[dev]"   # ... plus pytest, ruff, and mypy
 ```
 
-## Usage
+## Why `porta`?
 
-```sh
-porta draw plan.porta -o plan.svg    # render to an SVG file (omit -o for stdout)
-porta draw plan.porta --debug-ascii  # print the solved layout as an ASCII grid
-```
+`porta` is built to be:
 
-From a source checkout, prefix with `uv run` (e.g. `uv run porta draw …`).
+- **Text-based** — a plan is plain text: editable in any editor, diffable, and
+  version-controlled alongside your campaign notes. No WYSIWYG, no binary files.
+- **Concise** — a terse syntax with strong defaults; a whole plan is a handful
+  of short lines.
+- **Deterministic** — no procedural generation and no randomness; the same plan
+  always renders the same map.
+- **Relational** — rooms are placed against other rooms, never drawn by hand or
+  given raw coordinates.
+- **Spatial** — the output is a flush, to-scale floor plan in tabletop
+  conventions, not a flowchart or connectivity graph.
+- **Fast** — placement is a single pass over a dependency graph, with no
+  constraint solver to run.
+- **AI-friendly** — terse, text-only, and predictable, so a language model can
+  read and write plans reliably (this one falls out of the rest).
 
-A plan that can't be solved — an unknown anchor, an overlap, a room that shares
-no wall with its anchor — is reported as `file:line: error: …` with a non-zero
-exit code.
+No existing tool hits all of these:
 
-## Documentation
+- **Procedural and AI generators** (Watabou, Inkarnate) aren't deterministic or
+  controllable — they invent a layout instead of rendering yours.
+- **GUI map editors** (Dungeondraft, Dungeon Scrawl) aren't text: mouse-driven,
+  binary, and kept apart from your notes.
+- **Diagram tools** (Mermaid, Graphviz, D2) give connectivity, not a spatial,
+  to-scale map.
+- **Hand-written SVG** is text, but neither concise nor relational — verbose and
+  easy to get wrong.
 
-- [**Rooms**](docs/room.md) — the `room` statement: ids, names, dimensions,
-  relations, alignment, shifting, and auto-dimensions (`?`).
-- [**Doors**](docs/door.md) — the default doors, and how to resize, move,
-  remove, and add them.
-- [**Design note**](docs/design.md) — the canonical spec and the reasoning
-  behind it.
-- [`examples/manor.porta`](examples/manor.porta) — a fuller worked plan.
-
-Not yet supported (tracked as issues): non-rectangular rooms, windows,
-multi-floor plans, and richer styling. See the design note for scope and
-phasing.
-
-## Develop
-
-```sh
-uv run porta --help
-uv run --extra dev pytest
-```

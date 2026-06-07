@@ -31,6 +31,7 @@ For more on the `porta` DSL specification, see the following documentation:
   auto-dimensions (`?`), and the layout resolution procedure.
 - [**Doors**](docs/door.md) — default doors & how to modify them, and
   the `door` statement for explicitly adding non-default doors.
+- [**Blocks**](docs/block.md) — joining rooms into one non-rectangular room.
 
 ## The `porta` tool
 

@@ -178,6 +178,66 @@ def _block_warnings(
     return warnings
 
 
+def block_wall_segments(building: Building) -> list[Segment]:
+    """Wall segments tracing each block's outer boundary (internal walls dropped).
+
+    For every block member, each of its four edges is emitted only over the parts
+    not shared with another member of the same block, so the union renders as one
+    outline rather than separate rectangles. Assumes a solved building.
+    """
+    by_id = {room.id: room for room in building.rooms}
+    segments: list[Segment] = []
+    for block in building.blocks:
+        members = [by_id[m] for m in block.members]
+        for member in members:
+            segments.extend(_member_boundary(member, members))
+    return segments
+
+
+def _member_boundary(member: Room, members: list[Room]) -> list[Segment]:
+    """The parts of ``member``'s four edges not shared with a sibling member.
+
+    Members never overlap, so any sibling edge lying on one of ``member``'s edge
+    lines (with overlap) must be the abutting member on the other side — i.e. an
+    internal wall to drop.
+    """
+    mx, my = _axis_lo(member, Axis.HORIZONTAL), _axis_lo(member, Axis.VERTICAL)
+    mw, mh = member.width, member.height
+    others = [n for n in members if n is not member]
+    segments: list[Segment] = []
+    for at_y in (my, my + mh):  # top, then bottom
+        blocked = [
+            (_axis_lo(n, Axis.HORIZONTAL), _axis_hi(n, Axis.HORIZONTAL))
+            for n in others
+            if at_y in (_axis_lo(n, Axis.VERTICAL), _axis_hi(n, Axis.VERTICAL))
+        ]
+        segments += [(x0, at_y, x1, at_y) for x0, x1 in _exposed(mx, mx + mw, blocked)]
+    for at_x in (mx, mx + mw):  # left, then right
+        blocked = [
+            (_axis_lo(n, Axis.VERTICAL), _axis_hi(n, Axis.VERTICAL))
+            for n in others
+            if at_x in (_axis_lo(n, Axis.HORIZONTAL), _axis_hi(n, Axis.HORIZONTAL))
+        ]
+        segments += [(at_x, y0, at_x, y1) for y0, y1 in _exposed(my, my + mh, blocked)]
+    return segments
+
+
+def _exposed(lo: int, hi: int, blocked: list[tuple[int, int]]) -> list[tuple[int, int]]:
+    """Sub-intervals of ``[lo, hi]`` left uncovered by the ``blocked`` intervals."""
+    cuts = sorted(
+        (max(lo, b0), min(hi, b1)) for b0, b1 in blocked if min(hi, b1) > max(lo, b0)
+    )
+    result: list[tuple[int, int]] = []
+    cursor = lo
+    for b0, b1 in cuts:
+        if b0 > cursor:
+            result.append((cursor, b0))
+        cursor = max(cursor, b1)
+    if cursor < hi:
+        result.append((cursor, hi))
+    return result
+
+
 def _resolve_auto_dims(room: Room, by_id: dict[str, Room]) -> None:
     """Resolve a room's ``?`` dimensions to fill the sizing anchor's wall.
 

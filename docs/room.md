@@ -20,9 +20,9 @@ room kitchen "Kitchen" 20x20 right-of hall
 > added by default between adjoining rooms. Door syntax is described
 > separately [here](door.md).
 
-> [!WARNING]
-> At the time of writing, **only rectangular rooms are supported** in
-> `porta`. Non-rectangular rooms are planned for a future release.
+> [!NOTE]
+> Each room is a **rectangle**. To make a non-rectangular room, group several
+> rooms into one space with a [block](block.md).
 
 ## The `room` statement
 

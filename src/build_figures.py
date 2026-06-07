@@ -1,8 +1,9 @@
 #!/usr/bin/env -S uv run python
 """Build (and check) the figures embedded in the docs.
 
-Every fenced ``porta`` block in ``docs/*.md`` is parsed and solved, so a broken
-or stale example fails the build. When the fence carries a path —
+Every fenced ``porta`` block in ``README.md`` and ``docs/*.md`` is parsed and
+solved, so a broken or stale example fails the build. When the fence carries a
+path —
 
     ```porta img/snug-fit.svg
     room a "A" 10x10 root
@@ -47,8 +48,9 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    docs = Path(__file__).parent.parent / "docs"
-    for md in sorted(docs.glob("*.md")):
+    root = Path(__file__).parent.parent
+    md_files = [root / "README.md", *sorted((root / "docs").glob("*.md"))]
+    for md in md_files:
         for block in _BLOCK.finditer(md.read_text()):
             try:
                 building = solve(parse(block["body"]))

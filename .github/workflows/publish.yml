@@ -1,0 +1,25 @@
+name: publish
+
+# Publish to PyPI via Trusted Publishing (OIDC) — no stored token.
+# Fires when a GitHub release is published; can also be run by hand
+# (Actions -> publish -> Run workflow) to publish an already-made release.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write # required for Trusted Publishing
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv run --extra dev pytest
+      - run: uv build
+      - run: uv publish

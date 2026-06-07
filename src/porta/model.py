@@ -113,6 +113,23 @@ class ExternalDoor:
     line: int
 
 
+@dataclass(frozen=True)
+class Block:
+    """A merged (possibly non-rectangular) room: a union of member rooms.
+
+    The members are normal rooms placed by the usual relations; the block drops
+    the walls they share with each other so they read as one space. The block's
+    ``id`` gives the single glyph (drawn in ``glyph_member``, or the first member
+    when unset) and ``name`` (if any) labels the union in the key.
+    """
+
+    id: str
+    name: str | None
+    members: list[str]
+    glyph_member: str | None = None
+    line: int = 0
+
+
 @dataclass
 class Building:
     """Rooms (with id lookup) plus standalone and external doors.
@@ -124,6 +141,7 @@ class Building:
     rooms: list[Room] = field(default_factory=list)
     doors: list[Doorway] = field(default_factory=list)
     external_doors: list[ExternalDoor] = field(default_factory=list)
+    blocks: list[Block] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
     def room(self, room_id: str) -> Room:

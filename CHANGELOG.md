@@ -11,6 +11,8 @@ Notable changes per release, newest first.
   the key shows its dimensions instead of a name.
 - Non-fatal warnings: solving collects advisories that the CLI prints to stderr
   (the run still succeeds with exit 0).
+- Parse the `block` statement (the first step toward non-rectangular rooms):
+  `block <id> ["<name>"] [glyph=<member>] <member>...`.
 
 ## 1.0.1 (2026-06-07)
 

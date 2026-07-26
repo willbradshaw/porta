@@ -30,7 +30,7 @@
   <line data-room="study" x1="20" y1="20" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line data-room="study" x1="30" y1="20" x2="30" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="study" x="15" y="30" text-anchor="middle" dominant-baseline="central" font-size="12">S</text>
-  <line class="open" x1="10" y1="20" x2="20" y2="20" stroke="black" stroke-width="0.5" stroke-dasharray="1.5 1.5" />
+  <line class="open" x1="10" y1="20" x2="20" y2="20" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <text class="scale" x="-12" y="59.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-12" y="68.8" font-size="6">H  Hall</text>
   <text class="key" x="-12" y="78.4" font-size="6">S  Study</text>

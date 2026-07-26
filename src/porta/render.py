@@ -32,7 +32,9 @@ _GRID_COLOUR = "#bbb"  # grey 5-ft grid
 _GRID_STROKE_FT = 0.15  # grid line thickness, in feet
 _DOOR_COLOUR = "black"  # door marks
 _DOOR_STROKE_FT = 1.5  # door line thickness, in feet
-_OPEN_DASH_FT = 1.5  # dash (and gap) length of an open-boundary line, in feet
+# Open boundaries are dotted: a near-zero dash with a round cap renders as a
+# dot of the wall's stroke width; the gap sets the dot spacing, in feet.
+_OPEN_DASH = "0.01 1.5"
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -219,13 +221,13 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f"{escape(glyph)}</text>"
         )
 
-    # Open doors: a dashed line across the gap left in the walls above.
+    # Open doors: a dotted line across the gap left in the walls above.
     for x1, y1, x2, y2 in sorted(open_door_segments(building)):
         lines.append(
             f'  <line class="open" x1="{_num(x1)}" y1="{_num(y1)}" '
             f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="black" '
             f'stroke-width="{_num(_WALL_STROKE_FT)}" '
-            f'stroke-dasharray="{_num(_OPEN_DASH_FT)} {_num(_OPEN_DASH_FT)}" />'
+            f'stroke-dasharray="{_OPEN_DASH}" stroke-linecap="round" />'
         )
 
     # Doors: a thick coloured line along the shared wall, over the rooms.

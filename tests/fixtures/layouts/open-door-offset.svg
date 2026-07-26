@@ -26,7 +26,7 @@
   <line data-room="lounge" x1="20" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line data-room="lounge" x1="40" y1="0" x2="40" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="lounge" x="30" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">L</text>
-  <line class="open" x1="20" y1="0" x2="20" y2="10" stroke="black" stroke-width="0.5" stroke-dasharray="1.5 1.5" />
+  <line class="open" x1="20" y1="0" x2="20" y2="10" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <text class="scale" x="-7" y="39.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-7" y="48.8" font-size="6">B  Bar</text>
   <text class="key" x="-7" y="58.4" font-size="6">L  Lounge</text>

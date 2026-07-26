@@ -28,7 +28,7 @@
   <line data-room="kitchen" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line data-room="kitchen" x1="0" y1="20" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="kitchen" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">1</text>
-  <line class="open" x1="30" y1="0" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-dasharray="1.5 1.5" />
+  <line class="open" x1="30" y1="0" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <text class="scale" x="3" y="39.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="3" y="48.8" font-size="6">1  Kitchen</text>
   <text class="key" x="3" y="58.4" font-size="6">2  Dining Room</text>

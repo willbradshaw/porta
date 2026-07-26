@@ -37,6 +37,7 @@ _DOOR_STROKE_FT = 1.5  # door line thickness, in feet
 # dot of the wall's stroke width; the gap sets the dot spacing, in feet.
 _OPEN_DASH = "0.01 1.5"
 _SECRET_FONT_FT = 5  # "S" marker of a secret door, in feet (the map convention)
+_SECRET_HALO_FT = 0.6  # background-coloured halo that keeps the S legible
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -241,13 +242,21 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f'stroke-width="{_num(_DOOR_STROKE_FT)}" />'
         )
 
-    # Secret doors: the wall stays intact; an "S" marks the concealed span.
+    # Secret doors: a normal-style door mark shows the size and position, and
+    # an "S" over it (haloed in the background colour to stay legible) says
+    # the door is concealed.
     for x1, y1, x2, y2 in sorted(secret_door_segments(building)):
+        lines.append(
+            f'  <line class="secret" x1="{_num(x1)}" y1="{_num(y1)}" '
+            f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="{_DOOR_COLOUR}" '
+            f'stroke-width="{_num(_DOOR_STROKE_FT)}" />'
+        )
         lines.append(
             f'  <text class="secret" x="{_num((x1 + x2) / 2)}" '
             f'y="{_num((y1 + y2) / 2)}" text-anchor="middle" '
-            f'dominant-baseline="central" '
-            f'font-size="{_num(_SECRET_FONT_FT)}">S</text>'
+            f'dominant-baseline="central" font-size="{_num(_SECRET_FONT_FT)}" '
+            f'stroke="{background}" stroke-width="{_num(_SECRET_HALO_FT)}" '
+            f'paint-order="stroke">S</text>'
         )
 
     # Centre the key block but left-align the lines within it (a legend reads

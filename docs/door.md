@@ -99,6 +99,42 @@ door b outside down
 
 <img alt="Two rooms with external doors on their outer walls" src="img/door-outside.svg" width="70%">
 
+## Open boundaries
+
+Two rooms sometimes form one freely traversable space — a kitchen opening
+into a dining area, or adjoining zones of a great hall — while remaining
+separately named and numbered. Adding **`open`** immediately after a door
+spec turns that door into an open boundary: the wall is omitted across the
+door's span and a dotted line marks where one room ends and the other
+begins, with no door drawn.
+
+```porta img/door-open.svg
+room kitchen "Kitchen" 30x20 root
+room dining  "Dining Room" 30x20 right-of kitchen door=20 open
+```
+
+<img alt="A kitchen and dining room whose shared boundary is fully open" src="img/door-open.svg" width="70%">
+
+An open door is placed exactly like a solid one: the same width and offset
+syntax, the same 5-ft default width, and the same fit and overlap rules
+(so a narrow opening — an archway — can share a wall with an ordinary
+door). The `open` marker works in every position a door spec can appear:
+
+```porta img/door-open-forms.svg
+room hall "Hall" 40x20 root
+room east "East" 20x20 down-of hall door=10 open
+room west "West" 20x20 down-of hall shift=20
+door=20@0 open east west
+door=10 open hall outside up
+```
+
+<img alt="Open boundaries on a relation, between incidental neighbours, and to the outside" src="img/door-open-forms.svg" width="70%">
+
+Open doors interact with [blocks](block.md) the way solid doors do: between
+two members of the same block the opening is suppressed with a warning (the
+shared wall is already gone), while an open door between a member and a room
+outside the block cuts a gap into the block's outline.
+
 ## Invalid doors
 
 `porta` rejects a door it can't place:
@@ -108,6 +144,8 @@ door b outside down
 - A door wider than its wall, or pushed past the wall's end by its offset.
 - Two doors that overlap on the same wall.
 - An external door on a side that isn't exterior — a room sits flush there.
+- An `open` marker that doesn't immediately follow a door spec, or an open
+  door combined with `no-door` on the same relation.
 
 ## Putting it together
 

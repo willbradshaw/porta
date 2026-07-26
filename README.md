@@ -25,6 +25,25 @@ the other.
 Files are read line by line: a `#` starts a comment that runs to the end of the
 line (a `#` inside a quoted name is literal), and blank lines are ignored.
 
+Any statement can be **continued** onto the next physical line by ending it
+with a backslash, separated from the last token by whitespace:
+
+```porta
+room pn "" 40x10 root
+room pw "" 10x20 down-of pn
+room pe "" 10x20 down-of pn align=end
+room ps "" 40x10 down-of pw \
+    down-of pe
+block passages "Passages" glyph=pn \
+    pn pw \
+    pe ps
+```
+
+Continued lines parse as one statement, and errors still point at the
+physical line of the offending token. A backslash anywhere else — mid-line,
+glued to a token, or followed by a comment — is an error, as is a blank (or
+comment-only) line inside a continued statement.
+
 For more on the `porta` DSL specification, see the following documentation:
 
 - [**Rooms**](docs/room.md) — the `room` statement, room positioning,

@@ -4,14 +4,11 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
-- Open boundaries between separately labeled rooms (#67, see `docs/door.md`):
-  an `open` attribute on any door spec (`door=20 open`, `door=10@0 open a b`,
-  `door open <room> outside <side>`) marks it as a doorless opening. It is
-  placed and validated like a solid door but renders as a dashed gap in the
-  wall — no door mark, free movement — while both rooms keep their own
-  glyphs and key entries. Open doors across a block boundary cut the block's
-  outline the same way; between members of one block they are suppressed
-  with a warning (the wall is already gone). `open` is now a reserved word.
+- Line continuation: end a line with a whitespace-separated backslash to
+  continue a statement onto the next line (see the README).
+- Open boundaries: marking a door `open` (e.g. `door=20 open`) removes the
+  wall across its span and draws a dotted line instead of a door mark; both
+  rooms keep their own glyphs and key entries (see `docs/door.md`).
 
 ## 1.2.0 (2026-07-26)
 

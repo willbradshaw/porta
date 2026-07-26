@@ -1,0 +1,10 @@
+room pn "" 40x10 root
+room pw "" 10x20 down-of pn
+room pe "" 10x20 down-of pn align=end
+room ps "" 40x10 down-of pw \
+    down-of pe
+block passages "Passages" glyph=pn \
+    pn pw \
+    pe ps
+door=10 \
+    pn outside up

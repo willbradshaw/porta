@@ -1,0 +1,2 @@
+room ruin "Ruined Hall" 30x20 root
+door=20 open ruin outside down

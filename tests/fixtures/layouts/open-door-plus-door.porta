@@ -1,0 +1,3 @@
+room shop "Shop" 20x20 root
+room store "Storeroom" 20x20 right-of shop door=10@0 open
+door@15 shop store

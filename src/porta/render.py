@@ -7,7 +7,12 @@ only (no runtime dependencies).
 
 from xml.sax.saxutils import escape
 
-from porta.layout import block_wall_segments, door_segments
+from porta.layout import (
+    block_wall_segments,
+    door_segments,
+    open_door_segments,
+    room_outline_segments,
+)
 from porta.model import Building, Room
 
 _GRID_FT = 5
@@ -27,6 +32,9 @@ _GRID_COLOUR = "#bbb"  # grey 5-ft grid
 _GRID_STROKE_FT = 0.15  # grid line thickness, in feet
 _DOOR_COLOUR = "black"  # door marks
 _DOOR_STROKE_FT = 1.5  # door line thickness, in feet
+# Open boundaries are dotted: a near-zero dash with a round cap renders as a
+# dot of the wall's stroke width; the gap sets the dot spacing, in feet.
+_OPEN_DASH = "0.01 1.5"
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -156,14 +164,26 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         )
     lines.append("  </g>")
 
+    # A room bordering an open door loses its plain rect: its outline is drawn
+    # as per-edge wall segments with the open spans cut out.
+    outlines = room_outline_segments(building)
     for room, x, y in sorted(placed, key=lambda t: t[0].id):
         if room.id in member_block:
             continue  # drawn as part of its block's outline below
-        lines.append(
-            f'  <rect data-room="{room.id}" x="{_num(x)}" y="{_num(y)}" '
-            f'width="{_num(room.width)}" height="{_num(room.height)}" '
-            f'fill="none" stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" />'
-        )
+        if room.id in outlines:
+            for x1, y1, x2, y2 in sorted(outlines[room.id]):
+                lines.append(
+                    f'  <line data-room="{room.id}" x1="{_num(x1)}" y1="{_num(y1)}" '
+                    f'x2="{_num(x2)}" y2="{_num(y2)}" '
+                    f'stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" '
+                    f'stroke-linecap="square" />'
+                )
+        else:
+            lines.append(
+                f'  <rect data-room="{room.id}" x="{_num(x)}" y="{_num(y)}" '
+                f'width="{_num(room.width)}" height="{_num(room.height)}" '
+                f'fill="none" stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" />'
+            )
         glyph = glyphs[room.id]
         if not glyph:
             continue  # unlabeled room
@@ -199,6 +219,15 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f'y="{_num(my + member.height / 2)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}">'
             f"{escape(glyph)}</text>"
+        )
+
+    # Open doors: a dotted line across the gap left in the walls above.
+    for x1, y1, x2, y2 in sorted(open_door_segments(building)):
+        lines.append(
+            f'  <line class="open" x1="{_num(x1)}" y1="{_num(y1)}" '
+            f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="black" '
+            f'stroke-width="{_num(_WALL_STROKE_FT)}" '
+            f'stroke-dasharray="{_OPEN_DASH}" stroke-linecap="round" />'
         )
 
     # Doors: a thick coloured line along the shared wall, over the rooms.

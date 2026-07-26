@@ -1,0 +1,2 @@
+room nave "Nave" 20x30 root
+room aisle "Aisle" 20x20 right-of nave door=20 open

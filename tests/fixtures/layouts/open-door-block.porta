@@ -1,0 +1,4 @@
+room main "" 20x20 root
+room wing "" 20x20 down-of main
+room porch "Porch" 20x20 right-of wing door=10 open
+block hall "Great Hall" main wing

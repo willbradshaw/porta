@@ -48,11 +48,14 @@ class Door:
     """A door on the wall a relation's room shares with its anchor.
 
     ``offset`` (feet from the wall's near end) defaults to ``None``, meaning
-    "centred" — the layout computes it.
+    "centred" — the layout computes it. An ``open`` door is a doorless
+    opening: placed and validated like any door, but rendered as a gap in
+    the wall (dashed) instead of a door mark — a non-blocking boundary.
     """
 
     width: int = 5
     offset: int | None = None
+    open: bool = False
 
 
 @dataclass(frozen=True)

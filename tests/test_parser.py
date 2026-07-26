@@ -220,15 +220,30 @@ def test_each_relation_keyword_maps_to_its_direction(
         pytest.param('room r "R" 20x20 up-of a door=0', id="door-zero-width"),
         pytest.param('room r "R" 20x20 up-of a doorx', id="door-malformed"),
         pytest.param('room r "R" 20x20 no-door', id="no-door-without-relation"),
+        # open modifier (must immediately follow a door spec)
+        pytest.param('room r "R" 20x20 up-of a open', id="open-without-door"),
+        pytest.param('room r "R" 20x20 up-of a open door', id="open-before-door"),
+        pytest.param('room r "R" 20x20 up-of a door open open', id="open-twice"),
+        pytest.param('room r "R" 20x20 up-of a no-door open', id="open-after-no-door"),
+        pytest.param(
+            'room r "R" 20x20 up-of a door=10 open no-door', id="open-door-and-no-door"
+        ),
+        pytest.param(
+            'room r "R" 20x20 up-of a no-door door=10 open', id="no-door-and-open-door"
+        ),
         # standalone door statement
         pytest.param("door a", id="standalone-door-one-id"),
         pytest.param("door a b c", id="standalone-door-three-ids"),
         pytest.param("door a a", id="standalone-door-self"),
         pytest.param('door a "B"', id="standalone-door-quoted-id"),
+        pytest.param("door a b open", id="standalone-open-trailing"),
+        pytest.param("open a b", id="open-statement-without-door"),
         # external door statement
         pytest.param("door a outside", id="external-door-missing-side"),
         pytest.param("door a outside sideways", id="external-door-bad-side"),
         pytest.param("door a outside down extra", id="external-door-too-many"),
+        pytest.param("door a outside down open", id="external-open-trailing"),
+        pytest.param("door a open outside down", id="external-open-misplaced"),
     ],
 )
 def test_invalid_source_raises(source: str) -> None:
@@ -248,6 +263,7 @@ def test_uppercase_id_is_rejected() -> None:
         "root",
         "door",
         "no-door",
+        "open",
         "outside",
         "shift",
         "align",
@@ -378,6 +394,60 @@ def test_external_door_carries_side_and_spec() -> None:
     building = parse('room a "A" 20x20 root\ndoor=10@5 a outside left')
     ext = building.external_doors[0]
     assert (ext.room, ext.side, ext.door) == ("a", Direction.LEFT, Door(10, 5))
+
+
+# --- open doors -------------------------------------------------------------
+#
+# 'open' marks a door as an open boundary (no door leaf, rendered as a gap).
+# It is an attribute of a door spec, written immediately after the door token,
+# and is valid in all three positions a door can appear.
+
+
+@pytest.mark.parametrize(
+    ("source", "expected_door"),
+    [
+        ('room b "B" 10x10 up-of a door open', Door(width=5, offset=None, open=True)),
+        (
+            'room b "B" 10x10 up-of a door=10 open',
+            Door(width=10, offset=None, open=True),
+        ),
+        (
+            'room b "B" 10x10 up-of a door=10@15 open',
+            Door(width=10, offset=15, open=True),
+        ),
+    ],
+)
+def test_open_is_parsed_onto_the_relation_door(
+    source: str, expected_door: Door
+) -> None:
+    assert parse(source).room("b").relations[0].door == expected_door
+
+
+def test_a_door_is_solid_by_default() -> None:
+    door = parse('room b "B" 10x10 up-of a door=10').room("b").relations[0].door
+    assert door is not None
+    assert not door.open
+
+
+def test_open_door_is_scoped_to_its_relation() -> None:
+    # 'open' binds to the preceding door spec; a later relation is unaffected.
+    room = parse('room b "B" 10x10 up-of a door open left-of c').room("b")
+    assert room.relations[0].door == Door(width=5, offset=None, open=True)
+    assert room.relations[1].door is None
+
+
+def test_standalone_open_door_is_parsed() -> None:
+    building = parse(
+        'room a "A" 10x10 root\nroom b "B" 10x10 right-of a\ndoor=10@0 open a b'
+    )
+    assert building.doors[0].door == Door(width=10, offset=0, open=True)
+
+
+def test_external_open_door_is_parsed() -> None:
+    building = parse('room a "A" 20x20 root\ndoor open a outside down')
+    ext = building.external_doors[0]
+    assert (ext.room, ext.side) == ("a", Direction.DOWN)
+    assert ext.door == Door(width=5, offset=None, open=True)
 
 
 # --- display glyphs ---------------------------------------------------------

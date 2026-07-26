@@ -4,6 +4,12 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Line continuation for long statements (#68, see `docs/block.md`): a
+  whitespace-separated backslash at the end of a line (outside quotes and
+  comments) continues the statement onto the next physical line. Errors keep
+  pointing at the physical line of the offending token; a stray backslash,
+  a blank/comment-only continuation line, or a continuation at end of file
+  is a clear parse error.
 - Open boundaries between separately labeled rooms (#67, see `docs/door.md`):
   an `open` attribute on any door spec (`door=20 open`, `door=10@0 open a b`,
   `door open <room> outside <side>`) marks it as a doorless opening. It is

@@ -23,7 +23,10 @@ produces, allowing `porta` to rapidly and deterministically generate one from
 the other.
 
 Files are read line by line: a `#` starts a comment that runs to the end of the
-line (a `#` inside a quoted name is literal), and blank lines are ignored.
+line (a `#` inside a quoted name is literal), and blank lines are ignored. A
+long statement can continue onto the next line by ending with a
+whitespace-separated backslash (see
+[long statements](docs/block.md#long-statements)).
 
 For more on the `porta` DSL specification, see the following documentation:
 

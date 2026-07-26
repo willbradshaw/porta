@@ -9,6 +9,9 @@ One line per room::
     room <id> "<Name>" <W>x<H> [glyph="<glyph>"] [root] [<relation> <anchor> ...]
     relation = up-of | down-of | left-of | right-of
 
+A statement may span several physical lines: a trailing whitespace-separated
+backslash (outside quotes and comments) continues it on the next line.
+
 The name slot is required but may be empty (``""``) for a room labelled only by
 its glyph and size.
 
@@ -18,6 +21,7 @@ Reference resolution (does ``anchor`` exist? is there exactly one root?) is a
 
 import re
 from dataclasses import replace
+from typing import NamedTuple
 
 from porta.errors import ParseError
 from porta.model import (
@@ -32,8 +36,20 @@ from porta.model import (
     Room,
 )
 
-# A token plus whether it was double-quoted in the source.
-Token = tuple[str, bool]
+
+class Token(NamedTuple):
+    """One source token: its text, whether it was double-quoted, and the
+    physical line it sits on (which may be a continuation line)."""
+
+    value: str
+    quoted: bool
+    line: int
+
+
+def _is_bare(token: Token, value: str) -> bool:
+    """Whether ``token`` is the unquoted keyword ``value``."""
+    return not token.quoted and token.value == value
+
 
 _ID_RE = re.compile(r"[a-z][a-z0-9_-]*\Z")
 _DIM_RE = re.compile(r"(\?|[0-9]+)x(\?|[0-9]+)\Z")
@@ -72,21 +88,18 @@ def parse(text: str) -> Building:
     external_doors: list[ExternalDoor] = []
     blocks: list[Block] = []
     seen: set[str] = set()
-    for lineno, raw in enumerate(text.splitlines(), start=1):
-        tokens = _tokenize(raw, lineno)
-        if not tokens:
-            continue  # blank or comment-only line (its line number is still spent)
-        head, head_quoted = tokens[0]
-        if not head_quoted and head.startswith("door"):
+    for tokens, lineno in _statements(text):
+        head = tokens[0]
+        if not head.quoted and head.value.startswith("door"):
             # '<room> outside <side>' is an external door; '<a> <b>' an internal
             # one. An 'open' attribute sits between the door spec and the ids.
-            outside_at = 3 if len(tokens) > 1 and tokens[1] == ("open", False) else 2
-            if len(tokens) > outside_at and tokens[outside_at] == ("outside", False):
+            outside_at = 3 if len(tokens) > 1 and _is_bare(tokens[1], "open") else 2
+            if len(tokens) > outside_at and _is_bare(tokens[outside_at], "outside"):
                 external_doors.append(_parse_external_door(tokens, lineno))
             else:
                 doors.append(_parse_doorway(tokens, lineno))
             continue
-        if not head_quoted and head == "block":
+        if _is_bare(head, "block"):
             block = _parse_block(tokens, lineno)
             if block.id in seen:
                 raise ParseError(f"duplicate id {block.id!r}", line=lineno)
@@ -99,6 +112,45 @@ def parse(text: str) -> Building:
         seen.add(room.id)
         rooms.append(room)
     return Building(rooms, doors, external_doors, blocks=blocks)
+
+
+def _statements(text: str) -> list[tuple[list[Token], int]]:
+    """Split source into logical statements: ``(tokens, starting line)`` pairs.
+
+    A trailing backslash (the last non-whitespace character on a line, outside
+    quotes and comments) joins the next physical line into the same statement.
+    Blank and comment-only lines separate statements and cannot appear inside a
+    continued one. Each token remembers its own physical line.
+    """
+    lines = text.splitlines()
+    statements: list[tuple[list[Token], int]] = []
+    index = 0
+    while index < len(lines):
+        lineno = index + 1
+        tokens, continued = _tokenize(lines[index], lineno)
+        index += 1
+        while continued:
+            if index >= len(lines):
+                raise ParseError(
+                    "unterminated line continuation at end of file", line=index
+                )
+            more, continued = _tokenize(lines[index], index + 1)
+            if not more and not continued:
+                raise ParseError(
+                    "a continued statement cannot contain a blank or comment-only line",
+                    line=index + 1,
+                )
+            tokens.extend(more)
+            index += 1
+        for token in tokens:
+            if _is_bare(token, "\\"):
+                raise ParseError(
+                    "a continuation backslash must be the last thing on its line",
+                    line=token.line,
+                )
+        if tokens:
+            statements.append((tokens, lineno))
+    return statements
 
 
 def _validate_id(value: str, quoted: bool, lineno: int) -> None:
@@ -130,17 +182,18 @@ def _validate_name(value: str, quoted: bool, lineno: int) -> None:
         raise ParseError("room name has unprintable characters", line=lineno)
 
 
-def _parse_glyph(tokens: list[Token], i: int, lineno: int) -> str:
+def _parse_glyph(tokens: list[Token], i: int) -> str:
     """Parse the quoted value after a bare ``glyph=`` token at index ``i``.
 
     ``glyph="12"`` tokenizes as a bare ``glyph=`` followed by a quoted value;
     ``""`` explicitly means *no* glyph (the room is unlabeled).
     """
-    if i + 1 >= len(tokens) or not tokens[i + 1][1]:
+    lineno = tokens[i].line
+    if i + 1 >= len(tokens) or not tokens[i + 1].quoted:
         raise ParseError(
             'glyph= needs a double-quoted value (use glyph="" for none)', line=lineno
         )
-    value = tokens[i + 1][0]
+    value = tokens[i + 1].value
     if value == "":
         return value  # empty quotes: explicitly unlabeled
     if len(value) > _MAX_GLYPH:
@@ -159,9 +212,9 @@ def _parse_door_spec(tokens: list[Token], lineno: int) -> tuple[Door, list[Token
 
     Returns the door spec and the remaining tokens after it.
     """
-    spec = _parse_door(tokens[0][0], lineno)
+    spec = _parse_door(tokens[0].value, lineno)
     rest = tokens[1:]
-    if rest and rest[0] == ("open", False):
+    if rest and _is_bare(rest[0], "open"):
         spec = replace(spec, open=True)
         rest = rest[1:]
     return spec, rest
@@ -172,9 +225,9 @@ def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
     spec, rest = _parse_door_spec(tokens, lineno)
     if len(rest) != 2:
         raise ParseError("a door needs exactly two room ids", line=lineno)
-    for room_id, quoted in rest:
-        _validate_id(room_id, quoted, lineno)
-    a, b = rest[0][0], rest[1][0]
+    for token in rest:
+        _validate_id(token.value, token.quoted, token.line)
+    a, b = rest[0].value, rest[1].value
     if a == b:
         raise ParseError("a door needs two different rooms", line=lineno)
     return Doorway(a=a, b=b, door=spec, line=lineno)
@@ -185,12 +238,14 @@ def _parse_external_door(tokens: list[Token], lineno: int) -> ExternalDoor:
     spec, rest = _parse_door_spec(tokens, lineno)
     if len(rest) != 3:
         raise ParseError("an external door needs '<room> outside <side>'", line=lineno)
-    (room, room_quoted), _outside, (side, side_quoted) = rest
-    _validate_id(room, room_quoted, lineno)
-    direction = _SIDES.get(side)
-    if side_quoted or direction is None:
-        raise ParseError(f"side must be up/down/left/right, got {side!r}", line=lineno)
-    return ExternalDoor(room=room, side=direction, door=spec, line=lineno)
+    room, _outside, side = rest
+    _validate_id(room.value, room.quoted, room.line)
+    direction = _SIDES.get(side.value)
+    if side.quoted or direction is None:
+        raise ParseError(
+            f"side must be up/down/left/right, got {side.value!r}", line=side.line
+        )
+    return ExternalDoor(room=room.value, side=direction, door=spec, line=lineno)
 
 
 def _parse_block(tokens: list[Token], lineno: int) -> Block:
@@ -207,11 +262,11 @@ def _parse_block(tokens: list[Token], lineno: int) -> Block:
             'a block needs an id, a name (use "" for none), and a member',
             line=lineno,
         )
-    block_id, id_quoted = tokens[1]
-    _validate_id(block_id, id_quoted, lineno)
+    block_id, id_quoted, id_line = tokens[1]
+    _validate_id(block_id, id_quoted, id_line)
 
-    name_value, name_quoted = tokens[2]
-    _validate_name(name_value, name_quoted, lineno)
+    name_value, name_quoted, name_line = tokens[2]
+    _validate_name(name_value, name_quoted, name_line)
     name = name_value or None  # "" -> no name
 
     members: list[str] = []
@@ -219,16 +274,16 @@ def _parse_block(tokens: list[Token], lineno: int) -> Block:
     glyph: str | None = None
     i = 3
     while i < len(tokens):
-        value, quoted = tokens[i]
+        value, quoted, line = tokens[i]
         if not quoted and value == "glyph=":
-            glyph = _parse_glyph(tokens, i, lineno)
+            glyph = _parse_glyph(tokens, i)
             i += 2
             continue
         if not quoted and value.startswith("glyph="):
             glyph_member = value[len("glyph=") :]
-            _validate_id(glyph_member, False, lineno)
+            _validate_id(glyph_member, False, line)
         else:
-            _validate_id(value, quoted, lineno)
+            _validate_id(value, quoted, line)
             members.append(value)
         i += 1
     if not members:
@@ -245,11 +300,14 @@ def _parse_block(tokens: list[Token], lineno: int) -> Block:
     )
 
 
-def _tokenize(raw: str, lineno: int) -> list[Token]:
+def _tokenize(raw: str, lineno: int) -> tuple[list[Token], bool]:
     """Split one source line into tokens, honouring quotes and ``#`` comments.
 
     A ``#`` outside quotes starts a comment to end of line; inside a quoted
-    string it is literal. Each token is tagged with whether it was quoted.
+    string it is literal. Each token is tagged with whether it was quoted and
+    the line it sits on. Also reports whether the line ends in a continuation:
+    a whitespace-separated ``\\`` as its last non-whitespace character (a ``\\``
+    anywhere else survives as a token for the caller to reject).
     """
     tokens: list[Token] = []
     i, n = 0, len(raw)
@@ -259,21 +317,23 @@ def _tokenize(raw: str, lineno: int) -> list[Token]:
             i += 1
         elif char == "#":
             break
+        elif char == "\\" and raw[i + 1 :].strip() == "":
+            return tokens, True
         elif char == '"':
             j = i + 1
             while j < n and raw[j] != '"':
                 j += 1
             if j >= n:
                 raise ParseError("unterminated quote", line=lineno)
-            tokens.append((raw[i + 1 : j], True))
+            tokens.append(Token(raw[i + 1 : j], True, lineno))
             i = j + 1
         else:
             j = i
             while j < n and not raw[j].isspace() and raw[j] not in '#"':
                 j += 1
-            tokens.append((raw[i:j], False))
+            tokens.append(Token(raw[i:j], False, lineno))
             i = j
-    return tokens
+    return tokens, False
 
 
 def _parse_room(tokens: list[Token], lineno: int) -> Room:
@@ -282,9 +342,9 @@ def _parse_room(tokens: list[Token], lineno: int) -> Room:
     The name slot is required but may be empty (``""``) for a room labelled only
     by its glyph and size.
     """
-    if tokens[0][0] != "room":
+    if tokens[0].value != "room":
         raise ParseError(
-            f"unknown directive {tokens[0][0]!r}; expected 'room'", line=lineno
+            f"unknown directive {tokens[0].value!r}; expected 'room'", line=lineno
         )
     if len(tokens) < 4:
         raise ParseError(
@@ -292,15 +352,17 @@ def _parse_room(tokens: list[Token], lineno: int) -> Room:
             line=lineno,
         )
 
-    room_id, id_quoted = tokens[1]
-    _validate_id(room_id, id_quoted, lineno)
+    room_id, id_quoted, id_line = tokens[1]
+    _validate_id(room_id, id_quoted, id_line)
 
-    name_value, name_quoted = tokens[2]
-    _validate_name(name_value, name_quoted, lineno)
+    name_value, name_quoted, name_line = tokens[2]
+    _validate_name(name_value, name_quoted, name_line)
     name = name_value or None  # "" -> no name
 
-    width, height, auto_width, auto_height = _parse_dimensions(tokens[3][0], lineno)
-    is_root, glyph, relations = _parse_modifiers(tokens[4:], lineno)
+    width, height, auto_width, auto_height = _parse_dimensions(
+        tokens[3].value, tokens[3].line
+    )
+    is_root, glyph, relations = _parse_modifiers(tokens[4:])
 
     return Room(
         id=room_id,
@@ -345,42 +407,47 @@ def _parse_dimension(raw: str, label: str, lineno: int) -> tuple[int, bool]:
     return value, False
 
 
-def _parse_modifiers(
-    tokens: list[Token], lineno: int
-) -> tuple[bool, str | None, list[Relation]]:
-    """Parse the trailing ``root``/``glyph=`` flags and relations (any order)."""
+def _parse_modifiers(tokens: list[Token]) -> tuple[bool, str | None, list[Relation]]:
+    """Parse the trailing ``root``/``glyph=`` flags and relations (any order).
+
+    Errors (and each relation's recorded line) point at the physical line of
+    the token concerned, which may be a continuation line.
+    """
     is_root = False
     glyph: str | None = None
     relations: list[Relation] = []
     i = 0
     while i < len(tokens):
-        value, quoted = tokens[i]
+        value, quoted, line = tokens[i]
         if quoted:
-            raise ParseError(f"unexpected quoted value {value!r}", line=lineno)
+            raise ParseError(f"unexpected quoted value {value!r}", line=line)
         if value == "root":
             is_root = True
             i += 1
             continue
         if value == "glyph=":
-            glyph = _parse_glyph(tokens, i, lineno)
+            glyph = _parse_glyph(tokens, i)
             i += 2
             continue
         if value.startswith("glyph="):
             raise ParseError(
                 f'a glyph must be double-quoted: glyph="{value[len("glyph=") :]}"',
-                line=lineno,
+                line=line,
             )
         if value == "open":
-            raise ParseError("'open' must immediately follow a door", line=lineno)
+            raise ParseError("'open' must immediately follow a door", line=line)
         direction = _KEYWORDS.get(value)
         if direction is None:
             if value.startswith(_MODIFIERS):
-                raise ParseError(f"{value!r} must follow a relation", line=lineno)
-            raise ParseError(f"unknown relation or keyword {value!r}", line=lineno)
+                raise ParseError(f"{value!r} must follow a relation", line=line)
+            raise ParseError(f"unknown relation or keyword {value!r}", line=line)
+        rel_line = line
         if i + 1 >= len(tokens):
-            raise ParseError(f"relation {value!r} needs an anchor room id", line=lineno)
-        anchor, anchor_quoted = tokens[i + 1]
-        _validate_id(anchor, anchor_quoted, lineno)
+            raise ParseError(
+                f"relation {value!r} needs an anchor room id", line=rel_line
+            )
+        anchor, anchor_quoted, anchor_line = tokens[i + 1]
+        _validate_id(anchor, anchor_quoted, anchor_line)
         i += 2
 
         align = Align.START
@@ -388,18 +455,20 @@ def _parse_modifiers(
         door: Door | None = None
         no_door = False
         while (
-            i < len(tokens) and not tokens[i][1] and tokens[i][0].startswith(_MODIFIERS)
+            i < len(tokens)
+            and not tokens[i].quoted
+            and tokens[i].value.startswith(_MODIFIERS)
         ):
-            token = tokens[i][0]
+            token, _, token_line = tokens[i]
             if token.startswith("shift="):
-                shift = _parse_shift(token, lineno)
+                shift = _parse_shift(token, token_line)
             elif token.startswith("align="):
-                align = _parse_align(token, lineno)
+                align = _parse_align(token, token_line)
             elif token == "no-door":
                 no_door = True
             else:
-                door = _parse_door(token, lineno)
-                if i + 1 < len(tokens) and tokens[i + 1] == ("open", False):
+                door = _parse_door(token, token_line)
+                if i + 1 < len(tokens) and _is_bare(tokens[i + 1], "open"):
                     door = replace(door, open=True)
                     i += 1
             i += 1
@@ -407,13 +476,13 @@ def _parse_modifiers(
         if no_door and door is not None and door.open:
             raise ParseError(
                 "cannot combine no-door with an open door on one relation",
-                line=lineno,
+                line=rel_line,
             )
         relations.append(
             Relation(
                 direction=direction,
                 anchor=anchor,
-                line=lineno,
+                line=rel_line,
                 align=align,
                 shift=shift,
                 door=door,

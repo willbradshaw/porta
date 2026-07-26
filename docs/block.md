@@ -72,6 +72,31 @@ are permitted but will raise a warning. Similarly, explicit
 targeting doors on walls within the block will raise a warning that they have
 been dropped.
 
+## Long statements
+
+A `block` with many members can outgrow one line. Any statement can be
+**continued** onto the next physical line by ending it with a backslash,
+separated from the last token by whitespace:
+
+```porta img/block-multiline.svg
+room pn "" 40x10 root
+room pw "" 10x20 down-of pn
+room pe "" 10x20 down-of pn align=end
+room ps "" 40x10 down-of pw down-of pe
+block passages "Passages" glyph=pn \
+    pn pw \
+    pe ps
+```
+
+<img alt="A ring of four passages declared as one multiline block" src="img/block-multiline.svg" width="70%">
+
+The continued lines parse as one statement: leading whitespace on a
+continuation line is ignored, and a comment may follow the final line.
+A backslash anywhere else — mid-line, glued to a token, or followed by a
+comment — is an error, as is a blank (or comment-only) line inside a
+continued statement. Error messages still point at the physical line of
+the offending token.
+
 ## Invalid blocks
 
 `porta` rejects a block it can't form:

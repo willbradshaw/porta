@@ -15,7 +15,7 @@ import textwrap
 import pytest
 
 from porta.errors import ParseError
-from porta.model import Align, Building, Direction, Door
+from porta.model import Align, Building, Direction, Door, Relation
 from porta.parser import parse
 
 # Lines: 1 blank, 2 comment, 3 entrance, 4 kitchen, 5 hall.
@@ -561,3 +561,114 @@ def test_invalid_block_raises(source: str) -> None:
 def test_block_id_colliding_with_a_room_raises() -> None:
     with pytest.raises(ParseError):
         parse('room a "" 10x10 root\nblock a "" b')
+
+
+# --- line continuation -------------------------------------------------------
+#
+# A backslash that is the last non-whitespace character on a line — outside
+# quotes and comments, and whitespace-separated from the preceding token —
+# joins the next physical line into the same logical statement. Statement-level
+# model fields keep the starting line; tokens (and the errors they raise, and
+# relations) carry their own physical line.
+
+
+def test_continued_statement_yields_an_identical_model() -> None:
+    single = 'room a "A" 10x10 root\nblock hall "Hall" a'
+    continued = 'room a "A" 10x10 root\nblock hall "Hall" \\\n    a'
+    assert parse(continued) == parse(single)
+
+
+def test_continued_block_matches_its_single_line_form() -> None:
+    single = 'block hall "Hall" glyph="9" glyph=a a b'
+    continued = 'block hall "Hall" glyph="9" glyph=a \\\n    a \\\n    b'
+    assert parse(continued).blocks == parse(single).blocks
+
+
+def test_continued_room_spreads_relations_over_lines() -> None:
+    # The statement starts on line 1; each relation reports the physical line
+    # its keyword sits on.
+    text = (
+        'room hall "Great Hall" 80x40 glyph="12" root \\\n'
+        "    right-of west align=end shift=10 no-door \\\n"
+        "    down-of north door=10@20"
+    )
+    room = parse(text).room("hall")
+    assert (room.line, room.is_root, room.glyph) == (1, True, "12")
+    assert room.relations == [
+        Relation(
+            direction=Direction.RIGHT,
+            anchor="west",
+            line=2,
+            align=Align.END,
+            shift=10,
+            no_door=True,
+        ),
+        Relation(
+            direction=Direction.DOWN,
+            anchor="north",
+            line=3,
+            door=Door(width=10, offset=20),
+        ),
+    ]
+
+
+def test_statement_after_a_continued_one_keeps_its_line_number() -> None:
+    text = 'block hall "Hall" \\\n    a\nroom b "B" 10x10 root'
+    assert parse(text).room("b").line == 3
+
+
+def test_door_statements_can_continue() -> None:
+    building = parse("door=10@0 open \\\n    a b")
+    assert building.doors[0].door == Door(width=10, offset=0, open=True)
+
+
+def test_comment_allowed_on_the_final_continuation_line() -> None:
+    block = parse('block hall "Hall" \\\n    a b  # members').blocks[0]
+    assert block.members == ["a", "b"]
+
+
+def test_a_lone_backslash_line_continues_without_tokens() -> None:
+    block = parse('block hall "Hall" \\\n    \\\n    a').blocks[0]
+    assert block.members == ["a"]
+
+
+def test_backslash_inside_a_quoted_name_is_literal() -> None:
+    name = parse('room a "Back\\slash Hall" 10x10 root').room("a").name
+    assert name == "Back\\slash Hall"
+
+
+def test_comment_ending_in_a_backslash_does_not_continue() -> None:
+    text = '# heading \\\nroom a "A" 10x10 root'
+    assert parse(text).room("a").line == 2
+
+
+@pytest.mark.parametrize(
+    ("source", "error_line"),
+    [
+        pytest.param('room a "A" 10x10 root \\', 1, id="continuation-at-eof"),
+        pytest.param('block hall "Hall" \\\n\n    a', 2, id="blank-continuation-line"),
+        pytest.param(
+            'block hall "Hall" \\\n# note\n    a',
+            2,
+            id="comment-only-continuation-line",
+        ),
+        pytest.param('room a "A" 10x10 \\ root', 1, id="backslash-mid-line"),
+        pytest.param(
+            'room a "A" 10x10 root \\ # done', 1, id="backslash-before-comment"
+        ),
+        pytest.param(
+            'block hall "Hall" \\\n    a!!',
+            2,
+            id="bad-token-reports-its-physical-line",
+        ),
+        pytest.param(
+            'room a "A" 10x10\\\nroot', 1, id="glued-backslash-is-not-a-continuation"
+        ),
+    ],
+)
+def test_invalid_continuation_raises_with_the_right_line(
+    source: str, error_line: int
+) -> None:
+    with pytest.raises(ParseError) as exc:
+        parse(source)
+    assert exc.value.line == error_line

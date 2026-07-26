@@ -4,8 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
-- Open boundaries between separately labeled rooms (#67): an `open` attribute
-  on any door spec (`door=20 open`, `door=10@0 open a b`,
+- Open boundaries between separately labeled rooms (#67, see `docs/door.md`):
+  an `open` attribute on any door spec (`door=20 open`, `door=10@0 open a b`,
   `door open <room> outside <side>`) marks it as a doorless opening. It is
   placed and validated like a solid door but renders as a dashed gap in the
   wall — no door mark, free movement — while both rooms keep their own

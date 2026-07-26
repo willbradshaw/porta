@@ -4,6 +4,15 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add explicit display glyphs on rooms and blocks: `glyph="12"` (1-3
+  printable characters) labels the entity verbatim in the plan and key;
+  `glyph=""` leaves it unlabeled (no glyph, no key entry). Automatic
+  glyphs still cover the rest and never collide with explicit ones;
+  duplicate explicit glyphs are an error (see `docs/room.md`).
+- Pad the `--debug-ascii` grid to the widest glyph and render unlabeled
+  rooms' cells as `_`; sort map keys shortest-glyph-first so `1`..`9`
+  precede `10`.
+
 ## 1.1.0 (2026-06-07)
 
 - Implement non-rectangular spaces via `block` statements, representing

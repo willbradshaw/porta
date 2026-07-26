@@ -135,6 +135,25 @@ two members of the same block the opening is suppressed with a warning (the
 shared wall is already gone), while an open door between a member and a room
 outside the block cuts a gap into the block's outline.
 
+## Secret doors
+
+A **`secret`** attribute, written in the same position as
+[`open`](#open-boundaries), marks a door as concealed. A secret door is
+placed and validated exactly like an ordinary one — the same width, offset,
+standalone, and external forms — but the wall renders intact (that is the
+point), with the conventional "S" marking the concealed span:
+
+```porta img/door-secret.svg
+room store "Storeroom" 30x30 root
+room cache "Hidden Cache" 10x20 right-of store door=5@5 secret
+door=10 secret store outside up
+```
+
+<img alt="A hidden cache behind a secret door, and a concealed exterior exit" src="img/door-secret.svg" width="70%">
+
+A door is at most one of `open` and `secret`: an opening cannot be
+concealed.
+
 ## Invalid doors
 
 `porta` rejects a door it can't place:
@@ -144,8 +163,9 @@ outside the block cuts a gap into the block's outline.
 - A door wider than its wall, or pushed past the wall's end by its offset.
 - Two doors that overlap on the same wall.
 - An external door on a side that isn't exterior — a room sits flush there.
-- An `open` marker that doesn't immediately follow a door spec, or an open
-  door combined with `no-door` on the same relation.
+- An `open` or `secret` marker that doesn't immediately follow a door spec,
+  a door carrying both markers, or either combined with `no-door` on the
+  same relation.
 
 ## Putting it together
 

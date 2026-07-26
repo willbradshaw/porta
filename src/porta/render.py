@@ -12,6 +12,7 @@ from porta.layout import (
     door_segments,
     open_door_segments,
     room_outline_segments,
+    secret_door_segments,
 )
 from porta.model import Building, Room
 
@@ -35,6 +36,7 @@ _DOOR_STROKE_FT = 1.5  # door line thickness, in feet
 # Open boundaries are dotted: a near-zero dash with a round cap renders as a
 # dot of the wall's stroke width; the gap sets the dot spacing, in feet.
 _OPEN_DASH = "0.01 1.5"
+_SECRET_FONT_FT = 5  # "S" marker of a secret door, in feet (the map convention)
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -237,6 +239,15 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f'  <line class="door" x1="{_num(x1)}" y1="{_num(y1)}" '
             f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="{_DOOR_COLOUR}" '
             f'stroke-width="{_num(_DOOR_STROKE_FT)}" />'
+        )
+
+    # Secret doors: the wall stays intact; an "S" marks the concealed span.
+    for x1, y1, x2, y2 in sorted(secret_door_segments(building)):
+        lines.append(
+            f'  <text class="secret" x="{_num((x1 + x2) / 2)}" '
+            f'y="{_num((y1 + y2) / 2)}" text-anchor="middle" '
+            f'dominant-baseline="central" '
+            f'font-size="{_num(_SECRET_FONT_FT)}">S</text>'
         )
 
     # Centre the key block but left-align the lines within it (a legend reads

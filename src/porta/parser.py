@@ -51,6 +51,28 @@ def _is_bare(token: Token, value: str) -> bool:
     return not token.quoted and token.value == value
 
 
+_DOOR_ATTRS = ("open", "secret")  # bare attribute words a door spec can take
+
+
+def _is_attr(token: Token) -> bool:
+    """Whether ``token`` is a bare door attribute (``open``/``secret``)."""
+    return not token.quoted and token.value in _DOOR_ATTRS
+
+
+def _apply_door_attr(door: Door, token: Token) -> Door:
+    """Apply a bare ``open``/``secret`` attribute token to a door spec.
+
+    A door takes at most one attribute: doubled or combined attributes raise.
+    """
+    if door.open or door.secret:
+        raise ParseError(
+            "a door takes at most one of 'open' and 'secret'", line=token.line
+        )
+    if token.value == "open":
+        return replace(door, open=True)
+    return replace(door, secret=True)
+
+
 _ID_RE = re.compile(r"[a-z][a-z0-9_-]*\Z")
 _DIM_RE = re.compile(r"(\?|[0-9]+)x(\?|[0-9]+)\Z")
 _GRID_FT = 5
@@ -67,7 +89,17 @@ _SIDES: dict[str, Direction] = {
 }
 # Words that are part of the syntax, so they cannot double as room ids.
 _RESERVED: frozenset[str] = frozenset(
-    {"root", "door", "no-door", "open", "outside", "shift", "align", *_KEYWORDS}
+    {
+        "root",
+        "door",
+        "no-door",
+        "open",
+        "secret",
+        "outside",
+        "shift",
+        "align",
+        *_KEYWORDS,
+    }
 )
 
 
@@ -92,8 +124,10 @@ def parse(text: str) -> Building:
         head = tokens[0]
         if not head.quoted and head.value.startswith("door"):
             # '<room> outside <side>' is an external door; '<a> <b>' an internal
-            # one. An 'open' attribute sits between the door spec and the ids.
-            outside_at = 3 if len(tokens) > 1 and _is_bare(tokens[1], "open") else 2
+            # one. Attributes ('open'/'secret') sit between the spec and the ids.
+            outside_at = 2
+            while len(tokens) > outside_at and _is_attr(tokens[outside_at - 1]):
+                outside_at += 1
             if len(tokens) > outside_at and _is_bare(tokens[outside_at], "outside"):
                 external_doors.append(_parse_external_door(tokens, lineno))
             else:
@@ -208,14 +242,15 @@ def _parse_glyph(tokens: list[Token], i: int) -> str:
 
 
 def _parse_door_spec(tokens: list[Token], lineno: int) -> tuple[Door, list[Token]]:
-    """Parse a statement's leading door token plus an optional bare ``open``.
+    """Parse a statement's leading door token plus an optional bare attribute
+    (``open``/``secret``).
 
     Returns the door spec and the remaining tokens after it.
     """
     spec = _parse_door(tokens[0].value, lineno)
     rest = tokens[1:]
-    if rest and _is_bare(rest[0], "open"):
-        spec = replace(spec, open=True)
+    while rest and _is_attr(rest[0]):
+        spec = _apply_door_attr(spec, rest[0])
         rest = rest[1:]
     return spec, rest
 
@@ -434,8 +469,8 @@ def _parse_modifiers(tokens: list[Token]) -> tuple[bool, str | None, list[Relati
                 f'a glyph must be double-quoted: glyph="{value[len("glyph=") :]}"',
                 line=line,
             )
-        if value == "open":
-            raise ParseError("'open' must immediately follow a door", line=line)
+        if value in _DOOR_ATTRS:
+            raise ParseError(f"{value!r} must immediately follow a door", line=line)
         direction = _KEYWORDS.get(value)
         if direction is None:
             if value.startswith(_MODIFIERS):
@@ -468,14 +503,15 @@ def _parse_modifiers(tokens: list[Token]) -> tuple[bool, str | None, list[Relati
                 no_door = True
             else:
                 door = _parse_door(token, token_line)
-                if i + 1 < len(tokens) and _is_bare(tokens[i + 1], "open"):
-                    door = replace(door, open=True)
+                while i + 1 < len(tokens) and _is_attr(tokens[i + 1]):
+                    door = _apply_door_attr(door, tokens[i + 1])
                     i += 1
             i += 1
 
-        if no_door and door is not None and door.open:
+        if no_door and door is not None and (door.open or door.secret):
+            kind = "an open" if door.open else "a secret"
             raise ParseError(
-                "cannot combine no-door with an open door on one relation",
+                f"cannot combine no-door with {kind} door on one relation",
                 line=rel_line,
             )
         relations.append(

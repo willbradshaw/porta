@@ -411,6 +411,56 @@ def test_open_door_across_a_block_boundary_renders_as_a_gap() -> None:
     assert (40.0, 0.0, 40.0, 20.0) not in outline
 
 
+# --- secret doors ------------------------------------------------------------
+#
+# A secret door keeps the wall fully intact (that is the point) and draws an
+# "S" marker (class="secret") centred on the door's span instead of a door
+# mark.
+
+SECRET_TWO = 'room a "A" 20x20 root\nroom b "Bee" 20x20 right-of a door=10@5 secret'
+
+
+def secret_markers(root: ET.Element) -> list[tuple[float, float, str | None]]:
+    return [
+        (float(t.get("x", "")), float(t.get("y", "")), t.text)
+        for t in root.iter(tag("text"))
+        if t.get("class") == "secret"
+    ]
+
+
+def test_secret_door_renders_as_an_s_marker_and_no_door_mark() -> None:
+    root = ET.fromstring(svg_of(SECRET_TWO))
+    assert secret_markers(root) == [(20.0, 10.0, "S")]  # midpoint of y[5,15]
+    assert [ln for ln in root.iter(tag("line")) if ln.get("class") == "door"] == []
+
+
+def test_secret_door_leaves_both_room_rects_intact() -> None:
+    root = ET.fromstring(svg_of(SECRET_TWO))
+    assert rect_by_room(root, "a") is not None
+    assert rect_by_room(root, "b") is not None
+    assert open_lines(root) == []
+
+
+def test_secret_and_solid_door_render_side_by_side() -> None:
+    source = SECRET_TWO + "\ndoor@15 a b"
+    root = ET.fromstring(svg_of(source))
+    assert len(secret_markers(root)) == 1
+    door = [ln for ln in root.iter(tag("line")) if ln.get("class") == "door"]
+    assert len(door) == 1
+
+
+def test_external_secret_door_marks_the_exterior_wall() -> None:
+    source = 'room a "A" 20x20 root\ndoor=10 secret a outside down'
+    root = ET.fromstring(svg_of(source))
+    assert secret_markers(root) == [(10.0, 20.0, "S")]
+    assert rect_by_room(root, "a") is not None
+
+
+def test_secret_door_does_not_change_the_ascii_rendering() -> None:
+    solid = 'room a "A" 20x20 root\nroom b "Bee" 20x20 right-of a'
+    assert ascii_of(SECRET_TWO) == ascii_of(solid)
+
+
 # --- blocks ----------------------------------------------------------------
 
 L_BLOCK = (

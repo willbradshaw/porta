@@ -4,6 +4,9 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Secret doors: marking a door `secret` (e.g. `door=5@5 secret`) keeps the
+  wall intact and draws the conventional "S" marker instead of a door mark
+  (see `docs/door.md`).
 - Line continuation: end a line with a whitespace-separated backslash to
   continue a statement onto the next line (see the README).
 - Open boundaries: marking a door `open` (e.g. `door=20 open`) removes the

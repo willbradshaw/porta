@@ -231,6 +231,18 @@ def test_each_relation_keyword_maps_to_its_direction(
         pytest.param(
             'room r "R" 20x20 up-of a no-door door=10 open', id="no-door-and-open-door"
         ),
+        # secret modifier (same placement rule as open; the two are exclusive)
+        pytest.param('room r "R" 20x20 up-of a secret', id="secret-without-door"),
+        pytest.param('room r "R" 20x20 up-of a door secret secret', id="secret-twice"),
+        pytest.param('room r "R" 20x20 up-of a door open secret', id="open-and-secret"),
+        pytest.param('room r "R" 20x20 up-of a door secret open', id="secret-and-open"),
+        pytest.param(
+            'room r "R" 20x20 up-of a door=10 secret no-door',
+            id="secret-door-and-no-door",
+        ),
+        pytest.param("door=5@5 open secret a b", id="standalone-open-and-secret"),
+        pytest.param("door a b secret", id="standalone-secret-trailing"),
+        pytest.param("door a secret outside down", id="external-secret-misplaced"),
         # standalone door statement
         pytest.param("door a", id="standalone-door-one-id"),
         pytest.param("door a b c", id="standalone-door-three-ids"),
@@ -264,6 +276,7 @@ def test_uppercase_id_is_rejected() -> None:
         "door",
         "no-door",
         "open",
+        "secret",
         "outside",
         "shift",
         "align",
@@ -448,6 +461,49 @@ def test_external_open_door_is_parsed() -> None:
     ext = building.external_doors[0]
     assert (ext.room, ext.side) == ("a", Direction.DOWN)
     assert ext.door == Door(width=5, offset=None, open=True)
+
+
+# --- secret doors -----------------------------------------------------------
+#
+# 'secret' is a door attribute like 'open': written immediately after the door
+# spec, valid in all three door positions, mutually exclusive with 'open'.
+
+
+@pytest.mark.parametrize(
+    ("source", "expected_door"),
+    [
+        (
+            'room b "B" 10x10 up-of a door secret',
+            Door(width=5, offset=None, secret=True),
+        ),
+        (
+            'room b "B" 10x10 up-of a door=10 secret',
+            Door(width=10, offset=None, secret=True),
+        ),
+        (
+            'room b "B" 10x10 up-of a door=10@15 secret',
+            Door(width=10, offset=15, secret=True),
+        ),
+    ],
+)
+def test_secret_is_parsed_onto_the_relation_door(
+    source: str, expected_door: Door
+) -> None:
+    assert parse(source).room("b").relations[0].door == expected_door
+
+
+def test_standalone_secret_door_is_parsed() -> None:
+    building = parse(
+        'room a "A" 10x10 root\nroom b "B" 10x10 right-of a\ndoor=5@5 secret a b'
+    )
+    assert building.doors[0].door == Door(width=5, offset=5, secret=True)
+
+
+def test_external_secret_door_is_parsed() -> None:
+    building = parse('room a "A" 20x20 root\ndoor secret a outside right')
+    ext = building.external_doors[0]
+    assert (ext.room, ext.side) == ("a", Direction.RIGHT)
+    assert ext.door == Door(width=5, offset=None, secret=True)
 
 
 # --- display glyphs ---------------------------------------------------------

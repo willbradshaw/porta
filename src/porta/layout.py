@@ -469,10 +469,11 @@ def door_segments(building: Building) -> list[Segment]:
 
     Doors are on by default: a relation with a real shared wall gets a default
     door unless ``no_door`` suppresses it; an explicit ``door`` overrides its
-    width/position. Validates every door, open ones included (raising on an
-    explicit door that has no wall or doesn't fit). Assumes a solved building.
+    width/position. Validates every door, open and secret ones included
+    (raising on an explicit door that has no wall or doesn't fit). Assumes a
+    solved building.
     """
-    return [seg for seg, is_open in _placed_doors(building) if not is_open]
+    return [s for s, d in _placed_doors(building) if not d.open and not d.secret]
 
 
 def open_door_segments(building: Building) -> list[Segment]:
@@ -482,32 +483,42 @@ def open_door_segments(building: Building) -> list[Segment]:
     draws them as a gap in the wall instead of a door mark. Assumes a solved
     building.
     """
-    return [seg for seg, is_open in _placed_doors(building) if is_open]
+    return [seg for seg, door in _placed_doors(building) if door.open]
 
 
-def _placed_doors(building: Building) -> list[tuple[Segment, bool]]:
-    """Place and validate every door, as ``(segment, open?)`` pairs.
+def secret_door_segments(building: Building) -> list[Segment]:
+    """Return the line ``(x1, y1, x2, y2)`` for every *secret* door.
 
-    Open and solid doors share one placement pass so the overlap check sees
-    them all together.
+    Secret doors are placed and validated exactly like solid ones; the
+    renderer keeps the wall intact and draws an "S" marker over the span.
+    Assumes a solved building.
+    """
+    return [seg for seg, door in _placed_doors(building) if door.secret]
+
+
+def _placed_doors(building: Building) -> list[tuple[Segment, Door]]:
+    """Place and validate every door, as ``(segment, door)`` pairs.
+
+    Solid, open, and secret doors share one placement pass so the overlap
+    check sees them all together.
     """
     by_id = {room.id: room for room in building.rooms}
     block_of = _block_of(building)
-    placed: list[tuple[Segment, bool]] = []
+    placed: list[tuple[Segment, Door]] = []
     for room in building.rooms:
         for rel in room.relations:
             if rel.no_door or _same_block(room.id, rel.anchor, block_of):
                 continue  # ``no_door``, or an internal wall of a block (dropped)
             segment = _relation_door(room, by_id[rel.anchor], rel)
             if segment is not None:
-                placed.append((segment, rel.door is not None and rel.door.open))
+                placed.append((segment, rel.door if rel.door is not None else Door()))
     for doorway in building.doors:
         if _same_block(doorway.a, doorway.b, block_of):
             continue  # internal wall of a block (dropped)
-        placed.append((_doorway_door(doorway, by_id), doorway.door.open))
+        placed.append((_doorway_door(doorway, by_id), doorway.door))
     for external in building.external_doors:
         segment = _external_door_line(external, by_id, building.rooms)
-        placed.append((segment, external.door.open))
+        placed.append((segment, external.door))
     _check_door_overlaps([seg for seg, _ in placed])
     return placed
 

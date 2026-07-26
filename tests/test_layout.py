@@ -15,6 +15,7 @@ from porta.layout import (
     door_segments,
     find_overlaps,
     open_door_segments,
+    secret_door_segments,
     solve,
 )
 from porta.model import Building, Room
@@ -439,6 +440,98 @@ def test_partial_open_door_leaves_stubs_in_the_block_outline() -> None:
     assert (40, 0, 40, 5) in segments
     assert (40, 15, 40, 20) in segments
     assert (40, 0, 40, 20) not in segments
+
+
+# --- secret doors -----------------------------------------------------------
+#
+# A secret door is placed and validated exactly like a solid one but reported
+# by secret_door_segments(), so the renderer keeps the wall intact and draws
+# an "S" marker instead of a door mark.
+
+
+def secret_doors_of(text: str) -> list[tuple[int, int, int, int]]:
+    return secret_door_segments(solve(parse(text)))
+
+
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        # default 5-ft width, centred on the 10-ft shared wall.
+        pytest.param(
+            'room a "A" 20x20 root\nroom b "B" 10x10 up-of a door secret',
+            (0, 0, 5, 0),
+            id="default-width",
+        ),
+        # the acceptance example: explicit width and offset.
+        pytest.param(
+            'room store "Storeroom" 30x30 root\n'
+            'room cache "Hidden Cache" 10x20 right-of store door=5@5 secret',
+            (30, 5, 30, 10),
+            id="explicit-width-and-offset",
+        ),
+        # standalone form between incidental neighbours.
+        pytest.param(
+            'room a "A" 40x20 root\n'
+            'room b "B" 20x20 down-of a\n'
+            'room c "C" 20x20 down-of a shift=20\n'
+            "door secret b c",
+            (20, 25, 20, 30),
+            id="standalone",
+        ),
+        # external form: a concealed exit on an exterior wall.
+        pytest.param(
+            'room a "A" 20x20 root\ndoor=10 secret a outside down',
+            (5, 20, 15, 20),
+            id="external",
+        ),
+    ],
+)
+def test_secret_door_line_geometry(
+    source: str, expected: tuple[int, int, int, int]
+) -> None:
+    assert secret_doors_of(source) == [expected]
+
+
+def test_secret_door_replaces_the_default_solid_door() -> None:
+    text = 'room a "A" 20x20 root\nroom b "B" 20x20 right-of a door secret'
+    assert doors_of(text) == []
+    assert open_door_segments(solve(parse(text))) == []
+
+
+def test_secret_door_that_does_not_fit_raises() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 up-of a door=20 secret'
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
+def test_secret_and_solid_doors_share_the_overlap_check() -> None:
+    text = (
+        'room a "A" 20x20 root\nroom b "B" 20x20 right-of a door=20 secret\ndoor@5 a b'
+    )
+    with pytest.raises(LayoutError):
+        solve(parse(text))
+
+
+def test_secret_door_can_coexist_with_a_solid_door_on_the_wall() -> None:
+    text = (
+        'room a "A" 20x20 root\n'
+        'room b "B" 20x20 right-of a door=5@0 secret\n'
+        "door@10 a b"
+    )
+    building = solve(parse(text))
+    assert secret_door_segments(building) == [(20, 0, 20, 5)]
+    assert door_segments(building) == [(20, 10, 20, 15)]
+
+
+def test_secret_door_inside_a_block_is_dropped_with_a_warning() -> None:
+    text = (
+        'room main "" 20x20 root\n'
+        'room wing "" 20x20 right-of main door secret\n'
+        'block hall "Hall" main wing'
+    )
+    building = solve(parse(text))
+    assert secret_door_segments(building) == []
+    assert any("suppressed" in warning for warning in building.warnings)
 
 
 # --- auto dimensions (?) ---------------------------------------------------

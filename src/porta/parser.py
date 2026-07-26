@@ -6,7 +6,7 @@ or raises :class:`~porta.errors.ParseError`.
 
 One line per room::
 
-    room <id> "<Name>" <W>x<H> [root] [<relation> <anchor> ...]
+    room <id> "<Name>" <W>x<H> [glyph="<glyph>"] [root] [<relation> <anchor> ...]
     relation = up-of | down-of | left-of | right-of
 
 The name slot is required but may be empty (``""``) for a room labelled only by
@@ -39,6 +39,7 @@ _DIM_RE = re.compile(r"(\?|[0-9]+)x(\?|[0-9]+)\Z")
 _GRID_FT = 5
 _DEFAULT_DOOR_FT = 5
 _MAX_NAME = 40  # room name length cap (the name drives the rendered key's width)
+_MAX_GLYPH = 3  # display glyph length cap (fits multi-digit room numbers)
 _MODIFIERS = ("shift=", "align=", "door", "no-door")  # relation-modifier prefixes
 _KEYWORDS: dict[str, Direction] = {
     direction.value: direction for direction in Direction
@@ -126,6 +127,30 @@ def _validate_name(value: str, quoted: bool, lineno: int) -> None:
         raise ParseError("room name has unprintable characters", line=lineno)
 
 
+def _parse_glyph(tokens: list[Token], i: int, lineno: int) -> str:
+    """Parse the quoted value after a bare ``glyph=`` token at index ``i``.
+
+    ``glyph="12"`` tokenizes as a bare ``glyph=`` followed by a quoted value;
+    ``""`` explicitly means *no* glyph (the room is unlabeled).
+    """
+    if i + 1 >= len(tokens) or not tokens[i + 1][1]:
+        raise ParseError(
+            'glyph= needs a double-quoted value (use glyph="" for none)', line=lineno
+        )
+    value = tokens[i + 1][0]
+    if value == "":
+        return value  # empty quotes: explicitly unlabeled
+    if len(value) > _MAX_GLYPH:
+        raise ParseError(
+            f"glyph must be 1-{_MAX_GLYPH} characters, got {len(value)}", line=lineno
+        )
+    if any(char.isspace() for char in value):
+        raise ParseError("glyph cannot contain whitespace", line=lineno)
+    if not value.isprintable():
+        raise ParseError("glyph has unprintable characters", line=lineno)
+    return value
+
+
 def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
     """Parse a standalone ``door[=W][@O] <a> <b>`` line."""
     spec = _parse_door(tokens[0][0], lineno)
@@ -155,11 +180,13 @@ def _parse_external_door(tokens: list[Token], lineno: int) -> ExternalDoor:
 
 
 def _parse_block(tokens: list[Token], lineno: int) -> Block:
-    """Parse a ``block <id> "<name>" [glyph=<member>] <member-id>...`` line.
+    """Parse a ``block <id> "<name>" [glyph=...] <member-id>...`` line.
 
     The id and name follow the same rules as a room's: the name slot is required
-    but may be empty (``""``). Whether the members exist, the glyph target is one
-    of them, and the union is contiguous are *semantic* checks left to layout.
+    but may be empty (``""``). A bare ``glyph=<member>`` picks which member the
+    glyph is drawn in; a quoted ``glyph="<glyph>"`` sets the display glyph
+    itself. Whether the members exist, the glyph target is one of them, and the
+    union is contiguous are *semantic* checks left to layout.
     """
     if len(tokens) < 4:
         raise ParseError(
@@ -175,19 +202,32 @@ def _parse_block(tokens: list[Token], lineno: int) -> Block:
 
     members: list[str] = []
     glyph_member: str | None = None
-    for value, quoted in tokens[3:]:
+    glyph: str | None = None
+    i = 3
+    while i < len(tokens):
+        value, quoted = tokens[i]
+        if not quoted and value == "glyph=":
+            glyph = _parse_glyph(tokens, i, lineno)
+            i += 2
+            continue
         if not quoted and value.startswith("glyph="):
             glyph_member = value[len("glyph=") :]
             _validate_id(glyph_member, False, lineno)
         else:
             _validate_id(value, quoted, lineno)
             members.append(value)
+        i += 1
     if not members:
         raise ParseError("a block needs at least one member room", line=lineno)
     if len(members) != len(set(members)):
         raise ParseError("a block lists a member more than once", line=lineno)
     return Block(
-        id=block_id, name=name, members=members, glyph_member=glyph_member, line=lineno
+        id=block_id,
+        name=name,
+        members=members,
+        glyph_member=glyph_member,
+        glyph=glyph,
+        line=lineno,
     )
 
 
@@ -246,13 +286,14 @@ def _parse_room(tokens: list[Token], lineno: int) -> Room:
     name = name_value or None  # "" -> no name
 
     width, height, auto_width, auto_height = _parse_dimensions(tokens[3][0], lineno)
-    is_root, relations = _parse_modifiers(tokens[4:], lineno)
+    is_root, glyph, relations = _parse_modifiers(tokens[4:], lineno)
 
     return Room(
         id=room_id,
         name=name,
         width=width,
         height=height,
+        glyph=glyph,
         auto_width=auto_width,
         auto_height=auto_height,
         is_root=is_root,
@@ -290,9 +331,12 @@ def _parse_dimension(raw: str, label: str, lineno: int) -> tuple[int, bool]:
     return value, False
 
 
-def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relation]]:
-    """Parse the trailing ``root`` flag and relations (with modifiers, any order)."""
+def _parse_modifiers(
+    tokens: list[Token], lineno: int
+) -> tuple[bool, str | None, list[Relation]]:
+    """Parse the trailing ``root``/``glyph=`` flags and relations (any order)."""
     is_root = False
+    glyph: str | None = None
     relations: list[Relation] = []
     i = 0
     while i < len(tokens):
@@ -303,6 +347,15 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
             is_root = True
             i += 1
             continue
+        if value == "glyph=":
+            glyph = _parse_glyph(tokens, i, lineno)
+            i += 2
+            continue
+        if value.startswith("glyph="):
+            raise ParseError(
+                f'a glyph must be double-quoted: glyph="{value[len("glyph=") :]}"',
+                line=lineno,
+            )
         direction = _KEYWORDS.get(value)
         if direction is None:
             if value.startswith(_MODIFIERS):
@@ -343,7 +396,7 @@ def _parse_modifiers(tokens: list[Token], lineno: int) -> tuple[bool, list[Relat
                 no_door=no_door,
             )
         )
-    return is_root, relations
+    return is_root, glyph, relations
 
 
 def _parse_door(token: str, lineno: int) -> Door:

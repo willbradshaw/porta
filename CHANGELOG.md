@@ -4,14 +4,17 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
-- Secret doors: marking a door `secret` (e.g. `door=5@5 secret`) keeps the
-  wall intact and draws the conventional "S" marker instead of a door mark
-  (see `docs/door.md`).
-- Line continuation: end a line with a whitespace-separated backslash to
-  continue a statement onto the next line (see the README).
+## 1.3.0 (2026-07-26)
+
 - Open boundaries: marking a door `open` (e.g. `door=20 open`) removes the
   wall across its span and draws a dotted line instead of a door mark; both
   rooms keep their own glyphs and key entries (see `docs/door.md`).
+- Secret doors: marking a door `secret` (e.g. `door=5@5 secret`) draws the
+  usual door mark with the conventional "S" over it and records the door as
+  secret in the model (see `docs/door.md`).
+- Line continuation: end a line with a whitespace-separated backslash to
+  continue a statement onto the next line (see the README).
+- `open` and `secret` are now reserved words and cannot be used as room ids.
 
 ## 1.2.0 (2026-07-26)
 

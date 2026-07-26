@@ -1,0 +1,2 @@
+room tower "Tall Tower" 10x40 root glyph="12a"
+room base  "Base"       30x10 down-of tower

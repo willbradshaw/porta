@@ -380,6 +380,69 @@ def test_external_door_carries_side_and_spec() -> None:
     assert (ext.room, ext.side, ext.door) == ("a", Direction.LEFT, Door(10, 5))
 
 
+# --- display glyphs ---------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        pytest.param('room a "A" 10x10 root', None, id="default-is-automatic"),
+        pytest.param('room a "A" 10x10 root glyph="12"', "12", id="after-root"),
+        pytest.param('room a "A" 10x10 glyph="12" root', "12", id="before-root"),
+        pytest.param('room a "A" 10x10 glyph="" root', "", id="empty-is-unlabeled"),
+        pytest.param('room a "A" 10x10 glyph="A&b" root', "A&b", id="punctuation"),
+        pytest.param('room a "A" 10x10 glyph="19" up-of b', "19", id="before-relation"),
+        pytest.param('room a "A" 10x10 up-of b glyph="19"', "19", id="after-relation"),
+        pytest.param(
+            'room a "A" 10x10 up-of b shift=5 glyph="19"',
+            "19",
+            id="after-relation-modifiers",
+        ),
+    ],
+)
+def test_room_glyph_is_parsed(source: str, expected: str | None) -> None:
+    assert parse(source).room("a").glyph == expected
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param('room a "A" 10x10 root glyph=12', id="unquoted-value"),
+        pytest.param('room a "A" 10x10 root glyph=', id="missing-value"),
+        pytest.param('room a "A" 10x10 root glyph= 12', id="bare-value-after-equals"),
+        pytest.param('room a "A" 10x10 root glyph="1234"', id="too-long"),
+        pytest.param('room a "A" 10x10 root glyph="1 2"', id="whitespace"),
+        pytest.param('room a "A" 10x10 root glyph="\t"', id="tab"),
+        pytest.param('room a "A" 10x10 root glyph="\x00"', id="unprintable"),
+        pytest.param('room a "A" 10x10 glyph="x" glyph=', id="second-glyph-malformed"),
+        pytest.param('block h "H" a glyph= b', id="block-bare-value-after-equals"),
+    ],
+)
+def test_invalid_glyph_raises(source: str) -> None:
+    with pytest.raises(ParseError):
+        parse(source)
+
+
+def test_block_display_glyph_is_parsed() -> None:
+    source = 'room a "" 10x10 root\nblock hall "Hall" glyph="19" a'
+    block = parse(source).blocks[0]
+    assert (block.glyph, block.glyph_member, block.members) == ("19", None, ["a"])
+
+
+def test_block_display_glyph_and_glyph_member_coexist() -> None:
+    # Quoted glyph="..." is the display glyph; bare glyph=<id> places it.
+    source = (
+        'room a "" 10x10 root\nroom b "" 10x10 right-of a\n'
+        'block hall "Hall" glyph="19" glyph=b a b'
+    )
+    block = parse(source).blocks[0]
+    assert (block.glyph, block.glyph_member, block.members) == ("19", "b", ["a", "b"])
+
+
+def test_block_glyph_may_be_empty_for_unlabeled() -> None:
+    assert parse('room a "" 10x10 root\nblock h "" glyph="" a').blocks[0].glyph == ""
+
+
 # --- block statements ------------------------------------------------------
 
 

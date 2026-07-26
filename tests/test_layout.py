@@ -745,3 +745,56 @@ def test_block_keeps_doors_to_rooms_outside_it() -> None:
 def test_invalid_block_layout_raises(source: str) -> None:
     with pytest.raises(LayoutError):
         solve(parse(source))
+
+
+# --- display glyphs ---------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param(
+            'room a "" 20x20 root glyph="9"\nroom b "" 20x20 right-of a glyph="9"',
+            id="room-room",
+        ),
+        pytest.param(
+            'room a "" 20x20 root glyph="9"\nroom b "" 20x20 right-of a\n'
+            'block h "" glyph="9" b',
+            id="room-block",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 20x20 right-of a\n'
+            'room c "" 20x20 right-of b\n'
+            'block h "" glyph="9" a\nblock g "" glyph="9" c',
+            id="block-block",
+        ),
+    ],
+)
+def test_duplicate_explicit_glyph_raises(source: str) -> None:
+    with pytest.raises(LayoutError, match="glyph '9' is used by both"):
+        solve(parse(source))
+
+
+def test_duplicate_glyph_error_reports_the_second_line() -> None:
+    src = 'room a "" 20x20 root glyph="9"\nroom b "" 20x20 right-of a glyph="9"'
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(src))
+    assert exc.value.line == 2
+
+
+def test_unlabeled_rooms_do_not_collide() -> None:
+    # glyph="" labels nothing, so any number of them may coexist.
+    src = 'room a "" 20x20 root glyph=""\nroom b "" 20x20 right-of a glyph=""'
+    assert solve(parse(src)).warnings == []
+
+
+def test_member_glyph_is_suppressed_with_a_warning_not_an_error() -> None:
+    # The member's glyph is inert, so it neither collides with the identical
+    # room glyph outside the block nor shows up anywhere; it just warns.
+    src = (
+        'room a "" 20x20 root glyph="9"\n'
+        'room b "" 20x20 right-of a glyph="9"\n'
+        'block h "" b'
+    )
+    building = solve(parse(src))
+    assert any("glyph '9' is suppressed" in w and "'b'" in w for w in building.warnings)

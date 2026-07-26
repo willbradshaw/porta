@@ -81,6 +81,7 @@ def solve(building: Building) -> Building:
         raise OverlapError((first.id, second.id), rect)
 
     _validate_blocks(building, by_id)
+    _validate_glyphs(building)
     building.warnings.extend(_block_warnings(building, by_id, _block_of(building)))
 
     door_segments(building)  # validates every door (raises on a bad one)
@@ -125,6 +126,32 @@ def _validate_blocks(building: Building, by_id: dict[str, Room]) -> None:
         _check_block_contiguous(block, by_id)
 
 
+def _validate_glyphs(building: Building) -> None:
+    """Reject two entities carrying the same explicit display glyph.
+
+    Only glyphs that are actually shown compete: a block member's glyph is
+    suppressed by its block (warned about, not an error) and empty glyphs
+    (``glyph=""``) label nothing.
+    """
+    member_of = _block_of(building)
+    entities = [
+        (room.id, room.glyph, room.line)
+        for room in building.rooms
+        if room.id not in member_of
+    ]
+    entities += [(block.id, block.glyph, block.line) for block in building.blocks]
+    owners: dict[str, str] = {}
+    for entity_id, glyph, line in entities:
+        if not glyph:
+            continue  # automatic (None) or explicitly unlabeled ("")
+        if glyph in owners:
+            raise LayoutError(
+                f"glyph {glyph!r} is used by both {owners[glyph]!r} and {entity_id!r}",
+                line=line,
+            )
+        owners[glyph] = entity_id
+
+
 def _check_block_contiguous(block: Block, by_id: dict[str, Room]) -> None:
     """Raise unless the block's members form one wall-connected region."""
     members = [by_id[m] for m in block.members]
@@ -152,7 +179,7 @@ def _check_block_contiguous(block: Block, by_id: dict[str, Room]) -> None:
 def _block_warnings(
     building: Building, by_id: dict[str, Room], block_of: dict[str, str]
 ) -> list[str]:
-    """Advisories: a block suppresses its members' names and any door between them."""
+    """Advisories: a block suppresses its members' names, glyphs, and doors."""
     warnings: list[str] = []
     for block in building.blocks:
         for member in block.members:
@@ -160,6 +187,12 @@ def _block_warnings(
             if name is not None:
                 warnings.append(
                     f"room {member!r}: name {name!r} is suppressed inside "
+                    f"block {block.id!r}"
+                )
+            glyph = by_id[member].glyph
+            if glyph:
+                warnings.append(
+                    f"room {member!r}: glyph {glyph!r} is suppressed inside "
                     f"block {block.id!r}"
                 )
     for room in building.rooms:

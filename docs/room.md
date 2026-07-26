@@ -29,7 +29,7 @@ room kitchen "Kitchen" 20x20 right-of hall
 A room is declared in a `porta` plan as follows:
 
 ```text
-room <id> "<name>" <dimensions> <relations>
+room <id> "<name>" <dimensions> [glyph="<glyph>"] <relations>
 ```
 
 Each `room` statement consists of the following components in order:
@@ -38,15 +38,17 @@ Each `room` statement consists of the following components in order:
 2. A [room ID](#room-id) used to point to that room elsewhere in the plan;
 3. A [room name](#room-name) shown in the rendered map key (may be empty);
 4. A [dimension declaration](#dimensions) of the form `WxH`;
-5. One or more [relations](#relations).
+5. An optional explicit [display glyph](#glyphs);
+6. One or more [relations](#relations).
 
 ### Room ID
 
 A room ID is the handle other parts of the `porta` plan use to refer to that
-room. Its first available letter is also the room's **key letter** on the
-rendered map (the key maps letters back to names); the id is otherwise not
-shown. An ID must match `[a-z][a-z0-9_-]*`: a lowercase letter to start,
-followed by any number of lowercase letters, digits, hyphens, or underscores.
+room. Its first available letter also supplies the room's default
+[glyph](#glyphs) on the rendered map (the key maps glyphs back to names); the
+id is otherwise not shown. An ID must match `[a-z][a-z0-9_-]*`: a lowercase
+letter to start, followed by any number of lowercase letters, digits, hyphens,
+or underscores.
 Each ID must be unique within a plan, and can't match any of `porta`'s
 reserved keywords.
 
@@ -75,6 +77,44 @@ A non-empty name must meet the following criteria:
 
 Names are interpreted literally, without escapes. All printable Unicode
 is valid within a name, subject to the restrictions above.
+
+### Glyphs
+
+Each room is labeled on the rendered map by a short **glyph**, which the key
+below the map maps back to the room's name. By default, `porta` assigns
+glyphs automatically: the first letter of the room's [ID](#room-id)
+(uppercased) that no other room has claimed, falling back to a generic pool.
+
+An explicit glyph can be set instead with `glyph="..."`, placed after the
+dimensions:
+
+```porta img/glyphs.svg
+room cells "Prison Cells" 30x20 root glyph="12"
+room guard "Guard Post"   20x20 right-of cells glyph="13"
+room store ""             10x20 right-of guard glyph=""
+room hall  "Hall"         60x20 down-of cells
+```
+
+<img alt="Rooms with explicit numeric glyphs, an automatic glyph, and an unlabeled room" src="img/glyphs.svg" width="70%">
+
+This is chiefly useful for transcribing source material whose areas are
+already numbered: glyphs like `10` or `12a` can't be produced by automatic
+assignment. An explicit glyph must be:
+
+- 1-3 characters long;
+- Double-quoted;
+- Printable, with no whitespace.
+
+The glyph is drawn verbatim in the room and in the key, scaled down when
+needed to fit the room's width. Explicit glyphs must be **unique** across the
+plan's rooms and [blocks](block.md) — a duplicate raises an error. Rooms
+without an explicit glyph still receive automatic glyphs, which never collide
+with the explicit ones.
+
+The empty glyph `glyph=""` marks the room as **unlabeled**: no glyph is
+drawn, and the room gets no key entry at all (`store` above). In the
+[debug-ascii grid](../README.md#the-porta-tool), an unlabeled room's cells
+render as `_`.
 
 ### Dimensions
 
@@ -345,6 +385,7 @@ under this schema and will raise errors:
 - Gaps between a room and its anchor
 - Corner-only anchor contact
 - Unsolvable `?` dimensions
+- Duplicate explicit [glyphs](#glyphs)
 
 ## Putting it together
 

@@ -1,0 +1,3 @@
+room cells "Prison Cells" 30x20 root glyph="12"
+room guard "Guard Post"   20x20 right-of cells glyph="13"
+room hall  "Hall"         50x20 down-of cells

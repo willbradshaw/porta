@@ -331,6 +331,90 @@ def test_block_cells_carry_the_block_glyph_in_ascii() -> None:
     assert "W" not in grid
 
 
+# --- display glyphs --------------------------------------------------------
+
+# Explicit multi-char glyphs ("12", "1"), an automatic one (hall -> H), and an
+# unlabeled room (store, glyph="") together in one small plan.
+GLYPHS = (
+    'room cells "Prison Cells" 20x10 root glyph="12"\n'
+    'room guard "Guard Post" 10x10 right-of cells glyph="1"\n'
+    'room store "" 10x10 right-of guard glyph=""\n'
+    'room hall "Hall" 40x10 down-of cells'
+)
+
+GLYPHS_ASCII = """\
+12 12 12 12 1  1  _  _
+12 12 12 12 1  1  _  _
+H  H  H  H  H  H  H  H
+H  H  H  H  H  H  H  H
+
+1=guard  H=hall  12=cells"""
+
+
+def test_explicit_glyphs_pad_the_grid_and_fill_the_legend() -> None:
+    # Cells pad to the widest glyph, the unlabeled room fills with '_' and has
+    # no legend entry, and the legend sorts shortest-glyph-first.
+    assert ascii_of(GLYPHS) == GLYPHS_ASCII
+
+
+def test_automatic_glyphs_avoid_explicit_ones() -> None:
+    # 'beta' claims A explicitly, so 'alpha' falls through to its next letter.
+    text = 'room beta "" 10x10 root glyph="A"\nroom alpha "" 10x10 right-of beta'
+    legend = ascii_of(text).split("\n\n")[1]
+    assert "A=beta" in legend
+    assert "L=alpha" in legend
+
+
+def test_explicit_glyph_is_rendered_in_the_svg_room_and_key() -> None:
+    root = ET.fromstring(svg_of(GLYPHS))
+    assert text_by_room(root, "cells").text == "12"
+    key_lines = [t.text for t in root.iter(tag("text")) if t.get("class") == "key"]
+    assert key_lines == ["1  Guard Post", "H  Hall", "12  Prison Cells"]
+
+
+def test_unlabeled_room_keeps_its_rect_but_has_no_svg_label() -> None:
+    root = ET.fromstring(svg_of(GLYPHS))
+    assert rect_by_room(root, "store") is not None
+    with pytest.raises(AssertionError):
+        text_by_room(root, "store")
+
+
+@pytest.mark.parametrize(
+    ("glyph", "expected_font"),
+    [
+        ("9", 6.0),  # single char: the usual 0.6 x shorter side
+        ("123", 5.0),  # three chars overflow a 10-ft-wide room: shrink to fit
+    ],
+)
+def test_svg_glyph_font_shrinks_to_fit_the_room_width(
+    glyph: str, expected_font: float
+) -> None:
+    root = ET.fromstring(svg_of(f'room a "" 10x30 root glyph="{glyph}"'))
+    assert float(text_by_room(root, "a").get("font-size", "")) == expected_font
+
+
+def test_glyph_with_xml_specials_is_escaped() -> None:
+    root = ET.fromstring(svg_of('room a "" 20x20 root glyph="A&b"'))  # parses = escaped
+    assert text_by_room(root, "a").text == "A&b"
+
+
+def test_block_explicit_glyph_labels_the_union() -> None:
+    text = L_BLOCK.replace(
+        'block hall "Great Hall"', 'block hall "Great Hall" glyph="19"'
+    )
+    assert ascii_of(text).split("\n\n")[1] == "19=hall"
+    root = ET.fromstring(svg_of(text))
+    block_glyphs = [t for t in root.iter(tag("text")) if t.get("data-block") == "hall"]
+    assert [t.text for t in block_glyphs] == ["19"]
+
+
+def test_unlabeled_block_draws_no_glyph_and_no_key_line() -> None:
+    text = L_BLOCK.replace('block hall "Great Hall"', 'block hall "" glyph=""')
+    assert ascii_of(text).split("\n\n")[1] == ""
+    root = ET.fromstring(svg_of(text))
+    assert [t for t in root.iter(tag("text")) if t.get("data-block")] == []
+
+
 def test_manor_renders_to_golden_svg_fixture() -> None:
     source = Path("examples/manor.porta").read_text()
     expected = Path("tests/fixtures/manor.svg").read_text()

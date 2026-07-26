@@ -12,12 +12,14 @@ from porta.model import Building, Room
 
 _GRID_FT = 5
 _EMPTY = "."
+_NO_GLYPH = "_"  # ascii cell fill for an unlabeled (glyph="") room
 _FALLBACK_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 _SVG_NS = "http://www.w3.org/2000/svg"
 _MARGIN_FT = 10  # padding around the plan, in feet
 _WALL_STROKE_FT = 0.5  # wall line thickness, in feet
 _LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
+_LABEL_FIT = 0.9  # widest fraction of the room width a glyph may span
 _KEY_FONT_FT = 6  # key/caption font, in feet (fixed, not tied to room sizes)
 _KEY_LINE_RATIO = 1.6  # key line spacing as a multiple of the key font
 _CHAR_W = 0.6  # rough average glyph width (fraction of font), for centring the key
@@ -31,9 +33,10 @@ _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in
 def render_ascii(building: Building) -> str:
     """Render a solved building as an ASCII grid plus a glyph legend.
 
-    One character per 5-ft cell, space-separated, north at the top; empty
-    cells are ``.``. A blank line then a ``glyph=id`` legend (in source order)
-    follows.
+    One cell per 5-ft square, space-separated, north at the top; every cell is
+    padded to the widest glyph in the plan. Empty cells are ``.``; an unlabeled
+    room's cells are ``_``. A blank line then a ``glyph=id`` legend
+    (shortest-glyph-first, then lexicographic) follows.
 
     Args:
         building: A building whose rooms have been placed by
@@ -61,11 +64,14 @@ def render_ascii(building: Building) -> str:
         r0 = (y - min_y) // _GRID_FT
         for r in range(r0, r0 + room.height // _GRID_FT):
             for c in range(c0, c0 + room.width // _GRID_FT):
-                grid[r][c] = glyphs[room.id]
+                grid[r][c] = glyphs[room.id] or _NO_GLYPH
 
-    body = "\n".join(" ".join(cell for cell in row) for row in grid)
+    cell_w = max(1, *(len(glyph) for glyph in glyphs.values()))
+    body = "\n".join(
+        " ".join(cell.ljust(cell_w) for cell in row).rstrip() for row in grid
+    )
     member_block = _member_block(building)
-    ordered = sorted(_legend_ids(building, member_block), key=lambda eid: glyphs[eid])
+    ordered = _legend_ids(building, member_block, glyphs)
     legend = "  ".join(f"{glyphs[eid]}={eid}" for eid in ordered)
     return f"{body}\n\n{legend}"
 
@@ -105,9 +111,7 @@ def render_svg(building: Building, *, background: str = "white") -> str:
     plan_h = max_y - min_y
 
     caption = f"1 square = {_GRID_FT} ft"
-    entity_ids = sorted(
-        _legend_ids(building, member_block), key=lambda eid: glyphs[eid]
-    )
+    entity_ids = _legend_ids(building, member_block, glyphs)
     entries = [_key_line(building, by_id, eid, glyphs[eid]) for eid in entity_ids]
     chrome = [caption, *entries]
     # The key is a fixed readable size (not tied to room sizes — a single small
@@ -155,17 +159,20 @@ def render_svg(building: Building, *, background: str = "white") -> str:
     for room, x, y in sorted(placed, key=lambda t: t[0].id):
         if room.id in member_block:
             continue  # drawn as part of its block's outline below
-        font = min(room.width, room.height) * _LABEL_RATIO
         lines.append(
             f'  <rect data-room="{room.id}" x="{_num(x)}" y="{_num(y)}" '
             f'width="{_num(room.width)}" height="{_num(room.height)}" '
             f'fill="none" stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" />'
         )
+        glyph = glyphs[room.id]
+        if not glyph:
+            continue  # unlabeled room
+        font = _glyph_font(room.width, room.height, glyph)
         lines.append(
             f'  <text data-room="{room.id}" x="{_num(x + room.width / 2)}" '
             f'y="{_num(y + room.height / 2)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}">'
-            f"{glyphs[room.id]}</text>"
+            f"{escape(glyph)}</text>"
         )
 
     # Blocks: the union boundary as wall lines (internal walls dropped), then one
@@ -179,16 +186,19 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f'stroke-linecap="square" />'
         )
     for block in sorted(building.blocks, key=lambda b: b.id):
+        glyph = glyphs[block.id]
+        if not glyph:
+            continue  # unlabeled block
         member = by_id[block.glyph_member or block.members[0]]
         mx, my = member.x, member.y
         assert mx is not None
         assert my is not None
-        font = min(member.width, member.height) * _LABEL_RATIO
+        font = _glyph_font(member.width, member.height, glyph)
         lines.append(
             f'  <text data-block="{block.id}" x="{_num(mx + member.width / 2)}" '
             f'y="{_num(my + member.height / 2)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}">'
-            f"{glyphs[block.id]}</text>"
+            f"{escape(glyph)}</text>"
         )
 
     # Doors: a thick coloured line along the shared wall, over the rooms.
@@ -253,23 +263,52 @@ def _member_block(building: Building) -> dict[str, str]:
     return {member: block.id for block in building.blocks for member in block.members}
 
 
-def _legend_ids(building: Building, member_block: dict[str, str]) -> list[str]:
-    """Ids that earn a glyph and a key line: non-member rooms, then blocks."""
+def _entity_ids(building: Building, member_block: dict[str, str]) -> list[str]:
+    """Ids that own a glyph slot: non-member rooms, then blocks."""
     rooms = [room.id for room in building.rooms if room.id not in member_block]
     return rooms + [block.id for block in building.blocks]
+
+
+def _legend_ids(
+    building: Building, member_block: dict[str, str], glyphs: dict[str, str]
+) -> list[str]:
+    """Entities that earn a key line: those with a non-empty glyph.
+
+    Ordered shortest-glyph-first then lexicographic, so numeric glyphs read
+    ``1``..``9`` before ``10``.
+    """
+    ids = [eid for eid in _entity_ids(building, member_block) if glyphs[eid]]
+    return sorted(ids, key=lambda eid: (len(glyphs[eid]), glyphs[eid]))
+
+
+def _glyph_font(width: int, height: int, glyph: str) -> float:
+    """Glyph font size: the usual fraction of the shorter side, shrunk when a
+    multi-character glyph would otherwise overflow the room's width."""
+    size = min(width, height) * _LABEL_RATIO
+    return min(size, width * _LABEL_FIT / (len(glyph) * _CHAR_W))
 
 
 def _assign_glyphs(building: Building) -> dict[str, str]:
     """Assign a glyph to each non-member room and each block; members inherit
     their block's glyph.
 
-    Entities are processed in id order, so contention for a letter resolves
-    alphabetically and the result is independent of statement order.
+    An explicit ``glyph="..."`` is used verbatim (``""`` = unlabeled). The rest
+    are automatic — processed in id order, so contention for a letter resolves
+    alphabetically and the result is independent of statement order — and never
+    collide with an explicit glyph.
     """
     member_block = _member_block(building)
-    used: set[str] = set()
-    glyphs: dict[str, str] = {}
-    for entity_id in sorted(_legend_ids(building, member_block)):
+    explicit = [
+        (room.id, room.glyph) for room in building.rooms if room.id not in member_block
+    ]
+    explicit += [(block.id, block.glyph) for block in building.blocks]
+    glyphs: dict[str, str] = {
+        eid: glyph for eid, glyph in explicit if glyph is not None
+    }
+    used = {glyph for glyph in glyphs.values() if glyph}
+    for entity_id in sorted(_entity_ids(building, member_block)):
+        if entity_id in glyphs:
+            continue
         chosen = _pick_glyph(entity_id, used)
         used.add(chosen)
         glyphs[entity_id] = chosen

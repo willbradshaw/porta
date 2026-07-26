@@ -81,6 +81,9 @@ class Room:
     name: str | None
     width: int
     height: int
+    # Display glyph: ``None`` = assign automatically; ``""`` = unlabeled (no
+    # glyph, no key entry); anything else is drawn and keyed verbatim.
+    glyph: str | None = None
     is_root: bool = False
     relations: list[Relation] = field(default_factory=list)
     line: int = 0
@@ -118,15 +121,18 @@ class Block:
     """A merged (possibly non-rectangular) room: a union of member rooms.
 
     The members are normal rooms placed by the usual relations; the block drops
-    the walls they share with each other so they read as one space. The block's
-    ``id`` gives the single glyph (drawn in ``glyph_member``, or the first member
-    when unset) and ``name`` (if any) labels the union in the key.
+    the walls they share with each other so they read as one space. The block
+    carries a single glyph — explicit via ``glyph``, else derived from ``id`` —
+    drawn in ``glyph_member`` (or the first member when unset), and ``name``
+    (if any) labels the union in the key.
     """
 
     id: str
     name: str | None
     members: list[str]
     glyph_member: str | None = None
+    # Display glyph, with the same semantics as :attr:`Room.glyph`.
+    glyph: str | None = None
     line: int = 0
 
 

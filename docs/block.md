@@ -21,17 +21,21 @@ level.
 ## The `block` statement
 
 ```
-block <id> "<name>" [glyph=<member-id>] <member-id>...
+block <id> "<name>" [glyph="<glyph>"] [glyph=<member-id>] <member-id>...
 ```
 
-- **`<id>`**: the block's own ID; its first letter is the union's glyph. Same
-  rules as a [room ID](room.md#room-id), in the same namespace (unique across
-  all rooms and blocks).
+- **`<id>`**: the block's own ID; its first letter is the union's default
+  glyph. Same rules as a [room ID](room.md#room-id), in the same namespace
+  (unique across all rooms and blocks).
 - **`"<name>"`**: labels the union in the key, with the same rules as a
   [room name](room.md#room-name). As for a room, the slot is **required** but
   may be empty (`""`); an empty name keys the union by its glyph alone.
-- **`glyph=<member-id>`**: optional; which member the glyph is drawn in (default:
-  the first member listed). If present, must match a specified member room ID.
+- **`glyph="<glyph>"`** (quoted): optional; an explicit
+  [display glyph](room.md#glyphs) for the union, with the same rules as a
+  room's — including `glyph=""` for an unlabeled block with no key entry.
+- **`glyph=<member-id>`** (bare): optional; which member the glyph is drawn in
+  (default: the first member listed). If present, must match a specified member
+  room ID.
 - **`<member-id>...`**: one or more member rooms, specified by [ID](room.md#room-id).
   Each ID must correspond to a room declared elsewhere in the plan, and specified
   rooms must be **contiguous**: each must be adjacent to at least one other room
@@ -59,10 +63,11 @@ block hall "Great Hall" main wing
 
 <img alt="An L-shaped hall with a neighbouring study and chapel" src="img/block-neighbour.svg" width="70%">
 
-Names given to individual member rooms are suppressed in the SVG map; the
-block is labeled with the glyph and name specified in the `block` statement.
-Consequently, names of member rooms are typically empty (`""`); nonempty member
-names are permitted but will raise a warning. Similarly, explicit
+Names and [glyphs](room.md#glyphs) given to individual member rooms are
+suppressed in the SVG map; the block is labeled with the glyph and name
+specified in the `block` statement. Consequently, names of member rooms are
+typically empty (`""`); nonempty member names — and explicit member glyphs —
+are permitted but will raise a warning. Similarly, explicit
 [door declarations](door.md#door-declarations) and [statements](door.md#the-door-statement)
 targeting doors on walls within the block will raise a warning that they have
 been dropped.

@@ -1,0 +1,2 @@
+room bar "Bar" 20x20 root
+room lounge "Lounge" 20x20 right-of bar door=10@0 open

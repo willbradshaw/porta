@@ -1,0 +1,2 @@
+room kitchen "Kitchen" 30x20 glyph="1" root
+room dining "Dining Room" 30x20 right-of kitchen door=20 open glyph="2"

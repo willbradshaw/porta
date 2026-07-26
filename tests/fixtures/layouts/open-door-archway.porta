@@ -1,0 +1,2 @@
+room hall "Hall" 30x20 root
+room study "Study" 30x20 down-of hall door=10 open

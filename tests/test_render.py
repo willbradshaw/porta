@@ -290,6 +290,127 @@ def test_background_is_configurable() -> None:
     assert 'fill="#f0f0f0"' in custom
 
 
+# --- open doors ------------------------------------------------------------
+#
+# An open door renders as a genuine gap in the wall (the adjoining rooms'
+# outlines are emitted as per-edge segments with the opening cut out) with a
+# dashed line across it (class="open") instead of a door mark.
+
+OPEN_TWO = 'room a "A" 20x20 root\nroom b "Bee" 20x20 right-of a door=20 open'
+
+
+def open_lines(root: ET.Element) -> list[tuple[float, float, float, float]]:
+    return [
+        tuple(float(ln.get(k, "")) for k in ("x1", "y1", "x2", "y2"))
+        for ln in root.iter(tag("line"))
+        if ln.get("class") == "open"
+    ]
+
+
+def walls_by_room(root: ET.Element, room_id: str) -> set[tuple[float, ...]]:
+    return {
+        tuple(float(ln.get(k, "")) for k in ("x1", "y1", "x2", "y2"))
+        for ln in root.iter(tag("line"))
+        if ln.get("data-room") == room_id
+    }
+
+
+def test_open_door_renders_as_one_dashed_line_and_no_door_mark() -> None:
+    root = ET.fromstring(svg_of(OPEN_TWO))
+    assert open_lines(root) == [(20.0, 0.0, 20.0, 20.0)]
+    dashed = [ln for ln in root.iter(tag("line")) if ln.get("class") == "open"]
+    assert dashed[0].get("stroke-dasharray") is not None
+    assert [ln for ln in root.iter(tag("line")) if ln.get("class") == "door"] == []
+
+
+def test_open_boundary_cuts_the_shared_wall_out_of_both_outlines() -> None:
+    # Neither room is a plain rect any more; each outline omits the open span.
+    root = ET.fromstring(svg_of(OPEN_TWO))
+    assert [r for r in root.iter(tag("rect")) if r.get("data-room")] == []
+    assert walls_by_room(root, "a") == {
+        (0.0, 0.0, 20.0, 0.0),  # top
+        (0.0, 20.0, 20.0, 20.0),  # bottom
+        (0.0, 0.0, 0.0, 20.0),  # left; the right edge is fully open
+    }
+    assert walls_by_room(root, "b") == {
+        (20.0, 0.0, 40.0, 0.0),
+        (20.0, 20.0, 40.0, 20.0),
+        (40.0, 0.0, 40.0, 20.0),
+    }
+
+
+def test_partial_opening_keeps_the_rest_of_the_wall() -> None:
+    # A centred 10-ft archway: the shared edge keeps a 5-ft stub at each end.
+    source = 'room a "A" 20x20 root\nroom b "Bee" 20x20 right-of a door=10 open'
+    root = ET.fromstring(svg_of(source))
+    assert open_lines(root) == [(20.0, 5.0, 20.0, 15.0)]
+    assert {(20.0, 0.0, 20.0, 5.0), (20.0, 15.0, 20.0, 20.0)} <= walls_by_room(
+        root, "a"
+    )
+
+
+def test_rooms_away_from_the_opening_keep_their_plain_rects() -> None:
+    source = OPEN_TWO + '\nroom c "Sea" 20x20 down-of a'
+    root = ET.fromstring(svg_of(source))
+    assert rect_by_room(root, "c") is not None
+
+
+def test_open_rooms_keep_their_glyphs_and_key_entries() -> None:
+    root = ET.fromstring(svg_of(OPEN_TWO))
+    assert text_by_room(root, "a").text == "A"
+    assert text_by_room(root, "b").text == "B"
+    key_lines = [t.text for t in root.iter(tag("text")) if t.get("class") == "key"]
+    assert key_lines == ["A  A", "B  Bee"]
+
+
+def test_open_door_does_not_change_the_ascii_rendering() -> None:
+    solid = 'room a "A" 20x20 root\nroom b "Bee" 20x20 right-of a'
+    assert ascii_of(OPEN_TWO) == ascii_of(solid)
+
+
+def test_open_and_solid_door_render_side_by_side() -> None:
+    source = (
+        'room a "A" 20x20 root\n'
+        'room b "Bee" 20x20 right-of a door=10@0 open\n'
+        "door@15 a b"
+    )
+    root = ET.fromstring(svg_of(source))
+    assert open_lines(root) == [(20.0, 0.0, 20.0, 10.0)]
+    door = [ln for ln in root.iter(tag("line")) if ln.get("class") == "door"]
+    assert len(door) == 1
+
+
+def test_external_open_door_cuts_the_exterior_wall() -> None:
+    source = 'room a "A" 20x20 root\ndoor=10 open a outside down'
+    root = ET.fromstring(svg_of(source))
+    assert open_lines(root) == [(5.0, 20.0, 15.0, 20.0)]
+    assert {(0.0, 20.0, 5.0, 20.0), (15.0, 20.0, 20.0, 20.0)} <= walls_by_room(
+        root, "a"
+    )
+
+
+def test_open_door_across_a_block_boundary_renders_as_a_gap() -> None:
+    # 'side' opens into the block through a centred archway: one dashed line,
+    # stubs on side's outline, and no solid block-outline line across the span.
+    source = (
+        'room main "" 20x20 root\n'
+        'room wing "" 20x20 right-of main\n'
+        'room side "Side" 20x20 right-of wing door=10 open\n'
+        'block hall "Hall" main wing'
+    )
+    root = ET.fromstring(svg_of(source))
+    assert open_lines(root) == [(40.0, 5.0, 40.0, 15.0)]
+    assert {(40.0, 0.0, 40.0, 5.0), (40.0, 15.0, 40.0, 20.0)} <= walls_by_room(
+        root, "side"
+    )
+    outline = [
+        tuple(float(ln.get(k, "")) for k in ("x1", "y1", "x2", "y2"))
+        for ln in root.iter(tag("line"))
+        if ln.get("stroke-linecap") == "square"
+    ]
+    assert (40.0, 0.0, 40.0, 20.0) not in outline
+
+
 # --- blocks ----------------------------------------------------------------
 
 L_BLOCK = (

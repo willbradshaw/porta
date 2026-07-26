@@ -84,7 +84,7 @@ def solve(building: Building) -> Building:
     _validate_glyphs(building)
     building.warnings.extend(_block_warnings(building, by_id, _block_of(building)))
 
-    door_segments(building)  # validates every door (raises on a bad one)
+    _placed_doors(building)  # validates every door (raises on a bad one)
     return building
 
 
@@ -216,23 +216,69 @@ def block_wall_segments(building: Building) -> list[Segment]:
 
     For every block member, each of its four edges is emitted only over the parts
     not shared with another member of the same block, so the union renders as one
-    outline rather than separate rectangles. Assumes a solved building.
+    outline rather than separate rectangles. Open-door spans are dropped too, so
+    an open boundary into a block is a real gap in its outline. Assumes a solved
+    building.
     """
     by_id = {room.id: room for room in building.rooms}
+    openings = open_door_segments(building)
     segments: list[Segment] = []
     for block in building.blocks:
         members = [by_id[m] for m in block.members]
         for member in members:
-            segments.extend(_member_boundary(member, members))
+            segments.extend(_member_boundary(member, members, openings))
     return segments
 
 
-def _member_boundary(member: Room, members: list[Room]) -> list[Segment]:
+def room_outline_segments(building: Building) -> dict[str, list[Segment]]:
+    """Outlines of the rooms whose walls are cut by an open door.
+
+    Maps each such room's id to its four edges with every open-door span
+    removed. Rooms untouched by an opening are absent (they render as plain
+    rectangles); block members are covered by :func:`block_wall_segments`.
+    Assumes a solved building.
+    """
+    openings = open_door_segments(building)
+    if not openings:
+        return {}
+    member_of = _block_of(building)
+    outlines: dict[str, list[Segment]] = {}
+    for room in building.rooms:
+        if room.id in member_of:
+            continue
+        segments, cut = _room_outline(room, openings)
+        if cut:
+            outlines[room.id] = segments
+    return outlines
+
+
+def _room_outline(room: Room, openings: list[Segment]) -> tuple[list[Segment], bool]:
+    """``room``'s edges minus any open-door spans, plus whether any were cut."""
+    x, y = _axis_lo(room, Axis.HORIZONTAL), _axis_lo(room, Axis.VERTICAL)
+    w, h = room.width, room.height
+    segments: list[Segment] = []
+    cut = False
+    for at_y in (y, y + h):  # top, then bottom
+        blocked = [(x1, x2) for x1, y1, x2, y2 in openings if y1 == y2 == at_y]
+        exposed = _exposed(x, x + w, blocked)
+        cut = cut or exposed != [(x, x + w)]
+        segments += [(x0, at_y, x1, at_y) for x0, x1 in exposed]
+    for at_x in (x, x + w):  # left, then right
+        blocked = [(y1, y2) for x1, y1, x2, y2 in openings if x1 == x2 == at_x]
+        exposed = _exposed(y, y + h, blocked)
+        cut = cut or exposed != [(y, y + h)]
+        segments += [(at_x, y0, at_x, y1) for y0, y1 in exposed]
+    return segments, cut
+
+
+def _member_boundary(
+    member: Room, members: list[Room], openings: list[Segment]
+) -> list[Segment]:
     """The parts of ``member``'s four edges not shared with a sibling member.
 
     Members never overlap, so any sibling edge lying on one of ``member``'s edge
     lines (with overlap) must be the abutting member on the other side — i.e. an
-    internal wall to drop.
+    internal wall to drop. Open-door spans on an edge are dropped the same way.
     """
     mx, my = _axis_lo(member, Axis.HORIZONTAL), _axis_lo(member, Axis.VERTICAL)
     mw, mh = member.width, member.height
@@ -244,6 +290,7 @@ def _member_boundary(member: Room, members: list[Room]) -> list[Segment]:
             for n in others
             if at_y in (_axis_lo(n, Axis.VERTICAL), _axis_hi(n, Axis.VERTICAL))
         ]
+        blocked += [(x1, x2) for x1, y1, x2, y2 in openings if y1 == y2 == at_y]
         segments += [(x0, at_y, x1, at_y) for x0, x1 in _exposed(mx, mx + mw, blocked)]
     for at_x in (mx, mx + mw):  # left, then right
         blocked = [
@@ -251,6 +298,7 @@ def _member_boundary(member: Room, members: list[Room]) -> list[Segment]:
             for n in others
             if at_x in (_axis_lo(n, Axis.HORIZONTAL), _axis_hi(n, Axis.HORIZONTAL))
         ]
+        blocked += [(y1, y2) for x1, y1, x2, y2 in openings if x1 == x2 == at_x]
         segments += [(at_x, y0, at_x, y1) for y0, y1 in _exposed(my, my + mh, blocked)]
     return segments
 
@@ -417,31 +465,51 @@ def _union_bbox(
 
 
 def door_segments(building: Building) -> list[Segment]:
-    """Return the door line ``(x1, y1, x2, y2)`` for every door in the building.
+    """Return the door line ``(x1, y1, x2, y2)`` for every *solid* door.
 
     Doors are on by default: a relation with a real shared wall gets a default
     door unless ``no_door`` suppresses it; an explicit ``door`` overrides its
-    width/position. Validates each door (raising on an explicit door that has no
-    wall or doesn't fit). Assumes a solved building.
+    width/position. Validates every door, open ones included (raising on an
+    explicit door that has no wall or doesn't fit). Assumes a solved building.
+    """
+    return [seg for seg, is_open in _placed_doors(building) if not is_open]
+
+
+def open_door_segments(building: Building) -> list[Segment]:
+    """Return the line ``(x1, y1, x2, y2)`` for every *open* door.
+
+    Open doors are placed and validated exactly like solid ones; the renderer
+    draws them as a gap in the wall instead of a door mark. Assumes a solved
+    building.
+    """
+    return [seg for seg, is_open in _placed_doors(building) if is_open]
+
+
+def _placed_doors(building: Building) -> list[tuple[Segment, bool]]:
+    """Place and validate every door, as ``(segment, open?)`` pairs.
+
+    Open and solid doors share one placement pass so the overlap check sees
+    them all together.
     """
     by_id = {room.id: room for room in building.rooms}
     block_of = _block_of(building)
-    segments: list[Segment] = []
+    placed: list[tuple[Segment, bool]] = []
     for room in building.rooms:
         for rel in room.relations:
             if rel.no_door or _same_block(room.id, rel.anchor, block_of):
                 continue  # ``no_door``, or an internal wall of a block (dropped)
             segment = _relation_door(room, by_id[rel.anchor], rel)
             if segment is not None:
-                segments.append(segment)
+                placed.append((segment, rel.door is not None and rel.door.open))
     for doorway in building.doors:
         if _same_block(doorway.a, doorway.b, block_of):
             continue  # internal wall of a block (dropped)
-        segments.append(_doorway_door(doorway, by_id))
+        placed.append((_doorway_door(doorway, by_id), doorway.door.open))
     for external in building.external_doors:
-        segments.append(_external_door_line(external, by_id, building.rooms))
-    _check_door_overlaps(segments)
-    return segments
+        segment = _external_door_line(external, by_id, building.rooms)
+        placed.append((segment, external.door.open))
+    _check_door_overlaps([seg for seg, _ in placed])
+    return placed
 
 
 def _external_door_line(

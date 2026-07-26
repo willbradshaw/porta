@@ -299,7 +299,7 @@ def test_background_is_configurable() -> None:
 OPEN_TWO = 'room a "A" 20x20 root\nroom b "Bee" 20x20 right-of a door=20 open'
 
 
-def open_lines(root: ET.Element) -> list[tuple[float, float, float, float]]:
+def open_lines(root: ET.Element) -> list[tuple[float, ...]]:
     return [
         tuple(float(ln.get(k, "")) for k in ("x1", "y1", "x2", "y2"))
         for ln in root.iter(tag("line"))

@@ -17,6 +17,7 @@ Reference resolution (does ``anchor`` exist? is there exactly one root?) is a
 """
 
 import re
+from dataclasses import replace
 
 from porta.errors import ParseError
 from porta.model import (
@@ -50,7 +51,7 @@ _SIDES: dict[str, Direction] = {
 }
 # Words that are part of the syntax, so they cannot double as room ids.
 _RESERVED: frozenset[str] = frozenset(
-    {"root", "door", "no-door", "outside", "shift", "align", *_KEYWORDS}
+    {"root", "door", "no-door", "open", "outside", "shift", "align", *_KEYWORDS}
 )
 
 
@@ -77,8 +78,10 @@ def parse(text: str) -> Building:
             continue  # blank or comment-only line (its line number is still spent)
         head, head_quoted = tokens[0]
         if not head_quoted and head.startswith("door"):
-            # '<room> outside <side>' is an external door; '<a> <b>' an internal one.
-            if len(tokens) >= 3 and not tokens[2][1] and tokens[2][0] == "outside":
+            # '<room> outside <side>' is an external door; '<a> <b>' an internal
+            # one. An 'open' attribute sits between the door spec and the ids.
+            outside_at = 3 if len(tokens) > 1 and tokens[1] == ("open", False) else 2
+            if len(tokens) > outside_at and tokens[outside_at] == ("outside", False):
                 external_doors.append(_parse_external_door(tokens, lineno))
             else:
                 doors.append(_parse_doorway(tokens, lineno))
@@ -151,10 +154,22 @@ def _parse_glyph(tokens: list[Token], i: int, lineno: int) -> str:
     return value
 
 
-def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
-    """Parse a standalone ``door[=W][@O] <a> <b>`` line."""
+def _parse_door_spec(tokens: list[Token], lineno: int) -> tuple[Door, list[Token]]:
+    """Parse a statement's leading door token plus an optional bare ``open``.
+
+    Returns the door spec and the remaining tokens after it.
+    """
     spec = _parse_door(tokens[0][0], lineno)
     rest = tokens[1:]
+    if rest and rest[0] == ("open", False):
+        spec = replace(spec, open=True)
+        rest = rest[1:]
+    return spec, rest
+
+
+def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
+    """Parse a standalone ``door[=W][@O] [open] <a> <b>`` line."""
+    spec, rest = _parse_door_spec(tokens, lineno)
     if len(rest) != 2:
         raise ParseError("a door needs exactly two room ids", line=lineno)
     for room_id, quoted in rest:
@@ -166,9 +181,8 @@ def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
 
 
 def _parse_external_door(tokens: list[Token], lineno: int) -> ExternalDoor:
-    """Parse ``door[=W][@O] <room> outside <side>`` (side = up/down/left/right)."""
-    spec = _parse_door(tokens[0][0], lineno)
-    rest = tokens[1:]
+    """Parse ``door[=W][@O] [open] <room> outside <side>`` (side = up/down/...)."""
+    spec, rest = _parse_door_spec(tokens, lineno)
     if len(rest) != 3:
         raise ParseError("an external door needs '<room> outside <side>'", line=lineno)
     (room, room_quoted), _outside, (side, side_quoted) = rest
@@ -356,6 +370,8 @@ def _parse_modifiers(
                 f'a glyph must be double-quoted: glyph="{value[len("glyph=") :]}"',
                 line=lineno,
             )
+        if value == "open":
+            raise ParseError("'open' must immediately follow a door", line=lineno)
         direction = _KEYWORDS.get(value)
         if direction is None:
             if value.startswith(_MODIFIERS):
@@ -383,8 +399,16 @@ def _parse_modifiers(
                 no_door = True
             else:
                 door = _parse_door(token, lineno)
+                if i + 1 < len(tokens) and tokens[i + 1] == ("open", False):
+                    door = replace(door, open=True)
+                    i += 1
             i += 1
 
+        if no_door and door is not None and door.open:
+            raise ParseError(
+                "cannot combine no-door with an open door on one relation",
+                line=lineno,
+            )
         relations.append(
             Relation(
                 direction=direction,

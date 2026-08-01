@@ -47,7 +47,8 @@ comment-only) line inside a continued statement.
 For more on the `porta` DSL specification, see the following documentation:
 
 - [**Rooms**](docs/room.md) — the `room` statement, room positioning,
-  auto-dimensions (`?`), and the layout resolution procedure.
+  auto-dimensions (`?`), disconnected components and the `link` statement
+  for joining them, and the layout resolution procedure.
 - [**Doors**](docs/door.md) — default doors & how to modify them, and
   the `door` statement for explicitly adding non-default doors.
 - [**Blocks**](docs/block.md) — the `block` statement for joining

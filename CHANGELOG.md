@@ -4,6 +4,11 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Component links: `link <room> <relation> <room>` joins two disconnected
+  components flush, exactly like a relation between the two rooms, with the
+  usual align/shift and door modifiers (see `docs/room.md`).
+- `link` is now a reserved word and cannot be used as a room id.
+
 - Disconnected components: a plan may contain several groups of rooms, each
   with its own `root`; components are solved independently and packed into a
   top-aligned row with a 10 ft gap (see `docs/room.md`).

@@ -374,8 +374,42 @@ plan. The solved components are then packed into a west-to-east row, in
 order of their first room's appearance in the file: each component after
 the first is translated whole — its internal geometry untouched — so
 that its bounding box starts 10 feet east of the previous one, top edges
-aligned. Rooms in different components are never adjacent, so a door
-between them (or a block spanning them) is invalid.
+aligned. Packed components are never adjacent, so a door between them
+(or a block spanning them) is invalid; to join components into one
+continuous plan, link them.
+
+### Linking components
+
+A `link` statement joins two components through a relation between one
+room from each:
+
+```porta img/link.svg
+room north-gate "North Gate" 40x20 root
+room north-hall "North Hall" 30x30 down-of north-gate
+room south-vault "South Vault" 30x30 root
+room cache "Cache" 10x20 right-of south-vault
+link south-vault down-of north-hall
+```
+
+<img alt="Two components joined flush by a link" src="img/link.svg" width="70%">
+
+A link reads exactly like a [relation](#relations): the first room's
+whole component is translated so that room sits flush in the given
+direction of the second room. The usual 5-foot shared-wall minimum
+applies, `align=` and `shift=` act on the free axis, and the shared wall
+takes a default door, with `door=`, `no-door`, `open`, and `secret` all
+available. Only the component's translation changes — every room keeps
+its internal geometry, relations, and root — and once linked flush, the
+two components' rooms are genuinely adjacent, so standalone `door`
+statements between them work too.
+
+Links may chain any number of components, and several links may
+constrain the same components as long as they agree; contradictory
+links are an error. Linked components remain separate components, each
+with its own root. That makes a link easy to retire: when you replace
+it with real connecting geometry, the two parts become one component —
+and one component allows only one root — so the link and one of the
+roots are removed together.
 
 ## Resolution
 

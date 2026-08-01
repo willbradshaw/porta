@@ -1,0 +1,4 @@
+room west "West Hall" 20x20 root
+room east "East Hall" 20x20 root
+room annex "Annex" 10x10 root
+link east right-of west

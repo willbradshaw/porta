@@ -619,6 +619,56 @@ def test_block_id_colliding_with_a_room_raises() -> None:
         parse('room a "" 10x10 root\nblock a "" b')
 
 
+# --- link statements -------------------------------------------------------
+
+
+def test_link_is_parsed() -> None:
+    building = parse('room a "" 10x10 root\nroom b "" 10x10 root\nlink a left-of b')
+    assert len(building.links) == 1
+    link = building.links[0]
+    assert link.room == "a"
+    assert link.relation.direction is Direction.LEFT
+    assert link.relation.anchor == "b"
+    assert link.relation.align is Align.START
+    assert link.relation.shift == 0
+    assert link.relation.door is None
+    assert not link.relation.no_door
+    assert link.line == 3
+
+
+def test_link_takes_relation_modifiers_and_doors() -> None:
+    link = parse("link a down-of b align=end shift=-5 door=10@5 open").links[0]
+    assert link.relation.align is Align.END
+    assert link.relation.shift == -5
+    assert link.relation.door == Door(width=10, offset=5, open=True)
+
+
+def test_link_no_door_is_parsed() -> None:
+    link = parse("link a up-of b no-door").links[0]
+    assert link.relation.no_door
+    assert link.relation.door is None
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param("link a b", id="missing-direction"),
+        pytest.param("link a", id="too-short"),
+        pytest.param("link left-of b", id="missing-subject"),
+        pytest.param("link a left-of", id="missing-anchor"),
+        pytest.param("link a left-of a", id="same-room-twice"),
+        pytest.param('link "a" left-of b', id="quoted-subject"),
+        pytest.param("link a left-of b c", id="trailing-token"),
+        pytest.param("link a left-of b root", id="root-on-link"),
+        pytest.param("link a left-of b no-door door=10 open", id="no-door-open-clash"),
+        pytest.param('room link "" 10x10 root', id="link-is-reserved"),
+    ],
+)
+def test_invalid_link_raises(source: str) -> None:
+    with pytest.raises(ParseError):
+        parse(source)
+
+
 # --- line continuation -------------------------------------------------------
 #
 # A backslash that is the last non-whitespace character on a line — outside

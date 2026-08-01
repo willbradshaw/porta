@@ -28,6 +28,7 @@ from porta.model import (
     Door,
     Doorway,
     ExternalDoor,
+    Link,
     Relation,
     Room,
 )
@@ -63,7 +64,8 @@ def solve(building: Building) -> Building:
         raise LayoutError("the building needs exactly one root room, but has none")
     for component in components:
         _solve_component(component, by_id, sole=len(components) == 1)
-    _pack_components(components)
+    units = _resolve_links(building, components, by_id)
+    _pack_components(units)
 
     overlaps = find_overlaps(building)
     if overlaps:
@@ -502,6 +504,13 @@ def _placed_doors(building: Building) -> list[tuple[Segment, Door]]:
             segment = _relation_door(room, by_id[rel.anchor], rel)
             if segment is not None:
                 placed.append((segment, rel.door if rel.door is not None else Door()))
+    for link in building.links:
+        rel = link.relation
+        if rel.no_door:
+            continue
+        segment = _relation_door(by_id[link.room], by_id[rel.anchor], rel)
+        if segment is not None:
+            placed.append((segment, rel.door if rel.door is not None else Door()))
     for doorway in building.doors:
         if _same_block(doorway.a, doorway.b, block_of):
             continue  # internal wall of a block (dropped)
@@ -824,6 +833,149 @@ def _pack_components(components: list[list[Room]]) -> None:
             room.x += dx
             room.y += dy
         east = max(_axis_hi(room, Axis.HORIZONTAL) for room in component)
+
+
+def _resolve_links(
+    building: Building, components: list[list[Room]], by_id: dict[str, Room]
+) -> list[list[Room]]:
+    """Join link-connected components and return the units packing translates.
+
+    Each link fixes the relative offset of two components: the offset that
+    puts its subject room in the linked relation to its anchor room. Offsets
+    spread through the link graph outward from each group's first-appearing
+    component (which keeps its solved coordinates), so a consistent cycle of
+    links is fine and a contradictory one is an error. The returned units —
+    linked groups plus untouched lone components — stay in first-appearance
+    order.
+    """
+    if not building.links:
+        return components
+    comp_of = {room.id: i for i, comp in enumerate(components) for room in comp}
+    for link in building.links:
+        for room_id in (link.room, link.relation.anchor):
+            if room_id not in by_id:
+                raise LayoutError(
+                    f"link references unknown room {room_id!r}", line=link.line
+                )
+        if comp_of[link.room] == comp_of[link.relation.anchor]:
+            raise LayoutError(
+                f"link: rooms {link.room!r} and {link.relation.anchor!r} are "
+                f"already in the same component",
+                line=link.line,
+            )
+    edges: dict[int, list[Link]] = {}
+    for link in building.links:
+        edges.setdefault(comp_of[link.room], []).append(link)
+        edges.setdefault(comp_of[link.relation.anchor], []).append(link)
+
+    offsets: dict[int, tuple[int, int]] = {}
+    units: list[list[Room]] = []
+    for index, component in enumerate(components):
+        if index in offsets:
+            continue  # joined into an earlier group
+        if index not in edges:
+            units.append(component)
+            continue
+        group = _spread_offsets(index, edges, comp_of, by_id, offsets)
+        units.append([room for i in sorted(group) for room in components[i]])
+    for index, (dx, dy) in offsets.items():
+        for room in components[index]:
+            assert room.x is not None
+            assert room.y is not None
+            room.x += dx
+            room.y += dy
+    for link in building.links:
+        _check_link_wall(link, by_id)
+    return units
+
+
+def _spread_offsets(
+    start: int,
+    edges: dict[int, list[Link]],
+    comp_of: dict[str, int],
+    by_id: dict[str, Room],
+    offsets: dict[int, tuple[int, int]],
+) -> set[int]:
+    """Walk one link group from ``start``, filling in each member's offset.
+
+    Every link states ``offset(subject) = offset(anchor) + delta``; whichever
+    end is already known determines the other. A link whose two ends are both
+    known already must agree with them.
+    """
+    offsets[start] = (0, 0)
+    queue = [start]
+    group = {start}
+    while queue:
+        for link in edges[queue.pop()]:
+            subject, anchor = comp_of[link.room], comp_of[link.relation.anchor]
+            dx, dy = _link_delta(link, by_id)
+            if anchor in offsets:
+                ax, ay = offsets[anchor]
+                required = (ax + dx, ay + dy)
+                if subject in offsets:
+                    if offsets[subject] != required:
+                        raise LayoutError(
+                            f"link: contradictory links place the component "
+                            f"containing {link.room!r} in two places",
+                            line=link.line,
+                        )
+                    continue
+                offsets[subject] = required
+                grown = subject
+            else:  # the subject end is the known one
+                sx, sy = offsets[subject]
+                offsets[anchor] = (sx - dx, sy - dy)
+                grown = anchor
+            group.add(grown)
+            queue.append(grown)
+    return group
+
+
+def _link_delta(link: Link, by_id: dict[str, Room]) -> tuple[int, int]:
+    """The offset a link demands between its two components' translations.
+
+    Computed with both components in their own solved frames: where the
+    subject room would sit if placed by the link's relation (the usual
+    flush-plus-align/shift edge math) minus where it actually sits.
+    """
+    room, anchor = by_id[link.room], by_id[link.relation.anchor]
+    rel = link.relation
+    axis = rel.direction.axis
+    if rel.direction in (Direction.RIGHT, Direction.DOWN):
+        pinned = _axis_hi(anchor, axis)
+    else:
+        pinned = _axis_lo(anchor, axis) - _axis_dim(room, axis)
+    free_axis = _free_axis(rel.direction)
+    free = (
+        _aligned(
+            _axis_lo(anchor, free_axis),
+            _axis_dim(anchor, free_axis),
+            _axis_dim(room, free_axis),
+            rel.align,
+        )
+        + rel.shift
+    )
+    target = (pinned, free) if axis is Axis.HORIZONTAL else (free, pinned)
+    return (
+        target[0] - _axis_lo(room, Axis.HORIZONTAL),
+        target[1] - _axis_lo(room, Axis.VERTICAL),
+    )
+
+
+def _check_link_wall(link: Link, by_id: dict[str, Room]) -> None:
+    """A placed link must leave a real shared wall (>= 5 ft), like a relation."""
+    room, anchor = by_id[link.room], by_id[link.relation.anchor]
+    wall = _perp(link.relation.direction.axis)
+    overlap = min(_axis_hi(room, wall), _axis_hi(anchor, wall)) - max(
+        _axis_lo(room, wall), _axis_lo(anchor, wall)
+    )
+    if overlap < _GRID_FT:
+        raise LayoutError(
+            f"link: {link.room!r} {link.relation.direction.value} "
+            f"{link.relation.anchor!r} shares {max(overlap, 0)} ft of wall "
+            f"(needs at least {_GRID_FT} ft)",
+            line=link.line,
+        )
 
 
 def _component_root(component: list[Room], sole: bool) -> Room:

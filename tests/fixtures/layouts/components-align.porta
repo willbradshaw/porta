@@ -1,0 +1,5 @@
+room hall "Hall" 20x20 root
+room annex "Annex" 10x10 right-of hall
+room keep "Keep" 30x30 root
+room tower "Tower" 10x20 up-of keep
+room shed "Shed" 10x10 root

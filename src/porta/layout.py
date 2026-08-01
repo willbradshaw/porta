@@ -1,9 +1,15 @@
 """Resolve relational placement into concrete geometry.
 
-Topological DAG propagation: place the root at the origin, then derive every
-other room's coordinates from an already-placed anchor's edge plus a relation
-(align-start on the free axis). Also owns the *semantic* validations: exactly
-one root, known anchors, no cycles, no disconnected rooms.
+Topological DAG propagation: place each component's root at the origin, then
+derive every other room's coordinates from an already-placed anchor's edge
+plus a relation (align-start on the free axis). Also owns the *semantic*
+validations: exactly one root per connected component, known anchors, no
+cycles.
+
+A plan may hold several disconnected components (rooms connected by
+relations), each with its own root. Every component is solved internally as
+usual, then whole components are packed into a west-to-east row with a fixed
+gap — packing only translates, never reshapes.
 
 Coordinates are integer feet; ``x`` increases east, ``y`` increases south
 (north = up). A room's ``(x, y)`` is its top-left (NW) corner.
@@ -27,6 +33,7 @@ from porta.model import (
 )
 
 _GRID_FT = 5
+_COMPONENT_GAP_FT = 10  # space between packed components' bounding boxes
 # An axis-aligned rectangle as (x, y, width, height) in feet.
 Rect = tuple[int, int, int, int]
 # A line segment as (x1, y1, x2, y2) in feet.
@@ -43,37 +50,20 @@ def solve(building: Building) -> Building:
         The same building, with each room's ``x``/``y`` populated.
 
     Raises:
-        LayoutError: On any structural problem (root count, unknown anchor,
-            cycle, disconnected room, or an unsupported construct).
+        LayoutError: On any structural problem (a component with zero or
+            several roots, unknown anchor, cycle, or an unsupported
+            construct).
     """
     rooms = building.rooms
     by_id = {room.id: room for room in rooms}
 
-    root = _find_root(rooms)
     _validate_relations(rooms, by_id)
-    if root.auto_width or root.auto_height:
-        raise LayoutError(
-            f"root {root.id!r} cannot use '?' (no anchor to size against)",
-            line=root.line,
-        )
-
-    root.x, root.y = 0, 0
-    placed: set[str] = {root.id}
-    pending = [room for room in rooms if not room.is_root]
-
-    progressed = True
-    while pending and progressed:
-        progressed = False
-        for room in list(pending):
-            if room.relations and all(rel.anchor in placed for rel in room.relations):
-                _resolve_auto_dims(room, by_id)
-                _place(room, by_id)
-                placed.add(room.id)
-                pending.remove(room)
-                progressed = True
-
-    if pending:
-        _raise_unplaceable(pending)
+    components = _components(rooms)
+    if not components:
+        raise LayoutError("the building needs exactly one root room, but has none")
+    for component in components:
+        _solve_component(component, by_id, sole=len(components) == 1)
+    _pack_components(components)
 
     overlaps = find_overlaps(building)
     if overlaps:
@@ -752,15 +742,111 @@ def _intersection(a: Room, b: Room) -> Rect | None:
     return None
 
 
-def _find_root(rooms: list[Room]) -> Room:
-    """Return the sole root, or raise if there are zero or several."""
-    roots = [room for room in rooms if room.is_root]
+def _components(rooms: list[Room]) -> list[list[Room]]:
+    """Split the rooms into connected components (relations as undirected edges).
+
+    Components are ordered by the first appearance of any of their rooms in the
+    source, and each component lists its rooms in source order — so packing and
+    diagnostics are deterministic. Assumes anchors have been validated.
+    """
+    neighbours: dict[str, set[str]] = {room.id: set() for room in rooms}
+    for room in rooms:
+        for rel in room.relations:
+            neighbours[room.id].add(rel.anchor)
+            neighbours[rel.anchor].add(room.id)
+    components: list[list[Room]] = []
+    seen: set[str] = set()
+    for room in rooms:
+        if room.id in seen:
+            continue
+        member_ids = {room.id}
+        stack = [room.id]
+        while stack:
+            for neighbour in neighbours[stack.pop()]:
+                if neighbour not in member_ids:
+                    member_ids.add(neighbour)
+                    stack.append(neighbour)
+        seen |= member_ids
+        components.append([r for r in rooms if r.id in member_ids])
+    return components
+
+
+def _solve_component(component: list[Room], by_id: dict[str, Room], sole: bool) -> None:
+    """Place one component's rooms by DAG propagation, its root at the origin."""
+    root = _component_root(component, sole)
+    if root.auto_width or root.auto_height:
+        raise LayoutError(
+            f"root {root.id!r} cannot use '?' (no anchor to size against)",
+            line=root.line,
+        )
+
+    root.x, root.y = 0, 0
+    placed: set[str] = {root.id}
+    pending = [room for room in component if not room.is_root]
+
+    progressed = True
+    while pending and progressed:
+        progressed = False
+        for room in list(pending):
+            if room.relations and all(rel.anchor in placed for rel in room.relations):
+                _resolve_auto_dims(room, by_id)
+                _place(room, by_id)
+                placed.add(room.id)
+                pending.remove(room)
+                progressed = True
+
+    if pending:
+        _raise_unplaceable(pending)
+
+
+def _pack_components(components: list[list[Room]]) -> None:
+    """Translate the components into a west-to-east row, in order.
+
+    The first component keeps its literal coordinates (root at the origin);
+    each later one is shifted whole so its bounding box starts a fixed gap east
+    of the previous box, top edges aligned. Translation only — every room keeps
+    its internal geometry, doors, and relations.
+    """
+    if len(components) <= 1:
+        return
+    top = min(_axis_lo(room, Axis.VERTICAL) for room in components[0])
+    east = max(_axis_hi(room, Axis.HORIZONTAL) for room in components[0])
+    for component in components[1:]:
+        dx = (
+            east
+            + _COMPONENT_GAP_FT
+            - min(_axis_lo(room, Axis.HORIZONTAL) for room in component)
+        )
+        dy = top - min(_axis_lo(room, Axis.VERTICAL) for room in component)
+        for room in component:
+            assert room.x is not None
+            assert room.y is not None
+            room.x += dx
+            room.y += dy
+        east = max(_axis_hi(room, Axis.HORIZONTAL) for room in component)
+
+
+def _component_root(component: list[Room], sole: bool) -> Room:
+    """Return the component's sole root, or raise if it has zero or several.
+
+    ``sole`` (the building is one connected component) keeps the classic
+    building-level wording; with several components the diagnostic names the
+    component instead.
+    """
+    roots = [room for room in component if room.is_root]
     if not roots:
-        raise LayoutError("the building needs exactly one root room, but has none")
+        if sole:
+            raise LayoutError("the building needs exactly one root room, but has none")
+        first = component[0]
+        raise LayoutError(
+            f"the component containing room {first.id!r} has no root",
+            line=first.line,
+        )
     if len(roots) > 1:
         ids = ", ".join(repr(room.id) for room in roots)
+        where = "the building" if sole else "one connected component"
         raise LayoutError(
-            f"the building has more than one root room ({ids})", line=roots[1].line
+            f"{where} has more than one root room ({ids})", line=roots[1].line
         )
     root = roots[0]
     if root.relations:

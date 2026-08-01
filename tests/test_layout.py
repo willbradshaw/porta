@@ -800,7 +800,12 @@ def test_invalid_external_door_raises(source: str) -> None:
     "text",
     [
         pytest.param('room a "A" 10x10', id="no-root"),
-        pytest.param('room a "A" 10x10 root\nroom b "B" 10x10 root', id="two-roots"),
+        pytest.param(
+            'room a "A" 10x10 root\n'
+            'room c "C" 10x10 root\n'
+            'room b "B" 10x10 right-of a left-of c',
+            id="two-roots-in-one-component",
+        ),
         pytest.param(
             'room a "A" 10x10 root up-of b\nroom b "B" 10x10 down-of a',
             id="root-with-relations",
@@ -813,7 +818,9 @@ def test_invalid_external_door_raises(source: str) -> None:
             'room r "R" 10x10 root\nroom a "A" 10x10 up-of b\nroom b "B" 10x10 up-of a',
             id="cycle",
         ),
-        pytest.param('room r "R" 10x10 root\nroom a "A" 10x10', id="disconnected"),
+        pytest.param(
+            'room r "R" 10x10 root\nroom a "A" 10x10', id="rootless-component"
+        ),
         pytest.param(
             'room a "A" 10x10 root\n'
             'room c "C" 10x10 right-of a\n'
@@ -832,6 +839,94 @@ def test_unknown_anchor_error_points_at_the_relation_line() -> None:
     with pytest.raises(LayoutError) as exc:
         solve(parse(text))
     assert exc.value.line == 2
+
+
+# --- disconnected components -----------------------------------------------
+
+
+def test_two_isolated_roots_pack_into_a_row_with_a_gap() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 root'
+    building = solve(parse(text))
+    assert (building.room("a").x, building.room("a").y) == (0, 0)
+    assert (building.room("b").x, building.room("b").y) == (20, 0)
+
+
+def test_second_component_is_translated_whole_and_top_aligned() -> None:
+    # Component 1 spans x 0..30, y 0..20; component 2 internally has d
+    # protruding above c (negative y), so its bounding box top is at -20.
+    # Packing puts its box at x = 30 + 10 (the gap), top aligned with y = 0.
+    text = (
+        'room a "A" 20x20 root\n'
+        'room b "B" 10x10 right-of a\n'
+        'room c "C" 30x30 root\n'
+        'room d "D" 10x20 up-of c'
+    )
+    building = solve(parse(text))
+    assert (building.room("a").x, building.room("a").y) == (0, 0)
+    assert (building.room("b").x, building.room("b").y) == (20, 0)
+    assert (building.room("c").x, building.room("c").y) == (40, 20)
+    assert (building.room("d").x, building.room("d").y) == (40, 0)
+
+
+def test_components_pack_in_first_appearance_order() -> None:
+    # 'tail' opens the file (a forward reference to 'head'), so its
+    # component packs before 'solo' — order follows first appearance.
+    text = (
+        'room tail "T" 10x10 right-of head\n'
+        'room head "H" 10x10 root\n'
+        'room solo "S" 10x10 root'
+    )
+    building = solve(parse(text))
+    assert (building.room("head").x, building.room("head").y) == (0, 0)
+    assert (building.room("tail").x, building.room("tail").y) == (10, 0)
+    assert (building.room("solo").x, building.room("solo").y) == (30, 0)
+
+
+def test_rootless_component_error_names_a_room_in_it() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10\nroom c "C" 10x10 right-of b'
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "'b'" in exc.value.message
+    assert "no root" in exc.value.message
+    assert exc.value.line == 2
+
+
+def test_two_roots_in_one_component_error_lists_both() -> None:
+    text = (
+        'room a "A" 10x10 root\n'
+        'room c "C" 10x10 root\n'
+        'room b "B" 10x10 right-of a left-of c'
+    )
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "'a'" in exc.value.message
+    assert "'c'" in exc.value.message
+    assert exc.value.line == 2
+
+
+def test_no_root_anywhere_keeps_the_building_level_message() -> None:
+    with pytest.raises(LayoutError) as exc:
+        solve(parse('room a "A" 10x10'))
+    assert "building" in exc.value.message
+    assert exc.value.line is None
+
+
+def test_overlap_inside_a_later_component_is_still_detected() -> None:
+    text = (
+        'room a "A" 10x10 root\n'
+        'room b "B" 20x20 root\n'
+        'room c "C" 20x20 right-of b\n'
+        'room d "D" 20x20 right-of b'
+    )
+    with pytest.raises(OverlapError):
+        solve(parse(text))
+
+
+def test_door_between_components_shares_no_wall() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 root\ndoor a b'
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "share no wall" in exc.value.message
 
 
 # --- overlap detection -----------------------------------------------------

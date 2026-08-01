@@ -598,6 +598,11 @@ def test_unlabeled_block_draws_no_glyph_and_no_key_line() -> None:
     assert [t for t in root.iter(tag("text")) if t.get("data-block")] == []
 
 
+def test_ascii_renders_packed_components_with_a_gap() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 root'
+    assert ascii_of(text) == ("A A . . B B\nA A . . B B\n\nA=a  B=b")
+
+
 def test_manor_renders_to_golden_svg_fixture() -> None:
     source = Path("examples/manor.porta").read_text()
     expected = Path("tests/fixtures/manor.svg").read_text()

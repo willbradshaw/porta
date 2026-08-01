@@ -1,0 +1,4 @@
+room north-gate "North Gate" 40x20 root
+room north-hall "North Hall" 30x30 down-of north-gate
+room south-vault "South Vault" 30x30 root
+room cache "Cache" 10x20 right-of south-vault

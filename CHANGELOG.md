@@ -4,6 +4,10 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Disconnected components: a plan may contain several groups of rooms, each
+  with its own `root`; components are solved independently and packed into a
+  top-aligned row with a 10 ft gap (see `docs/room.md`).
+
 ## 1.3.0 (2026-07-26)
 
 - Open boundaries: marking a door `open` (e.g. `door=20 open`) removes the

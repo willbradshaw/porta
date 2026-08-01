@@ -6,7 +6,7 @@ Notable changes per release, newest first.
 
 - Component links: `link <room> <relation> <room>` joins two disconnected
   components flush, exactly like a relation between the two rooms, with the
-  usual align/shift and door modifiers (see `docs/room.md`).
+  usual align/shift and door modifiers (see `docs/link.md`).
 - `link` is now a reserved word and cannot be used as a room id.
 
 - Disconnected components: a plan may contain several groups of rooms, each

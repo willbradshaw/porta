@@ -103,6 +103,22 @@ class Room:
 
 
 @dataclass(frozen=True)
+class Link:
+    """A cross-component join: a relation that reaches between components.
+
+    Places the whole component containing ``room`` so that ``room`` sits in
+    ``relation`` to the anchor room (which lives in another component) —
+    flush, wall-shared, and with the usual align/shift and door handling.
+    Only the component's translation is affected; its internal geometry,
+    root, and relations are untouched.
+    """
+
+    room: str
+    relation: Relation
+    line: int
+
+
+@dataclass(frozen=True)
 class Doorway:
     """A standalone door between two adjacent rooms (any pair, not just anchors)."""
 
@@ -154,6 +170,7 @@ class Building:
     doors: list[Doorway] = field(default_factory=list)
     external_doors: list[ExternalDoor] = field(default_factory=list)
     blocks: list[Block] = field(default_factory=list)
+    links: list[Link] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
     def room(self, room_id: str) -> Room:

@@ -1,0 +1,4 @@
+room hall "Hall" 40x30 root
+room wing "Wing" 20x20 root
+room store "Store" 10x10 down-of wing
+link wing right-of hall align=end shift=-5 door=10@5 open

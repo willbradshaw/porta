@@ -929,6 +929,148 @@ def test_door_between_components_shares_no_wall() -> None:
     assert "share no wall" in exc.value.message
 
 
+# --- component links -------------------------------------------------------
+
+
+def test_link_translates_the_whole_subject_component() -> None:
+    # 'c' is placed down-of 'b' exactly as a relation would place it, and 'd'
+    # rides along with its component.
+    text = (
+        'room a "A" 20x20 root\n'
+        'room b "B" 10x10 down-of a\n'
+        'room c "C" 10x10 root\n'
+        'room d "D" 10x10 right-of c\n'
+        "link c down-of b"
+    )
+    building = solve(parse(text))
+    assert (building.room("c").x, building.room("c").y) == (0, 30)
+    assert (building.room("d").x, building.room("d").y) == (10, 30)
+
+
+def test_link_align_and_shift_act_on_the_free_axis() -> None:
+    text = (
+        'room a "A" 30x10 root\n'
+        'room c "C" 10x10 root\n'
+        "link c down-of a align=end shift=-5"
+    )
+    building = solve(parse(text))
+    assert (building.room("c").x, building.room("c").y) == (15, 10)
+
+
+def test_links_chain_across_three_components() -> None:
+    text = (
+        'room a "A" 10x10 root\n'
+        'room b "B" 10x10 root\n'
+        'room c "C" 10x10 root\n'
+        "link b right-of a\n"
+        "link c right-of b"
+    )
+    building = solve(parse(text))
+    assert (building.room("b").x, building.room("b").y) == (10, 0)
+    assert (building.room("c").x, building.room("c").y) == (20, 0)
+
+
+def test_consistent_link_cycle_is_fine() -> None:
+    # The two links state the same constraint from both ends. Each link still
+    # carries its own default door, so one must say no-door (overlapping
+    # doors are an error, as everywhere else).
+    text = (
+        'room a "A" 10x10 root\n'
+        'room b "B" 10x10 root\n'
+        "link b right-of a\n"
+        "link a left-of b no-door"
+    )
+    building = solve(parse(text))
+    assert (building.room("b").x, building.room("b").y) == (10, 0)
+    assert doors_of(text) == [(10, 0, 10, 5)]
+
+
+def test_contradictory_links_raise() -> None:
+    text = (
+        'room a "A" 10x10 root\n'
+        'room b "B" 10x10 root\n'
+        "link b right-of a\n"
+        "link b down-of a"
+    )
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "contradict" in exc.value.message
+
+
+def test_first_component_keeps_literal_coordinates_when_linked() -> None:
+    # The subject appears first, so its component anchors the group and the
+    # *anchor* component is the one translated (into negative x here).
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 root\nlink a right-of b'
+    building = solve(parse(text))
+    assert (building.room("a").x, building.room("a").y) == (0, 0)
+    assert (building.room("b").x, building.room("b").y) == (-10, 0)
+
+
+def test_link_within_one_component_raises() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 right-of a\nlink b right-of a'
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "same component" in exc.value.message
+
+
+def test_link_to_unknown_room_raises() -> None:
+    text = 'room a "A" 10x10 root\nlink a right-of ghost'
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "'ghost'" in exc.value.message
+
+
+def test_link_needs_a_shared_wall_after_placement() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 root\nlink b right-of a shift=20'
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "wall" in exc.value.message
+
+
+def test_link_gets_a_default_door_on_the_shared_wall() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 root\nlink b right-of a'
+    assert doors_of(text) == [(10, 0, 10, 5)]
+
+
+def test_link_no_door_suppresses_the_door() -> None:
+    text = 'room a "A" 10x10 root\nroom b "B" 10x10 root\nlink b right-of a no-door'
+    assert doors_of(text) == []
+
+
+def test_link_open_door_is_an_opening() -> None:
+    text = (
+        'room a "A" 10x10 root\nroom b "B" 10x10 root\nlink b right-of a door=10 open'
+    )
+    building = solve(parse(text))
+    assert open_door_segments(building) == [(10, 0, 10, 10)]
+    assert door_segments(building) == []
+
+
+def test_unlinked_components_pack_around_the_linked_group() -> None:
+    text = (
+        'room a "A" 10x10 root\n'
+        'room b "B" 10x10 root\n'
+        'room c "C" 10x10 root\n'
+        "link b down-of a"
+    )
+    building = solve(parse(text))
+    assert (building.room("a").x, building.room("a").y) == (0, 0)
+    assert (building.room("b").x, building.room("b").y) == (0, 10)
+    assert (building.room("c").x, building.room("c").y) == (20, 0)
+
+
+def test_overlap_caused_by_a_link_is_detected() -> None:
+    text = (
+        'room a "A" 20x20 root\n'
+        'room b "B" 10x10 down-of a\n'
+        'room c "C" 10x10 root\n'
+        'room d "D" 10x10 left-of c\n'
+        "link c right-of b"
+    )
+    with pytest.raises(OverlapError):
+        solve(parse(text))
+
+
 # --- overlap detection -----------------------------------------------------
 
 

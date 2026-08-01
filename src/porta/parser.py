@@ -32,6 +32,7 @@ from porta.model import (
     Door,
     Doorway,
     ExternalDoor,
+    Link,
     Relation,
     Room,
 )
@@ -98,6 +99,7 @@ _RESERVED: frozenset[str] = frozenset(
         "outside",
         "shift",
         "align",
+        "link",
         *_KEYWORDS,
     }
 )
@@ -119,6 +121,7 @@ def parse(text: str) -> Building:
     doors: list[Doorway] = []
     external_doors: list[ExternalDoor] = []
     blocks: list[Block] = []
+    links: list[Link] = []
     seen: set[str] = set()
     for tokens, lineno in _statements(text):
         head = tokens[0]
@@ -133,6 +136,9 @@ def parse(text: str) -> Building:
             else:
                 doors.append(_parse_doorway(tokens, lineno))
             continue
+        if _is_bare(head, "link"):
+            links.append(_parse_link(tokens, lineno))
+            continue
         if _is_bare(head, "block"):
             block = _parse_block(tokens, lineno)
             if block.id in seen:
@@ -145,7 +151,7 @@ def parse(text: str) -> Building:
             raise ParseError(f"duplicate room id {room.id!r}", line=lineno)
         seen.add(room.id)
         rooms.append(room)
-    return Building(rooms, doors, external_doors, blocks=blocks)
+    return Building(rooms, doors, external_doors, blocks=blocks, links=links)
 
 
 def _statements(text: str) -> list[tuple[list[Token], int]]:
@@ -471,61 +477,97 @@ def _parse_modifiers(tokens: list[Token]) -> tuple[bool, str | None, list[Relati
             )
         if value in _DOOR_ATTRS:
             raise ParseError(f"{value!r} must immediately follow a door", line=line)
-        direction = _KEYWORDS.get(value)
-        if direction is None:
+        if _KEYWORDS.get(value) is None:
             if value.startswith(_MODIFIERS):
                 raise ParseError(f"{value!r} must follow a relation", line=line)
             raise ParseError(f"unknown relation or keyword {value!r}", line=line)
-        rel_line = line
-        if i + 1 >= len(tokens):
-            raise ParseError(
-                f"relation {value!r} needs an anchor room id", line=rel_line
-            )
-        anchor, anchor_quoted, anchor_line = tokens[i + 1]
-        _validate_id(anchor, anchor_quoted, anchor_line)
-        i += 2
-
-        align = Align.START
-        shift = 0
-        door: Door | None = None
-        no_door = False
-        while (
-            i < len(tokens)
-            and not tokens[i].quoted
-            and tokens[i].value.startswith(_MODIFIERS)
-        ):
-            token, _, token_line = tokens[i]
-            if token.startswith("shift="):
-                shift = _parse_shift(token, token_line)
-            elif token.startswith("align="):
-                align = _parse_align(token, token_line)
-            elif token == "no-door":
-                no_door = True
-            else:
-                door = _parse_door(token, token_line)
-                while i + 1 < len(tokens) and _is_attr(tokens[i + 1]):
-                    door = _apply_door_attr(door, tokens[i + 1])
-                    i += 1
-            i += 1
-
-        if no_door and door is not None and (door.open or door.secret):
-            kind = "an open" if door.open else "a secret"
-            raise ParseError(
-                f"cannot combine no-door with {kind} door on one relation",
-                line=rel_line,
-            )
-        relations.append(
-            Relation(
-                direction=direction,
-                anchor=anchor,
-                line=rel_line,
-                align=align,
-                shift=shift,
-                door=door,
-                no_door=no_door,
-            )
-        )
+        relation, i = _parse_relation_at(tokens, i)
+        relations.append(relation)
     return is_root, glyph, relations
+
+
+def _parse_relation_at(tokens: list[Token], i: int) -> tuple[Relation, int]:
+    """Parse ``<direction> <anchor> [modifiers...]`` at index ``i``.
+
+    The caller guarantees ``tokens[i]`` is a relation keyword. Returns the
+    relation and the index of the first token after it.
+    """
+    value, _, rel_line = tokens[i]
+    direction = _KEYWORDS[value]
+    if i + 1 >= len(tokens):
+        raise ParseError(f"relation {value!r} needs an anchor room id", line=rel_line)
+    anchor, anchor_quoted, anchor_line = tokens[i + 1]
+    _validate_id(anchor, anchor_quoted, anchor_line)
+    i += 2
+
+    align = Align.START
+    shift = 0
+    door: Door | None = None
+    no_door = False
+    while (
+        i < len(tokens)
+        and not tokens[i].quoted
+        and tokens[i].value.startswith(_MODIFIERS)
+    ):
+        token, _, token_line = tokens[i]
+        if token.startswith("shift="):
+            shift = _parse_shift(token, token_line)
+        elif token.startswith("align="):
+            align = _parse_align(token, token_line)
+        elif token == "no-door":
+            no_door = True
+        else:
+            door = _parse_door(token, token_line)
+            while i + 1 < len(tokens) and _is_attr(tokens[i + 1]):
+                door = _apply_door_attr(door, tokens[i + 1])
+                i += 1
+        i += 1
+
+    if no_door and door is not None and (door.open or door.secret):
+        kind = "an open" if door.open else "a secret"
+        raise ParseError(
+            f"cannot combine no-door with {kind} door on one relation",
+            line=rel_line,
+        )
+    relation = Relation(
+        direction=direction,
+        anchor=anchor,
+        line=rel_line,
+        align=align,
+        shift=shift,
+        door=door,
+        no_door=no_door,
+    )
+    return relation, i
+
+
+def _parse_link(tokens: list[Token], lineno: int) -> Link:
+    """Parse a ``link <room> <direction> <room> [modifiers...]`` line.
+
+    The modifiers are exactly a relation's (``align=``/``shift=``/door
+    handling). Whether the rooms exist and sit in different components are
+    *semantic* checks left to layout.
+    """
+    if len(tokens) < 4:
+        raise ParseError("a link needs '<room> <relation> <room>'", line=lineno)
+    room, room_quoted, room_line = tokens[1]
+    _validate_id(room, room_quoted, room_line)
+    keyword = tokens[2]
+    if keyword.quoted or keyword.value not in _KEYWORDS:
+        raise ParseError(
+            f"link relation must be up-of/down-of/left-of/right-of, "
+            f"got {keyword.value!r}",
+            line=keyword.line,
+        )
+    relation, after = _parse_relation_at(tokens, 2)
+    if after != len(tokens):
+        raise ParseError(
+            f"unexpected {tokens[after].value!r} after the link",
+            line=tokens[after].line,
+        )
+    if relation.anchor == room:
+        raise ParseError("a link needs two different rooms", line=lineno)
+    return Link(room=room, relation=relation, line=lineno)
 
 
 def _parse_door(token: str, lineno: int) -> Door:

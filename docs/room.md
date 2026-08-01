@@ -374,8 +374,9 @@ plan. The solved components are then packed into a west-to-east row, in
 order of their first room's appearance in the file: each component after
 the first is translated whole — its internal geometry untouched — so
 that its bounding box starts 10 feet east of the previous one, top edges
-aligned. Rooms in different components are never adjacent, so a door
-between them (or a block spanning them) is invalid.
+aligned. Packed components are never adjacent, so a door between them
+(or a block spanning them) is invalid; to join components into one
+continuous plan, use a [`link` statement](link.md).
 
 ## Resolution
 

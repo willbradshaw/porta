@@ -149,11 +149,13 @@ For more on relation syntax, see [below](#positioning-rooms).
 
 ### The root
 
-Every `porta` plan must have exactly one `root` room, defining the
-fixed point against which all other rooms are measured. Plans with
-zero roots, or more than one, are invalid. `porta` puts
-the top-left corner of the root room at the origin of its coordinate
-system and grows the plan outward from there.
+Every connected group of rooms must have exactly one `root` room,
+defining the fixed point against which the other rooms in the group are
+measured. Most plans are a single connected group with a single root;
+`porta` puts the top-left corner of the root room at the origin of its
+coordinate system and grows the plan outward from there. A plan can also
+hold several [disconnected components](#disconnected-components), each
+with its own root.
 
 ```porta img/root.svg
 room r "Root room" 40x30 root
@@ -349,13 +351,39 @@ room b "Span room" 10x? left-of r left-of a
 In all cases, a `?` needs something to measure against. `porta` will reject
 auto dimensions when there is no wall to size from.
 
+## Disconnected components
+
+Relations chain rooms into connected groups — **components**. A plan may
+contain several components, each with its own `root`; multiple `root`
+rooms are only an error when two of them end up in the same component.
+This suits iterative transcription of an existing map: model the regions
+you understand first, preview them together, and join them with real
+connecting rooms later.
+
+```porta img/components.svg
+room north-gate "North Gate" 40x20 root
+room north-hall "North Hall" 30x30 down-of north-gate
+room south-vault "South Vault" 30x30 root
+room cache "Cache" 10x20 right-of south-vault
+```
+
+<img alt="Two disconnected components packed side by side" src="img/components.svg" width="70%">
+
+Each component is solved on its own, exactly like a single-component
+plan. The solved components are then packed into a west-to-east row, in
+order of their first room's appearance in the file: each component after
+the first is translated whole — its internal geometry untouched — so
+that its bounding box starts 10 feet east of the previous one, top edges
+aligned. Rooms in different components are never adjacent, so a door
+between them (or a block spanning them) is invalid.
+
 ## Resolution
 
 In `porta`, rooms are placed into the coordinate system by building and
 traversing a dependency graph. The root is placed at the origin, rooms
 anchored to the root are placed in relation to it, rooms anchored to
 *those* rooms are placed, and so on until no rooms are left. Cycles,
-disconnected components, and irresolvable placements raise errors as
+rootless components, and irresolvable placements raise errors as
 invalid plans. Because of this directed acyclic structure, the whole
 plan can be resolved in a single pass, and no constraint solver is needed.
 
@@ -363,7 +391,9 @@ The coordinate system is measured in feet, with the `x`-axis increasing
 to the right and the `y`-axis increasing downward. The top-left corner
 of the root is placed at `(0,0)`; rooms above or to the left of the root
 have negative coordinates. Each room is defined by the coordinates of its
-top-left corner plus its dimensions.
+top-left corner plus its dimensions. When a plan has several components,
+only the first keeps its literal coordinates; the rest are translated
+into the packed row.
 
 Auto-dimensions (`?`) are resolved just before each room is placed, at which
 point the position and dimensions of its anchors are already known. As a
@@ -377,10 +407,9 @@ defined at the time of its placement, and for each room to share at least
 5 feet of wall with each of its anchors. The following are all invalid
 under this schema and will raise errors:
 
-- 0 or multiple roots
+- A [connected component](#disconnected-components) with 0 or multiple roots
 - Non-existent anchors
 - Cyclic room dependencies
-- Disconnected rooms
 - Overlaps between rooms
 - Gaps between a room and its anchor
 - Corner-only anchor contact

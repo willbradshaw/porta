@@ -645,10 +645,13 @@ def test_in_steps_are_open_at_both_ends() -> None:
     assert (20, 10, 20, 15) not in lines
 
 
-def test_treads_cross_the_run_every_half_grid() -> None:
+def test_treads_narrow_toward_the_downhill_end() -> None:
+    # Run is 10 ft east; treads shrink linearly from the full 5 ft breadth at
+    # the high (west) end to 40% at the low end, centred on y=12.5.
     lines = stair_lines(STAIR_ROOM + "stairs up hall down=right")
-    for x in (12.5, 15, 17.5):
-        assert (x, 10, x, 15) in lines
+    assert (12.5, 10.375, 12.5, 14.625) in lines  # scale 0.85
+    assert (15, 10.75, 15, 14.25) in lines  # scale 0.7
+    assert (17.5, 11.125, 17.5, 13.875) in lines  # scale 0.55
 
 
 def test_arrow_points_in_the_down_direction() -> None:
@@ -659,9 +662,11 @@ def test_arrow_points_in_the_down_direction() -> None:
 
 
 def test_vertical_run_treads_and_arrow() -> None:
+    # down=up: the low end is north, so treads narrow toward smaller y.
     lines = stair_lines(STAIR_ROOM + "stairs up hall down=up")
-    for y in (12.5, 15, 17.5):
-        assert (10, y, 15, y) in lines
+    assert (11.125, 12.5, 13.875, 12.5) in lines  # scale 0.55 (northmost)
+    assert (10.75, 15, 14.25, 15) in lines  # scale 0.7
+    assert (10.375, 17.5, 14.625, 17.5) in lines  # scale 0.85 (southmost)
     assert (12.5, 17.5, 12.5, 12.5) in lines  # shaft, south to north
     assert (12.5, 12.5, 11, 14) in lines
     assert (12.5, 12.5, 14, 14) in lines

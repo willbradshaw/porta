@@ -40,8 +40,9 @@ side  = up | down | left | right
 
 ## Reading the symbol
 
-The arrow always points down the flight. The open (undrawn) sides are the
-entrances, and they distinguish the three senses:
+The arrow always points down the flight, and the treads narrow toward the
+downhill end — two readings of the same fact. The open (undrawn) sides are
+the entrances, and they distinguish the three senses:
 
 ```porta img/stairs-senses.svg
 room going-up "Stairs Up" 20x20 root

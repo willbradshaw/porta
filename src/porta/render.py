@@ -46,6 +46,7 @@ _SECRET_HALO_FT = 0.6  # background-coloured halo that keeps the S legible
 # down= direction) is inset from the footprint ends and tipped with two barbs.
 _TREAD_SPACING_FT = 2.5
 _TREAD_STROKE_FT = 0.25
+_TREAD_MIN_RATIO = 0.4  # tread length at the downhill end, as a fraction
 _STAIR_ARROW_INSET_FT = 2.5
 _STAIR_ARROW_BARB_FT = 1.5
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
@@ -430,19 +431,27 @@ def _stair_hard_edges(stairs: Stairs, rect: Rect) -> list[_Line]:
 
 
 def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
-    """Tread lines crossing the run every half grid (footprint ends excluded)."""
+    """Tread lines crossing the run every half grid (footprint ends excluded).
+
+    Treads narrow toward the downhill end — the classic depth cue — shrinking
+    linearly from the footprint's full breadth at the high end to
+    ``_TREAD_MIN_RATIO`` of it at the low end, centred across the run.
+    """
     x, y, w, h = rect
+    horizontal = stairs.down.axis is Axis.HORIZONTAL
+    run = w if horizontal else h
+    cross = h if horizontal else w
     treads: list[_Line] = []
-    if stairs.down.axis is Axis.HORIZONTAL:
-        t = _TREAD_SPACING_FT
-        while t < w:
-            treads.append((x + t, y, x + t, y + h))
-            t += _TREAD_SPACING_FT
-    else:
-        t = _TREAD_SPACING_FT
-        while t < h:
-            treads.append((x, y + t, x + w, y + t))
-            t += _TREAD_SPACING_FT
+    t = _TREAD_SPACING_FT
+    while t < run:
+        downhill = t if stairs.down in (Direction.RIGHT, Direction.DOWN) else run - t
+        scale = 1 - (1 - _TREAD_MIN_RATIO) * (downhill / run)
+        half = cross * scale / 2
+        if horizontal:
+            treads.append((x + t, y + h / 2 - half, x + t, y + h / 2 + half))
+        else:
+            treads.append((x + w / 2 - half, y + t, x + w / 2 + half, y + t))
+        t += _TREAD_SPACING_FT
     return treads
 
 

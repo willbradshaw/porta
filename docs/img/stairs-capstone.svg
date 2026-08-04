@@ -31,7 +31,7 @@
   <g class="stairs" data-room="hall">
     <line x1="35" y1="5" x2="40" y2="5" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="35" y1="25" x2="40" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-    <line x1="37.5" y1="5" x2="37.5" y2="25" stroke="black" stroke-width="0.25" />
+    <line x1="37.5" y1="8" x2="37.5" y2="22" stroke="black" stroke-width="0.25" />
     <line x1="38.75" y1="15" x2="36.25" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="round" />
     <line x1="36.25" y1="15" x2="37.75" y2="13.5" stroke="black" stroke-width="0.5" stroke-linecap="round" />
     <line x1="36.25" y1="15" x2="37.75" y2="16.5" stroke="black" stroke-width="0.5" stroke-linecap="round" />
@@ -40,9 +40,9 @@
     <line x1="60" y1="15" x2="65" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="60" y1="5" x2="60" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="65" y1="5" x2="65" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-    <line x1="60" y1="7.5" x2="65" y2="7.5" stroke="black" stroke-width="0.25" />
-    <line x1="60" y1="10" x2="65" y2="10" stroke="black" stroke-width="0.25" />
-    <line x1="60" y1="12.5" x2="65" y2="12.5" stroke="black" stroke-width="0.25" />
+    <line x1="61.125" y1="7.5" x2="63.875" y2="7.5" stroke="black" stroke-width="0.25" />
+    <line x1="60.75" y1="10" x2="64.25" y2="10" stroke="black" stroke-width="0.25" />
+    <line x1="60.375" y1="12.5" x2="64.625" y2="12.5" stroke="black" stroke-width="0.25" />
     <line x1="62.5" y1="12.5" x2="62.5" y2="7.5" stroke="black" stroke-width="0.5" stroke-linecap="round" />
     <line x1="62.5" y1="7.5" x2="61" y2="9" stroke="black" stroke-width="0.5" stroke-linecap="round" />
     <line x1="62.5" y1="7.5" x2="64" y2="9" stroke="black" stroke-width="0.5" stroke-linecap="round" />
@@ -51,9 +51,9 @@
     <line x1="50" y1="15" x2="55" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="50" y1="5" x2="50" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="55" y1="5" x2="55" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-    <line x1="50" y1="7.5" x2="55" y2="7.5" stroke="black" stroke-width="0.25" />
-    <line x1="50" y1="10" x2="55" y2="10" stroke="black" stroke-width="0.25" />
-    <line x1="50" y1="12.5" x2="55" y2="12.5" stroke="black" stroke-width="0.25" />
+    <line x1="50.375" y1="7.5" x2="54.625" y2="7.5" stroke="black" stroke-width="0.25" />
+    <line x1="50.75" y1="10" x2="54.25" y2="10" stroke="black" stroke-width="0.25" />
+    <line x1="51.125" y1="12.5" x2="53.875" y2="12.5" stroke="black" stroke-width="0.25" />
     <line x1="52.5" y1="7.5" x2="52.5" y2="12.5" stroke="black" stroke-width="0.5" stroke-linecap="round" />
     <line x1="52.5" y1="12.5" x2="51" y2="11" stroke="black" stroke-width="0.5" stroke-linecap="round" />
     <line x1="52.5" y1="12.5" x2="54" y2="11" stroke="black" stroke-width="0.5" stroke-linecap="round" />

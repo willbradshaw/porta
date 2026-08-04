@@ -858,12 +858,12 @@ def divider_segments(building: Building) -> list[Segment]:
     """Place and validate every divider, as drawn line segments.
 
     A divider marks the suppressed boundary between two members of the same
-    block as a level-change line. The line spans the whole shared edge except
-    where a stair *entrance* (open side, in either room) meets the boundary:
-    the flight continues through the level change there, and a line across
-    the open end would redraw it as closed. A closed side or flank flush
-    with the boundary keeps the line — the flight is walled off from the
-    other half. Assumes a solved building.
+    block as a dashed dividing line. The line spans the whole shared edge
+    except where a stair *entrance* (open side, in either room) meets the
+    boundary: the flight continues across the boundary there, and a line
+    over the open end would redraw it as closed. A closed side or flank
+    flush with the boundary keeps the line — the flight is walled off from
+    the other half. Assumes a solved building.
 
     Raises:
         LayoutError: On an unknown room, rooms not members of one block,

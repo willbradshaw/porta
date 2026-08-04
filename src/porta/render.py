@@ -54,8 +54,8 @@ _TREAD_STROKE_FT = 0.25
 # would read as a solid boundary.
 _TREAD_MAX_RATIO = 0.7
 _TREAD_MIN_RATIO = 0.3
-# Dividers: a level-change line along a suppressed block boundary. Tread-thin
-# and dashed so it reads as an edge (of a dais, a raised half), not a wall.
+# Dividers: a dividing line along a suppressed block boundary. Tread-thin
+# and dashed so it reads as a marking on the floor, not a wall.
 _DIVIDER_STROKE_FT = 0.25
 _DIVIDER_DASH = "1.5 1"  # dash length and gap, in feet
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
@@ -255,7 +255,7 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f"{escape(glyph)}</text>"
         )
 
-    # Dividers: a dashed level-change line along a suppressed block boundary,
+    # Dividers: a dashed dividing line along a suppressed block boundary,
     # cut where a stair entrance carries the flight through it.
     for x1, y1, x2, y2 in sorted(divider_segments(building)):
         lines.append(

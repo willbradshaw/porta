@@ -64,7 +64,7 @@ block hall "Great Hall" main wing
 <img alt="An L-shaped hall with a neighbouring study and chapel" src="img/block-neighbour.svg" width="70%">
 
 The suppressed boundary between two members can be drawn back in as a
-level-change line with a [divider](divider.md).
+dashed dividing line with a [divider](divider.md).
 
 Names and [glyphs](room.md#glyphs) given to individual member rooms are
 suppressed in the SVG map; the block is labeled with the glyph and name

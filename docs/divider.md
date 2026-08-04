@@ -1,8 +1,8 @@
 # Dividers
 
-A **divider** statement marks a level change inside a [block](block.md) —
-the edge of a dais, or the raised half of a chamber — by drawing the
-suppressed boundary between two members back in as a thin dashed line:
+A **divider** statement draws the suppressed boundary between two
+[block](block.md) members back in as a thin dashed dividing line — here,
+the edge of a chamber's raised half:
 
 ```porta img/divider.svg
 room low "" 40x20 root
@@ -27,14 +27,14 @@ divider <member-id> <member-id>
   the two members overlap partially.
 - A divider is purely visual: it does not affect placement, doors, or
   [stairs](stairs.md) validation, and does not appear in the ASCII
-  rendering. It is a level change, not a wall — the space is still one
+  rendering. It is a dividing line, not a wall — the space is still one
   block, with one glyph and one key entry.
 
 ## Stairs through a divider
 
 Where a stair **entrance** (an open end of a flight, in either room) meets
 the boundary, the divider is cut over its span: the flight continues
-through the level change, and an unbroken line across the open end would
+across the boundary, and an unbroken line across the open end would
 redraw it as a closed flight leaving the floor. A *closed* side or flank
 flush with the boundary keeps the line — the flight is walled off from the
 other half.

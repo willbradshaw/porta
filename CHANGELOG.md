@@ -5,9 +5,8 @@ Notable changes per release, newest first.
 ## Unreleased
 
 - Dividers: `divider <a> <b>` draws the suppressed boundary between two
-  members of a block as a thin dashed level-change line (the edge of a
-  dais or a raised half), cut wherever a stair entrance carries a flight
-  through it (see `docs/divider.md`).
+  members of a block as a thin dashed dividing line, cut wherever a stair
+  entrance carries a flight through it (see `docs/divider.md`).
 - `divider` is now a reserved word and cannot be used as a room id.
 
 ## 1.5.0 (2026-08-04)

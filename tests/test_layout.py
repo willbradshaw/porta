@@ -1233,7 +1233,7 @@ def test_stairs_that_do_not_fit_report_the_room() -> None:
 #
 # A split chamber: 'low' (40x20 at the origin) over 'high' (40x10), one
 # block, so the boundary at y=20 (x 0-40) is suppressed; the divider draws
-# it back as a level-change line.
+# it back as a dashed dividing line.
 
 SPLIT_CHAMBER = (
     'room low "" 40x20 root\n'
@@ -1277,7 +1277,7 @@ def test_divider_covers_only_the_overlapping_span() -> None:
     [
         # An 'in' flight in the lower half, topping out on the boundary.
         pytest.param("stairs in low down=up size=10x10 at=15,10", id="in-from-low"),
-        # The same level change drawn in the upper half instead.
+        # The same flight drawn in the upper half instead.
         pytest.param("stairs in high down=down size=10x5 at=15,0", id="in-from-high"),
         # A floor-leaving flight entered across the boundary cuts it too.
         pytest.param("stairs up low down=down size=10x10 at=15,10", id="up-from-low"),
@@ -1292,7 +1292,7 @@ def test_stair_entrance_on_the_boundary_cuts_the_divider(statement: str) -> None
 
 def test_closed_stair_side_on_the_boundary_keeps_the_divider() -> None:
     # The flight runs east along the boundary: its south flank is closed, so
-    # the level-change line runs straight past it.
+    # the dividing line runs straight past it.
     text = f"{SPLIT_CHAMBER}\nstairs up low down=right size=10x5 at=0,15"
     assert dividers(text) == [(0, 20, 40, 20)]
 

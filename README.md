@@ -53,8 +53,8 @@ For more on the `porta` DSL specification, see the following documentation:
   the `door` statement for explicitly adding non-default doors.
 - [**Blocks**](docs/block.md) — the `block` statement for joining
   multiple `room`s into a single non-rectangular space.
-- [**Dividers**](docs/divider.md) — the `divider` statement for marking
-  a level change between two members of a block.
+- [**Dividers**](docs/divider.md) — the `divider` statement for drawing
+  a dividing line between two members of a block.
 - [**Links**](docs/link.md) — the `link` statement for joining
   disconnected components into one continuous plan.
 - [**Stairs**](docs/stairs.md) — the `stairs` statement for flights

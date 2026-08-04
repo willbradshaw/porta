@@ -132,13 +132,12 @@ class Stairs:
 
 @dataclass(frozen=True)
 class Divider:
-    """A level-change line along the boundary of two same-block members.
+    """A dashed dividing line along the boundary of two same-block members.
 
     A block suppresses the wall between its members; a divider draws that
-    boundary back in as a thin dashed line — the edge of a dais or a raised
-    half of the space, not a wall. Spans where a stair entrance meets the
-    boundary are left out, so a flight through the divider keeps its open
-    end (see :func:`~porta.layout.divider_segments`).
+    boundary back in as a thin dashed line. Spans where a stair entrance
+    meets the boundary are left out, so a flight through the divider keeps
+    its open end (see :func:`~porta.layout.divider_segments`).
     """
 
     a: str

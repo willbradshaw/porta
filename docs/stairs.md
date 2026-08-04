@@ -27,7 +27,7 @@ side  = up | down | left | right
   A room may contain any number of stairs. Naming a
   [block](block.md) member places the flight in that member.
 - **`down=<side>`** (required): the plan direction that leads *downward* on
-  the flight — the direction the rendered arrow points.
+  the flight — the direction the rendered treads narrow toward.
 - **`size=<WxH>`**: the footprint in feet (grid multiples). Defaults to one
   grid square across the run and two along it (`10x5` for a horizontal run,
   `5x10` for a vertical one).
@@ -40,9 +40,10 @@ side  = up | down | left | right
 
 ## Reading the symbol
 
-The arrow always points down the flight, and the treads narrow toward the
-downhill end — two readings of the same fact. The open (undrawn) sides are
-the entrances, and they distinguish the three senses:
+The treads narrow toward the downhill end of the flight — broad steps at
+the top shrinking toward the drop. The sides with a solid wall line are
+closed; the open sides (marked only by the thin end tread) are the
+entrances, and they distinguish the three senses:
 
 ```porta img/stairs-senses.svg
 room going-up "Stairs Up" 20x20 root
@@ -55,10 +56,9 @@ stairs in within down=down
 
 <img alt="The three stair senses side by side" src="img/stairs-senses.svg" width="70%">
 
-- **`up`** opens on the side the arrow points toward: you enter at the
-  bottom of the flight and climb away off the floor. Stepping *down* the
-  arrow returns you to this floor.
-- **`down`** opens on the side behind the arrow: you enter at the top and
+- **`up`** opens at the narrow (downhill) end: you enter at the bottom of
+  the flight and climb away off the floor.
+- **`down`** opens at the broad (top) end: you enter at the top and
   descend away off the floor.
 - **`in`** opens at both ends — both the upper and lower levels are on this
   floor, and only the flanks are walled.

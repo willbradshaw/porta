@@ -42,13 +42,11 @@ _DOOR_STROKE_FT = 1.5  # door line thickness, in feet
 _OPEN_DASH = "0.01 1.5"
 _SECRET_FONT_FT = 5  # "S" marker of a secret door, in feet (the map convention)
 _SECRET_HALO_FT = 0.6  # background-coloured halo that keeps the S legible
-# Stairs: treads cross the run every half grid; the arrow (pointing in the
-# down= direction) is inset from the footprint ends and tipped with two barbs.
+# Stairs: treads cross the run every half grid, narrowing toward the
+# downhill (down=) end.
 _TREAD_SPACING_FT = 2.5
 _TREAD_STROKE_FT = 0.25
 _TREAD_MIN_RATIO = 0.4  # tread length at the downhill end, as a fraction
-_STAIR_ARROW_INSET_FT = 2.5
-_STAIR_ARROW_BARB_FT = 1.5
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -246,8 +244,8 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f"{escape(glyph)}</text>"
         )
 
-    # Stairs: hard lines on the non-entrance sides, treads across the run,
-    # and an arrow pointing in the downhill (down=) direction.
+    # Stairs: hard lines on the non-entrance sides and treads across the run,
+    # narrowing toward the downhill (down=) end.
     for stairs, rect in footprints:
         lines.append(f'  <g class="stairs" data-room="{stairs.room}">')
         for sx1, sy1, sx2, sy2 in _stair_hard_edges(stairs, rect):
@@ -262,13 +260,6 @@ def render_svg(building: Building, *, background: str = "white") -> str:
                 f'    <line x1="{_num(sx1)}" y1="{_num(sy1)}" '
                 f'x2="{_num(sx2)}" y2="{_num(sy2)}" '
                 f'stroke="black" stroke-width="{_num(_TREAD_STROKE_FT)}" />'
-            )
-        for sx1, sy1, sx2, sy2 in _stair_arrow(stairs, rect):
-            lines.append(
-                f'    <line x1="{_num(sx1)}" y1="{_num(sy1)}" '
-                f'x2="{_num(sx2)}" y2="{_num(sy2)}" '
-                f'stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" '
-                f'stroke-linecap="round" />'
             )
         lines.append("  </g>")
 
@@ -431,19 +422,27 @@ def _stair_hard_edges(stairs: Stairs, rect: Rect) -> list[_Line]:
 
 
 def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
-    """Tread lines crossing the run every half grid (footprint ends excluded).
+    """Tread lines crossing the run every half grid, ends included.
 
-    Treads narrow toward the downhill end — the classic depth cue — shrinking
-    linearly from the footprint's full breadth at the high end to
-    ``_TREAD_MIN_RATIO`` of it at the low end, centred across the run.
+    Treads narrow toward the downhill end — the depth cue that shows which
+    way the flight descends — shrinking linearly from the footprint's full
+    breadth at the high end to ``_TREAD_MIN_RATIO`` of it at the low end,
+    centred across the run. At a closed end the hard edge already draws the
+    line, so the end tread is emitted only where the footprint is open.
     """
     x, y, w, h = rect
     horizontal = stairs.down.axis is Axis.HORIZONTAL
     run = w if horizontal else h
     cross = h if horizontal else w
+    open_sides = stair_open_sides(stairs)
+    start_open = (Direction.LEFT if horizontal else Direction.UP) in open_sides
+    end_open = (Direction.RIGHT if horizontal else Direction.DOWN) in open_sides
     treads: list[_Line] = []
-    t = _TREAD_SPACING_FT
-    while t < run:
+    t: float = 0
+    while t <= run:
+        if (t == 0 and not start_open) or (t == run and not end_open):
+            t += _TREAD_SPACING_FT
+            continue
         downhill = t if stairs.down in (Direction.RIGHT, Direction.DOWN) else run - t
         scale = 1 - (1 - _TREAD_MIN_RATIO) * (downhill / run)
         half = cross * scale / 2
@@ -453,39 +452,6 @@ def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
             treads.append((x + w / 2 - half, y + t, x + w / 2 + half, y + t))
         t += _TREAD_SPACING_FT
     return treads
-
-
-def _stair_arrow(stairs: Stairs, rect: Rect) -> list[_Line]:
-    """The downhill arrow: a centred shaft along the run plus two tip barbs."""
-    x, y, w, h = rect
-    barb = _STAIR_ARROW_BARB_FT
-    if stairs.down.axis is Axis.HORIZONTAL:
-        cy = y + h / 2
-        inset = min(_STAIR_ARROW_INSET_FT, w / 4)
-        if stairs.down is Direction.RIGHT:
-            tail, tip = x + inset, x + w - inset
-            step = -barb
-        else:
-            tail, tip = x + w - inset, x + inset
-            step = barb
-        return [
-            (tail, cy, tip, cy),
-            (tip, cy, tip + step, cy - barb),
-            (tip, cy, tip + step, cy + barb),
-        ]
-    cx = x + w / 2
-    inset = min(_STAIR_ARROW_INSET_FT, h / 4)
-    if stairs.down is Direction.DOWN:
-        tail, tip = y + inset, y + h - inset
-        step = -barb
-    else:
-        tail, tip = y + h - inset, y + inset
-        step = barb
-    return [
-        (cx, tail, cx, tip),
-        (cx, tip, cx - barb, tip + step),
-        (cx, tip, cx + barb, tip + step),
-    ]
 
 
 def _glyph_font(width: int, height: int, glyph: str) -> float:

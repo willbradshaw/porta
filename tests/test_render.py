@@ -602,13 +602,17 @@ def test_unlabeled_block_draws_no_glyph_and_no_key_line() -> None:
 #
 # A 30x30 room at the origin; the default footprint is (10, 10, 10, 5) for a
 # horizontal run and (10, 10, 5, 10) for a vertical one (centred, one square
-# across the run, two along it). Hard sides use the wall stroke; treads cross
-# the run every half grid; the arrow points in the down= direction.
+# across the run, two along it). Hard sides use the wall stroke (0.5); treads
+# use the thin stroke (0.25), cross the run every half grid ends included,
+# and narrow toward the down= end.
 
 STAIR_ROOM = 'room hall "Hall" 30x30 root\n'
 
+WALL = "0.5"
+TREAD = "0.25"
 
-def stair_lines(text: str) -> list[tuple[float, float, float, float]]:
+
+def stair_lines(text: str, stroke: str) -> list[tuple[float, float, float, float]]:
     root = ET.fromstring(svg_of(text))
     groups = [g for g in root.iter(tag("g")) if g.get("class") == "stairs"]
     assert len(groups) == 1
@@ -620,56 +624,62 @@ def stair_lines(text: str) -> list[tuple[float, float, float, float]]:
             float(line.get("y2", "0")),
         )
         for line in groups[0].iter(tag("line"))
+        if line.get("stroke-width") == stroke
     ]
 
 
 def test_up_stairs_are_open_on_the_downhill_side() -> None:
-    lines = stair_lines(STAIR_ROOM + "stairs up hall down=right")
-    assert (10, 10, 20, 10) in lines  # north flank
-    assert (10, 15, 20, 15) in lines  # south flank
-    assert (10, 10, 10, 15) in lines  # closed far (west) end
-    assert (20, 10, 20, 15) not in lines  # entrance opens where the arrow points
+    edges = stair_lines(STAIR_ROOM + "stairs up hall down=right", WALL)
+    assert (10, 10, 20, 10) in edges  # north flank
+    assert (10, 15, 20, 15) in edges  # south flank
+    assert (10, 10, 10, 15) in edges  # closed far (west) end
+    assert (20, 10, 20, 15) not in edges  # entrance opens at the downhill end
 
 
-def test_down_stairs_are_open_opposite_the_arrow() -> None:
-    lines = stair_lines(STAIR_ROOM + "stairs down hall down=right")
-    assert (20, 10, 20, 15) in lines  # closed far (east) end
-    assert (10, 10, 10, 15) not in lines  # entrance opens behind the arrow
+def test_down_stairs_are_open_at_the_top_end() -> None:
+    edges = stair_lines(STAIR_ROOM + "stairs down hall down=right", WALL)
+    assert (20, 10, 20, 15) in edges  # closed far (east) end
+    assert (10, 10, 10, 15) not in edges  # entrance opens at the high end
 
 
 def test_in_steps_are_open_at_both_ends() -> None:
-    lines = stair_lines(STAIR_ROOM + "stairs in hall down=right")
-    assert (10, 10, 20, 10) in lines
-    assert (10, 15, 20, 15) in lines
-    assert (10, 10, 10, 15) not in lines
-    assert (20, 10, 20, 15) not in lines
+    edges = stair_lines(STAIR_ROOM + "stairs in hall down=right", WALL)
+    assert (10, 10, 20, 10) in edges
+    assert (10, 15, 20, 15) in edges
+    assert (10, 10, 10, 15) not in edges
+    assert (20, 10, 20, 15) not in edges
 
 
 def test_treads_narrow_toward_the_downhill_end() -> None:
     # Run is 10 ft east; treads shrink linearly from the full 5 ft breadth at
-    # the high (west) end to 40% at the low end, centred on y=12.5.
-    lines = stair_lines(STAIR_ROOM + "stairs up hall down=right")
-    assert (12.5, 10.375, 12.5, 14.625) in lines  # scale 0.85
-    assert (15, 10.75, 15, 14.25) in lines  # scale 0.7
-    assert (17.5, 11.125, 17.5, 13.875) in lines  # scale 0.55
+    # the high (west) end to 40% at the low end, centred on y=12.5. The
+    # closed west end has no tread (the hard edge draws that line); the open
+    # east end gets the narrowest tread, marking the entrance.
+    treads = stair_lines(STAIR_ROOM + "stairs up hall down=right", TREAD)
+    assert treads == [
+        (12.5, 10.375, 12.5, 14.625),  # scale 0.85
+        (15, 10.75, 15, 14.25),  # scale 0.7
+        (17.5, 11.125, 17.5, 13.875),  # scale 0.55
+        (20, 11.5, 20, 13.5),  # scale 0.4, at the open end
+    ]
 
 
-def test_arrow_points_in_the_down_direction() -> None:
-    lines = stair_lines(STAIR_ROOM + "stairs up hall down=right")
-    assert (12.5, 12.5, 17.5, 12.5) in lines  # shaft, west to east
-    assert (17.5, 12.5, 16, 11) in lines  # barbs at the east tip
-    assert (17.5, 12.5, 16, 14) in lines
+def test_in_steps_have_treads_at_both_ends() -> None:
+    treads = stair_lines(STAIR_ROOM + "stairs in hall down=right", TREAD)
+    assert (10, 10, 10, 15) in treads  # full breadth at the open high end
+    assert (20, 11.5, 20, 13.5) in treads  # narrowest at the open low end
 
 
-def test_vertical_run_treads_and_arrow() -> None:
-    # down=up: the low end is north, so treads narrow toward smaller y.
-    lines = stair_lines(STAIR_ROOM + "stairs up hall down=up")
-    assert (11.125, 12.5, 13.875, 12.5) in lines  # scale 0.55 (northmost)
-    assert (10.75, 15, 14.25, 15) in lines  # scale 0.7
-    assert (10.375, 17.5, 14.625, 17.5) in lines  # scale 0.85 (southmost)
-    assert (12.5, 17.5, 12.5, 12.5) in lines  # shaft, south to north
-    assert (12.5, 12.5, 11, 14) in lines
-    assert (12.5, 12.5, 14, 14) in lines
+def test_vertical_run_treads() -> None:
+    # down=up: the low end is north, so treads narrow toward smaller y; the
+    # north entrance is open and gets the end tread, the south end is closed.
+    treads = stair_lines(STAIR_ROOM + "stairs up hall down=up", TREAD)
+    assert treads == [
+        (11.5, 10, 13.5, 10),  # scale 0.4, at the open north end
+        (11.125, 12.5, 13.875, 12.5),  # scale 0.55
+        (10.75, 15, 14.25, 15),  # scale 0.7
+        (10.375, 17.5, 14.625, 17.5),  # scale 0.85
+    ]
 
 
 def test_glyph_moves_off_the_stairs() -> None:

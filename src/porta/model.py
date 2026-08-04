@@ -115,10 +115,11 @@ class Stairs:
     """A flight of stairs drawn inside a room.
 
     ``down`` is the plan direction that leads downward on the flight — the
-    direction the rendered arrow points. The open (entrance) sides derive
-    from it and the sense: ``UP`` opens toward ``down``, ``DOWN`` opens away
-    from it, ``IN`` opens at both ends of the run. ``to`` is an opaque
-    destination label (e.g. ``level-2.entry``), recorded but not solved.
+    direction the rendered treads narrow toward. The open (entrance) sides
+    derive from it and the sense: ``UP`` opens toward ``down``, ``DOWN``
+    opens away from it, ``IN`` opens at both ends of the run. ``to`` is an
+    opaque destination label (e.g. ``level-2.entry``), recorded but not
+    solved.
     """
 
     room: str

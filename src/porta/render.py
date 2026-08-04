@@ -46,9 +46,11 @@ _SECRET_HALO_FT = 0.6  # background-coloured halo that keeps the S legible
 # downhill (down=) end.
 _TREAD_SPACING_FT = 2.5
 _TREAD_STROKE_FT = 0.25
-# Tread length as a fraction of the footprint's breadth, interpolated from the
-# high end to the downhill end. The cap stays below 1 so no tread ever spans
-# flank to flank — a full-breadth line would read as a solid boundary.
+# Tread length as a fraction of the footprint's *visible* breadth (the flank
+# strokes are centred on the boundary, so half a wall stroke each side is
+# already ink), interpolated from the high end to the downhill end. The cap
+# stays below 1 so no tread ever spans flank to flank — a full-breadth line
+# would read as a solid boundary.
 _TREAD_MAX_RATIO = 0.7
 _TREAD_MIN_RATIO = 0.3
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
@@ -438,7 +440,9 @@ def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
     x, y, w, h = rect
     horizontal = stairs.down.axis is Axis.HORIZONTAL
     run = w if horizontal else h
-    cross = h if horizontal else w
+    # Ratios apply to the breadth actually visible between the flank walls'
+    # inner faces (each flank stroke intrudes half its width).
+    cross = (h if horizontal else w) - _WALL_STROKE_FT
     open_sides = stair_open_sides(stairs)
     start_open = (Direction.LEFT if horizontal else Direction.UP) in open_sides
     end_open = (Direction.RIGHT if horizontal else Direction.DOWN) in open_sides

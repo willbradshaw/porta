@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="884" viewBox="-17 -10 74 88.4">
+  <rect x="-17" y="-10" width="74" height="88.4" fill="#e0e0e0" />
+  <g stroke="#bbb" stroke-width="0.15">
+    <line x1="0" y1="0" x2="0" y2="40" />
+    <line x1="5" y1="0" x2="5" y2="40" />
+    <line x1="10" y1="0" x2="10" y2="40" />
+    <line x1="15" y1="0" x2="15" y2="40" />
+    <line x1="20" y1="0" x2="20" y2="40" />
+    <line x1="25" y1="0" x2="25" y2="40" />
+    <line x1="30" y1="0" x2="30" y2="40" />
+    <line x1="35" y1="0" x2="35" y2="40" />
+    <line x1="40" y1="0" x2="40" y2="40" />
+    <line x1="0" y1="0" x2="40" y2="0" />
+    <line x1="0" y1="5" x2="40" y2="5" />
+    <line x1="0" y1="10" x2="40" y2="10" />
+    <line x1="0" y1="15" x2="40" y2="15" />
+    <line x1="0" y1="20" x2="40" y2="20" />
+    <line x1="0" y1="25" x2="40" y2="25" />
+    <line x1="0" y1="30" x2="40" y2="30" />
+    <line x1="0" y1="35" x2="40" y2="35" />
+    <line x1="0" y1="40" x2="40" y2="40" />
+  </g>
+  <line x1="0" y1="0" x2="0" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="0" y1="0" x2="40" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="0" y1="30" x2="0" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="0" y1="40" x2="40" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="40" y1="0" x2="40" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="40" y1="30" x2="40" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <text data-block="great" x="20" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">G</text>
+  <line class="divider" x1="0" y1="30" x2="15" y2="30" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
+  <line class="divider" x1="25" y1="30" x2="40" y2="30" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
+  <g class="stairs" data-room="dais">
+    <line x1="15" y1="30" x2="15" y2="35" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+    <line x1="25" y1="30" x2="25" y2="35" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+    <line x1="18.575" y1="30" x2="21.425" y2="30" stroke="black" stroke-width="0.25" />
+    <line x1="17.942" y1="31.667" x2="22.058" y2="31.667" stroke="black" stroke-width="0.25" />
+    <line x1="17.308" y1="33.333" x2="22.692" y2="33.333" stroke="black" stroke-width="0.25" />
+    <line x1="16.675" y1="35" x2="23.325" y2="35" stroke="black" stroke-width="0.25" />
+  </g>
+  <line class="door" x1="15" y1="0" x2="25" y2="0" stroke="black" stroke-width="1.5" />
+  <text class="scale" x="-7" y="59.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="-7" y="68.8" font-size="6">G  Great Hall</text>
+</svg>

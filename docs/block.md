@@ -63,6 +63,9 @@ block hall "Great Hall" main wing
 
 <img alt="An L-shaped hall with a neighbouring study and chapel" src="img/block-neighbour.svg" width="70%">
 
+The suppressed boundary between two members can be drawn back in as a
+level-change line with a [divider](divider.md).
+
 Names and [glyphs](room.md#glyphs) given to individual member rooms are
 suppressed in the SVG map; the block is labeled with the glyph and name
 specified in the `block` statement. Consequently, names of member rooms are
@@ -71,41 +74,6 @@ are permitted but will raise a warning. Similarly, explicit
 [door declarations](door.md#door-declarations) and [statements](door.md#the-door-statement)
 targeting doors on walls within the block will raise a warning that they have
 been dropped.
-
-## Dividers
-
-A **divider** statement draws the suppressed boundary between two members
-back in as a thin dashed line — a level change within the space, such as
-the edge of a dais or a raised half of a chamber, rather than a wall:
-
-```porta img/block-divider.svg
-room low "" 40x20 root
-room high "" 40x10 down-of low
-block chamber "Chamber" low high
-divider low high
-stairs in low down=up size=10x10 at=15,10
-door low outside up
-```
-
-<img alt="A chamber whose raised half is marked by a dashed divider, with steps up to it" src="img/block-divider.svg" width="70%">
-
-```
-divider <member-id> <member-id>
-```
-
-- The two rooms must be **members of the same block** and share a wall; the
-  divider runs the whole shared edge.
-- Where a [stairs](stairs.md) entrance (an open end of a flight, in either
-  room) meets the boundary, the line is cut over its span — the flight
-  continues through the level change, and an unbroken line across its open
-  end would redraw it as a closed flight leaving the floor. A *closed* side
-  or flank flush with the boundary keeps the line.
-- The divider is purely visual: it does not affect placement, doors, or
-  stair validation, and does not appear in the ASCII rendering.
-
-`porta` rejects a divider it can't draw: an unknown room ID, rooms that are
-not members of one block, members that share no wall, or two dividers on
-the same boundary.
 
 ## Invalid blocks
 

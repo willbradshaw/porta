@@ -809,6 +809,8 @@ def _check_stair_access(building: Building, door_lines: list[Segment]) -> None:
                 continue
             covered = any(_doors_overlap(edge, line) for line in door_lines)
             if side in open_sides and not covered:
+                if _opens_into_block(building, by_id, stairs.room, side, edge):
+                    continue  # the block suppressed the wall; nothing blocks
                 raise LayoutError(
                     f"stairs in room {stairs.room!r}: the entrance faces a "
                     f"wall with no door",
@@ -821,6 +823,34 @@ def _check_stair_access(building: Building, door_lines: list[Segment]) -> None:
                     f"flight",
                     line=stairs.line,
                 )
+
+
+def _opens_into_block(
+    building: Building,
+    by_id: dict[str, Room],
+    room_id: str,
+    side: Direction,
+    edge: Segment,
+) -> bool:
+    """Whether ``edge`` opens into a same-block member across the boundary.
+
+    A block suppresses the wall between its members, so a stair entrance
+    flush with that stretch of the room boundary opens into shared floor,
+    not into a wall.
+    """
+    block_of = _block_of(building)
+    block_id = block_of.get(room_id)
+    if block_id is None:
+        return False
+    room = by_id[room_id]
+    x1, y1, x2, y2 = edge
+    span = (x1, x2) if y1 == y2 else (y1, y2)
+    members = next(b.members for b in building.blocks if b.id == block_id)
+    return any(
+        _flush_outside(room, side, by_id[member], span)
+        for member in members
+        if member != room_id
+    )
 
 
 def _rect_edge(rect: Rect, side: Direction) -> Segment:

@@ -1198,6 +1198,18 @@ def test_door_into_a_closed_stair_side_is_rejected() -> None:
     assert exc.value.line == 3
 
 
+def test_stair_entrance_into_a_block_neighbour_is_fine() -> None:
+    # The hall-dais wall is suppressed by the block, so the steps' north
+    # entrance opens into the shared space, not into a wall.
+    text = (
+        'room hall "" 40x30 root\n'
+        'room dais "" 40x10 down-of hall\n'
+        'block great "Great Hall" hall dais\n'
+        "stairs in dais down=up size=10x5 at=15,0"
+    )
+    solve(parse(text))  # does not raise
+
+
 def test_door_beside_a_closed_stair_side_is_fine() -> None:
     # The door sits on the same wall but south of the flight's span.
     text = (

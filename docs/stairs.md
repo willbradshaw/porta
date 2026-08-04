@@ -74,18 +74,26 @@ stairs in within down=down
 - An inaccessible flight: an entrance flush with a stretch of wall that has
   no door on it. (A flight whose *closed* far side sits on a wall is fine —
   the run continues past it on another level — and so is an entrance
-  covered by a door, like a stair closet entered from the next room.)
+  covered by a door, like a stair closet entered from the next room, or
+  one opening across a block-internal boundary.)
 - A blocked door: one whose span meets a closed side or flank of a
   footprint, so it would open into the back of the staircase.
 
 ## Putting it together
 
 ```porta img/stairs-capstone.svg
-room hall "Great Hall" 50x30 root
+room hall "" 40x30 root
+room dais "" 40x10 down-of hall
+block great "Great Hall" hall dais
 room tower "Tower" 20x20 right-of hall
-stairs in hall down=left size=5x20 at=35,5
-stairs up tower down=up at=10,5
-stairs down tower down=down at=5,5
+stairs in dais down=up size=10x5 at=15,0
+stairs up tower down=up at=0,10
+stairs down tower down=down at=5,10
+door=10 dais outside down
 ```
 
-<img alt="A hall with dais steps and a stair tower going both up and down" src="img/stairs-capstone.svg" width="70%">
+The dais is a [block](block.md) member, so the steps' upper entrance opens
+across the suppressed hall–dais boundary into the shared space — no door
+needed there.
+
+<img alt="A great hall with steps up to its dais, and a stair tower with paired flights up and down" src="img/stairs-capstone.svg" width="70%">

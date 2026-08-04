@@ -25,11 +25,11 @@
     <line x1="0" y1="20" x2="80" y2="20" />
   </g>
   <rect data-room="going-down" x="30" y="0" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="going-down" x="40" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">G</text>
+  <text data-room="going-down" x="45" y="10" text-anchor="middle" dominant-baseline="central" font-size="6">G</text>
   <rect data-room="going-up" x="0" y="0" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="going-up" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">O</text>
+  <text data-room="going-up" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="6">O</text>
   <rect data-room="within" x="60" y="0" width="20" height="20" fill="none" stroke="black" stroke-width="0.5" />
-  <text data-room="within" x="70" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">W</text>
+  <text data-room="within" x="75" y="10" text-anchor="middle" dominant-baseline="central" font-size="6">W</text>
   <g class="stairs" data-room="going-up">
     <line x1="5" y1="5" x2="10" y2="5" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="5" y1="5" x2="5" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />

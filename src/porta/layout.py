@@ -32,6 +32,7 @@ from porta.model import (
     Relation,
     Room,
     Stairs,
+    StairSense,
 )
 
 _GRID_FT = 5
@@ -77,8 +78,9 @@ def solve(building: Building) -> Building:
     _validate_glyphs(building)
     building.warnings.extend(_block_warnings(building, by_id, _block_of(building)))
 
-    _placed_doors(building)  # validates every door (raises on a bad one)
-    stair_footprints(building)  # validates every stairs (raises on a bad one)
+    # Validates every door and stairs (raising on a bad one) along the way.
+    door_lines = [segment for segment, _ in _placed_doors(building)]
+    _check_stair_entrances(building, door_lines)
     return building
 
 
@@ -763,6 +765,71 @@ def stair_footprints(building: Building) -> list[tuple[Stairs, Rect]]:
                 )
         placed.append((stairs, rect))
     return placed
+
+
+_OPPOSITE_SIDE: dict[Direction, Direction] = {
+    Direction.UP: Direction.DOWN,
+    Direction.DOWN: Direction.UP,
+    Direction.LEFT: Direction.RIGHT,
+    Direction.RIGHT: Direction.LEFT,
+}
+
+
+def stair_open_sides(stairs: Stairs) -> set[Direction]:
+    """The footprint sides left open — the entrances of the flight.
+
+    ``UP`` stairs open toward ``down`` (you enter at the bottom of the
+    flight); ``DOWN`` stairs open away from it (you enter at the top);
+    ``IN`` steps open at both ends of the run.
+    """
+    if stairs.sense is StairSense.UP:
+        return {stairs.down}
+    if stairs.sense is StairSense.DOWN:
+        return {_OPPOSITE_SIDE[stairs.down]}
+    return {stairs.down, _OPPOSITE_SIDE[stairs.down]}
+
+
+def _check_stair_entrances(building: Building, door_lines: list[Segment]) -> None:
+    """Reject a stair entrance flush with a doorless stretch of wall.
+
+    An entrance on the room boundary is fine when a door (of any kind, on
+    either side) covers part of its span — a stair closet entered through a
+    door. With nothing there to enter from, the flight is inaccessible and
+    almost certainly misorientated.
+    """
+    by_id = {room.id: room for room in building.rooms}
+    for stairs, rect in stair_footprints(building):
+        room = by_id[stairs.room]
+        for side in stair_open_sides(stairs):
+            edge = _rect_edge(rect, side)
+            if _edge_on_room_boundary(edge, room) and not any(
+                _doors_overlap(edge, line) for line in door_lines
+            ):
+                raise LayoutError(
+                    f"stairs in room {stairs.room!r}: the entrance faces a "
+                    f"wall with no door",
+                    line=stairs.line,
+                )
+
+
+def _rect_edge(rect: Rect, side: Direction) -> Segment:
+    """The ``side`` edge of a rectangle as a segment."""
+    x, y, w, h = rect
+    if side is Direction.UP:
+        return (x, y, x + w, y)
+    if side is Direction.DOWN:
+        return (x, y + h, x + w, y + h)
+    if side is Direction.LEFT:
+        return (x, y, x, y + h)
+    return (x + w, y, x + w, y + h)
+
+
+def _edge_on_room_boundary(edge: Segment, room: Room) -> bool:
+    """Whether a footprint edge lies on one of the room's four wall lines."""
+    x1, y1, _x2, y2 = edge
+    if y1 == y2:  # horizontal edge
+        return y1 in (_axis_lo(room, Axis.VERTICAL), _axis_hi(room, Axis.VERTICAL))
+    return x1 in (_axis_lo(room, Axis.HORIZONTAL), _axis_hi(room, Axis.HORIZONTAL))
 
 
 def _rects_overlap(a: Rect, b: Rect) -> bool:

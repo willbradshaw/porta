@@ -6,7 +6,7 @@ levels within the floor:
 
 ```porta img/stairs.svg
 room landing "Landing" 20x20 root
-stairs up landing down=left at=0,0 to=level-1.hall
+stairs up landing down=right at=0,0 to=level-1.hall
 stairs down landing down=right at=10,15 to=level-3.entry
 ```
 
@@ -70,6 +70,10 @@ stairs in within down=down
 - A footprint (default or explicit) that does not fit inside the room.
 - Two stair footprints that overlap.
 - An off-grid `size=` or `at=`, or a missing `down=`.
+- An inaccessible flight: an entrance flush with a stretch of wall that has
+  no door on it. (A flight whose *closed* far side sits on a wall is fine —
+  the run continues past it on another level — and so is an entrance
+  covered by a door, like a stair closet entered from the next room.)
 
 ## Putting it together
 

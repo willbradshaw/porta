@@ -667,9 +667,42 @@ def test_vertical_run_treads_and_arrow() -> None:
     assert (12.5, 12.5, 14, 14) in lines
 
 
+def test_glyph_moves_off_the_stairs() -> None:
+    # The centred footprint blocks the room centre; the glyph settles in the
+    # largest free band (below the stairs) at that band's size.
+    root = ET.fromstring(svg_of(STAIR_ROOM + "stairs up hall down=right"))
+    label = text_by_room(root, "hall")
+    assert (label.get("x"), label.get("y")) == ("15", "22.5")
+    assert label.get("font-size") == "9"
+
+
+def test_glyph_settles_between_two_stairs() -> None:
+    text = (
+        'room landing "Landing" 20x20 root\n'
+        "stairs up landing down=right at=0,0\n"
+        "stairs down landing down=right at=10,15"
+    )
+    label = text_by_room(ET.fromstring(svg_of(text)), "landing")
+    assert (label.get("x"), label.get("y")) == ("10", "10")
+    assert label.get("font-size") == "6"
+
+
+def test_block_glyph_avoids_stairs_in_its_member() -> None:
+    # The block glyph is drawn in 'main'; stairs there push it aside.
+    text = (
+        'room main "" 30x30 root\n'
+        'room wing "" 10x10 down-of main\n'
+        'block hall "Great Hall" main wing\n'
+        "stairs up main down=right"
+    )
+    root = ET.fromstring(svg_of(text))
+    label = next(t for t in root.iter(tag("text")) if t.get("data-block") == "hall")
+    assert (label.get("x"), label.get("y")) == ("15", "22.5")
+
+
 def test_ascii_omits_stairs() -> None:
     text = 'room a "A" 10x10 root'
-    with_stairs = text + "\nstairs up a down=up size=5x10 at=0,0"
+    with_stairs = text + "\nstairs up a down=down size=5x5 at=0,0"
     assert ascii_of(with_stairs) == ascii_of(text)
 
 

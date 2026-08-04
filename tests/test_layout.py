@@ -1092,9 +1092,10 @@ def footprints(text: str) -> list[tuple[int, int, int, int]]:
             (10, 5, 15, 5),
             id="explicit-size-and-at",
         ),
-        # at= may butt the footprint against the far walls.
+        # at= may butt the footprint against the far walls (the *closed* far
+        # side on a wall is fine; the entrance opens north into the room).
         pytest.param(
-            "stairs up hall down=down size=5x10 at=25,20",
+            "stairs down hall down=down size=5x10 at=25,20",
             (25, 20, 5, 10),
             id="flush-far-corner",
         ),
@@ -1120,7 +1121,7 @@ def test_stair_footprint_is_room_relative() -> None:
 def test_two_stairs_may_share_a_room() -> None:
     text = (
         'room landing "Landing" 20x20 root\n'
-        "stairs up landing down=left at=0,0\n"
+        "stairs up landing down=right at=0,0\n"
         "stairs down landing down=right at=10,15"
     )
     assert footprints(text) == [(0, 0, 10, 5), (10, 15, 10, 5)]
@@ -1156,6 +1157,31 @@ def test_two_stairs_may_share_a_room() -> None:
 def test_invalid_stairs_raise(source: str) -> None:
     with pytest.raises(LayoutError):
         solve(parse(source))
+
+
+def test_stair_entrance_facing_a_doorless_wall_is_rejected() -> None:
+    # The flight opens west (down=left, sense up), flush with hall's west
+    # wall — nothing there to enter from.
+    text = 'room hall "Hall" 20x20 root\nstairs up hall down=left at=0,0'
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "entrance faces a wall" in exc.value.message
+    assert exc.value.line == 2
+
+
+def test_stair_entrance_covered_by_a_door_is_fine() -> None:
+    # Same flight, but the closet's default door sits on the entrance span.
+    text = (
+        'room hall "Hall" 20x20 root\n'
+        'room closet "" 10x10 left-of hall\n'
+        "stairs up hall down=left at=0,0"
+    )
+    assert solve(parse(text)).warnings == []
+
+
+def test_stair_entrance_into_the_room_is_fine() -> None:
+    text = 'room hall "Hall" 20x20 root\nstairs up hall down=right at=0,0'
+    solve(parse(text))  # does not raise
 
 
 def test_stairs_that_do_not_fit_report_the_room() -> None:

@@ -5,6 +5,7 @@ the debug-ascii rasterizer below. SVG is built from stdlib string templating
 only (no runtime dependencies).
 """
 
+from itertools import pairwise
 from xml.sax.saxutils import escape
 
 from porta.layout import (
@@ -15,8 +16,9 @@ from porta.layout import (
     room_outline_segments,
     secret_door_segments,
     stair_footprints,
+    stair_open_sides,
 )
-from porta.model import Axis, Building, Direction, Room, Stairs, StairSense
+from porta.model import Axis, Building, Direction, Room, Stairs
 
 _GRID_FT = 5
 _EMPTY = "."
@@ -46,12 +48,6 @@ _TREAD_SPACING_FT = 2.5
 _TREAD_STROKE_FT = 0.25
 _STAIR_ARROW_INSET_FT = 2.5
 _STAIR_ARROW_BARB_FT = 1.5
-_OPPOSITE: dict[Direction, Direction] = {
-    Direction.UP: Direction.DOWN,
-    Direction.DOWN: Direction.UP,
-    Direction.LEFT: Direction.RIGHT,
-    Direction.RIGHT: Direction.LEFT,
-}
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -127,6 +123,16 @@ def render_svg(building: Building, *, background: str = "white") -> str:
     glyphs = _assign_glyphs(building)
     by_id = {room.id: room for room in building.rooms}
     member_block = _member_block(building)
+    footprints = stair_footprints(building)
+    # Stair footprints per room, in room-local coordinates (glyphs avoid them).
+    room_stairs: dict[str, list[Rect]] = {}
+    for stairs, (fx, fy, fw, fh) in footprints:
+        stair_room = by_id[stairs.room]
+        assert stair_room.x is not None
+        assert stair_room.y is not None
+        room_stairs.setdefault(stairs.room, []).append(
+            (fx - stair_room.x, fy - stair_room.y, fw, fh)
+        )
 
     min_x = min(x for _, x, _ in placed)
     min_y = min(y for _, _, y in placed)
@@ -205,10 +211,10 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         glyph = glyphs[room.id]
         if not glyph:
             continue  # unlabeled room
-        font = _glyph_font(room.width, room.height, glyph)
+        lx, ly, font = _glyph_spot(room, room_stairs.get(room.id, []), glyph)
         lines.append(
-            f'  <text data-room="{room.id}" x="{_num(x + room.width / 2)}" '
-            f'y="{_num(y + room.height / 2)}" text-anchor="middle" '
+            f'  <text data-room="{room.id}" x="{_num(x + lx)}" '
+            f'y="{_num(y + ly)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}">'
             f"{escape(glyph)}</text>"
         )
@@ -231,17 +237,17 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         mx, my = member.x, member.y
         assert mx is not None
         assert my is not None
-        font = _glyph_font(member.width, member.height, glyph)
+        lx, ly, font = _glyph_spot(member, room_stairs.get(member.id, []), glyph)
         lines.append(
-            f'  <text data-block="{block.id}" x="{_num(mx + member.width / 2)}" '
-            f'y="{_num(my + member.height / 2)}" text-anchor="middle" '
+            f'  <text data-block="{block.id}" x="{_num(mx + lx)}" '
+            f'y="{_num(my + ly)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}">'
             f"{escape(glyph)}</text>"
         )
 
     # Stairs: hard lines on the non-entrance sides, treads across the run,
     # and an arrow pointing in the downhill (down=) direction.
-    for stairs, rect in stair_footprints(building):
+    for stairs, rect in footprints:
         lines.append(f'  <g class="stairs" data-room="{stairs.room}">')
         for sx1, sy1, sx2, sy2 in _stair_hard_edges(stairs, rect):
             lines.append(
@@ -371,17 +377,47 @@ def _legend_ids(
     return sorted(ids, key=lambda eid: (len(glyphs[eid]), glyphs[eid]))
 
 
+def _glyph_spot(
+    room: Room, obstacles: list[Rect], glyph: str
+) -> tuple[float, float, float]:
+    """Room-local glyph centre and font size, keeping clear of stair footprints.
+
+    With no stairs the glyph sits at the room's centre at the usual size.
+    Otherwise it is centred in the largest free full-width or full-height band
+    between the room's edges and the footprints, sized to that band — falling
+    back to the room centre when every band is blocked.
+    """
+    width, height = room.width, room.height
+    if not obstacles:
+        return width / 2, height / 2, _glyph_font(width, height, glyph)
+    xs = sorted({0, width, *(x for r in obstacles for x in (r[0], r[0] + r[2]))})
+    ys = sorted({0, height, *(y for r in obstacles for y in (r[1], r[1] + r[3]))})
+    bands = [(0, y0, width, y1 - y0) for y0, y1 in pairwise(ys)]
+    bands += [(x0, 0, x1 - x0, height) for x0, x1 in pairwise(xs)]
+    best: Rect | None = None
+    for band in bands:
+        blocked = any(
+            min(band[0] + band[2], r[0] + r[2]) > max(band[0], r[0])
+            and min(band[1] + band[3], r[1] + r[3]) > max(band[1], r[1])
+            for r in obstacles
+        )
+        if blocked:
+            continue
+        if best is None or band[2] * band[3] > best[2] * best[3]:
+            best = band
+    if best is None:
+        return width / 2, height / 2, _glyph_font(width, height, glyph)
+    bx, by, bw, bh = best
+    return bx + bw / 2, by + bh / 2, _glyph_font(bw, bh, glyph)
+
+
 # A drawn line as (x1, y1, x2, y2) in feet (may fall on half-grid points).
 _Line = tuple[float, float, float, float]
 
 
 def _stair_hard_edges(stairs: Stairs, rect: Rect) -> list[_Line]:
-    """The footprint edges drawn solid: every side that isn't an entrance.
-
-    ``UP`` stairs open where the arrow points (you would step down back onto
-    this floor); ``DOWN`` stairs open behind the arrow (you descend away);
-    ``IN`` steps open at both ends of the run, keeping only the flanks.
-    """
+    """The footprint edges drawn solid: every side that isn't an entrance
+    (see :func:`~porta.layout.stair_open_sides`)."""
     x, y, w, h = rect
     edges: dict[Direction, _Line] = {
         Direction.UP: (x, y, x + w, y),
@@ -389,12 +425,7 @@ def _stair_hard_edges(stairs: Stairs, rect: Rect) -> list[_Line]:
         Direction.LEFT: (x, y, x, y + h),
         Direction.RIGHT: (x + w, y, x + w, y + h),
     }
-    if stairs.sense is StairSense.UP:
-        open_sides = {stairs.down}
-    elif stairs.sense is StairSense.DOWN:
-        open_sides = {_OPPOSITE[stairs.down]}
-    else:  # IN
-        open_sides = {stairs.down, _OPPOSITE[stairs.down]}
+    open_sides = stair_open_sides(stairs)
     return [edge for side, edge in edges.items() if side not in open_sides]
 
 

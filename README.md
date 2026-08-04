@@ -55,6 +55,8 @@ For more on the `porta` DSL specification, see the following documentation:
   multiple `room`s into a single non-rectangular space.
 - [**Links**](docs/link.md) — the `link` statement for joining
   disconnected components into one continuous plan.
+- [**Stairs**](docs/stairs.md) — the `stairs` statement for flights
+  leading up or down off a floor, or between levels within one.
 
 ## The `porta` tool
 

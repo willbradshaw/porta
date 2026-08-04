@@ -1,0 +1,4 @@
+room main "" 40x30 root
+room wing "" 20x20 down-of main
+block hall "Great Hall" main wing
+stairs up wing down=down at=5,10

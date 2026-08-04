@@ -598,6 +598,81 @@ def test_unlabeled_block_draws_no_glyph_and_no_key_line() -> None:
     assert [t for t in root.iter(tag("text")) if t.get("data-block")] == []
 
 
+# --- stairs ----------------------------------------------------------------
+#
+# A 30x30 room at the origin; the default footprint is (10, 10, 10, 5) for a
+# horizontal run and (10, 10, 5, 10) for a vertical one (centred, one square
+# across the run, two along it). Hard sides use the wall stroke; treads cross
+# the run every half grid; the arrow points in the down= direction.
+
+STAIR_ROOM = 'room hall "Hall" 30x30 root\n'
+
+
+def stair_lines(text: str) -> list[tuple[float, float, float, float]]:
+    root = ET.fromstring(svg_of(text))
+    groups = [g for g in root.iter(tag("g")) if g.get("class") == "stairs"]
+    assert len(groups) == 1
+    return [
+        (
+            float(line.get("x1", "0")),
+            float(line.get("y1", "0")),
+            float(line.get("x2", "0")),
+            float(line.get("y2", "0")),
+        )
+        for line in groups[0].iter(tag("line"))
+    ]
+
+
+def test_up_stairs_are_open_on_the_downhill_side() -> None:
+    lines = stair_lines(STAIR_ROOM + "stairs up hall down=right")
+    assert (10, 10, 20, 10) in lines  # north flank
+    assert (10, 15, 20, 15) in lines  # south flank
+    assert (10, 10, 10, 15) in lines  # closed far (west) end
+    assert (20, 10, 20, 15) not in lines  # entrance opens where the arrow points
+
+
+def test_down_stairs_are_open_opposite_the_arrow() -> None:
+    lines = stair_lines(STAIR_ROOM + "stairs down hall down=right")
+    assert (20, 10, 20, 15) in lines  # closed far (east) end
+    assert (10, 10, 10, 15) not in lines  # entrance opens behind the arrow
+
+
+def test_in_steps_are_open_at_both_ends() -> None:
+    lines = stair_lines(STAIR_ROOM + "stairs in hall down=right")
+    assert (10, 10, 20, 10) in lines
+    assert (10, 15, 20, 15) in lines
+    assert (10, 10, 10, 15) not in lines
+    assert (20, 10, 20, 15) not in lines
+
+
+def test_treads_cross_the_run_every_half_grid() -> None:
+    lines = stair_lines(STAIR_ROOM + "stairs up hall down=right")
+    for x in (12.5, 15, 17.5):
+        assert (x, 10, x, 15) in lines
+
+
+def test_arrow_points_in_the_down_direction() -> None:
+    lines = stair_lines(STAIR_ROOM + "stairs up hall down=right")
+    assert (12.5, 12.5, 17.5, 12.5) in lines  # shaft, west to east
+    assert (17.5, 12.5, 16, 11) in lines  # barbs at the east tip
+    assert (17.5, 12.5, 16, 14) in lines
+
+
+def test_vertical_run_treads_and_arrow() -> None:
+    lines = stair_lines(STAIR_ROOM + "stairs up hall down=up")
+    for y in (12.5, 15, 17.5):
+        assert (10, y, 15, y) in lines
+    assert (12.5, 17.5, 12.5, 12.5) in lines  # shaft, south to north
+    assert (12.5, 12.5, 11, 14) in lines
+    assert (12.5, 12.5, 14, 14) in lines
+
+
+def test_ascii_omits_stairs() -> None:
+    text = 'room a "A" 10x10 root'
+    with_stairs = text + "\nstairs up a down=up size=5x10 at=0,0"
+    assert ascii_of(with_stairs) == ascii_of(text)
+
+
 def test_ascii_renders_packed_components_with_a_gap() -> None:
     text = 'room a "A" 10x10 root\nroom b "B" 10x10 root'
     assert ascii_of(text) == ("A A . . B B\nA A . . B B\n\nA=a  B=b")

@@ -17,6 +17,7 @@ from porta.layout import (
     open_door_segments,
     secret_door_segments,
     solve,
+    stair_footprints,
 )
 from porta.model import Building, Room
 from porta.parser import parse
@@ -1069,6 +1070,100 @@ def test_overlap_caused_by_a_link_is_detected() -> None:
     )
     with pytest.raises(OverlapError):
         solve(parse(text))
+
+
+# --- stairs ----------------------------------------------------------------
+
+
+def footprints(text: str) -> list[tuple[int, int, int, int]]:
+    return [rect for _, rect in stair_footprints(solve(parse(text)))]
+
+
+@pytest.mark.parametrize(
+    ("statement", "expected"),
+    [
+        # A 30x30 room at the origin. Default footprint is one grid square
+        # across the run and two along it, centred (rounded down to the grid).
+        pytest.param("stairs up hall down=right", (10, 10, 10, 5), id="run-east"),
+        pytest.param("stairs down hall down=up", (10, 10, 5, 10), id="run-north"),
+        # Explicit size and position, measured from the room's NW corner.
+        pytest.param(
+            "stairs in hall down=left size=15x5 at=10,5",
+            (10, 5, 15, 5),
+            id="explicit-size-and-at",
+        ),
+        # at= may butt the footprint against the far walls.
+        pytest.param(
+            "stairs up hall down=down size=5x10 at=25,20",
+            (25, 20, 5, 10),
+            id="flush-far-corner",
+        ),
+    ],
+)
+def test_stair_footprint_geometry(
+    statement: str, expected: tuple[int, int, int, int]
+) -> None:
+    text = f'room hall "Hall" 30x30 root\n{statement}'
+    assert footprints(text) == [expected]
+
+
+def test_stair_footprint_is_room_relative() -> None:
+    # The room sits away from the origin; the footprint follows it.
+    text = (
+        'room a "A" 10x10 root\n'
+        'room hall "Hall" 20x20 right-of a\n'
+        "stairs up hall down=right"
+    )
+    assert footprints(text) == [(15, 5, 10, 5)]
+
+
+def test_two_stairs_may_share_a_room() -> None:
+    text = (
+        'room landing "Landing" 20x20 root\n'
+        "stairs up landing down=left at=0,0\n"
+        "stairs down landing down=right at=10,15"
+    )
+    assert footprints(text) == [(0, 0, 10, 5), (10, 15, 10, 5)]
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param(
+            'room hall "Hall" 20x20 root\nstairs up ghost down=up',
+            id="unknown-room",
+        ),
+        pytest.param(
+            'room hall "Hall" 5x5 root\nstairs up hall down=right',
+            id="default-footprint-too-wide",
+        ),
+        pytest.param(
+            'room hall "Hall" 20x20 root\nstairs up hall down=up size=25x5',
+            id="explicit-size-too-wide",
+        ),
+        pytest.param(
+            'room hall "Hall" 20x20 root\nstairs up hall down=right at=15,0',
+            id="at-pushes-past-the-wall",
+        ),
+        pytest.param(
+            'room landing "Landing" 20x20 root\n'
+            "stairs up landing down=left at=0,0\n"
+            "stairs down landing down=right at=5,0",
+            id="overlapping-footprints",
+        ),
+    ],
+)
+def test_invalid_stairs_raise(source: str) -> None:
+    with pytest.raises(LayoutError):
+        solve(parse(source))
+
+
+def test_stairs_that_do_not_fit_report_the_room() -> None:
+    text = 'room hall "Hall" 5x5 root\nstairs up hall down=right'
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "'hall'" in exc.value.message
+    assert exc.value.line == 2
 
 
 # --- overlap detection -----------------------------------------------------

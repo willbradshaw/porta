@@ -8,13 +8,15 @@ only (no runtime dependencies).
 from xml.sax.saxutils import escape
 
 from porta.layout import (
+    Rect,
     block_wall_segments,
     door_segments,
     open_door_segments,
     room_outline_segments,
     secret_door_segments,
+    stair_footprints,
 )
-from porta.model import Building, Room
+from porta.model import Axis, Building, Direction, Room, Stairs, StairSense
 
 _GRID_FT = 5
 _EMPTY = "."
@@ -38,6 +40,18 @@ _DOOR_STROKE_FT = 1.5  # door line thickness, in feet
 _OPEN_DASH = "0.01 1.5"
 _SECRET_FONT_FT = 5  # "S" marker of a secret door, in feet (the map convention)
 _SECRET_HALO_FT = 0.6  # background-coloured halo that keeps the S legible
+# Stairs: treads cross the run every half grid; the arrow (pointing in the
+# down= direction) is inset from the footprint ends and tipped with two barbs.
+_TREAD_SPACING_FT = 2.5
+_TREAD_STROKE_FT = 0.25
+_STAIR_ARROW_INSET_FT = 2.5
+_STAIR_ARROW_BARB_FT = 1.5
+_OPPOSITE: dict[Direction, Direction] = {
+    Direction.UP: Direction.DOWN,
+    Direction.DOWN: Direction.UP,
+    Direction.LEFT: Direction.RIGHT,
+    Direction.RIGHT: Direction.LEFT,
+}
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -47,7 +61,8 @@ def render_ascii(building: Building) -> str:
     One cell per 5-ft square, space-separated, north at the top; every cell is
     padded to the widest glyph in the plan. Empty cells are ``.``; an unlabeled
     room's cells are ``_``. A blank line then a ``glyph=id`` legend
-    (shortest-glyph-first, then lexicographic) follows.
+    (shortest-glyph-first, then lexicographic) follows. Like doors, stairs
+    are not rendered in the ascii grid (it shows room extents only).
 
     Args:
         building: A building whose rooms have been placed by
@@ -224,6 +239,32 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f"{escape(glyph)}</text>"
         )
 
+    # Stairs: hard lines on the non-entrance sides, treads across the run,
+    # and an arrow pointing in the downhill (down=) direction.
+    for stairs, rect in stair_footprints(building):
+        lines.append(f'  <g class="stairs" data-room="{stairs.room}">')
+        for sx1, sy1, sx2, sy2 in _stair_hard_edges(stairs, rect):
+            lines.append(
+                f'    <line x1="{_num(sx1)}" y1="{_num(sy1)}" '
+                f'x2="{_num(sx2)}" y2="{_num(sy2)}" '
+                f'stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" '
+                f'stroke-linecap="square" />'
+            )
+        for sx1, sy1, sx2, sy2 in _stair_treads(stairs, rect):
+            lines.append(
+                f'    <line x1="{_num(sx1)}" y1="{_num(sy1)}" '
+                f'x2="{_num(sx2)}" y2="{_num(sy2)}" '
+                f'stroke="black" stroke-width="{_num(_TREAD_STROKE_FT)}" />'
+            )
+        for sx1, sy1, sx2, sy2 in _stair_arrow(stairs, rect):
+            lines.append(
+                f'    <line x1="{_num(sx1)}" y1="{_num(sy1)}" '
+                f'x2="{_num(sx2)}" y2="{_num(sy2)}" '
+                f'stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" '
+                f'stroke-linecap="round" />'
+            )
+        lines.append("  </g>")
+
     # Open doors: a dotted line across the gap left in the walls above.
     for x1, y1, x2, y2 in sorted(open_door_segments(building)):
         lines.append(
@@ -328,6 +369,83 @@ def _legend_ids(
     """
     ids = [eid for eid in _entity_ids(building, member_block) if glyphs[eid]]
     return sorted(ids, key=lambda eid: (len(glyphs[eid]), glyphs[eid]))
+
+
+# A drawn line as (x1, y1, x2, y2) in feet (may fall on half-grid points).
+_Line = tuple[float, float, float, float]
+
+
+def _stair_hard_edges(stairs: Stairs, rect: Rect) -> list[_Line]:
+    """The footprint edges drawn solid: every side that isn't an entrance.
+
+    ``UP`` stairs open where the arrow points (you would step down back onto
+    this floor); ``DOWN`` stairs open behind the arrow (you descend away);
+    ``IN`` steps open at both ends of the run, keeping only the flanks.
+    """
+    x, y, w, h = rect
+    edges: dict[Direction, _Line] = {
+        Direction.UP: (x, y, x + w, y),
+        Direction.DOWN: (x, y + h, x + w, y + h),
+        Direction.LEFT: (x, y, x, y + h),
+        Direction.RIGHT: (x + w, y, x + w, y + h),
+    }
+    if stairs.sense is StairSense.UP:
+        open_sides = {stairs.down}
+    elif stairs.sense is StairSense.DOWN:
+        open_sides = {_OPPOSITE[stairs.down]}
+    else:  # IN
+        open_sides = {stairs.down, _OPPOSITE[stairs.down]}
+    return [edge for side, edge in edges.items() if side not in open_sides]
+
+
+def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
+    """Tread lines crossing the run every half grid (footprint ends excluded)."""
+    x, y, w, h = rect
+    treads: list[_Line] = []
+    if stairs.down.axis is Axis.HORIZONTAL:
+        t = _TREAD_SPACING_FT
+        while t < w:
+            treads.append((x + t, y, x + t, y + h))
+            t += _TREAD_SPACING_FT
+    else:
+        t = _TREAD_SPACING_FT
+        while t < h:
+            treads.append((x, y + t, x + w, y + t))
+            t += _TREAD_SPACING_FT
+    return treads
+
+
+def _stair_arrow(stairs: Stairs, rect: Rect) -> list[_Line]:
+    """The downhill arrow: a centred shaft along the run plus two tip barbs."""
+    x, y, w, h = rect
+    barb = _STAIR_ARROW_BARB_FT
+    if stairs.down.axis is Axis.HORIZONTAL:
+        cy = y + h / 2
+        inset = min(_STAIR_ARROW_INSET_FT, w / 4)
+        if stairs.down is Direction.RIGHT:
+            tail, tip = x + inset, x + w - inset
+            step = -barb
+        else:
+            tail, tip = x + w - inset, x + inset
+            step = barb
+        return [
+            (tail, cy, tip, cy),
+            (tip, cy, tip + step, cy - barb),
+            (tip, cy, tip + step, cy + barb),
+        ]
+    cx = x + w / 2
+    inset = min(_STAIR_ARROW_INSET_FT, h / 4)
+    if stairs.down is Direction.DOWN:
+        tail, tip = y + inset, y + h - inset
+        step = -barb
+    else:
+        tail, tip = y + h - inset, y + inset
+        step = barb
+    return [
+        (cx, tail, cx, tip),
+        (cx, tip, cx - barb, tip + step),
+        (cx, tip, cx + barb, tip + step),
+    ]
 
 
 def _glyph_font(width: int, height: int, glyph: str) -> float:

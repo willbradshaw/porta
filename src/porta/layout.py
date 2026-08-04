@@ -31,6 +31,7 @@ from porta.model import (
     Link,
     Relation,
     Room,
+    Stairs,
 )
 
 _GRID_FT = 5
@@ -77,6 +78,7 @@ def solve(building: Building) -> Building:
     building.warnings.extend(_block_warnings(building, by_id, _block_of(building)))
 
     _placed_doors(building)  # validates every door (raises on a bad one)
+    stair_footprints(building)  # validates every stairs (raises on a bad one)
     return building
 
 
@@ -712,6 +714,62 @@ def _door_on_wall(
     if horizontal:
         return (start, coord, end, coord)
     return (coord, start, coord, end)
+
+
+def stair_footprints(building: Building) -> list[tuple[Stairs, Rect]]:
+    """Place and validate every stairs, as ``(stairs, footprint)`` pairs.
+
+    The footprint is absolute ``(x, y, w, h)`` in feet. The default size is
+    one grid square across the run and two along it (from ``down``'s axis);
+    the default position is centred in the room, rounded down to the grid.
+    Assumes a solved building.
+
+    Raises:
+        LayoutError: On an unknown room, a footprint that does not fit its
+            room, or two overlapping footprints.
+    """
+    by_id = {room.id: room for room in building.rooms}
+    placed: list[tuple[Stairs, Rect]] = []
+    for stairs in building.stairs:
+        room = by_id.get(stairs.room)
+        if room is None:
+            raise LayoutError(
+                f"stairs reference unknown room {stairs.room!r}", line=stairs.line
+            )
+        if stairs.size is not None:
+            w, h = stairs.size
+        elif stairs.down.axis is Axis.HORIZONTAL:
+            w, h = 2 * _GRID_FT, _GRID_FT
+        else:
+            w, h = _GRID_FT, 2 * _GRID_FT
+        if stairs.at is not None:
+            ox, oy = stairs.at
+        else:
+            ox = (room.width - w) // (2 * _GRID_FT) * _GRID_FT
+            oy = (room.height - h) // (2 * _GRID_FT) * _GRID_FT
+        if ox < 0 or oy < 0 or ox + w > room.width or oy + h > room.height:
+            raise LayoutError(
+                f"stairs in {room.id!r} ({w}x{h} at {ox},{oy}) do not fit the "
+                f"room ({room.width}x{room.height})",
+                line=stairs.line,
+            )
+        assert room.x is not None
+        assert room.y is not None
+        rect: Rect = (room.x + ox, room.y + oy, w, h)
+        for _, other in placed:
+            if _rects_overlap(rect, other):
+                raise LayoutError(
+                    f"two stairs in room {room.id!r} overlap", line=stairs.line
+                )
+        placed.append((stairs, rect))
+    return placed
+
+
+def _rects_overlap(a: Rect, b: Rect) -> bool:
+    """Whether two rectangles share interior area (flush contact is fine)."""
+    ax, ay, aw, ah = a
+    bx, by, bw, bh = b
+    return min(ax + aw, bx + bw) > max(ax, bx) and min(ay + ah, by + bh) > max(ay, by)
 
 
 def find_overlaps(building: Building) -> list[tuple[Room, Room, Rect]]:

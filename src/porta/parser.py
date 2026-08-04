@@ -35,6 +35,8 @@ from porta.model import (
     Link,
     Relation,
     Room,
+    Stairs,
+    StairSense,
 )
 
 
@@ -100,9 +102,12 @@ _RESERVED: frozenset[str] = frozenset(
         "shift",
         "align",
         "link",
+        "stairs",
+        "in",
         *_KEYWORDS,
     }
 )
+_STAIR_SENSES: dict[str, StairSense] = {sense.value: sense for sense in StairSense}
 
 
 def parse(text: str) -> Building:
@@ -122,6 +127,7 @@ def parse(text: str) -> Building:
     external_doors: list[ExternalDoor] = []
     blocks: list[Block] = []
     links: list[Link] = []
+    stairs: list[Stairs] = []
     seen: set[str] = set()
     for tokens, lineno in _statements(text):
         head = tokens[0]
@@ -139,6 +145,9 @@ def parse(text: str) -> Building:
         if _is_bare(head, "link"):
             links.append(_parse_link(tokens, lineno))
             continue
+        if _is_bare(head, "stairs"):
+            stairs.append(_parse_stairs(tokens, lineno))
+            continue
         if _is_bare(head, "block"):
             block = _parse_block(tokens, lineno)
             if block.id in seen:
@@ -151,7 +160,9 @@ def parse(text: str) -> Building:
             raise ParseError(f"duplicate room id {room.id!r}", line=lineno)
         seen.add(room.id)
         rooms.append(room)
-    return Building(rooms, doors, external_doors, blocks=blocks, links=links)
+    return Building(
+        rooms, doors, external_doors, blocks=blocks, links=links, stairs=stairs
+    )
 
 
 def _statements(text: str) -> list[tuple[list[Token], int]]:
@@ -568,6 +579,88 @@ def _parse_link(tokens: list[Token], lineno: int) -> Link:
     if relation.anchor == room:
         raise ParseError("a link needs two different rooms", line=lineno)
     return Link(room=room, relation=relation, line=lineno)
+
+
+def _parse_stairs(tokens: list[Token], lineno: int) -> Stairs:
+    """Parse a ``stairs <up|down|in> <room> down=<side> [modifiers...]`` line.
+
+    ``down=`` (required) is the plan direction that leads downward on the
+    flight. Optional modifiers: ``size=WxH``, ``at=X,Y`` (offset from the
+    room's NW corner; default centred), and an opaque ``to=<label>``.
+    Whether the room exists and the footprint fits are left to layout.
+    """
+    if len(tokens) < 3:
+        raise ParseError("stairs need '<up|down|in> <room>'", line=lineno)
+    sense_value, sense_quoted, sense_line = tokens[1]
+    sense = _STAIR_SENSES.get(sense_value)
+    if sense_quoted or sense is None:
+        raise ParseError(
+            f"stairs direction must be up, down, or in, got {sense_value!r}",
+            line=sense_line,
+        )
+    room, room_quoted, room_line = tokens[2]
+    _validate_id(room, room_quoted, room_line)
+
+    down: Direction | None = None
+    size: tuple[int, int] | None = None
+    at: tuple[int, int] | None = None
+    to: str | None = None
+    for token in tokens[3:]:
+        value, quoted, line = token
+        if quoted:
+            raise ParseError(f"unexpected quoted value {value!r}", line=line)
+        if value.startswith("down="):
+            side = value[len("down=") :]
+            down = _SIDES.get(side)
+            if down is None:
+                raise ParseError(
+                    f"down= side must be up/down/left/right, got {side!r}", line=line
+                )
+        elif value.startswith("size="):
+            size = _parse_stair_size(value[len("size=") :], line)
+        elif value.startswith("at="):
+            at = _parse_stair_at(value[len("at=") :], line)
+        elif value.startswith("to="):
+            to = value[len("to=") :]
+            if not to:
+                raise ParseError("to= needs a destination label", line=line)
+        else:
+            raise ParseError(f"unknown stairs modifier {value!r}", line=line)
+    if down is None:
+        raise ParseError("stairs need a down=<side> orientation", line=lineno)
+    return Stairs(
+        room=room, sense=sense, down=down, size=size, at=at, to=to, line=lineno
+    )
+
+
+def _parse_stair_size(raw: str, lineno: int) -> tuple[int, int]:
+    """Parse a stair footprint ``WxH``: positive, on-grid, no ``?``."""
+    match = re.fullmatch(r"([0-9]+)x([0-9]+)", raw)
+    if match is None:
+        raise ParseError(f"stairs size must be WxH in feet, got {raw!r}", line=lineno)
+    width, _ = _parse_dimension(match.group(1), "stairs width", lineno)
+    height, _ = _parse_dimension(match.group(2), "stairs height", lineno)
+    return width, height
+
+
+def _parse_stair_at(raw: str, lineno: int) -> tuple[int, int]:
+    """Parse a stair position ``X,Y``: non-negative, on-grid feet."""
+    match = re.fullmatch(r"(-?[0-9]+),(-?[0-9]+)", raw)
+    if match is None:
+        raise ParseError(f"stairs at= must be X,Y in feet, got {raw!r}", line=lineno)
+    x, y = int(match.group(1)), int(match.group(2))
+    for label, value in (("x", x), ("y", y)):
+        if value < 0:
+            raise ParseError(
+                f"stairs at= {label} must be non-negative, got {value}", line=lineno
+            )
+        if value % _GRID_FT != 0:
+            raise ParseError(
+                f"stairs at= {label} must be a multiple of {_GRID_FT} (the grid), "
+                f"got {value}",
+                line=lineno,
+            )
+    return x, y
 
 
 def _parse_door(token: str, lineno: int) -> Door:

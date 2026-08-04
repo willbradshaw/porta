@@ -15,7 +15,7 @@ import textwrap
 import pytest
 
 from porta.errors import ParseError
-from porta.model import Align, Building, Direction, Door, Relation
+from porta.model import Align, Building, Direction, Door, Relation, StairSense
 from porta.parser import parse
 
 # Lines: 1 blank, 2 comment, 3 entrance, 4 kitchen, 5 hall.
@@ -665,6 +665,77 @@ def test_link_no_door_is_parsed() -> None:
     ],
 )
 def test_invalid_link_raises(source: str) -> None:
+    with pytest.raises(ParseError):
+        parse(source)
+
+
+# --- stairs statements -----------------------------------------------------
+
+
+def test_stairs_are_parsed_with_defaults() -> None:
+    building = parse('room hall "Hall" 20x20 root\nstairs down hall down=right')
+    assert len(building.stairs) == 1
+    stairs = building.stairs[0]
+    assert stairs.room == "hall"
+    assert stairs.sense is StairSense.DOWN
+    assert stairs.down is Direction.RIGHT
+    assert stairs.size is None
+    assert stairs.at is None
+    assert stairs.to is None
+    assert stairs.line == 2
+
+
+@pytest.mark.parametrize(
+    ("keyword", "sense"),
+    [("up", StairSense.UP), ("down", StairSense.DOWN), ("in", StairSense.IN)],
+)
+def test_each_stair_sense_keyword_maps(keyword: str, sense: StairSense) -> None:
+    stairs = parse(f"stairs {keyword} hall down=up").stairs[0]
+    assert stairs.sense is sense
+
+
+def test_stairs_modifiers_are_parsed() -> None:
+    stairs = parse(
+        "stairs in dais down=left size=15x5 at=10,5 to=level-2.entry"
+    ).stairs[0]
+    assert stairs.down is Direction.LEFT
+    assert stairs.size == (15, 5)
+    assert stairs.at == (10, 5)
+    assert stairs.to == "level-2.entry"
+
+
+def test_two_stairs_in_one_room_parse() -> None:
+    text = (
+        'room landing "Landing" 20x20 root\n'
+        "stairs up landing down=left at=0,0\n"
+        "stairs down landing down=right at=10,10"
+    )
+    assert [s.sense for s in parse(text).stairs] == [StairSense.UP, StairSense.DOWN]
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param("stairs", id="bare-keyword"),
+        pytest.param("stairs up", id="missing-room"),
+        pytest.param("stairs hall down=up", id="missing-sense"),
+        pytest.param("stairs sideways hall down=up", id="bad-sense"),
+        pytest.param("stairs up hall", id="missing-down"),
+        pytest.param("stairs up hall down=northeast", id="bad-side"),
+        pytest.param("stairs up hall down=up size=12x5", id="size-off-grid"),
+        pytest.param("stairs up hall down=up size=0x5", id="size-zero"),
+        pytest.param("stairs up hall down=up size=10", id="size-malformed"),
+        pytest.param("stairs up hall down=up at=3,5", id="at-off-grid"),
+        pytest.param("stairs up hall down=up at=-5,0", id="at-negative"),
+        pytest.param("stairs up hall down=up at=5", id="at-malformed"),
+        pytest.param("stairs up hall down=up to=", id="to-empty"),
+        pytest.param("stairs up hall down=up gap=5", id="unknown-modifier"),
+        pytest.param('stairs up "hall" down=up', id="quoted-room"),
+        pytest.param('room stairs "S" 10x10 root', id="stairs-is-reserved"),
+        pytest.param('room in "I" 10x10 root', id="in-is-reserved"),
+    ],
+)
+def test_invalid_stairs_raises(source: str) -> None:
     with pytest.raises(ParseError):
         parse(source)
 

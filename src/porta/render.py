@@ -49,8 +49,8 @@ _TREAD_STROKE_FT = 0.25
 # Tread length as a fraction of the footprint's breadth, interpolated from the
 # high end to the downhill end. The cap stays below 1 so no tread ever spans
 # flank to flank — a full-breadth line would read as a solid boundary.
-_TREAD_MAX_RATIO = 0.8
-_TREAD_MIN_RATIO = 0.4
+_TREAD_MAX_RATIO = 0.7
+_TREAD_MIN_RATIO = 0.3
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 

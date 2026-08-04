@@ -1,0 +1,5 @@
+room low "" 10x20 root
+room high "" 10x10 down-of low
+block cell "Cell" low high
+divider low high
+stairs in low down=up size=10x10 at=0,10

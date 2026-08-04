@@ -598,6 +598,148 @@ def test_unlabeled_block_draws_no_glyph_and_no_key_line() -> None:
     assert [t for t in root.iter(tag("text")) if t.get("data-block")] == []
 
 
+# --- stairs ----------------------------------------------------------------
+#
+# A 30x30 room at the origin; the default footprint is (10, 10, 10, 5) for a
+# horizontal run and (10, 10, 5, 10) for a vertical one (centred, one square
+# across the run, two along it). Hard sides use the wall stroke (0.5); treads
+# use the thin stroke (0.25), cross the run every third of a grid square ends
+# included, and narrow toward the down= end.
+
+STAIR_ROOM = 'room hall "Hall" 30x30 root\n'
+
+WALL = "0.5"
+TREAD = "0.25"
+
+
+def stair_lines(text: str, stroke: str) -> list[tuple[float, float, float, float]]:
+    root = ET.fromstring(svg_of(text))
+    groups = [g for g in root.iter(tag("g")) if g.get("class") == "stairs"]
+    assert len(groups) == 1
+    return [
+        (
+            float(line.get("x1", "0")),
+            float(line.get("y1", "0")),
+            float(line.get("x2", "0")),
+            float(line.get("y2", "0")),
+        )
+        for line in groups[0].iter(tag("line"))
+        if line.get("stroke-width") == stroke
+    ]
+
+
+def test_up_stairs_are_open_on_the_downhill_side() -> None:
+    edges = stair_lines(STAIR_ROOM + "stairs up hall down=right", WALL)
+    assert (10, 10, 20, 10) in edges  # north flank
+    assert (10, 15, 20, 15) in edges  # south flank
+    assert (10, 10, 10, 15) in edges  # closed far (west) end
+    assert (20, 10, 20, 15) not in edges  # entrance opens at the downhill end
+
+
+def test_down_stairs_are_open_at_the_top_end() -> None:
+    edges = stair_lines(STAIR_ROOM + "stairs down hall down=right", WALL)
+    assert (20, 10, 20, 15) in edges  # closed far (east) end
+    assert (10, 10, 10, 15) not in edges  # entrance opens at the high end
+
+
+def test_in_steps_are_open_at_both_ends() -> None:
+    edges = stair_lines(STAIR_ROOM + "stairs in hall down=right", WALL)
+    assert (10, 10, 20, 10) in edges
+    assert (10, 15, 20, 15) in edges
+    assert (10, 10, 10, 15) not in edges
+    assert (20, 10, 20, 15) not in edges
+
+
+def test_treads_narrow_toward_the_downhill_end() -> None:
+    # Run is 10 ft east; treads shrink linearly from 80% of the 5 ft breadth
+    # at the high (west) end to 40% at the low end, centred on y=12.5. The
+    # closed west end has no tread (the hard edge draws that line); the open
+    # east end gets the narrowest tread, marking the entrance.
+    # Ratios apply to the visible breadth between the flank walls' inner
+    # faces: 5 ft minus the 0.5 ft wall stroke = 4.5 ft. A 10-ft run has six
+    # tread intervals (three per square); the closed west end has no tread.
+    treads = stair_lines(STAIR_ROOM + "stairs up hall down=right", TREAD)
+    assert treads == [
+        (11.667, 11.075, 11.667, 13.925),  # scale 0.633
+        (13.333, 11.225, 13.333, 13.775),  # scale 0.567
+        (15, 11.375, 15, 13.625),  # scale 0.5
+        (16.667, 11.525, 16.667, 13.475),  # scale 0.433
+        (18.333, 11.675, 18.333, 13.325),  # scale 0.367
+        (20, 11.825, 20, 13.175),  # scale 0.3, at the open end
+    ]
+
+
+def test_in_steps_have_treads_at_both_ends_never_flank_to_flank() -> None:
+    treads = stair_lines(STAIR_ROOM + "stairs in hall down=right", TREAD)
+    # The broadest tread (the open high end) still stops short of the
+    # flanks, so it cannot be mistaken for a solid boundary.
+    assert (10, 10.925, 10, 14.075) in treads  # scale 0.7 at the open high end
+    assert (20, 11.825, 20, 13.175) in treads  # scale 0.3 at the open low end
+    assert (10, 10, 10, 15) not in treads
+
+
+def test_tread_count_scales_with_run_length() -> None:
+    # Three intervals per square: a 15-ft run has nine; the closed east end
+    # contributes no tread, the open west entrance does.
+    treads = stair_lines(
+        STAIR_ROOM + "stairs down hall down=right size=15x5 at=5,10", TREAD
+    )
+    assert len(treads) == 9
+
+
+def test_vertical_run_treads() -> None:
+    # down=up: the low end is north, so treads narrow toward smaller y; the
+    # north entrance is open and gets the end tread, the south end is closed.
+    treads = stair_lines(STAIR_ROOM + "stairs up hall down=up", TREAD)
+    assert treads == [
+        (11.825, 10, 13.175, 10),  # scale 0.3, at the open north end
+        (11.675, 11.667, 13.325, 11.667),  # scale 0.367
+        (11.525, 13.333, 13.475, 13.333),  # scale 0.433
+        (11.375, 15, 13.625, 15),  # scale 0.5
+        (11.225, 16.667, 13.775, 16.667),  # scale 0.567
+        (11.075, 18.333, 13.925, 18.333),  # scale 0.633
+    ]
+
+
+def test_glyph_moves_off_the_stairs() -> None:
+    # The centred footprint blocks the room centre; the glyph settles in the
+    # largest free band (below the stairs) at that band's size.
+    root = ET.fromstring(svg_of(STAIR_ROOM + "stairs up hall down=right"))
+    label = text_by_room(root, "hall")
+    assert (label.get("x"), label.get("y")) == ("15", "22.5")
+    assert label.get("font-size") == "9"
+
+
+def test_glyph_settles_between_two_stairs() -> None:
+    text = (
+        'room landing "Landing" 20x20 root\n'
+        "stairs up landing down=right at=0,0\n"
+        "stairs down landing down=right at=10,15"
+    )
+    label = text_by_room(ET.fromstring(svg_of(text)), "landing")
+    assert (label.get("x"), label.get("y")) == ("10", "10")
+    assert label.get("font-size") == "6"
+
+
+def test_block_glyph_avoids_stairs_in_its_member() -> None:
+    # The block glyph is drawn in 'main'; stairs there push it aside.
+    text = (
+        'room main "" 30x30 root\n'
+        'room wing "" 10x10 down-of main\n'
+        'block hall "Great Hall" main wing\n'
+        "stairs up main down=right"
+    )
+    root = ET.fromstring(svg_of(text))
+    label = next(t for t in root.iter(tag("text")) if t.get("data-block") == "hall")
+    assert (label.get("x"), label.get("y")) == ("15", "22.5")
+
+
+def test_ascii_omits_stairs() -> None:
+    text = 'room a "A" 10x10 root'
+    with_stairs = text + "\nstairs up a down=down size=5x5 at=0,0"
+    assert ascii_of(with_stairs) == ascii_of(text)
+
+
 def test_ascii_renders_packed_components_with_a_gap() -> None:
     text = 'room a "A" 10x10 root\nroom b "B" 10x10 root'
     assert ascii_of(text) == ("A A . . B B\nA A . . B B\n\nA=a  B=b")

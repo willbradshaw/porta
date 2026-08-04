@@ -1,0 +1,2 @@
+room hall "Audience Hall" 40x30 root
+stairs in hall down=left size=10x20 at=20,5

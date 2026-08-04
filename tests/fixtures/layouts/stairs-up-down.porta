@@ -1,0 +1,3 @@
+room landing "Landing" 20x20 root
+stairs up landing down=right at=0,0
+stairs down landing down=right at=10,15

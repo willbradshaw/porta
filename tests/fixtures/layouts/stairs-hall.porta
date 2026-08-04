@@ -1,0 +1,2 @@
+room work-hall "Working Hall" 70x40 glyph="19" root
+stairs down work-hall down=down

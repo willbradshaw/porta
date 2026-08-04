@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="776" height="784" viewBox="-18.8 -10 77.6 78.4">
+  <rect x="-18.8" y="-10" width="77.6" height="78.4" fill="white" />
+  <g stroke="#bbb" stroke-width="0.15">
+    <line x1="0" y1="0" x2="0" y2="30" />
+    <line x1="5" y1="0" x2="5" y2="30" />
+    <line x1="10" y1="0" x2="10" y2="30" />
+    <line x1="15" y1="0" x2="15" y2="30" />
+    <line x1="20" y1="0" x2="20" y2="30" />
+    <line x1="25" y1="0" x2="25" y2="30" />
+    <line x1="30" y1="0" x2="30" y2="30" />
+    <line x1="35" y1="0" x2="35" y2="30" />
+    <line x1="40" y1="0" x2="40" y2="30" />
+    <line x1="0" y1="0" x2="40" y2="0" />
+    <line x1="0" y1="5" x2="40" y2="5" />
+    <line x1="0" y1="10" x2="40" y2="10" />
+    <line x1="0" y1="15" x2="40" y2="15" />
+    <line x1="0" y1="20" x2="40" y2="20" />
+    <line x1="0" y1="25" x2="40" y2="25" />
+    <line x1="0" y1="30" x2="40" y2="30" />
+  </g>
+  <rect data-room="hall" x="0" y="0" width="40" height="30" fill="none" stroke="black" stroke-width="0.5" />
+  <text data-room="hall" x="10" y="15" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>
+  <g class="stairs" data-room="hall">
+    <line x1="20" y1="5" x2="30" y2="5" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+    <line x1="20" y1="25" x2="30" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+    <line x1="20" y1="12.075" x2="20" y2="17.925" stroke="black" stroke-width="0.25" />
+    <line x1="21.667" y1="11.425" x2="21.667" y2="18.575" stroke="black" stroke-width="0.25" />
+    <line x1="23.333" y1="10.775" x2="23.333" y2="19.225" stroke="black" stroke-width="0.25" />
+    <line x1="25" y1="10.125" x2="25" y2="19.875" stroke="black" stroke-width="0.25" />
+    <line x1="26.667" y1="9.475" x2="26.667" y2="20.525" stroke="black" stroke-width="0.25" />
+    <line x1="28.333" y1="8.825" x2="28.333" y2="21.175" stroke="black" stroke-width="0.25" />
+    <line x1="30" y1="8.175" x2="30" y2="21.825" stroke="black" stroke-width="0.25" />
+  </g>
+  <text class="scale" x="-8.8" y="49.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="-8.8" y="58.8" font-size="6">H  Audience Hall</text>
+</svg>

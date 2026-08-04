@@ -102,6 +102,34 @@ class Room:
     y: int | None = None
 
 
+class StairSense(Enum):
+    """Where a flight of stairs leads, relative to the floor being drawn."""
+
+    UP = "up"  # leaves this floor upward
+    DOWN = "down"  # leaves this floor downward
+    IN = "in"  # a level change within the floor (e.g. steps up to a dais)
+
+
+@dataclass(frozen=True)
+class Stairs:
+    """A flight of stairs drawn inside a room.
+
+    ``down`` is the plan direction that leads downward on the flight — the
+    direction the rendered treads narrow toward. The open (entrance) sides
+    derive from it and the sense: ``UP`` opens toward ``down``, ``DOWN``
+    opens away from it, ``IN`` opens at both ends of the run.
+    """
+
+    room: str
+    sense: StairSense
+    down: Direction
+    size: tuple[int, int] | None = None  # (w, h) in feet; None = default
+    at: tuple[int, int] | None = (
+        None  # offset from the room's NW corner; None = centred
+    )
+    line: int = 0
+
+
 @dataclass(frozen=True)
 class Link:
     """A cross-component join: a relation that reaches between components.
@@ -171,6 +199,7 @@ class Building:
     external_doors: list[ExternalDoor] = field(default_factory=list)
     blocks: list[Block] = field(default_factory=list)
     links: list[Link] = field(default_factory=list)
+    stairs: list[Stairs] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
     def room(self, room_id: str) -> Room:

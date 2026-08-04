@@ -1,0 +1,5 @@
+room vault "Vault" 30x30 root
+stairs up vault down=right size=5x5 at=5,5
+stairs down vault down=down size=5x5 at=20,5
+stairs in vault down=left size=5x5 at=5,20
+stairs up vault down=up size=5x5 at=20,20

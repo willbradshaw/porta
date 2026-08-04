@@ -4,6 +4,13 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Stairs: `stairs <up|down|in> <room> down=<side>` draws a flight of
+  narrowing treads inside a room — up/down off the floor or between levels
+  within it — with optional `size=` and `at=` placement; room glyphs move
+  aside, and inaccessible flights or doors blocked by one are errors (see
+  `docs/stairs.md`).
+- `stairs` and `in` are now reserved words and cannot be used as room ids.
+
 ## 1.4.0 (2026-08-01)
 
 - Disconnected components: a plan may contain several groups of rooms, each

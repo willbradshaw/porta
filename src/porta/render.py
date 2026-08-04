@@ -5,16 +5,20 @@ the debug-ascii rasterizer below. SVG is built from stdlib string templating
 only (no runtime dependencies).
 """
 
+from itertools import pairwise
 from xml.sax.saxutils import escape
 
 from porta.layout import (
+    Rect,
     block_wall_segments,
     door_segments,
     open_door_segments,
     room_outline_segments,
     secret_door_segments,
+    stair_footprints,
+    stair_open_sides,
 )
-from porta.model import Building, Room
+from porta.model import Axis, Building, Direction, Room, Stairs
 
 _GRID_FT = 5
 _EMPTY = "."
@@ -38,6 +42,17 @@ _DOOR_STROKE_FT = 1.5  # door line thickness, in feet
 _OPEN_DASH = "0.01 1.5"
 _SECRET_FONT_FT = 5  # "S" marker of a secret door, in feet (the map convention)
 _SECRET_HALO_FT = 0.6  # background-coloured halo that keeps the S legible
+# Stairs: treads cross the run at even spacing, narrowing toward the
+# downhill (down=) end.
+_TREADS_PER_GRID = 3  # tread intervals per 5-ft grid square along the run
+_TREAD_STROKE_FT = 0.25
+# Tread length as a fraction of the footprint's *visible* breadth (the flank
+# strokes are centred on the boundary, so half a wall stroke each side is
+# already ink), interpolated from the high end to the downhill end. The cap
+# stays below 1 so no tread ever spans flank to flank — a full-breadth line
+# would read as a solid boundary.
+_TREAD_MAX_RATIO = 0.7
+_TREAD_MIN_RATIO = 0.3
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -47,7 +62,8 @@ def render_ascii(building: Building) -> str:
     One cell per 5-ft square, space-separated, north at the top; every cell is
     padded to the widest glyph in the plan. Empty cells are ``.``; an unlabeled
     room's cells are ``_``. A blank line then a ``glyph=id`` legend
-    (shortest-glyph-first, then lexicographic) follows.
+    (shortest-glyph-first, then lexicographic) follows. Like doors, stairs
+    are not rendered in the ascii grid (it shows room extents only).
 
     Args:
         building: A building whose rooms have been placed by
@@ -112,6 +128,16 @@ def render_svg(building: Building, *, background: str = "white") -> str:
     glyphs = _assign_glyphs(building)
     by_id = {room.id: room for room in building.rooms}
     member_block = _member_block(building)
+    footprints = stair_footprints(building)
+    # Stair footprints per room, in room-local coordinates (glyphs avoid them).
+    room_stairs: dict[str, list[Rect]] = {}
+    for stairs, (fx, fy, fw, fh) in footprints:
+        stair_room = by_id[stairs.room]
+        assert stair_room.x is not None
+        assert stair_room.y is not None
+        room_stairs.setdefault(stairs.room, []).append(
+            (fx - stair_room.x, fy - stair_room.y, fw, fh)
+        )
 
     min_x = min(x for _, x, _ in placed)
     min_y = min(y for _, _, y in placed)
@@ -190,10 +216,10 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         glyph = glyphs[room.id]
         if not glyph:
             continue  # unlabeled room
-        font = _glyph_font(room.width, room.height, glyph)
+        lx, ly, font = _glyph_spot(room, room_stairs.get(room.id, []), glyph)
         lines.append(
-            f'  <text data-room="{room.id}" x="{_num(x + room.width / 2)}" '
-            f'y="{_num(y + room.height / 2)}" text-anchor="middle" '
+            f'  <text data-room="{room.id}" x="{_num(x + lx)}" '
+            f'y="{_num(y + ly)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}">'
             f"{escape(glyph)}</text>"
         )
@@ -216,13 +242,32 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         mx, my = member.x, member.y
         assert mx is not None
         assert my is not None
-        font = _glyph_font(member.width, member.height, glyph)
+        lx, ly, font = _glyph_spot(member, room_stairs.get(member.id, []), glyph)
         lines.append(
-            f'  <text data-block="{block.id}" x="{_num(mx + member.width / 2)}" '
-            f'y="{_num(my + member.height / 2)}" text-anchor="middle" '
+            f'  <text data-block="{block.id}" x="{_num(mx + lx)}" '
+            f'y="{_num(my + ly)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}">'
             f"{escape(glyph)}</text>"
         )
+
+    # Stairs: hard lines on the non-entrance sides and treads across the run,
+    # narrowing toward the downhill (down=) end.
+    for stairs, rect in footprints:
+        lines.append(f'  <g class="stairs" data-room="{stairs.room}">')
+        for sx1, sy1, sx2, sy2 in _stair_hard_edges(stairs, rect):
+            lines.append(
+                f'    <line x1="{_num(sx1)}" y1="{_num(sy1)}" '
+                f'x2="{_num(sx2)}" y2="{_num(sy2)}" '
+                f'stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" '
+                f'stroke-linecap="square" />'
+            )
+        for sx1, sy1, sx2, sy2 in _stair_treads(stairs, rect):
+            lines.append(
+                f'    <line x1="{_num(sx1)}" y1="{_num(sy1)}" '
+                f'x2="{_num(sx2)}" y2="{_num(sy2)}" '
+                f'stroke="black" stroke-width="{_num(_TREAD_STROKE_FT)}" />'
+            )
+        lines.append("  </g>")
 
     # Open doors: a dotted line across the gap left in the walls above.
     for x1, y1, x2, y2 in sorted(open_door_segments(building)):
@@ -328,6 +373,96 @@ def _legend_ids(
     """
     ids = [eid for eid in _entity_ids(building, member_block) if glyphs[eid]]
     return sorted(ids, key=lambda eid: (len(glyphs[eid]), glyphs[eid]))
+
+
+def _glyph_spot(
+    room: Room, obstacles: list[Rect], glyph: str
+) -> tuple[float, float, float]:
+    """Room-local glyph centre and font size, keeping clear of stair footprints.
+
+    With no stairs the glyph sits at the room's centre at the usual size.
+    Otherwise it is centred in the largest free full-width or full-height band
+    between the room's edges and the footprints, sized to that band — falling
+    back to the room centre when every band is blocked.
+    """
+    width, height = room.width, room.height
+    if not obstacles:
+        return width / 2, height / 2, _glyph_font(width, height, glyph)
+    xs = sorted({0, width, *(x for r in obstacles for x in (r[0], r[0] + r[2]))})
+    ys = sorted({0, height, *(y for r in obstacles for y in (r[1], r[1] + r[3]))})
+    bands = [(0, y0, width, y1 - y0) for y0, y1 in pairwise(ys)]
+    bands += [(x0, 0, x1 - x0, height) for x0, x1 in pairwise(xs)]
+    best: Rect | None = None
+    for band in bands:
+        blocked = any(
+            min(band[0] + band[2], r[0] + r[2]) > max(band[0], r[0])
+            and min(band[1] + band[3], r[1] + r[3]) > max(band[1], r[1])
+            for r in obstacles
+        )
+        if blocked:
+            continue
+        if best is None or band[2] * band[3] > best[2] * best[3]:
+            best = band
+    if best is None:
+        return width / 2, height / 2, _glyph_font(width, height, glyph)
+    bx, by, bw, bh = best
+    return bx + bw / 2, by + bh / 2, _glyph_font(bw, bh, glyph)
+
+
+# A drawn line as (x1, y1, x2, y2) in feet (may fall on half-grid points).
+_Line = tuple[float, float, float, float]
+
+
+def _stair_hard_edges(stairs: Stairs, rect: Rect) -> list[_Line]:
+    """The footprint edges drawn solid: every side that isn't an entrance
+    (see :func:`~porta.layout.stair_open_sides`)."""
+    x, y, w, h = rect
+    edges: dict[Direction, _Line] = {
+        Direction.UP: (x, y, x + w, y),
+        Direction.DOWN: (x, y + h, x + w, y + h),
+        Direction.LEFT: (x, y, x, y + h),
+        Direction.RIGHT: (x + w, y, x + w, y + h),
+    }
+    open_sides = stair_open_sides(stairs)
+    return [edge for side, edge in edges.items() if side not in open_sides]
+
+
+def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
+    """Tread lines crossing the run every ``1/_TREADS_PER_GRID`` of a grid
+    square, ends included.
+
+    Treads narrow toward the downhill end — the depth cue that shows which
+    way the flight descends — shrinking linearly from ``_TREAD_MAX_RATIO``
+    of the footprint's breadth at the high end to ``_TREAD_MIN_RATIO`` at
+    the low end, centred across the run. At a closed end the hard edge
+    already draws the line, so the end tread is emitted only where the
+    footprint is open.
+    """
+    x, y, w, h = rect
+    horizontal = stairs.down.axis is Axis.HORIZONTAL
+    run = w if horizontal else h
+    # Ratios apply to the breadth actually visible between the flank walls'
+    # inner faces (each flank stroke intrudes half its width).
+    cross = (h if horizontal else w) - _WALL_STROKE_FT
+    open_sides = stair_open_sides(stairs)
+    start_open = (Direction.LEFT if horizontal else Direction.UP) in open_sides
+    end_open = (Direction.RIGHT if horizontal else Direction.DOWN) in open_sides
+    treads: list[_Line] = []
+    intervals = run * _TREADS_PER_GRID // _GRID_FT
+    for i in range(intervals + 1):
+        if (i == 0 and not start_open) or (i == intervals and not end_open):
+            continue
+        t = run * i / intervals
+        downhill = t if stairs.down in (Direction.RIGHT, Direction.DOWN) else run - t
+        scale = _TREAD_MAX_RATIO - (
+            (_TREAD_MAX_RATIO - _TREAD_MIN_RATIO) * downhill / run
+        )
+        half = cross * scale / 2
+        if horizontal:
+            treads.append((x + t, y + h / 2 - half, x + t, y + h / 2 + half))
+        else:
+            treads.append((x + w / 2 - half, y + t, x + w / 2 + half, y + t))
+    return treads
 
 
 def _glyph_font(width: int, height: int, glyph: str) -> float:

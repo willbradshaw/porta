@@ -1,0 +1,6 @@
+room low "" 40x20 root
+room high "" 40x10 down-of low
+block chamber "Chamber" low high
+divider low high
+stairs in low down=up size=10x10 at=15,10
+door low outside up

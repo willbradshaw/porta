@@ -32,7 +32,8 @@
     <line x1="35" y1="5" x2="40" y2="5" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="35" y1="25" x2="40" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="35" y1="12.075" x2="35" y2="17.925" stroke="black" stroke-width="0.25" />
-    <line x1="37.5" y1="10.125" x2="37.5" y2="19.875" stroke="black" stroke-width="0.25" />
+    <line x1="36.667" y1="10.775" x2="36.667" y2="19.225" stroke="black" stroke-width="0.25" />
+    <line x1="38.333" y1="9.475" x2="38.333" y2="20.525" stroke="black" stroke-width="0.25" />
     <line x1="40" y1="8.175" x2="40" y2="21.825" stroke="black" stroke-width="0.25" />
   </g>
   <g class="stairs" data-room="tower">
@@ -40,18 +41,22 @@
     <line x1="60" y1="5" x2="60" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="65" y1="5" x2="65" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="61.825" y1="5" x2="63.175" y2="5" stroke="black" stroke-width="0.25" />
-    <line x1="61.6" y1="7.5" x2="63.4" y2="7.5" stroke="black" stroke-width="0.25" />
+    <line x1="61.675" y1="6.667" x2="63.325" y2="6.667" stroke="black" stroke-width="0.25" />
+    <line x1="61.525" y1="8.333" x2="63.475" y2="8.333" stroke="black" stroke-width="0.25" />
     <line x1="61.375" y1="10" x2="63.625" y2="10" stroke="black" stroke-width="0.25" />
-    <line x1="61.15" y1="12.5" x2="63.85" y2="12.5" stroke="black" stroke-width="0.25" />
+    <line x1="61.225" y1="11.667" x2="63.775" y2="11.667" stroke="black" stroke-width="0.25" />
+    <line x1="61.075" y1="13.333" x2="63.925" y2="13.333" stroke="black" stroke-width="0.25" />
   </g>
   <g class="stairs" data-room="tower">
     <line x1="50" y1="15" x2="55" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="50" y1="5" x2="50" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="55" y1="5" x2="55" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="50.925" y1="5" x2="54.075" y2="5" stroke="black" stroke-width="0.25" />
-    <line x1="51.15" y1="7.5" x2="53.85" y2="7.5" stroke="black" stroke-width="0.25" />
+    <line x1="51.075" y1="6.667" x2="53.925" y2="6.667" stroke="black" stroke-width="0.25" />
+    <line x1="51.225" y1="8.333" x2="53.775" y2="8.333" stroke="black" stroke-width="0.25" />
     <line x1="51.375" y1="10" x2="53.625" y2="10" stroke="black" stroke-width="0.25" />
-    <line x1="51.6" y1="12.5" x2="53.4" y2="12.5" stroke="black" stroke-width="0.25" />
+    <line x1="51.525" y1="11.667" x2="53.475" y2="11.667" stroke="black" stroke-width="0.25" />
+    <line x1="51.675" y1="13.333" x2="53.325" y2="13.333" stroke="black" stroke-width="0.25" />
   </g>
   <line class="door" x1="50" y1="5" x2="50" y2="10" stroke="black" stroke-width="1.5" />
   <text class="scale" x="8" y="49.2" font-size="6">1 square = 5 ft</text>

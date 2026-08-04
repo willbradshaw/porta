@@ -42,9 +42,9 @@ _DOOR_STROKE_FT = 1.5  # door line thickness, in feet
 _OPEN_DASH = "0.01 1.5"
 _SECRET_FONT_FT = 5  # "S" marker of a secret door, in feet (the map convention)
 _SECRET_HALO_FT = 0.6  # background-coloured halo that keeps the S legible
-# Stairs: treads cross the run every half grid, narrowing toward the
+# Stairs: treads cross the run at even spacing, narrowing toward the
 # downhill (down=) end.
-_TREAD_SPACING_FT = 2.5
+_TREADS_PER_GRID = 3  # tread intervals per 5-ft grid square along the run
 _TREAD_STROKE_FT = 0.25
 # Tread length as a fraction of the footprint's *visible* breadth (the flank
 # strokes are centred on the boundary, so half a wall stroke each side is
@@ -428,7 +428,8 @@ def _stair_hard_edges(stairs: Stairs, rect: Rect) -> list[_Line]:
 
 
 def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
-    """Tread lines crossing the run every half grid, ends included.
+    """Tread lines crossing the run every ``1/_TREADS_PER_GRID`` of a grid
+    square, ends included.
 
     Treads narrow toward the downhill end — the depth cue that shows which
     way the flight descends — shrinking linearly from ``_TREAD_MAX_RATIO``
@@ -447,11 +448,11 @@ def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
     start_open = (Direction.LEFT if horizontal else Direction.UP) in open_sides
     end_open = (Direction.RIGHT if horizontal else Direction.DOWN) in open_sides
     treads: list[_Line] = []
-    t: float = 0
-    while t <= run:
-        if (t == 0 and not start_open) or (t == run and not end_open):
-            t += _TREAD_SPACING_FT
+    intervals = run * _TREADS_PER_GRID // _GRID_FT
+    for i in range(intervals + 1):
+        if (i == 0 and not start_open) or (i == intervals and not end_open):
             continue
+        t = run * i / intervals
         downhill = t if stairs.down in (Direction.RIGHT, Direction.DOWN) else run - t
         scale = _TREAD_MAX_RATIO - (
             (_TREAD_MAX_RATIO - _TREAD_MIN_RATIO) * downhill / run
@@ -461,7 +462,6 @@ def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
             treads.append((x + t, y + h / 2 - half, x + t, y + h / 2 + half))
         else:
             treads.append((x + w / 2 - half, y + t, x + w / 2 + half, y + t))
-        t += _TREAD_SPACING_FT
     return treads
 
 

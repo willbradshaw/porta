@@ -18,9 +18,11 @@
     <line x1="0" y1="0" x2="10" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="0" y1="5" x2="10" y2="5" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="0" y1="0" x2="0" y2="5" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-    <line x1="2.5" y1="1.15" x2="2.5" y2="3.85" stroke="black" stroke-width="0.25" />
+    <line x1="1.667" y1="1.075" x2="1.667" y2="3.925" stroke="black" stroke-width="0.25" />
+    <line x1="3.333" y1="1.225" x2="3.333" y2="3.775" stroke="black" stroke-width="0.25" />
     <line x1="5" y1="1.375" x2="5" y2="3.625" stroke="black" stroke-width="0.25" />
-    <line x1="7.5" y1="1.6" x2="7.5" y2="3.4" stroke="black" stroke-width="0.25" />
+    <line x1="6.667" y1="1.525" x2="6.667" y2="3.475" stroke="black" stroke-width="0.25" />
+    <line x1="8.333" y1="1.675" x2="8.333" y2="3.325" stroke="black" stroke-width="0.25" />
     <line x1="10" y1="1.825" x2="10" y2="3.175" stroke="black" stroke-width="0.25" />
   </g>
   <g class="stairs" data-room="landing">
@@ -28,9 +30,11 @@
     <line x1="10" y1="20" x2="20" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="20" y1="15" x2="20" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="10" y1="15.925" x2="10" y2="19.075" stroke="black" stroke-width="0.25" />
-    <line x1="12.5" y1="16.15" x2="12.5" y2="18.85" stroke="black" stroke-width="0.25" />
+    <line x1="11.667" y1="16.075" x2="11.667" y2="18.925" stroke="black" stroke-width="0.25" />
+    <line x1="13.333" y1="16.225" x2="13.333" y2="18.775" stroke="black" stroke-width="0.25" />
     <line x1="15" y1="16.375" x2="15" y2="18.625" stroke="black" stroke-width="0.25" />
-    <line x1="17.5" y1="16.6" x2="17.5" y2="18.4" stroke="black" stroke-width="0.25" />
+    <line x1="16.667" y1="16.525" x2="16.667" y2="18.475" stroke="black" stroke-width="0.25" />
+    <line x1="18.333" y1="16.675" x2="18.333" y2="18.325" stroke="black" stroke-width="0.25" />
   </g>
   <text class="scale" x="-17" y="39.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-17" y="48.8" font-size="6">L  Landing</text>

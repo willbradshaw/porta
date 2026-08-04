@@ -603,8 +603,8 @@ def test_unlabeled_block_draws_no_glyph_and_no_key_line() -> None:
 # A 30x30 room at the origin; the default footprint is (10, 10, 10, 5) for a
 # horizontal run and (10, 10, 5, 10) for a vertical one (centred, one square
 # across the run, two along it). Hard sides use the wall stroke (0.5); treads
-# use the thin stroke (0.25), cross the run every half grid ends included,
-# and narrow toward the down= end.
+# use the thin stroke (0.25), cross the run every third of a grid square ends
+# included, and narrow toward the down= end.
 
 STAIR_ROOM = 'room hall "Hall" 30x30 root\n'
 
@@ -656,12 +656,15 @@ def test_treads_narrow_toward_the_downhill_end() -> None:
     # closed west end has no tread (the hard edge draws that line); the open
     # east end gets the narrowest tread, marking the entrance.
     # Ratios apply to the visible breadth between the flank walls' inner
-    # faces: 5 ft minus the 0.5 ft wall stroke = 4.5 ft.
+    # faces: 5 ft minus the 0.5 ft wall stroke = 4.5 ft. A 10-ft run has six
+    # tread intervals (three per square); the closed west end has no tread.
     treads = stair_lines(STAIR_ROOM + "stairs up hall down=right", TREAD)
     assert treads == [
-        (12.5, 11.15, 12.5, 13.85),  # scale 0.6
+        (11.667, 11.075, 11.667, 13.925),  # scale 0.633
+        (13.333, 11.225, 13.333, 13.775),  # scale 0.567
         (15, 11.375, 15, 13.625),  # scale 0.5
-        (17.5, 11.6, 17.5, 13.4),  # scale 0.4
+        (16.667, 11.525, 16.667, 13.475),  # scale 0.433
+        (18.333, 11.675, 18.333, 13.325),  # scale 0.367
         (20, 11.825, 20, 13.175),  # scale 0.3, at the open end
     ]
 
@@ -675,15 +678,26 @@ def test_in_steps_have_treads_at_both_ends_never_flank_to_flank() -> None:
     assert (10, 10, 10, 15) not in treads
 
 
+def test_tread_count_scales_with_run_length() -> None:
+    # Three intervals per square: a 15-ft run has nine; the closed east end
+    # contributes no tread, the open west entrance does.
+    treads = stair_lines(
+        STAIR_ROOM + "stairs down hall down=right size=15x5 at=5,10", TREAD
+    )
+    assert len(treads) == 9
+
+
 def test_vertical_run_treads() -> None:
     # down=up: the low end is north, so treads narrow toward smaller y; the
     # north entrance is open and gets the end tread, the south end is closed.
     treads = stair_lines(STAIR_ROOM + "stairs up hall down=up", TREAD)
     assert treads == [
         (11.825, 10, 13.175, 10),  # scale 0.3, at the open north end
-        (11.6, 12.5, 13.4, 12.5),  # scale 0.4
+        (11.675, 11.667, 13.325, 11.667),  # scale 0.367
+        (11.525, 13.333, 13.475, 13.333),  # scale 0.433
         (11.375, 15, 13.625, 15),  # scale 0.5
-        (11.15, 17.5, 13.85, 17.5),  # scale 0.6
+        (11.225, 16.667, 13.775, 16.667),  # scale 0.567
+        (11.075, 18.333, 13.925, 18.333),  # scale 0.633
     ]
 
 

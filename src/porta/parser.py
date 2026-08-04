@@ -29,6 +29,7 @@ from porta.model import (
     Block,
     Building,
     Direction,
+    Divider,
     Door,
     Doorway,
     ExternalDoor,
@@ -104,6 +105,7 @@ _RESERVED: frozenset[str] = frozenset(
         "link",
         "stairs",
         "in",
+        "divider",
         *_KEYWORDS,
     }
 )
@@ -128,6 +130,7 @@ def parse(text: str) -> Building:
     blocks: list[Block] = []
     links: list[Link] = []
     stairs: list[Stairs] = []
+    dividers: list[Divider] = []
     seen: set[str] = set()
     for tokens, lineno in _statements(text):
         head = tokens[0]
@@ -148,6 +151,9 @@ def parse(text: str) -> Building:
         if _is_bare(head, "stairs"):
             stairs.append(_parse_stairs(tokens, lineno))
             continue
+        if _is_bare(head, "divider"):
+            dividers.append(_parse_divider(tokens, lineno))
+            continue
         if _is_bare(head, "block"):
             block = _parse_block(tokens, lineno)
             if block.id in seen:
@@ -161,7 +167,13 @@ def parse(text: str) -> Building:
         seen.add(room.id)
         rooms.append(room)
     return Building(
-        rooms, doors, external_doors, blocks=blocks, links=links, stairs=stairs
+        rooms,
+        doors,
+        external_doors,
+        blocks=blocks,
+        links=links,
+        stairs=stairs,
+        dividers=dividers,
     )
 
 
@@ -579,6 +591,22 @@ def _parse_link(tokens: list[Token], lineno: int) -> Link:
     if relation.anchor == room:
         raise ParseError("a link needs two different rooms", line=lineno)
     return Link(room=room, relation=relation, line=lineno)
+
+
+def _parse_divider(tokens: list[Token], lineno: int) -> Divider:
+    """Parse a ``divider <a> <b>`` line.
+
+    Whether the rooms exist, share a block, and share a wall are *semantic*
+    checks left to layout.
+    """
+    if len(tokens) != 3:
+        raise ParseError("a divider needs exactly two room ids", line=lineno)
+    for token in tokens[1:]:
+        _validate_id(token.value, token.quoted, token.line)
+    a, b = tokens[1].value, tokens[2].value
+    if a == b:
+        raise ParseError("a divider needs two different rooms", line=lineno)
+    return Divider(a=a, b=b, line=lineno)
 
 
 def _parse_stairs(tokens: list[Token], lineno: int) -> Stairs:

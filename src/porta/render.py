@@ -11,6 +11,7 @@ from xml.sax.saxutils import escape
 from porta.layout import (
     Rect,
     block_wall_segments,
+    divider_segments,
     door_segments,
     open_door_segments,
     room_outline_segments,
@@ -53,6 +54,10 @@ _TREAD_STROKE_FT = 0.25
 # would read as a solid boundary.
 _TREAD_MAX_RATIO = 0.7
 _TREAD_MIN_RATIO = 0.3
+# Dividers: a level-change line along a suppressed block boundary. Tread-thin
+# and dashed so it reads as an edge (of a dais, a raised half), not a wall.
+_DIVIDER_STROKE_FT = 0.25
+_DIVIDER_DASH = "1.5 1"  # dash length and gap, in feet
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -248,6 +253,16 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f'y="{_num(my + ly)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}">'
             f"{escape(glyph)}</text>"
+        )
+
+    # Dividers: a dashed level-change line along a suppressed block boundary,
+    # cut where a stair entrance carries the flight through it.
+    for x1, y1, x2, y2 in sorted(divider_segments(building)):
+        lines.append(
+            f'  <line class="divider" x1="{_num(x1)}" y1="{_num(y1)}" '
+            f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="black" '
+            f'stroke-width="{_num(_DIVIDER_STROKE_FT)}" '
+            f'stroke-dasharray="{_DIVIDER_DASH}" />'
         )
 
     # Stairs: hard lines on the non-entrance sides and treads across the run,

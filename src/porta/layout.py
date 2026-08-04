@@ -78,9 +78,10 @@ def solve(building: Building) -> Building:
     _validate_glyphs(building)
     building.warnings.extend(_block_warnings(building, by_id, _block_of(building)))
 
-    # Validates every door and stairs (raising on a bad one) along the way.
+    # Validates every door, stairs, and divider (raising on a bad one).
     door_lines = [segment for segment, _ in _placed_doors(building)]
     _check_stair_access(building, door_lines)
+    divider_segments(building)
     return building
 
 
@@ -851,6 +852,83 @@ def _opens_into_block(
         for member in members
         if member != room_id
     )
+
+
+def divider_segments(building: Building) -> list[Segment]:
+    """Place and validate every divider, as drawn line segments.
+
+    A divider marks the suppressed boundary between two members of the same
+    block as a level-change line. The line spans the whole shared edge except
+    where a stair *entrance* (open side, in either room) meets the boundary:
+    the flight continues through the level change there, and a line across
+    the open end would redraw it as closed. A closed side or flank flush
+    with the boundary keeps the line — the flight is walled off from the
+    other half. Assumes a solved building.
+
+    Raises:
+        LayoutError: On an unknown room, rooms not members of one block,
+            rooms that share no wall, or two dividers on the same boundary.
+    """
+    by_id = {room.id: room for room in building.rooms}
+    block_of = _block_of(building)
+    entrances = _stair_entrance_edges(building)
+    seen: set[frozenset[str]] = set()
+    segments: list[Segment] = []
+    for divider in building.dividers:
+        for room_id in (divider.a, divider.b):
+            if room_id not in by_id:
+                raise LayoutError(
+                    f"divider references unknown room {room_id!r}", line=divider.line
+                )
+        if not _same_block(divider.a, divider.b, block_of):
+            raise LayoutError(
+                f"divider: rooms {divider.a!r} and {divider.b!r} are not "
+                f"members of the same block",
+                line=divider.line,
+            )
+        wall = _shared_wall(by_id[divider.a], by_id[divider.b])
+        if wall is None:
+            raise LayoutError(
+                f"divider: rooms {divider.a!r} and {divider.b!r} share no wall",
+                line=divider.line,
+            )
+        pair = frozenset((divider.a, divider.b))
+        if pair in seen:
+            raise LayoutError(
+                f"two dividers between {divider.a!r} and {divider.b!r}",
+                line=divider.line,
+            )
+        seen.add(pair)
+        segments.extend(_cut_divider(wall, pair, entrances))
+    return segments
+
+
+def _stair_entrance_edges(building: Building) -> list[tuple[str, Segment]]:
+    """Every stair entrance (open-side footprint edge), tagged with its room id."""
+    return [
+        (stairs.room, _rect_edge(rect, side))
+        for stairs, rect in stair_footprints(building)
+        for side in stair_open_sides(stairs)
+    ]
+
+
+def _cut_divider(
+    wall: _Wall, rooms: frozenset[str], entrances: list[tuple[str, Segment]]
+) -> list[Segment]:
+    """The divider's shared-edge line minus the stair entrances on it."""
+    horizontal, coord, lo, length = wall
+    blocked: list[tuple[int, int]] = []
+    for room_id, (x1, y1, x2, y2) in entrances:
+        if room_id not in rooms:
+            continue
+        if horizontal and y1 == y2 == coord:
+            blocked.append((x1, x2))
+        elif not horizontal and x1 == x2 == coord:
+            blocked.append((y1, y2))
+    exposed = _exposed(lo, lo + length, blocked)
+    if horizontal:
+        return [(a, coord, b, coord) for a, b in exposed]
+    return [(coord, a, coord, b) for a, b in exposed]
 
 
 def _rect_edge(rect: Rect, side: Direction) -> Segment:

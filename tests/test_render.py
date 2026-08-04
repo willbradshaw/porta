@@ -740,6 +740,64 @@ def test_ascii_omits_stairs() -> None:
     assert ascii_of(with_stairs) == ascii_of(text)
 
 
+# --- dividers ---------------------------------------------------------------
+#
+# A split chamber: 'low' (40x20 at the origin) over 'high' (40x10), one
+# block; the divider marks the suppressed boundary at y=20 as a dashed
+# tread-thin line (class="divider"), cut where a stair entrance meets it.
+
+SPLIT_CHAMBER = (
+    'room low "" 40x20 root\n'
+    'room high "" 40x10 down-of low\n'
+    'block chamber "Chamber" low high\n'
+    "divider low high"
+)
+
+
+def divider_lines(root: ET.Element) -> list[tuple[float, ...]]:
+    return [
+        tuple(float(ln.get(k, "")) for k in ("x1", "y1", "x2", "y2"))
+        for ln in root.iter(tag("line"))
+        if ln.get("class") == "divider"
+    ]
+
+
+def test_divider_renders_as_one_dashed_thin_line() -> None:
+    root = ET.fromstring(svg_of(SPLIT_CHAMBER))
+    assert divider_lines(root) == [(0.0, 20.0, 40.0, 20.0)]
+    line = next(ln for ln in root.iter(tag("line")) if ln.get("class") == "divider")
+    assert line.get("stroke-dasharray") is not None
+    assert line.get("stroke-width") == "0.25"
+
+
+def test_divider_is_cut_at_a_stair_entrance() -> None:
+    # The flight tops out on the boundary (x 15-25): the line stops either
+    # side of the open end, so the symbol still reads as an 'in' flight.
+    text = f"{SPLIT_CHAMBER}\nstairs in low down=up size=10x10 at=15,10"
+    assert divider_lines(ET.fromstring(svg_of(text))) == [
+        (0.0, 20.0, 15.0, 20.0),
+        (25.0, 20.0, 40.0, 20.0),
+    ]
+
+
+def test_divider_only_adds_its_own_lines() -> None:
+    # Every other line in the drawing (grid, outline, doors) is untouched.
+    without = ET.fromstring(svg_of("\n".join(SPLIT_CHAMBER.splitlines()[:-1])))
+    with_divider = ET.fromstring(svg_of(SPLIT_CHAMBER))
+
+    def others(root: ET.Element) -> list[dict[str, str]]:
+        return [
+            ln.attrib for ln in root.iter(tag("line")) if ln.get("class") != "divider"
+        ]
+
+    assert others(with_divider) == others(without)
+
+
+def test_divider_does_not_change_the_ascii_rendering() -> None:
+    without = "\n".join(SPLIT_CHAMBER.splitlines()[:-1])
+    assert ascii_of(SPLIT_CHAMBER) == ascii_of(without)
+
+
 def test_ascii_renders_packed_components_with_a_gap() -> None:
     text = 'room a "A" 10x10 root\nroom b "B" 10x10 root'
     assert ascii_of(text) == ("A A . . B B\nA A . . B B\n\nA=a  B=b")

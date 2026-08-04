@@ -131,6 +131,22 @@ class Stairs:
 
 
 @dataclass(frozen=True)
+class Divider:
+    """A level-change line along the boundary of two same-block members.
+
+    A block suppresses the wall between its members; a divider draws that
+    boundary back in as a thin dashed line — the edge of a dais or a raised
+    half of the space, not a wall. Spans where a stair entrance meets the
+    boundary are left out, so a flight through the divider keeps its open
+    end (see :func:`~porta.layout.divider_segments`).
+    """
+
+    a: str
+    b: str
+    line: int = 0
+
+
+@dataclass(frozen=True)
 class Link:
     """A cross-component join: a relation that reaches between components.
 
@@ -200,6 +216,7 @@ class Building:
     blocks: list[Block] = field(default_factory=list)
     links: list[Link] = field(default_factory=list)
     stairs: list[Stairs] = field(default_factory=list)
+    dividers: list[Divider] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
     def room(self, room_id: str) -> Room:

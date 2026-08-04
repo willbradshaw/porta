@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+## 1.5.0 (2026-08-04)
+
 - Stairs: `stairs <up|down|in> <room> down=<side>` draws a flight of
   narrowing treads inside a room — up/down off the floor or between levels
   within it — with optional `size=` and `at=` placement; room glyphs move

@@ -117,9 +117,7 @@ class Stairs:
     ``down`` is the plan direction that leads downward on the flight — the
     direction the rendered treads narrow toward. The open (entrance) sides
     derive from it and the sense: ``UP`` opens toward ``down``, ``DOWN``
-    opens away from it, ``IN`` opens at both ends of the run. ``to`` is an
-    opaque destination label (e.g. ``level-2.entry``), recorded but not
-    solved.
+    opens away from it, ``IN`` opens at both ends of the run.
     """
 
     room: str
@@ -129,7 +127,6 @@ class Stairs:
     at: tuple[int, int] | None = (
         None  # offset from the room's NW corner; None = centred
     )
-    to: str | None = None
     line: int = 0
 
 

@@ -585,9 +585,9 @@ def _parse_stairs(tokens: list[Token], lineno: int) -> Stairs:
     """Parse a ``stairs <up|down|in> <room> down=<side> [modifiers...]`` line.
 
     ``down=`` (required) is the plan direction that leads downward on the
-    flight. Optional modifiers: ``size=WxH``, ``at=X,Y`` (offset from the
-    room's NW corner; default centred), and an opaque ``to=<label>``.
-    Whether the room exists and the footprint fits are left to layout.
+    flight. Optional modifiers: ``size=WxH`` and ``at=X,Y`` (offset from
+    the room's NW corner; default centred). Whether the room exists and
+    the footprint fits are left to layout.
     """
     if len(tokens) < 3:
         raise ParseError("stairs need '<up|down|in> <room>'", line=lineno)
@@ -604,7 +604,6 @@ def _parse_stairs(tokens: list[Token], lineno: int) -> Stairs:
     down: Direction | None = None
     size: tuple[int, int] | None = None
     at: tuple[int, int] | None = None
-    to: str | None = None
     for token in tokens[3:]:
         value, quoted, line = token
         if quoted:
@@ -620,17 +619,11 @@ def _parse_stairs(tokens: list[Token], lineno: int) -> Stairs:
             size = _parse_stair_size(value[len("size=") :], line)
         elif value.startswith("at="):
             at = _parse_stair_at(value[len("at=") :], line)
-        elif value.startswith("to="):
-            to = value[len("to=") :]
-            if not to:
-                raise ParseError("to= needs a destination label", line=line)
         else:
             raise ParseError(f"unknown stairs modifier {value!r}", line=line)
     if down is None:
         raise ParseError("stairs need a down=<side> orientation", line=lineno)
-    return Stairs(
-        room=room, sense=sense, down=down, size=size, at=at, to=to, line=lineno
-    )
+    return Stairs(room=room, sense=sense, down=down, size=size, at=at, line=lineno)
 
 
 def _parse_stair_size(raw: str, lineno: int) -> tuple[int, int]:

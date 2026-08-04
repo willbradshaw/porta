@@ -681,7 +681,6 @@ def test_stairs_are_parsed_with_defaults() -> None:
     assert stairs.down is Direction.RIGHT
     assert stairs.size is None
     assert stairs.at is None
-    assert stairs.to is None
     assert stairs.line == 2
 
 
@@ -695,13 +694,10 @@ def test_each_stair_sense_keyword_maps(keyword: str, sense: StairSense) -> None:
 
 
 def test_stairs_modifiers_are_parsed() -> None:
-    stairs = parse(
-        "stairs in dais down=left size=15x5 at=10,5 to=level-2.entry"
-    ).stairs[0]
+    stairs = parse("stairs in dais down=left size=15x5 at=10,5").stairs[0]
     assert stairs.down is Direction.LEFT
     assert stairs.size == (15, 5)
     assert stairs.at == (10, 5)
-    assert stairs.to == "level-2.entry"
 
 
 def test_two_stairs_in_one_room_parse() -> None:
@@ -728,7 +724,7 @@ def test_two_stairs_in_one_room_parse() -> None:
         pytest.param("stairs up hall down=up at=3,5", id="at-off-grid"),
         pytest.param("stairs up hall down=up at=-5,0", id="at-negative"),
         pytest.param("stairs up hall down=up at=5", id="at-malformed"),
-        pytest.param("stairs up hall down=up to=", id="to-empty"),
+        pytest.param("stairs up hall down=up to=level-2", id="to-is-not-a-modifier"),
         pytest.param("stairs up hall down=up gap=5", id="unknown-modifier"),
         pytest.param('stairs up "hall" down=up', id="quoted-room"),
         pytest.param('room stairs "S" 10x10 root', id="stairs-is-reserved"),

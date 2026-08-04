@@ -6,7 +6,7 @@ Notable changes per release, newest first.
 
 - Stairs: `stairs <up|down|in> <room> down=<side>` draws a flight inside a
   room — up/down off the floor or between levels within it — with optional
-  `size=`, `at=`, and a recorded `to=` destination (see `docs/stairs.md`).
+  `size=` and `at=` placement (see `docs/stairs.md`).
 - `stairs` and `in` are now reserved words and cannot be used as room ids.
 
 ## 1.4.0 (2026-08-01)

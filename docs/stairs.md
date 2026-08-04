@@ -6,8 +6,8 @@ levels within the floor:
 
 ```porta img/stairs.svg
 room landing "Landing" 20x20 root
-stairs up landing down=right at=0,0 to=level-1.hall
-stairs down landing down=right at=10,15 to=level-3.entry
+stairs up landing down=right at=0,0
+stairs down landing down=right at=10,15
 ```
 
 <img alt="A landing with one flight up and one flight down" src="img/stairs.svg" width="70%">
@@ -15,7 +15,7 @@ stairs down landing down=right at=10,15 to=level-3.entry
 ## The `stairs` statement
 
 ```
-stairs <sense> <room> down=<side> [size=<WxH>] [at=<X,Y>] [to=<label>]
+stairs <sense> <room> down=<side> [size=<WxH>] [at=<X,Y>]
 sense = up | down | in
 side  = up | down | left | right
 ```
@@ -34,9 +34,9 @@ side  = up | down | left | right
 - **`at=<X,Y>`**: the footprint's top-left corner in feet from the room's
   own top-left (NW) corner, on the grid. Defaults to centred in the room
   (rounded down to the grid).
-- **`to=<label>`**: an optional destination recorded verbatim in the model
-  (e.g. `to=level-2.entry`). Nothing is solved or rendered from it — it is
-  bookkeeping for multi-floor plans.
+Where a flight leads (which floor, which room) is not modelled: `porta`
+draws one floor at a time, and the destination lives in your notes until
+multi-floor plans exist.
 
 ## Reading the symbol
 
@@ -82,8 +82,8 @@ stairs in within down=down
 room hall "Great Hall" 50x30 root
 room tower "Tower" 20x20 right-of hall
 stairs in hall down=left size=5x20 at=35,5
-stairs up tower down=up at=10,5 to=battlements
-stairs down tower down=down at=0,5 to=undercroft
+stairs up tower down=up at=10,5
+stairs down tower down=down at=0,5
 ```
 
 <img alt="A hall with dais steps and a stair tower going both up and down" src="img/stairs-capstone.svg" width="70%">

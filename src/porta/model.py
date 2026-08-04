@@ -136,8 +136,8 @@ class Divider:
 
     A block suppresses the wall between its members; a divider draws that
     boundary back in as a thin dashed line. Spans where a stair entrance
-    meets the boundary are left out, so a flight through the divider keeps
-    its open end (see :func:`~porta.layout.divider_segments`).
+    lies on the boundary are left out, so a flight ending there keeps its
+    open end (see :func:`~porta.layout.divider_segments`).
     """
 
     a: str

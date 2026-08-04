@@ -30,14 +30,14 @@ divider <member-id> <member-id>
   rendering. It is a dividing line, not a wall — the space is still one
   block, with one glyph and one key entry.
 
-## Stairs through a divider
+## Stairs on a divider
 
-Where a stair **entrance** (an open end of a flight, in either room) meets
-the boundary, the divider is cut over its span: the flight continues
-across the boundary, and an unbroken line across the open end would
-redraw it as a closed flight leaving the floor. A *closed* side or flank
-flush with the boundary keeps the line — the flight is walled off from the
-other half.
+Where a stair **entrance** (an open end of a flight, in either room) lies
+on the boundary, the divider is cut over its span: the flight is entered
+and left across the boundary, and an unbroken line over the open end
+would redraw it as a closed flight leaving the floor. A *closed* side or
+flank flush with the boundary keeps the line — the flight is walled off
+from the other half.
 
 ```porta img/divider-stairs.svg
 room lower "" 40x20 root
@@ -49,11 +49,11 @@ divider mid upper
 stairs in mid down=up size=10x10 at=15,0
 ```
 
-<img alt="Three terraces marked by two dividers, with one flight cutting through both" src="img/divider-stairs.svg" width="70%">
+<img alt="Three terraces marked by two dividers, each broken at one end of the flight" src="img/divider-stairs.svg" width="70%">
 
 Here one flight spans the middle terrace: both its ends are open (`in`
-[sense](stairs.md#reading-the-symbol)), so each divider is cut where the
-flight passes through it.
+[sense](stairs.md#reading-the-symbol)), one on each boundary, so each
+divider is cut at the end that lies on it.
 
 ## Invalid dividers
 
@@ -77,6 +77,6 @@ door=10 hall outside up
 
 The [stairs capstone](stairs.md#putting-it-together)'s great hall, with
 its dais edge made explicit: the divider runs the width of the hall and
-breaks where the steps climb through it.
+breaks at the steps' upper entrance.
 
 <img alt="A great hall whose dais edge is a dashed divider, broken by the steps up to it" src="img/divider-capstone.svg" width="70%">

@@ -859,8 +859,8 @@ def divider_segments(building: Building) -> list[Segment]:
 
     A divider marks the suppressed boundary between two members of the same
     block as a dashed dividing line. The line spans the whole shared edge
-    except where a stair *entrance* (open side, in either room) meets the
-    boundary: the flight continues across the boundary there, and a line
+    except where a stair *entrance* (open side, in either room) lies on the
+    boundary: the flight is entered across the boundary there, and a line
     over the open end would redraw it as closed. A closed side or flank
     flush with the boundary keeps the line — the flight is walled off from
     the other half. Assumes a solved building.

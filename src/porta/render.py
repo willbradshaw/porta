@@ -256,7 +256,7 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         )
 
     # Dividers: a dashed dividing line along a suppressed block boundary,
-    # cut where a stair entrance carries the flight through it.
+    # cut where a stair entrance lies on it.
     for x1, y1, x2, y2 in sorted(divider_segments(building)):
         lines.append(
             f'  <line class="divider" x1="{_num(x1)}" y1="{_num(y1)}" '

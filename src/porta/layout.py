@@ -80,7 +80,7 @@ def solve(building: Building) -> Building:
 
     # Validates every door and stairs (raising on a bad one) along the way.
     door_lines = [segment for segment, _ in _placed_doors(building)]
-    _check_stair_entrances(building, door_lines)
+    _check_stair_access(building, door_lines)
     return building
 
 
@@ -789,25 +789,36 @@ def stair_open_sides(stairs: Stairs) -> set[Direction]:
     return {stairs.down, _OPPOSITE_SIDE[stairs.down]}
 
 
-def _check_stair_entrances(building: Building, door_lines: list[Segment]) -> None:
-    """Reject a stair entrance flush with a doorless stretch of wall.
+def _check_stair_access(building: Building, door_lines: list[Segment]) -> None:
+    """Reject stairs and doors that block each other.
 
-    An entrance on the room boundary is fine when a door (of any kind, on
-    either side) covers part of its span — a stair closet entered through a
-    door. With nothing there to enter from, the flight is inaccessible and
-    almost certainly misorientated.
+    An *entrance* (open side) on the room boundary is fine when a door of
+    any kind covers part of its span — a stair closet entered through a
+    door — but with nothing there to enter from, the flight is inaccessible
+    and almost certainly misorientated. Conversely, a door whose span meets
+    a *closed* side or flank of a footprint on the boundary opens into the
+    back of the staircase and is rejected too.
     """
     by_id = {room.id: room for room in building.rooms}
     for stairs, rect in stair_footprints(building):
         room = by_id[stairs.room]
-        for side in stair_open_sides(stairs):
+        open_sides = stair_open_sides(stairs)
+        for side in Direction:
             edge = _rect_edge(rect, side)
-            if _edge_on_room_boundary(edge, room) and not any(
-                _doors_overlap(edge, line) for line in door_lines
-            ):
+            if not _edge_on_room_boundary(edge, room):
+                continue
+            covered = any(_doors_overlap(edge, line) for line in door_lines)
+            if side in open_sides and not covered:
                 raise LayoutError(
                     f"stairs in room {stairs.room!r}: the entrance faces a "
                     f"wall with no door",
+                    line=stairs.line,
+                )
+            if side not in open_sides and covered:
+                raise LayoutError(
+                    f"stairs in room {stairs.room!r}: a door opens into the "
+                    f"closed {side.value.removesuffix('-of')} side of the "
+                    f"flight",
                     line=stairs.line,
                 )
 

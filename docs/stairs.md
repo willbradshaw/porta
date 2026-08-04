@@ -5,12 +5,14 @@ recording whether it leads up off this floor, down off it, or between two
 levels within the floor:
 
 ```porta img/stairs.svg
-room landing "Landing" 20x20 root
+room hall "Hall" 40x30 root
+room landing "Landing" 20x20 right-of hall
+stairs in hall down=left size=10x20 at=25,5
 stairs up landing down=right at=0,0
 stairs down landing down=right at=10,15
 ```
 
-<img alt="A landing with one flight up and one flight down" src="img/stairs.svg" width="70%">
+<img alt="A hall with steps up to a dais and a landing with flights up and down" src="img/stairs.svg" width="70%">
 
 ## The `stairs` statement
 
@@ -34,9 +36,7 @@ side  = up | down | left | right
 - **`at=<X,Y>`**: the footprint's top-left corner in feet from the room's
   own top-left (NW) corner, on the grid. Defaults to centred in the room
   (rounded down to the grid).
-Where a flight leads (which floor, which room) is not modelled: `porta`
-draws one floor at a time, and the destination lives in your notes until
-multi-floor plans exist.
+Where a flight leads (which floor, which room) is not modelled.
 
 ## Reading the symbol
 
@@ -75,6 +75,8 @@ stairs in within down=down
   no door on it. (A flight whose *closed* far side sits on a wall is fine —
   the run continues past it on another level — and so is an entrance
   covered by a door, like a stair closet entered from the next room.)
+- A blocked door: one whose span meets a closed side or flank of a
+  footprint, so it would open into the back of the staircase.
 
 ## Putting it together
 
@@ -83,7 +85,7 @@ room hall "Great Hall" 50x30 root
 room tower "Tower" 20x20 right-of hall
 stairs in hall down=left size=5x20 at=35,5
 stairs up tower down=up at=10,5
-stairs down tower down=down at=0,5
+stairs down tower down=down at=5,5
 ```
 
 <img alt="A hall with dais steps and a stair tower going both up and down" src="img/stairs-capstone.svg" width="70%">

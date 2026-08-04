@@ -1184,6 +1184,30 @@ def test_stair_entrance_into_the_room_is_fine() -> None:
     solve(parse(text))  # does not raise
 
 
+def test_door_into_a_closed_stair_side_is_rejected() -> None:
+    # The closet's default door (west wall, y 0-5) opens straight into the
+    # closed back of the flight.
+    text = (
+        'room hall "Hall" 20x20 root\n'
+        'room closet "" 10x10 left-of hall\n'
+        "stairs up hall down=right at=0,0"
+    )
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "opens into the closed" in exc.value.message
+    assert exc.value.line == 3
+
+
+def test_door_beside_a_closed_stair_side_is_fine() -> None:
+    # The door sits on the same wall but south of the flight's span.
+    text = (
+        'room hall "Hall" 20x20 root\n'
+        'room closet "" 10x10 left-of hall door=5@5\n'
+        "stairs up hall down=right at=0,0"
+    )
+    solve(parse(text))  # does not raise
+
+
 def test_stairs_that_do_not_fit_report_the_room() -> None:
     text = 'room hall "Hall" 5x5 root\nstairs up hall down=right'
     with pytest.raises(LayoutError) as exc:

@@ -1,19 +1,17 @@
 # Dividers
 
 A **divider** statement draws the suppressed boundary between two
-[block](block.md) members back in as a thin dashed dividing line — here,
-the edge of a chamber's raised half:
+[block](block.md) members back in as a thin dashed dividing line:
 
 ```porta img/divider.svg
 room low "" 40x20 root
 room high "" 40x10 down-of low
 block chamber "Chamber" low high
 divider low high
-stairs in low down=up size=10x10 at=15,10
 door low outside up
 ```
 
-<img alt="A chamber whose raised half is marked by a dashed divider, with steps up to it" src="img/divider.svg" width="70%">
+<img alt="A chamber split in two by a dashed divider" src="img/divider.svg" width="70%">
 
 ## The `divider` statement
 
@@ -23,12 +21,22 @@ divider <member-id> <member-id>
 
 - The two rooms are given by [ID](room.md#room-id) and must be **members of
   the same block**, sharing a wall.
-- The divider runs the whole shared edge — only the overlapping span, when
-  the two members overlap partially.
 - A divider is purely visual: it does not affect placement, doors, or
   [stairs](stairs.md) validation, and does not appear in the ASCII
   rendering. It is a dividing line, not a wall — the space is still one
   block, with one glyph and one key entry.
+
+The divider runs the whole shared edge; when the two members overlap
+partially, that is only the overlapping span:
+
+```porta img/divider-offset.svg
+room low "" 20x20 root
+room high "" 20x20 down-of low shift=10
+block chamber "Chamber" low high
+divider low high
+```
+
+<img alt="Two offset halves of a chamber, divided only where they meet" src="img/divider-offset.svg" width="70%">
 
 ## Stairs on a divider
 
@@ -69,14 +77,19 @@ divider is cut at the end that lies on it.
 ```porta img/divider-capstone.svg
 room hall "" 40x30 root
 room dais "" 40x10 down-of hall
-block great "Great Hall" hall dais
+room wing "" 20x20 right-of hall shift=10
+block great "Great Hall" hall dais wing
 divider hall dais
+divider hall wing
 stairs in dais down=up size=10x5 at=15,0
 door=10 hall outside up
 ```
 
-The [stairs capstone](stairs.md#putting-it-together)'s great hall, with
-its dais edge made explicit: the divider runs the width of the hall and
-breaks at the steps' upper entrance.
+The [stairs capstone](stairs.md#putting-it-together)'s great hall, with a
+wing added and both boundaries drawn. The hall–dais divider runs the
+width of the hall and breaks at the steps' upper entrance; the hall–wing
+divider runs unbroken down the stretch of edge the two rooms share, while
+the rest of that edge — where only the hall stands — remains the block's
+solid outer wall.
 
-<img alt="A great hall whose dais edge is a dashed divider, broken by the steps up to it" src="img/divider-capstone.svg" width="70%">
+<img alt="A great hall with a dais divider broken by steps, and an unbroken divider across a wing" src="img/divider-capstone.svg" width="70%">

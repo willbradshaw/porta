@@ -651,23 +651,26 @@ def test_in_steps_are_open_at_both_ends() -> None:
 
 
 def test_treads_narrow_toward_the_downhill_end() -> None:
-    # Run is 10 ft east; treads shrink linearly from the full 5 ft breadth at
-    # the high (west) end to 40% at the low end, centred on y=12.5. The
+    # Run is 10 ft east; treads shrink linearly from 80% of the 5 ft breadth
+    # at the high (west) end to 40% at the low end, centred on y=12.5. The
     # closed west end has no tread (the hard edge draws that line); the open
     # east end gets the narrowest tread, marking the entrance.
     treads = stair_lines(STAIR_ROOM + "stairs up hall down=right", TREAD)
     assert treads == [
-        (12.5, 10.375, 12.5, 14.625),  # scale 0.85
-        (15, 10.75, 15, 14.25),  # scale 0.7
-        (17.5, 11.125, 17.5, 13.875),  # scale 0.55
+        (12.5, 10.75, 12.5, 14.25),  # scale 0.7
+        (15, 11, 15, 14),  # scale 0.6
+        (17.5, 11.25, 17.5, 13.75),  # scale 0.5
         (20, 11.5, 20, 13.5),  # scale 0.4, at the open end
     ]
 
 
-def test_in_steps_have_treads_at_both_ends() -> None:
+def test_in_steps_have_treads_at_both_ends_never_flank_to_flank() -> None:
     treads = stair_lines(STAIR_ROOM + "stairs in hall down=right", TREAD)
-    assert (10, 10, 10, 15) in treads  # full breadth at the open high end
-    assert (20, 11.5, 20, 13.5) in treads  # narrowest at the open low end
+    # The broadest tread (the open high end) still stops short of the
+    # flanks, so it cannot be mistaken for a solid boundary.
+    assert (10, 10.5, 10, 14.5) in treads  # scale 0.8 at the open high end
+    assert (20, 11.5, 20, 13.5) in treads  # scale 0.4 at the open low end
+    assert (10, 10, 10, 15) not in treads
 
 
 def test_vertical_run_treads() -> None:
@@ -676,9 +679,9 @@ def test_vertical_run_treads() -> None:
     treads = stair_lines(STAIR_ROOM + "stairs up hall down=up", TREAD)
     assert treads == [
         (11.5, 10, 13.5, 10),  # scale 0.4, at the open north end
-        (11.125, 12.5, 13.875, 12.5),  # scale 0.55
-        (10.75, 15, 14.25, 15),  # scale 0.7
-        (10.375, 17.5, 14.625, 17.5),  # scale 0.85
+        (11.25, 12.5, 13.75, 12.5),  # scale 0.5
+        (11, 15, 14, 15),  # scale 0.6
+        (10.75, 17.5, 14.25, 17.5),  # scale 0.7
     ]
 
 

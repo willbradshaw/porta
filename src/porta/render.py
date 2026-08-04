@@ -46,7 +46,11 @@ _SECRET_HALO_FT = 0.6  # background-coloured halo that keeps the S legible
 # downhill (down=) end.
 _TREAD_SPACING_FT = 2.5
 _TREAD_STROKE_FT = 0.25
-_TREAD_MIN_RATIO = 0.4  # tread length at the downhill end, as a fraction
+# Tread length as a fraction of the footprint's breadth, interpolated from the
+# high end to the downhill end. The cap stays below 1 so no tread ever spans
+# flank to flank — a full-breadth line would read as a solid boundary.
+_TREAD_MAX_RATIO = 0.8
+_TREAD_MIN_RATIO = 0.4
 _DISPLAY_SCALE = 10  # px per foot for the default render size (viewBox stays in feet)
 
 
@@ -425,10 +429,11 @@ def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
     """Tread lines crossing the run every half grid, ends included.
 
     Treads narrow toward the downhill end — the depth cue that shows which
-    way the flight descends — shrinking linearly from the footprint's full
-    breadth at the high end to ``_TREAD_MIN_RATIO`` of it at the low end,
-    centred across the run. At a closed end the hard edge already draws the
-    line, so the end tread is emitted only where the footprint is open.
+    way the flight descends — shrinking linearly from ``_TREAD_MAX_RATIO``
+    of the footprint's breadth at the high end to ``_TREAD_MIN_RATIO`` at
+    the low end, centred across the run. At a closed end the hard edge
+    already draws the line, so the end tread is emitted only where the
+    footprint is open.
     """
     x, y, w, h = rect
     horizontal = stairs.down.axis is Axis.HORIZONTAL
@@ -444,7 +449,9 @@ def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
             t += _TREAD_SPACING_FT
             continue
         downhill = t if stairs.down in (Direction.RIGHT, Direction.DOWN) else run - t
-        scale = 1 - (1 - _TREAD_MIN_RATIO) * (downhill / run)
+        scale = _TREAD_MAX_RATIO - (
+            (_TREAD_MAX_RATIO - _TREAD_MIN_RATIO) * downhill / run
+        )
         half = cross * scale / 2
         if horizontal:
             treads.append((x + t, y + h / 2 - half, x + t, y + h / 2 + half))

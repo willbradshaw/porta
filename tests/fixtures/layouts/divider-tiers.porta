@@ -1,0 +1,7 @@
+room lower "" 40x20 root
+room mid "" 40x10 down-of lower
+room upper "" 40x10 down-of mid
+block terraces "Terraces" lower mid upper
+divider lower mid
+divider mid upper
+stairs in mid down=up size=10x10 at=15,0

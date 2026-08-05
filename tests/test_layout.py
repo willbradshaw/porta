@@ -12,6 +12,7 @@ import pytest
 from porta.errors import LayoutError, OverlapError
 from porta.layout import (
     block_wall_segments,
+    divider_segments,
     door_segments,
     find_overlaps,
     open_door_segments,
@@ -1226,6 +1227,134 @@ def test_stairs_that_do_not_fit_report_the_room() -> None:
         solve(parse(text))
     assert "'hall'" in exc.value.message
     assert exc.value.line == 2
+
+
+# --- dividers ---------------------------------------------------------------
+#
+# A split chamber: 'low' (40x20 at the origin) over 'high' (40x10), one
+# block, so the boundary at y=20 (x 0-40) is suppressed; the divider draws
+# it back as a dashed dividing line.
+
+SPLIT_CHAMBER = (
+    'room low "" 40x20 root\n'
+    'room high "" 40x10 down-of low\n'
+    'block chamber "Chamber" low high\n'
+    "divider low high"
+)
+
+
+def dividers(text: str) -> list[tuple[int, int, int, int]]:
+    return divider_segments(solve(parse(text)))
+
+
+def test_divider_spans_the_whole_shared_edge() -> None:
+    assert dividers(SPLIT_CHAMBER) == [(0, 20, 40, 20)]
+
+
+def test_divider_on_a_vertical_boundary() -> None:
+    text = (
+        'room west "" 20x20 root\n'
+        'room east "" 20x20 right-of west\n'
+        'block chamber "Chamber" west east\n'
+        "divider west east"
+    )
+    assert dividers(text) == [(20, 0, 20, 20)]
+
+
+def test_divider_covers_only_the_overlapping_span() -> None:
+    # 'high' is shifted 10 ft east, so the shared edge is x 10-20 only.
+    text = (
+        'room low "" 20x20 root\n'
+        'room high "" 20x20 down-of low shift=10\n'
+        'block chamber "Chamber" low high\n'
+        "divider low high"
+    )
+    assert dividers(text) == [(10, 20, 20, 20)]
+
+
+@pytest.mark.parametrize(
+    "statement",
+    [
+        # An 'in' flight in the lower half, topping out on the boundary.
+        pytest.param("stairs in low down=up size=10x10 at=15,10", id="in-from-low"),
+        # The same flight drawn in the upper half instead.
+        pytest.param("stairs in high down=down size=10x5 at=15,0", id="in-from-high"),
+        # A floor-leaving flight entered across the boundary cuts it too.
+        pytest.param("stairs up low down=down size=10x10 at=15,10", id="up-from-low"),
+    ],
+)
+def test_stair_entrance_on_the_boundary_cuts_the_divider(statement: str) -> None:
+    assert dividers(f"{SPLIT_CHAMBER}\n{statement}") == [
+        (0, 20, 15, 20),
+        (25, 20, 40, 20),
+    ]
+
+
+def test_closed_stair_side_on_the_boundary_keeps_the_divider() -> None:
+    # The flight runs east along the boundary: its south flank is closed, so
+    # the dividing line runs straight past it.
+    text = f"{SPLIT_CHAMBER}\nstairs up low down=right size=10x5 at=0,15"
+    assert dividers(text) == [(0, 20, 40, 20)]
+
+
+def test_entrance_spanning_the_whole_boundary_removes_the_divider() -> None:
+    text = f"{SPLIT_CHAMBER}\nstairs in low down=up size=40x10 at=0,10"
+    assert dividers(text) == []
+
+
+def test_stairs_elsewhere_in_the_room_do_not_cut_the_divider() -> None:
+    text = f"{SPLIT_CHAMBER}\nstairs in low down=up size=10x10 at=15,5"
+    assert dividers(text) == [(0, 20, 40, 20)]
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param(f"{SPLIT_CHAMBER}\ndivider low ghost", id="unknown-room"),
+        pytest.param(
+            'room a "A" 20x20 root\nroom b "B" 20x20 down-of a\ndivider a b',
+            id="rooms-not-in-a-block",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\n'
+            'room b "" 20x20 down-of a\n'
+            'room c "" 20x20 right-of a\n'
+            'room d "" 20x20 down-of c\n'
+            'block one "" a b\n'
+            'block two "" c d\n'
+            "divider a c",
+            id="rooms-in-different-blocks",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\n'
+            'room b "" 20x20 down-of a\n'
+            'room c "C" 20x20 right-of a\n'
+            'block one "" a b\n'
+            "divider a c",
+            id="one-room-outside-the-block",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\n'
+            'room b "" 20x20 down-of a\n'
+            'room c "" 20x20 down-of b\n'
+            'block tower "Tower" a b c\n'
+            "divider a c",
+            id="members-share-no-wall",
+        ),
+        pytest.param(f"{SPLIT_CHAMBER}\ndivider high low", id="duplicate-boundary"),
+    ],
+)
+def test_invalid_divider_layout_raises(source: str) -> None:
+    with pytest.raises(LayoutError):
+        solve(parse(source))
+
+
+def test_divider_error_reports_its_line() -> None:
+    text = 'room a "A" 20x20 root\nroom b "B" 20x20 down-of a\ndivider a b'
+    with pytest.raises(LayoutError) as exc:
+        solve(parse(text))
+    assert "not members of the same block" in exc.value.message
+    assert exc.value.line == 3
 
 
 # --- overlap detection -----------------------------------------------------

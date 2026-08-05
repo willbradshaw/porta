@@ -1,0 +1,4 @@
+room west "" 20x20 root
+room east "" 20x20 right-of west shift=10
+block chamber "Chamber" west east
+divider west east

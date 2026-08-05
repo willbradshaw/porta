@@ -15,7 +15,15 @@ import textwrap
 import pytest
 
 from porta.errors import ParseError
-from porta.model import Align, Building, Direction, Door, Relation, StairSense
+from porta.model import (
+    Align,
+    Building,
+    Direction,
+    Divider,
+    Door,
+    Relation,
+    StairSense,
+)
 from porta.parser import parse
 
 # Lines: 1 blank, 2 comment, 3 entrance, 4 kitchen, 5 hall.
@@ -732,6 +740,42 @@ def test_two_stairs_in_one_room_parse() -> None:
     ],
 )
 def test_invalid_stairs_raises(source: str) -> None:
+    with pytest.raises(ParseError):
+        parse(source)
+
+
+# --- divider statements ------------------------------------------------------
+
+
+def test_divider_is_parsed() -> None:
+    text = (
+        'room low "" 40x20 root\n'
+        'room high "" 40x10 down-of low\n'
+        'block chamber "Chamber" low high\n'
+        "divider low high"
+    )
+    assert parse(text).dividers == [Divider(a="low", b="high", line=4)]
+
+
+def test_two_dividers_parse() -> None:
+    dividers = parse("divider a b\ndivider b c").dividers
+    assert [(d.a, d.b) for d in dividers] == [("a", "b"), ("b", "c")]
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param("divider", id="bare-keyword"),
+        pytest.param("divider a", id="one-room"),
+        pytest.param("divider a b c", id="three-rooms"),
+        pytest.param("divider a a", id="same-room-twice"),
+        pytest.param('divider "a" b', id="quoted-room"),
+        pytest.param("divider a B!", id="invalid-id"),
+        pytest.param("divider door b", id="reserved-word-as-id"),
+        pytest.param('room divider "D" 10x10 root', id="divider-is-reserved"),
+    ],
+)
+def test_invalid_divider_raises(source: str) -> None:
     with pytest.raises(ParseError):
         parse(source)
 

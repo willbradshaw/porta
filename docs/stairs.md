@@ -94,6 +94,7 @@ door=10 dais outside down
 
 The dais is a [block](block.md) member, so the steps' upper entrance opens
 across the suppressed hall–dais boundary into the shared space — no door
-needed there.
+needed there. To draw the rest of that boundary as a dividing line, see
+[dividers](divider.md).
 
 <img alt="A great hall with steps up to its dais, and a stair tower with paired flights up and down" src="img/stairs-capstone.svg" width="70%">

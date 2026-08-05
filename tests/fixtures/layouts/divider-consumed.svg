@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="784" viewBox="-32 -10 74 78.4">
+  <rect x="-32" y="-10" width="74" height="78.4" fill="white" />
+  <g stroke="#bbb" stroke-width="0.15">
+    <line x1="0" y1="0" x2="0" y2="30" />
+    <line x1="5" y1="0" x2="5" y2="30" />
+    <line x1="10" y1="0" x2="10" y2="30" />
+    <line x1="0" y1="0" x2="10" y2="0" />
+    <line x1="0" y1="5" x2="10" y2="5" />
+    <line x1="0" y1="10" x2="10" y2="10" />
+    <line x1="0" y1="15" x2="10" y2="15" />
+    <line x1="0" y1="20" x2="10" y2="20" />
+    <line x1="0" y1="25" x2="10" y2="25" />
+    <line x1="0" y1="30" x2="10" y2="30" />
+  </g>
+  <line x1="0" y1="0" x2="0" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="0" y1="0" x2="10" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="0" y1="20" x2="0" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="0" y1="30" x2="10" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="10" y1="0" x2="10" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line x1="10" y1="20" x2="10" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <text data-block="cell" x="5" y="5" text-anchor="middle" dominant-baseline="central" font-size="6">C</text>
+  <g class="stairs" data-room="low">
+    <line x1="0" y1="10" x2="0" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+    <line x1="10" y1="10" x2="10" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+    <line x1="3.575" y1="10" x2="6.425" y2="10" stroke="black" stroke-width="0.25" />
+    <line x1="3.258" y1="11.667" x2="6.742" y2="11.667" stroke="black" stroke-width="0.25" />
+    <line x1="2.942" y1="13.333" x2="7.058" y2="13.333" stroke="black" stroke-width="0.25" />
+    <line x1="2.625" y1="15" x2="7.375" y2="15" stroke="black" stroke-width="0.25" />
+    <line x1="2.308" y1="16.667" x2="7.692" y2="16.667" stroke="black" stroke-width="0.25" />
+    <line x1="1.992" y1="18.333" x2="8.008" y2="18.333" stroke="black" stroke-width="0.25" />
+    <line x1="1.675" y1="20" x2="8.325" y2="20" stroke="black" stroke-width="0.25" />
+  </g>
+  <text class="scale" x="-22" y="49.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="-22" y="58.8" font-size="6">C  Cell</text>
+</svg>

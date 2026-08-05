@@ -1,0 +1,5 @@
+room west "" 20x20 root
+room east "" 10x20 right-of west
+block chamber "Chamber" west east
+divider west east
+stairs in west down=left size=10x10 at=10,5

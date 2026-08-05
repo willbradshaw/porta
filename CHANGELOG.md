@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+## 1.6.0 (2026-08-05)
+
 - Dividers: `divider <a> <b>` draws the suppressed boundary between two
   members of a block as a thin dashed dividing line, cut wherever a stair
   entrance lies on it (see `docs/divider.md`).

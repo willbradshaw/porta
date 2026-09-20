@@ -21,7 +21,10 @@
     <line x1="-20" y1="30" x2="30" y2="30" />
     <line x1="-20" y1="35" x2="30" y2="35" />
   </g>
-  <rect data-room="hall" x="0" y="0" width="30" height="30" fill="none" stroke="black" stroke-width="0.5" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="30" x2="30" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="0" x2="30" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
   <text data-room="terrace" x="-10" y="25" text-anchor="middle" dominant-baseline="central" font-size="12">T</text>
   <line class="divider" x1="-20" y1="15" x2="0" y2="15" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />

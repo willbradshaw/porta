@@ -1725,6 +1725,38 @@ def test_auto_door_tracks_resolved_room_dimensions(height: int) -> None:
     ("source", "perimeter", "interior"),
     [
         pytest.param('room a "" 20x20 root', 80, [], id="single"),
+        pytest.param('room a "" 20x20 exterior root', 0, [], id="outdoors-only"),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 20x20 exterior right-of a',
+            80,
+            [],
+            id="indoor-outdoor",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 10x10 exterior right-of a shift=5',
+            80,
+            [],
+            id="partial-outdoor-contact",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 20x20 exterior root\nlink b right-of a',
+            80,
+            [],
+            id="linked-outdoors",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 20x20 exterior right-of a door=? open',
+            60,
+            [],
+            id="auto-open-outdoors",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 20x20 right-of a\n'
+            'block hall "" a b\nroom c "" 40x10 exterior down-of a door=? open',
+            100,
+            [],
+            id="block-partial-auto-open-outdoors",
+        ),
         pytest.param(
             'room a "" 20x20 root\nroom b "" 20x20 right-of a',
             120,
@@ -1876,9 +1908,13 @@ def test_exterior_default_doors(
     ],
     ids=["inline", "standalone", "outside", "link"],
 )
-def test_exterior_invalid_walls(source: str) -> None:
+@pytest.mark.parametrize("width", ["", "=?"], ids=["default", "auto"])
+@pytest.mark.parametrize(
+    "kind", ["", " open", " secret"], ids=["solid", "open", "secret"]
+)
+def test_exterior_invalid_walls(source: str, width: str, kind: str) -> None:
     with pytest.raises(LayoutError, match=r"no wall|no outside wall"):
-        solve(parse(source))
+        solve(parse(source.replace("door", f"door{width}{kind}")))
 
 
 def test_exterior_auto_dimensions_and_shift() -> None:

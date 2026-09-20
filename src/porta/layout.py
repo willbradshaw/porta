@@ -220,8 +220,9 @@ def _block_warnings(
 def wall_segments(building: Building) -> tuple[list[Segment], list[Segment]]:
     """Derive exterior and interior structural walls of a solved building.
 
-    One room on a span makes it exposed (including courtyard edges); two make
-    it interior, unless their common block suppresses the wall. Open doors cut
+    One interior room on a span makes it exposed (including courtyard edges
+    and contacts with exterior rooms); two make it interior, unless their
+    common block suppresses the wall. Exterior rooms contribute no walls. Open doors cut
     either kind. Shared walls are emitted once; adjacent spans are merged.
     Classification uses final coordinates, including linked components.
 
@@ -230,6 +231,8 @@ def wall_segments(building: Building) -> tuple[list[Segment], list[Segment]]:
     """
     edges: dict[tuple[bool, int], list[tuple[int, int, str]]] = {}
     for room in building.rooms:
+        if room.exterior:
+            continue
         for x1, y1, x2, y2 in _room_outline(room, [])[0]:
             horizontal = y1 == y2
             coord, lo, hi = (y1, x1, x2) if horizontal else (x1, y1, y2)

@@ -27,6 +27,8 @@ room kitchen "Kitchen" 20x20 right-of hall
 Exposed walls use a stronger stroke than shared interior walls. This follows
 the full plan, including partial adjacencies and [blocks](block.md); shared
 walls are drawn once. Walls facing courtyard gaps are exposed too.
+Walls between interior and exterior rooms also use the stronger exposed stroke;
+outdoor boundaries never contribute structural walls.
 
 ## Exterior spaces
 

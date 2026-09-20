@@ -27,10 +27,10 @@
     <line x1="-15" y1="40" x2="45" y2="40" />
     <line x1="-15" y1="45" x2="45" y2="45" />
   </g>
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="0" x2="30" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <text data-room="court" x="-7.5" y="15" text-anchor="middle" dominant-baseline="central" font-size="9">C</text>
-  <line data-room="hall" x1="0" y1="0" x2="0" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="hall" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="hall" x1="30" y1="0" x2="30" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
   <text data-room="porch" x="10" y="-5" text-anchor="middle" dominant-baseline="central" font-size="6">P</text>
   <text data-room="terrace" x="15" y="37.5" text-anchor="middle" dominant-baseline="central" font-size="9">T</text>

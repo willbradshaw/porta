@@ -900,8 +900,13 @@ def test_exterior_walls_and_labels(blocked: bool, door: str) -> None:
     for room_id in ("patio", "lawn"):
         assert svg.findall(f'.//s:rect[@data-room="{room_id}"]', ns) == []
         assert svg.findall(f'.//s:line[@data-room="{room_id}"]', ns) == []
-    assert svg.findall('.//s:rect[@data-room="hall"]', ns) or svg.findall(
-        './/s:line[@data-room="hall"]', ns
-    )
+    walls = svg.findall('.//s:line[@class="wall exterior"]', ns)
+    assert len(walls) == (5 if door == " door open" else 4)
+    assert svg.findall('.//s:line[@class="wall interior"]', ns) == []
+    for wall in walls:
+        assert wall.attrib["stroke-width"] == "0.8"
+        assert all(
+            0 <= float(wall.attrib[key]) <= 20 for key in ("x1", "x2", "y1", "y2")
+        )
     assert ("Garden" in render_svg(building)) == blocked
     assert "patio" in render_ascii(building) or "garden" in render_ascii(building)

@@ -119,6 +119,16 @@ plan's rooms and [blocks](block.md) — a duplicate raises an error. Rooms
 without an explicit glyph still receive automatic glyphs, which never collide
 with the explicit ones.
 
+Automatic assignment uses the 36 single-character glyphs `A`–`Z` and `0`–`9`,
+shared by rooms and blocks. Explicit glyphs from this pool reserve their
+characters, leaving fewer available for automatic assignment. Block members
+inherit their block's glyph and do not consume additional entries. Explicit
+multi-character glyphs and unlabeled entities do not consume pool entries.
+If the pool is exhausted, both SVG and ASCII rendering raise a `ValueError`
+identifying the entity that could not be labeled and explaining the remedies:
+assign unique explicit multi-character glyphs (such as `glyph="12"`) to some
+rooms or blocks, or use `glyph=""` for intentionally unlabeled entities.
+
 The empty glyph `glyph=""` marks the room as **unlabeled**: no glyph is
 drawn, and the room gets no key entry at all (`store` above). In the
 [debug-ascii grid](../README.md#the-porta-tool), an unlabeled room's cells

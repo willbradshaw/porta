@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Report an actionable, format-neutral error when automatic room/block glyphs
+  run out in SVG or ASCII rendering, and document the capacity and workarounds.
 - Correct the room, block, and door references for reserved IDs, forward
   references, automatic glyphs, block connectivity, and door dimensions and
   offsets, with examples of forward references and a partially exposed wall.

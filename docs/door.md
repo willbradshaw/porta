@@ -45,6 +45,14 @@ types of door declaration:
   start of the door to `O` feet from the start of the wall, and
   `door=W@O` sets both.
 
+Widths must be positive integer multiples of 5 ft (`5`, `10`, etc.);
+offsets must be nonnegative integer multiples of 5 ft (`0`, `5`, `10`, etc.).
+For an internal door, the offset starts at the near end of the **actual
+shared wall interval**: the top for a vertical wall, or the left for a
+horizontal wall. Under partial adjacency, this may differ from a room's
+corner. The entire door must fit within that shared interval. These rules
+also apply to standalone doors between rooms.
+
 ```porta img/door-declarations.svg
 room r "Root" 20x20 root
 room a "Room A" 20x20 right-of r no-door
@@ -98,6 +106,22 @@ door b outside down
 ```
 
 <img alt="Two rooms with external doors on their outer walls" src="img/door-outside.svg" width="70%">
+
+External-door offsets are measured along the named room side, from its top
+for `left`/`right` or its left end for `up`/`down`. The entire door span must
+be exterior, but a neighbouring room elsewhere on that side is allowed:
+
+```porta img/door-partial-exterior.svg
+room hall "Hall" 20x30 root
+room annexe "Annexe" 10x10 right-of hall shift=10 door@0
+door@20 hall outside right
+```
+
+<img alt="A hall with an internal door to an annexe and an exterior door farther down the same side" src="img/door-partial-exterior.svg" width="70%">
+
+The shared wall starts 10 ft below the hall's top, so the internal `door@0`
+starts there. The external `door@20` starts 20 ft below the hall's top and
+occupies the next 5 ft of exposed wall, just below the annexe.
 
 ## Open boundaries
 
@@ -162,7 +186,8 @@ concealed.
   a corner).
 - A door wider than its wall, or pushed past the wall's end by its offset.
 - Two doors that overlap on the same wall.
-- An external door on a side that isn't exterior — a room sits flush there.
+- An external door whose span overlaps a neighbouring room flush against
+  that side.
 - An `open` or `secret` marker that doesn't immediately follow a door spec,
   a door carrying both markers, or either combined with `no-door` on the
   same relation.

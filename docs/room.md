@@ -3,9 +3,9 @@
 The core of a `porta` plan is a list of [rooms](#the-room-statement), linked by 
 [relations](#relations) into a floorplan. With the exception of
 the [root](#the-root), each room is positioned relative to one or more
-**[anchors](#adjacency)** defined previously in the plan. `porta`
-[resolves rooms](#resolution) outward from the root until
-every room is placed.
+**[anchors](#adjacency)** declared anywhere in the plan, including later in
+the file. `porta` [resolves rooms](#resolution) in dependency order, placing
+anchors before the rooms that depend on them, regardless of source order.
 
 ```porta img/overview.svg
 room hall    "Hall"    30x20 root
@@ -44,9 +44,9 @@ Each `room` statement consists of the following components in order:
 ### Room ID
 
 A room ID is the handle other parts of the `porta` plan use to refer to that
-room. Its first available letter also supplies the room's default
+room. It also supplies candidates for the room's automatic
 [glyph](#glyphs) on the rendered map (the key maps glyphs back to names); the
-id is otherwise not shown. An ID must match `[a-z][a-z0-9_-]*`: a lowercase
+ID is otherwise not shown. An ID must match `[a-z][a-z0-9_-]*`: a lowercase
 letter to start, followed by any number of lowercase letters, digits, hyphens,
 or underscores.
 Each ID must be unique within a plan, and can't match any of `porta`'s
@@ -55,8 +55,9 @@ reserved keywords.
 > [!WARNING]
 > At the time of writing, the following keywords are **reserved** in `porta`
 > plans and cannot be used for room IDs:
-> `root`, `door`, `no-door`, `outside`, `shift`, `align`, `up-of`, `down-of`,
-> `left-of`, `right-of`
+> `root`, `door`, `no-door`, `open`, `secret`, `outside`, `shift`, `align`,
+> `link`, `stairs`, `in`, `divider`, `up-of`, `down-of`, `left-of`, `right-of`.
+> Other syntax words, such as `room`, `block`, and `glyph`, are not reserved.
 
 > [!NOTE]
 > Valid IDs: `hall`, `store_room-2`, `wc1`.
@@ -81,9 +82,16 @@ is valid within a name, subject to the restrictions above.
 ### Glyphs
 
 Each room is labeled on the rendered map by a short **glyph**, which the key
-below the map maps back to the room's name. By default, `porta` assigns
-glyphs automatically: the first letter of the room's [ID](#room-id)
-(uppercased) that no other room has claimed, falling back to a generic pool.
+below the map maps back to the room's name. Automatic assignment considers
+rooms outside blocks and the [blocks](block.md) themselves together, in
+alphabetical [ID](#room-id) order, regardless of source order. Explicit
+glyphs reserve their values first. For each remaining entity, `porta` scans
+its ID from left to right for the first unused alphanumeric character,
+uppercased, skipping hyphens and underscores. Only if none is available
+does it use the first unused glyph from the fallback pool. For example,
+`hall` gets `A` if `H` is already reserved and `A` is free; digits in IDs
+are also candidates. Entities with `glyph=""` and rooms inside blocks do
+not receive their own automatic glyphs.
 
 An explicit glyph can be set instead with `glyph="..."`, placed after the
 dimensions:
@@ -379,6 +387,14 @@ aligned. Packed components are never adjacent, so a door between them
 continuous plan, use a [`link` statement](link.md).
 
 ## Resolution
+
+Forward references are valid: this plan places `parent` before `child` even
+though `child` is declared first.
+
+```porta
+room child "" 5x5 right-of parent
+room parent "" 5x5 root
+```
 
 In `porta`, rooms are placed into the coordinate system by building and
 traversing a dependency graph. The root is placed at the origin, rooms

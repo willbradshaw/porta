@@ -1,6 +1,6 @@
 # Outdoor L-shaped block: no outline; interior neighbor keeps its door/wall.
-exterior main "" 30x20 root
-exterior wing "" 15x20 down-of main
+room main "" 30x20 exterior root
+room wing "" 15x20 exterior down-of main
 block garden "Garden" glyph="G" glyph=wing main wing
 divider main wing
 room hall "Hall" 20x20 right-of main door open

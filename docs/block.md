@@ -1,7 +1,7 @@
 # Blocks
 
 A **block** joins several [rooms](room.md) into a single space, suppressing
-walls and doors between them. They are most commonly used to create non-rectangular
+boundaries and doors between members of the same kind. They are most commonly used to create non-rectangular
 spaces in the rendered SVG map:
 
 ```porta img/block-l.svg
@@ -18,10 +18,11 @@ single glyph and key entry determined by the `block` statement. Relations
 with other spaces in the map (adjacency, doors, etc) are handled at the room
 level.
 
-Blocks may also group [exterior spaces](room.md#exterior-spaces). An exterior
-block has a shared glyph and key entry but no enclosing walls; adjacent
-interiors retain their walls and doors. A block cannot mix interior and exterior
-members.
+Blocks may also group [exterior rooms](room.md#exterior-spaces), suppressing
+their automatic dividers. An exterior block has a shared glyph and key entry
+but no enclosing walls. Mixed interior/exterior blocks are allowed: walls and
+doors between interior and exterior members remain, as do those at contacts
+with rooms outside the block.
 
 ## The `block` statement
 
@@ -62,7 +63,8 @@ The member rooms included in a block are ordinary
 [`room` statements](room.md#the-room-statement), with all the features that
 implies: relations, `align`/`shift`, `?` auto-dimensions, doors, etc.
 When a group of rooms are combined into a block, the walls and doors
-between those rooms are suppressed, but walls and doors on the outer edge
+between members of the same kind are suppressed, but interior/exterior walls
+and doors remain. Walls and doors on the outer edge
 of the block persist:
 
 ```porta img/block-neighbour.svg
@@ -86,8 +88,8 @@ specified in the `block` statement. Consequently, names of member rooms are
 typically empty (`""`); nonempty member names — and explicit member glyphs —
 are permitted but will raise a warning. Similarly, explicit
 [door declarations](door.md#door-declarations) and [statements](door.md#the-door-statement)
-targeting doors on walls within the block will raise a warning that they have
-been dropped.
+targeting doors between members of the same kind raise a warning that they
+have been dropped. Doors between interior and exterior members remain.
 
 ## Invalid blocks
 

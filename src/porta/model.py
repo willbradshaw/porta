@@ -135,7 +135,7 @@ class Stairs:
 
 @dataclass(frozen=True)
 class Divider:
-    """A dashed dividing line along the boundary of two same-block members.
+    """An explicit dashed line between exterior rooms or same-block interiors.
 
     A block suppresses the wall between its members; a divider draws that
     boundary back in as a thin dashed line. Spans where a stair entrance
@@ -189,7 +189,8 @@ class Block:
     """A merged (possibly non-rectangular) room: a union of member rooms.
 
     The members are normal rooms placed by the usual relations; the block drops
-    the walls they share with each other so they read as one space. The block
+    boundaries between members of the same kind so they read as one space.
+    Interior/exterior walls and doors remain even within a block. The block
     carries a single glyph — explicit via ``glyph``, else derived from ``id`` —
     drawn in ``glyph_member`` (or the first member when unset), and ``name``
     (if any) labels the union in the key.

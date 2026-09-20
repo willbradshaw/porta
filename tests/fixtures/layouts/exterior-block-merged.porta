@@ -1,0 +1,7 @@
+# Exterior members merge without a divider; another block remains distinct.
+room terrace "" 20x20 exterior root
+room lawn "" 20x20 exterior right-of terrace
+block garden "Garden" terrace lawn
+room court "" 20x20 exterior down-of terrace
+room path "" 20x20 exterior right-of court
+block approach "Approach" court path

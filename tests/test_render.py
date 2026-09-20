@@ -889,8 +889,8 @@ def test_auto_door_svg_matches_explicit_full_span(source: str, kind: str) -> Non
 def test_exterior_walls_and_labels(blocked: bool, door: str) -> None:
     source = (
         'room hall "Hall" 20x20 root\n'
-        f'exterior patio "" 30x20 down-of hall{door}\n'
-        'exterior lawn "" 20x20 right-of patio\n'
+        f'room patio "" 30x20 exterior down-of hall{door}\n'
+        'room lawn "" 20x20 exterior right-of patio\n'
     )
     if blocked:
         source += 'block garden "Garden" patio lawn'

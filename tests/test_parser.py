@@ -940,12 +940,13 @@ def test_invalid_auto_door_spec(spec: str) -> None:
         parse(f'room a "A" 20x20 right-of b {spec}')
 
 
-@pytest.mark.parametrize("directive", ["room", "exterior"])
-def test_space_declaration(directive: str) -> None:
+@pytest.mark.parametrize("attribute", ["", "exterior"])
+def test_space_declaration(attribute: str) -> None:
     room = parse(
-        f'{directive} terrace "Terrace" ?x20 glyph="T" right-of hall align=end shift=-5'
+        f'room terrace "Terrace" ?x20 {attribute} glyph="T" '
+        "right-of hall align=end shift=-5"
     ).rooms[0]
-    assert room.exterior == (directive == "exterior")
+    assert room.exterior == (attribute == "exterior")
     assert room.auto_width
     assert room.height == 20
     assert room.glyph == "T"
@@ -956,12 +957,35 @@ def test_space_declaration(directive: str) -> None:
 @pytest.mark.parametrize(
     "source",
     [
-        'exterior a "A" 12x20 root',
-        "exterior a 20x20 root",
-        'exterior a "A" 20x20 nonsense',
+        'room a "A" 12x20 exterior root',
+        "room a 20x20 exterior root",
+        'room a "A" 20x20 exterior nonsense',
     ],
     ids=["off-grid", "missing-name", "unknown-modifier"],
 )
 def test_invalid_exterior_declaration(source: str) -> None:
+    with pytest.raises(ParseError):
+        parse(source)
+
+
+@pytest.mark.parametrize(
+    "modifiers",
+    [
+        "exterior root",
+        "root exterior",
+        'glyph="T" exterior root',
+        "right-of hall exterior",
+    ],
+)
+def test_exterior_is_a_room_attribute(modifiers: str) -> None:
+    assert parse(f'room terrace "" 20x20 {modifiers}').room("terrace").exterior
+
+
+@pytest.mark.parametrize(
+    "source",
+    ['exterior terrace "" 20x20 root', 'room exterior "" 20x20 root'],
+    ids=["no-exterior-directive", "reserved-attribute"],
+)
+def test_invalid_exterior_syntax(source: str) -> None:
     with pytest.raises(ParseError):
         parse(source)

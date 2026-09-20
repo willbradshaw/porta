@@ -30,29 +30,30 @@ walls are drawn once. Walls facing courtyard gaps are exposed too.
 
 ## Exterior spaces
 
-Use `exterior` in place of `room` for an outdoor rectangle:
+Add the `exterior` attribute to a `room` for an outdoor rectangle:
 
 ```text
-exterior <id> "<name>" <dimensions> [glyph="<glyph>"] <relations>
+room <id> "<name>" <dimensions> exterior [glyph="<glyph>"] <relations>
 ```
 
 Exterior spaces follow the same ID, name, glyph, dimensions (including `?`),
 `root`, relation, alignment, shift, overlap, and component-link rules as rooms.
-Their exposed edges and boundaries with other exterior spaces have no walls
-or default doors. Where they touch an interior room, that room retains its wall
+Their exposed edges have no enclosing lines. Adjacent exterior rooms have a
+thin dashed [divider](divider.md) along their shared edge, with no wall or door.
+This applies to incidental contact as well as declared relations and links. Where they touch an interior room, that room retains its wall
 and the usual door rules apply: a relation or link adds a default door, while
 incidental contact alone does not.
 
 ```porta img/exterior.svg
 room hall "Hall" 30x20 root
-exterior terrace "Terrace" ?x15 down-of hall
-exterior yard "Yard" 20x15 right-of terrace
+room terrace "Terrace" ?x15 exterior down-of hall
+room yard "Yard" 20x15 exterior right-of terrace
 ```
 
 <img alt="Hall with a door to the terrace; terrace and yard have no enclosing walls" src="img/exterior.svg" width="70%">
 
-The hall/terrace boundary has a wall and a door. The terrace/yard boundary and
-all exposed outdoor edges remain open. Exterior spaces still have glyphs and
+The hall/terrace boundary has a wall and a door. A dashed divider distinguishes
+the terrace from the yard; exposed outdoor edges remain unmarked. Exterior spaces still have glyphs and
 key entries, and contribute to the plan bounds and grid. The ASCII view shows
 their extents like room extents.
 
@@ -62,10 +63,11 @@ To connect an interior room to a named exterior space, use a relation, link,
 or `door <interior-id> <exterior-id>`, rather than an `outside` door.
 `no-door` is allowed on outdoor relations and links, where it has no effect.
 
-A [block](block.md) can group exterior spaces into one labelled area. All
-members must be exterior, or all must be interior; mixed blocks are errors.
-Existing block conventions apply, including suppressing explicit doors between
-members with a warning and permitting explicit [dividers](divider.md).
+A [block](block.md) can group exterior rooms into one labelled area, suppressing
+their automatic dividers. Use an explicit `divider` to restore a boundary within
+the block. Blocks may mix interior and exterior rooms: walls and doors between
+those two kinds remain, while boundaries between members of the same kind are
+suppressed (explicit doors there produce a warning).
 Stairs may be placed in exterior spaces; an entrance facing a wall-free edge
 does not require a door.
 
@@ -74,7 +76,7 @@ does not require a door.
 A room is declared in a `porta` plan as follows:
 
 ```text
-room <id> "<name>" <dimensions> [glyph="<glyph>"] <relations>
+room <id> "<name>" <dimensions> [exterior] [glyph="<glyph>"] <relations>
 ```
 
 Each `room` statement consists of the following components in order:
@@ -83,7 +85,7 @@ Each `room` statement consists of the following components in order:
 2. A [room ID](#room-id) used to point to that room elsewhere in the plan;
 3. A [room name](#room-name) shown in the rendered map key (may be empty);
 4. A [dimension declaration](#dimensions) of the form `WxH`;
-5. An optional explicit [display glyph](#glyphs);
+5. Optional `exterior` and explicit [display glyph](#glyphs) attributes;
 6. One or more [relations](#relations).
 
 ### Room ID
@@ -100,7 +102,7 @@ reserved keywords.
 > [!WARNING]
 > At the time of writing, the following keywords are **reserved** in `porta`
 > plans and cannot be used for room IDs:
-> `root`, `door`, `no-door`, `open`, `secret`, `outside`, `shift`, `align`,
+> `root`, `exterior`, `door`, `no-door`, `open`, `secret`, `outside`, `shift`, `align`,
 > `link`, `stairs`, `in`, `divider`, `up-of`, `down-of`, `left-of`, `right-of`.
 > Other syntax words, such as `room`, `block`, and `glyph`, are not reserved.
 

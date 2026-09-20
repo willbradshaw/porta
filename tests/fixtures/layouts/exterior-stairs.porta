@@ -1,6 +1,6 @@
 # Exterior stairs can open onto exposed edges or another exterior space.
-exterior terrace "Terrace" 30x20 root
-exterior yard "Yard" 30x20 down-of terrace
+room terrace "Terrace" 30x20 exterior root
+room yard "Yard" 30x20 exterior down-of terrace
 room hall "Hall" 20x20 left-of terrace door=10@5
 stairs up terrace down=down size=10x10 at=15,10
 stairs up yard down=right size=10x10 at=20,5

@@ -20,7 +20,10 @@
     <line x1="0" y1="25" x2="50" y2="25" />
     <line x1="0" y1="30" x2="50" y2="30" />
   </g>
-  <rect data-room="gallery" x="0" y="0" width="50" height="30" fill="none" stroke="black" stroke-width="0.5" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="30" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="50" y2="0" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="30" x2="50" y2="30" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="50" y1="0" x2="50" y2="30" stroke="black" stroke-width="1" stroke-linecap="square" />
   <text data-room="gallery" x="25" y="15" text-anchor="middle" dominant-baseline="central" font-size="6">G</text>
   <g class="stairs" data-room="gallery">
     <line x1="0" y1="5" x2="15" y2="5" stroke="black" stroke-width="0.5" stroke-linecap="square" />

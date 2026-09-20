@@ -18,6 +18,8 @@ Overlap detection is Stage 3; the alignment/spacing modifiers and snug-fit
 validation are tracked as separate issues.
 """
 
+from itertools import pairwise
+
 from porta.errors import LayoutError, OverlapError
 from porta.model import (
     Align,
@@ -208,6 +210,56 @@ def _block_warnings(
     return warnings
 
 
+def wall_segments(building: Building) -> tuple[list[Segment], list[Segment]]:
+    """Derive exterior and interior structural walls of a solved building.
+
+    One room on a span makes it exposed (including courtyard edges); two make
+    it interior, unless their common block suppresses the wall. Open doors cut
+    either kind. Shared walls are emitted once; adjacent spans are merged.
+    Classification uses final coordinates, including linked components.
+
+    Returns:
+        Exterior segments, then interior segments, in feet.
+    """
+    edges: dict[tuple[bool, int], list[tuple[int, int, str]]] = {}
+    for room in building.rooms:
+        for x1, y1, x2, y2 in _room_outline(room, [])[0]:
+            horizontal = y1 == y2
+            coord, lo, hi = (y1, x1, x2) if horizontal else (x1, y1, y2)
+            edges.setdefault((horizontal, coord), []).append((lo, hi, room.id))
+    openings = open_door_segments(building)
+    block_of = _block_of(building)
+    exterior: list[Segment] = []
+    interior: list[Segment] = []
+    for (horizontal, coord), spans in sorted(edges.items()):
+        points = sorted({p for lo, hi, _ in spans for p in (lo, hi)})
+        cuts = [
+            (x1, x2) if horizontal else (y1, y2)
+            for x1, y1, x2, y2 in openings
+            if (y1 == y2 == coord if horizontal else x1 == x2 == coord)
+        ]
+        classified: dict[bool, list[tuple[int, int]]] = {True: [], False: []}
+        for lo, hi in pairwise(points):
+            owners = [rid for start, end, rid in spans if start <= lo and hi <= end]
+            if not owners or (
+                len(owners) == 2 and _same_block(owners[0], owners[1], block_of)
+            ):
+                continue
+            intervals = classified[len(owners) == 1]
+            for start, end in _exposed(lo, hi, cuts):
+                if intervals and intervals[-1][1] == start:
+                    intervals[-1] = (intervals[-1][0], end)
+                else:
+                    intervals.append((start, end))
+        for exposed, intervals in classified.items():
+            target = exterior if exposed else interior
+            target.extend(
+                (lo, coord, hi, coord) if horizontal else (coord, lo, coord, hi)
+                for lo, hi in intervals
+            )
+    return sorted(exterior), sorted(interior)
+
+
 def block_wall_segments(building: Building) -> list[Segment]:
     """Wall segments tracing each block's outer boundary (internal walls dropped).
 
@@ -231,8 +283,9 @@ def room_outline_segments(building: Building) -> dict[str, list[Segment]]:
     """Outlines of the rooms whose walls are cut by an open door.
 
     Maps each such room's id to its four edges with every open-door span
-    removed. Rooms untouched by an opening are absent (they render as plain
-    rectangles); block members are covered by :func:`block_wall_segments`.
+    removed. Rooms untouched by an opening are absent; block members are
+    covered by :func:`block_wall_segments`. For building-wide exterior/interior
+    classification, use :func:`wall_segments` instead.
     Assumes a solved building.
     """
     openings = open_door_segments(building)

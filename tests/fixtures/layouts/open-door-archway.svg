@@ -18,17 +18,13 @@
     <line x1="0" y1="35" x2="30" y2="35" />
     <line x1="0" y1="40" x2="30" y2="40" />
   </g>
-  <line data-room="hall" x1="0" y1="0" x2="0" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="hall" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="hall" x1="0" y1="20" x2="10" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="hall" x1="20" y1="20" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="hall" x1="30" y1="0" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="0" y1="20" x2="10" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="20" y1="20" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="40" x2="30" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="0" x2="30" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
   <text data-room="hall" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>
-  <line data-room="study" x1="0" y1="20" x2="0" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="study" x1="0" y1="20" x2="10" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="study" x1="0" y1="40" x2="30" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="study" x1="20" y1="20" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="study" x1="30" y1="20" x2="30" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="study" x="15" y="30" text-anchor="middle" dominant-baseline="central" font-size="12">S</text>
   <line class="open" x1="10" y1="20" x2="20" y2="20" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <text class="scale" x="-12" y="59.2" font-size="6">1 square = 5 ft</text>

@@ -19,6 +19,7 @@ from porta.layout import (
     secret_door_segments,
     solve,
     stair_footprints,
+    wall_segments,
 )
 from porta.model import Building, Room
 from porta.parser import parse
@@ -1718,3 +1719,126 @@ def test_auto_door_allows_stair_entrance(kind: str) -> None:
 def test_auto_door_tracks_resolved_room_dimensions(height: int) -> None:
     source = f'room a "A" 30x{height} root\nroom b "B" 20x? right-of a door=? open'
     assert open_doors_of(source) == [(30, 0, 30, height)]
+
+
+@pytest.mark.parametrize(
+    ("source", "perimeter", "interior"),
+    [
+        pytest.param('room a "" 20x20 root', 80, [], id="single"),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 20x20 right-of a',
+            120,
+            [(20, 0, 20, 20)],
+            id="full-adjacency",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 10x10 right-of a shift=5',
+            100,
+            [(20, 5, 20, 15)],
+            id="partial-adjacency",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 10x10 up-of a shift=5',
+            100,
+            [(5, 0, 15, 0)],
+            id="horizontal-negative",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 10x10 right-of a\n'
+            'room c "" 10x10 right-of a align=end',
+            100,
+            [(20, 0, 20, 20), (20, 10, 30, 10)],
+            id="t-junction",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 10x10 right-of a\nblock hall "" a b',
+            100,
+            [],
+            id="block",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 10x10 right-of a\n'
+            'room c "" 10x10 right-of b\nblock hall "" a b',
+            120,
+            [(30, 0, 30, 10)],
+            id="block-faces-room",
+        ),
+        pytest.param(
+            'room a "" 10x10 root\nroom b "" 10x10 right-of a\n'
+            'room c "" 10x10 right-of b\nroom d "" 10x10 right-of c\n'
+            'block first "" a b\nblock second "" c d',
+            100,
+            [(20, 0, 20, 10)],
+            id="block-faces-block",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 20x20 root',
+            160,
+            [],
+            id="disconnected-collinear",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 20x20 root\nlink b right-of a',
+            120,
+            [(20, 0, 20, 20)],
+            id="linked",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 20x20 right-of a door=10 open',
+            120,
+            [(20, 0, 20, 5), (20, 15, 20, 20)],
+            id="partial-open",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\nroom b "" 20x20 right-of a door=20 open',
+            120,
+            [],
+            id="full-open",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\ndoor=10 open a outside down',
+            70,
+            [],
+            id="external-open",
+        ),
+        pytest.param(
+            'room a "" 20x20 root\ndoor=10 secret a outside down',
+            80,
+            [],
+            id="external-secret",
+        ),
+        pytest.param(
+            'room a "" 30x10 root\nroom b "" 10x10 down-of a\n'
+            'room c "" 10x10 down-of a align=end\nroom d "" 30x10 down-of b',
+            160,
+            [(0, 10, 10, 10), (0, 20, 10, 20), (20, 10, 30, 10), (20, 20, 30, 20)],
+            id="courtyard",
+        ),
+    ],
+)
+def test_derived_wall_classification(
+    source: str, perimeter: int, interior: list[tuple[int, int, int, int]]
+) -> None:
+    building = solve(parse(source))
+    exterior, shared = wall_segments(building)
+    assert shared == sorted(interior)
+    assert sum(x2 - x1 + y2 - y1 for x1, y1, x2, y2 in exterior) == perimeter
+    assert len(exterior + shared) == len(set(exterior + shared))
+    building.rooms.reverse()
+    assert wall_segments(building) == (exterior, shared)
+
+
+def test_partial_adjacency_splits_exposed_wall_at_both_ends() -> None:
+    building = solve(parse('room a "" 20x20 root\nroom b "" 10x10 right-of a shift=5'))
+    exterior, interior = wall_segments(building)
+    assert exterior == [
+        (0, 0, 0, 20),
+        (0, 0, 20, 0),
+        (0, 20, 20, 20),
+        (20, 0, 20, 5),
+        (20, 5, 30, 5),
+        (20, 15, 20, 20),
+        (20, 15, 30, 15),
+        (30, 5, 30, 15),
+    ]
+    assert interior == [(20, 5, 20, 15)]

@@ -10,14 +10,13 @@ from xml.sax.saxutils import escape
 
 from porta.layout import (
     Rect,
-    block_wall_segments,
     divider_segments,
     door_segments,
     open_door_segments,
-    room_outline_segments,
     secret_door_segments,
     stair_footprints,
     stair_open_sides,
+    wall_segments,
 )
 from porta.model import Axis, Building, Direction, Room, Stairs
 
@@ -28,7 +27,8 @@ _FALLBACK_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 _SVG_NS = "http://www.w3.org/2000/svg"
 _MARGIN_FT = 10  # padding around the plan, in feet
-_WALL_STROKE_FT = 0.5  # wall line thickness, in feet
+_WALL_STROKE_FT = 0.5  # interior walls and stair edges, in feet
+_EXTERIOR_WALL_STROKE_FT = 1.0  # exposed building envelope, in feet
 _LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
 _LABEL_FIT = 0.9  # widest fraction of the room width a glyph may span
 _KEY_FONT_FT = 6  # key/caption font, in feet (fixed, not tied to room sizes)
@@ -114,9 +114,9 @@ def render_svg(building: Building, *, background: str = "white") -> str:
     Geometry is drawn directly in feet (1 user unit = 1 foot); no scaling or
     y-flip is needed (the layout's x-east/y-south coordinates are already
     SVG-native). The viewBox frames the room bounding box plus a margin, so
-    rooms are emitted at their literal (possibly negative) coordinates. Each
-    room is a bordered rectangle with a centered glyph; a key (glyph to name)
-    is drawn below the plan.
+    walls are emitted at their literal (possibly negative) coordinates, with
+    stronger exterior strokes and shared interior walls drawn once. Rooms have
+    centered glyphs; a key (glyph to name) is drawn below the plan.
 
     Args:
         building: A building whose rooms have been placed by
@@ -198,26 +198,23 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         )
     lines.append("  </g>")
 
-    # A room bordering an open door loses its plain rect: its outline is drawn
-    # as per-edge wall segments with the open spans cut out.
-    outlines = room_outline_segments(building)
+    # Shared walls appear once. Square caps close perpendicular corners.
+    exterior, interior = wall_segments(building)
+    for kind, segments, width in (
+        ("interior", interior, _WALL_STROKE_FT),
+        ("exterior", exterior, _EXTERIOR_WALL_STROKE_FT),
+    ):
+        for x1, y1, x2, y2 in segments:
+            lines.append(
+                f'  <line class="wall {kind}" x1="{_num(x1)}" y1="{_num(y1)}" '
+                f'x2="{_num(x2)}" y2="{_num(y2)}" '
+                f'stroke="black" stroke-width="{_num(width)}" '
+                f'stroke-linecap="square" />'
+            )
+
     for room, x, y in sorted(placed, key=lambda t: t[0].id):
         if room.id in member_block:
-            continue  # drawn as part of its block's outline below
-        if room.id in outlines:
-            for x1, y1, x2, y2 in sorted(outlines[room.id]):
-                lines.append(
-                    f'  <line data-room="{room.id}" x1="{_num(x1)}" y1="{_num(y1)}" '
-                    f'x2="{_num(x2)}" y2="{_num(y2)}" '
-                    f'stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" '
-                    f'stroke-linecap="square" />'
-                )
-        else:
-            lines.append(
-                f'  <rect data-room="{room.id}" x="{_num(x)}" y="{_num(y)}" '
-                f'width="{_num(room.width)}" height="{_num(room.height)}" '
-                f'fill="none" stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" />'
-            )
+            continue
         glyph = glyphs[room.id]
         if not glyph:
             continue  # unlabeled room
@@ -229,16 +226,7 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f"{escape(glyph)}</text>"
         )
 
-    # Blocks: the union boundary as wall lines (internal walls dropped), then one
-    # glyph at the block's glyph member's centre. Square caps extend each segment
-    # by half its width so perpendicular segments meet in a clean corner.
-    for x1, y1, x2, y2 in sorted(block_wall_segments(building)):
-        lines.append(
-            f'  <line x1="{_num(x1)}" y1="{_num(y1)}" '
-            f'x2="{_num(x2)}" y2="{_num(y2)}" '
-            f'stroke="black" stroke-width="{_num(_WALL_STROKE_FT)}" '
-            f'stroke-linecap="square" />'
-        )
+    # One glyph per block, at its selected member.
     for block in sorted(building.blocks, key=lambda b: b.id):
         glyph = glyphs[block.id]
         if not glyph:

@@ -20,9 +20,14 @@
     <line x1="0" y1="45" x2="30" y2="45" />
     <line x1="0" y1="50" x2="30" y2="50" />
   </g>
-  <rect data-room="base" x="0" y="40" width="30" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <line class="wall interior" x1="0" y1="40" x2="10" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="10" y2="0" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="50" x2="30" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="10" y1="0" x2="10" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="10" y1="40" x2="30" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="40" x2="30" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
   <text data-room="base" x="15" y="45" text-anchor="middle" dominant-baseline="central" font-size="6">B</text>
-  <rect data-room="tower" x="0" y="0" width="10" height="40" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="tower" x="5" y="20" text-anchor="middle" dominant-baseline="central" font-size="5">12a</text>
   <line class="door" x1="0" y1="40" x2="5" y2="40" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-12" y="69.2" font-size="6">1 square = 5 ft</text>

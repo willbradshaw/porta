@@ -4,6 +4,9 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Draw exposed building walls at twice the interior stroke width, deriving walls
+  across the whole plan and drawing shared spans once while preserving block
+  boundaries, openings, doors, dividers, and stairs.
 - Add automatic door width (`door=?`) to span the full shared wall or exterior
   side, including open and secret doors and component-link doors.
   Cover all declaration forms with SVG goldens and show an automatic opening

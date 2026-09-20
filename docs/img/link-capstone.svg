@@ -32,23 +32,29 @@
     <line x1="0" y1="65" x2="70" y2="65" />
     <line x1="0" y1="70" x2="70" y2="70" />
   </g>
-  <rect data-room="cellar" x="30" y="50" width="20" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <line class="wall interior" x1="0" y1="20" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="5" y1="50" x2="10" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="20" y1="50" x2="25" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="30" y1="20" x2="30" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="30" y1="50" x2="50" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="50" x2="5" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="5" y1="50" x2="5" y2="70" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="5" y1="70" x2="25" y2="70" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="25" y1="50" x2="25" y2="70" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="25" y1="50" x2="30" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="0" x2="30" y2="20" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="20" x2="70" y2="20" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="50" x2="30" y2="60" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="60" x2="50" y2="60" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="50" y1="50" x2="50" y2="60" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="50" y1="50" x2="70" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="70" y1="20" x2="70" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
   <text data-room="cellar" x="40" y="55" text-anchor="middle" dominant-baseline="central" font-size="6">C</text>
-  <line data-room="chapel" x1="5" y1="50" x2="5" y2="70" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="chapel" x1="5" y1="50" x2="10" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="chapel" x1="5" y1="70" x2="25" y2="70" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="chapel" x1="20" y1="50" x2="25" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="chapel" x1="25" y1="50" x2="25" y2="70" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="chapel" x="15" y="60" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>
-  <rect data-room="gate" x="0" y="0" width="30" height="20" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="gate" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">G</text>
-  <rect data-room="keep" x="30" y="20" width="40" height="30" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="keep" x="50" y="35" text-anchor="middle" dominant-baseline="central" font-size="18">K</text>
-  <line data-room="yard" x1="0" y1="20" x2="0" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="yard" x1="0" y1="20" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="yard" x1="0" y1="50" x2="10" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="yard" x1="20" y1="50" x2="30" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="yard" x1="30" y1="20" x2="30" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="yard" x="15" y="35" text-anchor="middle" dominant-baseline="central" font-size="18">Y</text>
   <line class="open" x1="10" y1="50" x2="20" y2="50" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <line class="door" x1="10" y1="20" x2="15" y2="20" stroke="black" stroke-width="1.5" />

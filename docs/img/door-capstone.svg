@@ -32,27 +32,27 @@
     <line x1="-30" y1="45" x2="60" y2="45" />
     <line x1="-30" y1="50" x2="60" y2="50" />
   </g>
-  <rect data-room="cloak" x="-10" y="40" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
+  <line class="wall interior" x1="-10" y1="40" x2="45" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="0" y1="0" x2="0" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="20" y1="0" x2="20" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="30" y1="40" x2="30" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="50" y1="0" x2="50" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall exterior" x1="-30" y1="0" x2="-30" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="-30" y1="0" x2="60" y2="0" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="-30" y1="40" x2="-10" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="-10" y1="40" x2="-10" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="-10" y1="50" x2="45" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="45" y1="40" x2="45" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="45" y1="40" x2="60" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="60" y1="0" x2="60" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
   <text data-room="cloak" x="-5" y="45" text-anchor="middle" dominant-baseline="central" font-size="6">C</text>
-  <line data-room="dining" x1="20" y1="0" x2="20" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="dining" x1="20" y1="0" x2="50" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="dining" x1="50" y1="0" x2="50" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="dining" x="35" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">D</text>
-  <rect data-room="drawing" x="-30" y="0" width="30" height="40" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="drawing" x="-15" y="20" text-anchor="middle" dominant-baseline="central" font-size="18">R</text>
-  <rect data-room="hall" x="0" y="0" width="20" height="40" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="hall" x="10" y="20" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>
-  <line data-room="kitchen" x1="20" y1="20" x2="20" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="kitchen" x1="20" y1="40" x2="50" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="kitchen" x1="50" y1="20" x2="50" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="kitchen" x="35" y="30" text-anchor="middle" dominant-baseline="central" font-size="12">K</text>
-  <rect data-room="pantry" x="50" y="0" width="10" height="40" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="pantry" x="55" y="20" text-anchor="middle" dominant-baseline="central" font-size="6">P</text>
-  <rect data-room="passage" x="20" y="40" width="10" height="10" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="passage" x="25" y="45" text-anchor="middle" dominant-baseline="central" font-size="6">A</text>
-  <rect data-room="porch" x="0" y="40" width="20" height="10" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="porch" x="10" y="45" text-anchor="middle" dominant-baseline="central" font-size="6">O</text>
-  <rect data-room="scullery" x="30" y="40" width="15" height="10" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="scullery" x="37.5" y="45" text-anchor="middle" dominant-baseline="central" font-size="6">S</text>
   <line class="open" x1="20" y1="20" x2="50" y2="20" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <line class="door" x1="-30" y1="15" x2="-30" y2="20" stroke="black" stroke-width="1.5" />

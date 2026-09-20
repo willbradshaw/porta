@@ -5,6 +5,7 @@ rendering them to SVG. CLI-driven, zero runtime dependencies.
 
 The user-facing references are [`docs/room.md`](docs/room.md) (rooms, placement,
 auto-dimensions, validation), [`docs/door.md`](docs/door.md) (doors),
+[`docs/window.md`](docs/window.md) (windows),
 [`docs/block.md`](docs/block.md) (blocks), [`docs/divider.md`](docs/divider.md)
 (dividers), [`docs/link.md`](docs/link.md) (links), and
 [`docs/stairs.md`](docs/stairs.md) (stairs). For exact behaviour the code is the

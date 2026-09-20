@@ -44,7 +44,15 @@ class Align(Enum):
 
 
 @dataclass(frozen=True)
-class Door:
+class WallSpan:
+    """Shared sizing for a wall feature; not a DSL statement."""
+
+    width: int | None = 5
+    offset: int | None = None
+
+
+@dataclass(frozen=True)
+class Door(WallSpan):
     """A door on the wall a relation's room shares with its anchor.
 
     ``width=None`` spans the full shared wall (or the full exterior side).
@@ -56,8 +64,6 @@ class Door:
     marker over the door's span. A door is at most one of the two.
     """
 
-    width: int | None = 5
-    offset: int | None = None
     open: bool = False
     secret: bool = False
 
@@ -184,6 +190,20 @@ class ExternalDoor:
     line: int
 
 
+@dataclass(frozen=True, kw_only=True)
+class Window(WallSpan):
+    """A plain window between rooms or on an exterior room edge.
+
+    Exactly one of ``other`` and ``side`` identifies the target wall.
+    """
+
+    width: int = 5
+    room: str
+    other: str | None = None
+    side: Direction | None = None
+    line: int = 0
+
+
 @dataclass(frozen=True)
 class Block:
     """A merged (possibly non-rectangular) room: a union of member rooms.
@@ -221,6 +241,7 @@ class Building:
     stairs: list[Stairs] = field(default_factory=list)
     dividers: list[Divider] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
+    windows: list[Window] = field(default_factory=list)
 
     def room(self, room_id: str) -> Room:
         """Return the room with ``room_id``.

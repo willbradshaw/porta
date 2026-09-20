@@ -12,6 +12,9 @@ in a non-default location.
 > ASCII debug view (`porta draw <plan>.porta --debug-ascii`) 
 > shows the room layout without them.
 
+For glazed wall spans, use a separate [window statement](window.md), which
+shares standalone door placement and sizing conventions.
+
 ## Default doors
 
 Every [relation](room.md#relations) connecting two rooms is given a

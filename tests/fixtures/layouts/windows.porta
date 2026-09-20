@@ -1,0 +1,10 @@
+room hall "" 20x20 root
+room study "Study" 20x20 right-of hall no-door
+room wing "" 10x10 up-of hall
+block great "Great Hall" hall wing
+window=10@5 hall study
+window@10 hall outside up
+window wing outside up
+window study outside right
+window=10@5 study outside down
+door hall outside left

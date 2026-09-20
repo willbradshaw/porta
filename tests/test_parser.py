@@ -23,6 +23,7 @@ from porta.model import (
     Door,
     Relation,
     StairSense,
+    WallSpan,
 )
 from porta.parser import parse
 
@@ -989,3 +990,83 @@ def test_exterior_is_a_room_attribute(modifiers: str) -> None:
 def test_invalid_exterior_syntax(source: str) -> None:
     with pytest.raises(ParseError):
         parse(source)
+
+
+@pytest.mark.parametrize(
+    ("spec", "width", "offset"),
+    [
+        ("window", 5, None),
+        ("window=10", 10, None),
+        ("window@0", 5, 0),
+        ("window=10@5", 10, 5),
+    ],
+    ids=["default", "width", "offset", "both"],
+)
+@pytest.mark.parametrize("side", ["up", "down", "left", "right"])
+def test_window_spec(spec: str, width: int, offset: int | None, side: str) -> None:
+    window = parse(f"{spec} hall outside {side}").windows[0]
+    assert (window.room, window.width, window.offset, window.line) == (
+        "hall",
+        width,
+        offset,
+        1,
+    )
+    assert window.side == Direction(f"{side}-of")
+
+
+@pytest.mark.parametrize(
+    "statement",
+    [
+        "window",
+        "window hall",
+        "window hall up extra",
+        "window hall outside",
+        "window hall outside north",
+        'window hall outside "up"',
+        'window "hall" up',
+        "window=0 hall up",
+        "window=-5 hall up",
+        "window=3 hall up",
+        "window@-5 hall up",
+        "window@3 hall up",
+        "window=foo hall up",
+        "window@ hall up",
+        "window= hall up",
+        "window@5@5 hall up",
+        "windows hall up",
+        "window open hall up",
+        "window secret hall up",
+        'room window "" 20x20 root',
+    ],
+    ids=lambda statement: statement,
+)
+def test_invalid_window_statement(statement: str) -> None:
+    with pytest.raises(ParseError) as error:
+        parse(statement)
+    assert error.value.line == 1
+
+
+@pytest.mark.parametrize("kind", ["door", "window"])
+@pytest.mark.parametrize(
+    "spec", ["", "=10", "@5", "=10@5"], ids=["default", "width", "offset", "both"]
+)
+def test_wall_feature_room_pair(kind: str, spec: str) -> None:
+    building = parse(f"{kind}{spec} hall study")
+    feature: WallSpan
+    if kind == "door":
+        declaration = building.doors[0]
+        assert (declaration.a, declaration.b) == ("hall", "study")
+        feature = declaration.door
+    else:
+        window = building.windows[0]
+        assert (window.room, window.other, window.side) == ("hall", "study", None)
+        feature = window
+    assert feature.width == (10 if "=" in spec else 5)
+    assert feature.offset == (5 if "@" in spec else None)
+
+
+@pytest.mark.parametrize("kind", ["door", "window"])
+@pytest.mark.parametrize("target", ["a a", '"a" b', "a", "a b c", 'a "outside" up'])
+def test_invalid_wall_feature_target(kind: str, target: str) -> None:
+    with pytest.raises(ParseError):
+        parse(f"{kind} {target}")

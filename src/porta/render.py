@@ -17,6 +17,7 @@ from porta.layout import (
     stair_footprints,
     stair_open_sides,
     wall_segments,
+    window_segments,
 )
 from porta.model import Axis, Building, Direction, Room, Stairs
 
@@ -271,6 +272,20 @@ def render_svg(building: Building, *, background: str = "white") -> str:
                 f'stroke="black" stroke-width="{_num(_TREAD_STROKE_FT)}" />'
             )
         lines.append("  </g>")
+
+    # Windows have white interiors between two strokes, half a foot apart.
+    for x1, y1, x2, y2 in sorted(window_segments(building)):
+        lines.append(
+            f'  <line class="window-fill" x1="{_num(x1)}" y1="{_num(y1)}" '
+            f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="white" stroke-width="0.5" />'
+        )
+        for offset in (-0.25, 0.25):
+            dx, dy = (0, offset) if y1 == y2 else (offset, 0)
+            lines.append(
+                f'  <line class="window" x1="{_num(x1 + dx)}" '
+                f'y1="{_num(y1 + dy)}" x2="{_num(x2 + dx)}" '
+                f'y2="{_num(y2 + dy)}" stroke="black" stroke-width="0.25" />'
+            )
 
     # Open doors: a dotted line across the gap left in the walls above.
     for x1, y1, x2, y2 in sorted(open_door_segments(building)):

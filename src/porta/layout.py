@@ -35,6 +35,8 @@ from porta.model import (
     Room,
     Stairs,
     StairSense,
+    WallSpan,
+    Window,
 )
 
 _GRID_FT = 5
@@ -80,8 +82,9 @@ def solve(building: Building) -> Building:
     _validate_glyphs(building)
     building.warnings.extend(_block_warnings(building, by_id, _block_of(building)))
 
-    # Validates every door, stairs, and divider (raising on a bad one).
+    # Validate wall features, stairs, and dividers (raising on a bad one).
     door_lines = [segment for segment, _ in _placed_doors(building)]
+    window_segments(building)
     _check_stair_access(building, door_lines)
     divider_segments(building)
     return building
@@ -214,6 +217,14 @@ def _block_warnings(
                 f"door between {doorway.a!r} and {doorway.b!r} is suppressed "
                 f"(same block)"
             )
+    for window in building.windows:
+        if window.other is not None and _same_block(
+            window.room, window.other, block_of
+        ):
+            warnings.append(
+                f"window between {window.room!r} and {window.other!r} is suppressed "
+                "within a block"
+            )
     return warnings
 
 
@@ -237,7 +248,7 @@ def wall_segments(building: Building) -> tuple[list[Segment], list[Segment]]:
             horizontal = y1 == y2
             coord, lo, hi = (y1, x1, x2) if horizontal else (x1, y1, y2)
             edges.setdefault((horizontal, coord), []).append((lo, hi, room.id))
-    openings = open_door_segments(building)
+    openings = open_door_segments(building) + window_segments(building)
     block_of = _block_of(building)
     exterior: list[Segment] = []
     interior: list[Segment] = []
@@ -274,13 +285,13 @@ def block_wall_segments(building: Building) -> list[Segment]:
     """Wall segments tracing each block's outer boundary (internal walls dropped).
 
     For every block member, each of its four edges is emitted only over the parts
-    not shared with another interior member of the same block, so interiors form one
-    outline rather than separate rectangles. Open-door spans are dropped too, so
-    an open boundary into a block is a real gap in its outline. Assumes a solved
+    not shared with another member of the same block, so the union renders as one
+    outline rather than separate rectangles. Open-door and window spans are
+    dropped too, leaving gaps for the renderer to mark. Assumes a solved
     building.
     """
     by_id = {room.id: room for room in building.rooms}
-    openings = open_door_segments(building)
+    openings = open_door_segments(building) + window_segments(building)
     segments: list[Segment] = []
     for block in building.blocks:
         members = [by_id[m] for m in block.members if not by_id[m].exterior]
@@ -290,16 +301,16 @@ def block_wall_segments(building: Building) -> list[Segment]:
 
 
 def room_outline_segments(building: Building) -> dict[str, list[Segment]]:
-    """Segment outlines for exterior spaces and rooms cut by an open door.
+    """Outlines of rooms whose walls are cut by an open door or window.
 
-    Maps each such room's id to its four edges with every open-door span
+    Maps each such room's id to its four edges with every open-door or window span
     removed. Rooms untouched by an opening are absent; block members are
     covered by :func:`block_wall_segments`. For building-wide exterior/interior
     classification, use :func:`wall_segments` instead.
     Exterior spaces map to empty outlines; adjacent interiors supply walls.
     Assumes a solved building.
     """
-    openings = open_door_segments(building)
+    openings = open_door_segments(building) + window_segments(building)
     member_of = _block_of(building)
     outlines: dict[str, list[Segment]] = {}
     for room in building.rooms:
@@ -586,37 +597,75 @@ def _placed_doors(building: Building) -> list[tuple[Segment, Door]]:
             continue  # internal wall of a block (dropped)
         placed.append((_doorway_door(doorway, by_id), doorway.door))
     for external in building.external_doors:
-        segment = _external_door_line(external, by_id, building.rooms)
+        segment = _external_wall_feature_line(external, by_id, building.rooms)
         placed.append((segment, external.door))
     _check_door_overlaps([seg for seg, _ in placed])
     return placed
 
 
-def _external_door_line(
-    external: ExternalDoor, by_id: dict[str, Room], rooms: list[Room]
+def window_segments(building: Building) -> list[Segment]:
+    """Place windows, rejecting occupied spans and door overlaps.
+
+    Assumes solved coordinates. Touching endpoints are allowed, as for doors.
+    Windows never provide stair access.
+    """
+    if not building.windows:
+        return []
+    by_id = {room.id: room for room in building.rooms}
+    doors = [segment for segment, _ in _placed_doors(building)]
+    placed: list[Segment] = []
+    block_of = _block_of(building)
+    for window in building.windows:
+        if window.other is not None:
+            if _same_block(window.room, window.other, block_of):
+                continue
+            segment = _internal_wall_feature_line(
+                window.room, window.other, window, window.line, by_id
+            )
+        else:
+            segment = _external_wall_feature_line(window, by_id, building.rooms)
+        if any(_doors_overlap(segment, other) for other in doors + placed):
+            raise LayoutError(
+                f"window on {window.room!r} overlaps a door or another window",
+                line=window.line,
+            )
+        placed.append(segment)
+    return placed
+
+
+def _external_wall_feature_line(
+    external: ExternalDoor | Window, by_id: dict[str, Room], rooms: list[Room]
 ) -> Segment:
-    """Door line on a room's exterior ``side`` edge; validates fit and that the
+    """Door or window on a room's exterior edge; validates fit and that the
     span is genuinely exterior (no room flush on the other side)."""
+    kind = "window" if isinstance(external, Window) else "external door"
     room = by_id.get(external.room)
     if room is None:
         raise LayoutError(
-            f"external door references unknown room {external.room!r}",
+            f"{kind} references unknown room {external.room!r}",
             line=external.line,
         )
     if room.exterior:
         raise LayoutError(
-            f"external door on {room.id!r}: an exterior space has no outside wall",
+            f"{kind} on {room.id!r}: an exterior space has no outside wall",
             line=external.line,
         )
+    assert external.side is not None
     horizontal, coord, lo, length = _edge(room, external.side)
-    segment = _door_on_wall(
-        external.door, horizontal, coord, lo, length, external.room, external.line
+    segment = _span_on_wall(
+        external if isinstance(external, Window) else external.door,
+        horizontal,
+        coord,
+        lo,
+        length,
+        external.room,
+        external.line,
     )
     span = (segment[0], segment[2]) if horizontal else (segment[1], segment[3])
     for other in rooms:
         if other.id != room.id and _flush_outside(room, external.side, other, span):
             raise LayoutError(
-                f"external door on {room.id!r} ({external.side.value}) is not "
+                f"{kind} on {room.id!r} ({external.side.value}) is not "
                 f"exterior: {other.id!r} is on the other side",
                 line=external.line,
             )
@@ -695,26 +744,29 @@ def _relation_door(room: Room, anchor: Room, rel: Relation) -> Segment | None:
             )
         return None  # default door needs a real wall
     door = rel.door if rel.door is not None else Door()
-    return _door_on_wall(door, horizontal, coord, lo, length, room.id, rel.line)
+    return _span_on_wall(door, horizontal, coord, lo, length, room.id, rel.line)
 
 
 def _doorway_door(doorway: Doorway, by_id: dict[str, Room]) -> Segment:
     """Door line for a standalone ``door a b`` between two adjacent rooms."""
-    for room_id in (doorway.a, doorway.b):
-        if room_id not in by_id:
-            raise LayoutError(
-                f"door references unknown room {room_id!r}", line=doorway.line
-            )
-    wall = _shared_wall(by_id[doorway.a], by_id[doorway.b])
-    if wall is None or (by_id[doorway.a].exterior and by_id[doorway.b].exterior):
-        raise LayoutError(
-            f"door: rooms {doorway.a!r} and {doorway.b!r} share no wall",
-            line=doorway.line,
-        )
-    horizontal, coord, lo, length = wall
-    return _door_on_wall(
-        doorway.door, horizontal, coord, lo, length, doorway.a, doorway.line
+    return _internal_wall_feature_line(
+        doorway.a, doorway.b, doorway.door, doorway.line, by_id
     )
+
+
+def _internal_wall_feature_line(
+    a: str, b: str, feature: WallSpan, line: int, by_id: dict[str, Room]
+) -> Segment:
+    """Place a door or window on two rooms' shared wall."""
+    kind = "window" if isinstance(feature, Window) else "door"
+    for room_id in (a, b):
+        if room_id not in by_id:
+            raise LayoutError(f"{kind} references unknown room {room_id!r}", line=line)
+    wall = _shared_wall(by_id[a], by_id[b])
+    if wall is None or (by_id[a].exterior and by_id[b].exterior):
+        raise LayoutError(f"{kind}: rooms {a!r} and {b!r} share no wall", line=line)
+    horizontal, coord, lo, length = wall
+    return _span_on_wall(feature, horizontal, coord, lo, length, a, line)
 
 
 def _relation_wall(room: Room, anchor: Room, rel: Relation) -> _Wall:
@@ -757,8 +809,8 @@ def _shared_wall(a: Room, b: Room) -> _Wall | None:
     return None
 
 
-def _door_on_wall(
-    door: Door,
+def _span_on_wall(
+    door: WallSpan,
     horizontal: bool,
     coord: int,
     lo: int,
@@ -766,11 +818,12 @@ def _door_on_wall(
     label: str,
     line: int,
 ) -> Segment:
-    """Place ``door`` on a wall segment of ``length``; raise if it doesn't fit."""
+    """Place a door or window on a wall; raise if it does not fit."""
+    kind = "window" if isinstance(door, Window) else "door"
     width = length if door.width is None else door.width
     if width > length:
         raise LayoutError(
-            f"door on {label!r} ({width} ft) is wider than the wall ({length} ft)",
+            f"{kind} on {label!r} ({width} ft) is wider than the wall ({length} ft)",
             line=line,
         )
     offset = (
@@ -780,7 +833,7 @@ def _door_on_wall(
     )
     if offset < 0 or offset + width > length:
         raise LayoutError(
-            f"door on {label!r} does not fit the wall "
+            f"{kind} on {label!r} does not fit the wall "
             f"(offset {offset} + width {width} > {length} ft)",
             line=line,
         )

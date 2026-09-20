@@ -38,6 +38,7 @@ from porta.model import (
     Room,
     Stairs,
     StairSense,
+    Window,
 )
 
 
@@ -97,6 +98,7 @@ _RESERVED: frozenset[str] = frozenset(
         "root",
         "exterior",
         "door",
+        "window",
         "no-door",
         "open",
         "secret",
@@ -126,6 +128,7 @@ def parse(text: str) -> Building:
         ParseError: On the first syntax error, carrying its source line.
     """
     rooms: list[Room] = []
+    windows: list[Window] = []
     doors: list[Doorway] = []
     external_doors: list[ExternalDoor] = []
     blocks: list[Block] = []
@@ -145,6 +148,9 @@ def parse(text: str) -> Building:
                 external_doors.append(_parse_external_door(tokens, lineno))
             else:
                 doors.append(_parse_doorway(tokens, lineno))
+            continue
+        if not head.quoted and head.value.startswith("window"):
+            windows.append(_parse_window(tokens, lineno))
             continue
         if _is_bare(head, "link"):
             links.append(_parse_link(tokens, lineno))
@@ -175,6 +181,7 @@ def parse(text: str) -> Building:
         links=links,
         stairs=stairs,
         dividers=dividers,
+        windows=windows,
     )
 
 
@@ -288,21 +295,37 @@ def _parse_door_spec(tokens: list[Token], lineno: int) -> tuple[Door, list[Token
 def _parse_doorway(tokens: list[Token], lineno: int) -> Doorway:
     """Parse a standalone ``door[=W][@O] [open] <a> <b>`` line."""
     spec, rest = _parse_door_spec(tokens, lineno)
-    if len(rest) != 2:
-        raise ParseError("a door needs exactly two room ids", line=lineno)
-    for token in rest:
-        _validate_id(token.value, token.quoted, token.line)
-    a, b = rest[0].value, rest[1].value
-    if a == b:
-        raise ParseError("a door needs two different rooms", line=lineno)
+    a, b = _parse_room_pair(rest, "door", lineno)
     return Doorway(a=a, b=b, door=spec, line=lineno)
 
 
 def _parse_external_door(tokens: list[Token], lineno: int) -> ExternalDoor:
     """Parse ``door[=W][@O] [open] <room> outside <side>`` (side = up/down/...)."""
     spec, rest = _parse_door_spec(tokens, lineno)
+    room, direction = _parse_exterior_target(rest, "door", lineno)
+    return ExternalDoor(room=room, side=direction, door=spec, line=lineno)
+
+
+def _parse_room_pair(rest: list[Token], kind: str, lineno: int) -> tuple[str, str]:
+    """Parse the room pair shared by door and window statements."""
+    if len(rest) != 2:
+        raise ParseError(f"a {kind} needs exactly two room ids", line=lineno)
+    for token in rest:
+        _validate_id(token.value, token.quoted, token.line)
+    a, b = rest[0].value, rest[1].value
+    if a == b:
+        raise ParseError(f"a {kind} needs two different rooms", line=lineno)
+    return a, b
+
+
+def _parse_exterior_target(
+    rest: list[Token], kind: str, lineno: int
+) -> tuple[str, Direction]:
+    """Parse the exterior target shared by door and window statements."""
     if len(rest) != 3:
-        raise ParseError("an external door needs '<room> outside <side>'", line=lineno)
+        raise ParseError(
+            f"an external {kind} needs '<room> outside <side>'", line=lineno
+        )
     room, _outside, side = rest
     _validate_id(room.value, room.quoted, room.line)
     direction = _SIDES.get(side.value)
@@ -310,7 +333,19 @@ def _parse_external_door(tokens: list[Token], lineno: int) -> ExternalDoor:
         raise ParseError(
             f"side must be up/down/left/right, got {side.value!r}", line=side.line
         )
-    return ExternalDoor(room=room.value, side=direction, door=spec, line=lineno)
+    return room.value, direction
+
+
+def _parse_window(tokens: list[Token], lineno: int) -> Window:
+    """Parse a standalone window with the same targets and sizing as a door."""
+    width, offset = _parse_span(tokens[0].value, "window", lineno)
+    assert width is not None  # automatic width is only supported for doors
+    rest = tokens[1:]
+    if len(rest) > 1 and _is_bare(rest[1], "outside"):
+        room, side = _parse_exterior_target(rest, "window", lineno)
+        return Window(room=room, side=side, width=width, offset=offset, line=lineno)
+    room, other = _parse_room_pair(rest, "window", lineno)
+    return Window(room=room, other=other, width=width, offset=offset, line=lineno)
 
 
 def _parse_block(tokens: list[Token], lineno: int) -> Block:
@@ -696,25 +731,30 @@ def _parse_stair_at(raw: str, lineno: int) -> tuple[int, int]:
 
 def _parse_door(token: str, lineno: int) -> Door:
     """Parse a ``door[=W][@O]`` modifier (width default 5, offset default centred)."""
-    rest = token[len("door") :]
+    width, offset = _parse_span(token, "door", lineno)
+    return Door(width=width, offset=offset)
+
+
+def _parse_span(token: str, kind: str, lineno: int) -> tuple[int | None, int | None]:
+    """Parse the shared door/window width and offset notation."""
+    rest = token[len(kind) :]
     width: int | None = _DEFAULT_DOOR_FT
     offset: int | None = None
     if "@" in rest:
         rest, _, raw = rest.partition("@")
-        offset = _door_dimension(raw, "door offset", lineno, allow_zero=True)
+        offset = _span_dimension(raw, f"{kind} offset", lineno, allow_zero=True)
     if rest.startswith("="):
         width = (
-            None
-            if rest[1:] == "?"
-            else _door_dimension(rest[1:], "door width", lineno, allow_zero=False)
+            None if kind == "door" and rest[1:] == "?"
+            else _span_dimension(rest[1:], f"{kind} width", lineno, allow_zero=False)
         )
     elif rest:
-        raise ParseError(f"malformed door modifier {token!r}", line=lineno)
-    return Door(width=width, offset=offset)
+        raise ParseError(f"malformed {kind} modifier {token!r}", line=lineno)
+    return width, offset
 
 
-def _door_dimension(raw: str, label: str, lineno: int, *, allow_zero: bool) -> int:
-    """Parse a door width/offset: a grid-aligned, non-negative (or positive) int."""
+def _span_dimension(raw: str, label: str, lineno: int, *, allow_zero: bool) -> int:
+    """Parse a grid-aligned width or offset for a door or window."""
     try:
         value = int(raw)
     except ValueError:

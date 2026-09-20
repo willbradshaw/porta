@@ -4,6 +4,9 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add standalone `window` statements between rooms or to the outside, rendered
+  as double lines with white interiors, with shared sizing and placement code.
+  Document placement and block boundaries; reserve `window` as a keyword.
 - Add a room `exterior` attribute using normal relational placement, dimensions,
   and labels. Adjacent exterior rooms get automatic dashed dividers, and exposed
   edges inside the plan grid get dashed demarcation. Blocks

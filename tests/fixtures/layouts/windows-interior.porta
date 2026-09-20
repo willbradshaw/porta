@@ -1,0 +1,10 @@
+# Partial shared walls and windows next to solid, open, and secret doors.
+room hall "Hall" 30x30 root
+room study "Study" 20x20 right-of hall shift=10 no-door
+room south "South" 30x20 down-of hall no-door
+window=10@5 study hall
+door@0 hall study
+window@0 hall south
+door@5 open hall south
+window=10@10 south hall
+door@20 secret hall south

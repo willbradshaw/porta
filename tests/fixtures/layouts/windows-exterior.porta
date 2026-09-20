@@ -1,0 +1,8 @@
+# Four sides: default, full width, and endpoint-touching windows.
+room gallery "Gallery" 30x20 root
+window gallery outside up
+window=20 gallery outside right
+window=10@0 gallery outside down
+window=10@10 gallery outside down
+window@0 gallery outside left
+window@15 gallery outside left

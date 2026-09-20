@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="740" height="1176" viewBox="-12 -10 74 117.6">
+  <rect x="-12" y="-10" width="74" height="117.6" fill="white" />
+  <g stroke="#bbb" stroke-width="0.15">
+    <line x1="0" y1="0" x2="0" y2="50" />
+    <line x1="5" y1="0" x2="5" y2="50" />
+    <line x1="10" y1="0" x2="10" y2="50" />
+    <line x1="15" y1="0" x2="15" y2="50" />
+    <line x1="20" y1="0" x2="20" y2="50" />
+    <line x1="25" y1="0" x2="25" y2="50" />
+    <line x1="30" y1="0" x2="30" y2="50" />
+    <line x1="35" y1="0" x2="35" y2="50" />
+    <line x1="40" y1="0" x2="40" y2="50" />
+    <line x1="45" y1="0" x2="45" y2="50" />
+    <line x1="50" y1="0" x2="50" y2="50" />
+    <line x1="0" y1="0" x2="50" y2="0" />
+    <line x1="0" y1="5" x2="50" y2="5" />
+    <line x1="0" y1="10" x2="50" y2="10" />
+    <line x1="0" y1="15" x2="50" y2="15" />
+    <line x1="0" y1="20" x2="50" y2="20" />
+    <line x1="0" y1="25" x2="50" y2="25" />
+    <line x1="0" y1="30" x2="50" y2="30" />
+    <line x1="0" y1="35" x2="50" y2="35" />
+    <line x1="0" y1="40" x2="50" y2="40" />
+    <line x1="0" y1="45" x2="50" y2="45" />
+    <line x1="0" y1="50" x2="50" y2="50" />
+  </g>
+  <line data-room="hall" x1="0" y1="0" x2="0" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="hall" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="hall" x1="20" y1="30" x2="30" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="hall" x1="30" y1="0" x2="30" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="hall" x1="30" y1="25" x2="30" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
+  <line data-room="south" x1="0" y1="30" x2="0" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="south" x1="0" y1="50" x2="30" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="south" x1="20" y1="30" x2="30" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="south" x1="30" y1="30" x2="30" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <text data-room="south" x="15" y="40" text-anchor="middle" dominant-baseline="central" font-size="12">S</text>
+  <line data-room="study" x1="30" y1="10" x2="30" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="study" x1="30" y1="10" x2="50" y2="10" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="study" x1="30" y1="25" x2="30" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="study" x1="30" y1="30" x2="50" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line data-room="study" x1="50" y1="10" x2="50" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <text data-room="study" x="40" y="20" text-anchor="middle" dominant-baseline="central" font-size="12">T</text>
+  <line class="window-fill" x1="0" y1="30" x2="5" y2="30" stroke="white" stroke-width="0.5" />
+  <line class="window" x1="0" y1="29.75" x2="5" y2="29.75" stroke="black" stroke-width="0.25" />
+  <line class="window" x1="0" y1="30.25" x2="5" y2="30.25" stroke="black" stroke-width="0.25" />
+  <line class="window-fill" x1="10" y1="30" x2="20" y2="30" stroke="white" stroke-width="0.5" />
+  <line class="window" x1="10" y1="29.75" x2="20" y2="29.75" stroke="black" stroke-width="0.25" />
+  <line class="window" x1="10" y1="30.25" x2="20" y2="30.25" stroke="black" stroke-width="0.25" />
+  <line class="window-fill" x1="30" y1="15" x2="30" y2="25" stroke="white" stroke-width="0.5" />
+  <line class="window" x1="29.75" y1="15" x2="29.75" y2="25" stroke="black" stroke-width="0.25" />
+  <line class="window" x1="30.25" y1="15" x2="30.25" y2="25" stroke="black" stroke-width="0.25" />
+  <line class="open" x1="5" y1="30" x2="10" y2="30" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
+  <line class="door" x1="30" y1="10" x2="30" y2="15" stroke="black" stroke-width="1.5" />
+  <line class="secret" x1="20" y1="30" x2="25" y2="30" stroke="black" stroke-width="1.5" />
+  <text class="secret" x="22.5" y="30" text-anchor="middle" dominant-baseline="central" font-size="5" stroke="white" stroke-width="0.6" paint-order="stroke">S</text>
+  <text class="scale" x="-2" y="69.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="-2" y="78.8" font-size="6">H  Hall</text>
+  <text class="key" x="-2" y="88.4" font-size="6">S  South</text>
+  <text class="key" x="-2" y="98" font-size="6">T  Study</text>
+</svg>

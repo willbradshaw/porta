@@ -1,0 +1,11 @@
+# Internal windows disappear with block walls; exterior windows remain.
+room west "" 20x20 root
+room east "" 20x20 right-of west
+block hall "Hall" west east
+window west east
+window west outside left
+window east outside right
+# A disconnected component exercises translated window coordinates.
+room tower "Tower" 10x10 root
+window=10 tower outside up
+window tower outside down

@@ -19,9 +19,12 @@
     <line x1="0" y1="20" x2="50" y2="20" />
     <line x1="0" y1="25" x2="50" y2="25" />
   </g>
-  <rect data-room="a" x="0" y="0" width="30" height="25" fill="none" stroke="black" stroke-width="0.5" />
+  <line class="wall interior" x1="30" y1="0" x2="30" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="25" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="50" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="25" x2="50" y2="25" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="50" y1="0" x2="50" y2="25" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <text data-room="a" x="15" y="12.5" text-anchor="middle" dominant-baseline="central" font-size="15">A</text>
-  <rect data-room="b" x="30" y="0" width="20" height="25" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="b" x="40" y="12.5" text-anchor="middle" dominant-baseline="central" font-size="12">B</text>
   <line class="door" x1="30" y1="10" x2="30" y2="15" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-2" y="44.2" font-size="6">1 square = 5 ft</text>

@@ -22,19 +22,18 @@
     <line x1="0" y1="35" x2="50" y2="35" />
     <line x1="0" y1="40" x2="50" y2="40" />
   </g>
-  <line data-room="dining" x1="30" y1="15" x2="50" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="dining" x1="30" y1="30" x2="30" y2="35" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="dining" x1="30" y1="35" x2="50" y2="35" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="dining" x1="50" y1="15" x2="50" y2="35" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="0" y1="30" x2="20" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="30" x2="20" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="30" x2="30" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="0" x2="30" y2="15" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="15" x2="50" y2="15" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="30" x2="30" y2="35" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="35" x2="50" y2="35" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="50" y1="15" x2="50" y2="35" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <text data-room="dining" x="40" y="25" text-anchor="middle" dominant-baseline="central" font-size="12">D</text>
-  <line data-room="hall" x1="0" y1="0" x2="0" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="hall" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="hall" x1="0" y1="30" x2="30" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="hall" x1="30" y1="0" x2="30" y2="15" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
-  <line data-room="porch" x1="0" y1="30" x2="0" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="porch" x1="0" y1="30" x2="20" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="porch" x1="20" y1="30" x2="20" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-room="porch" x="10" y="35" text-anchor="middle" dominant-baseline="central" font-size="6">P</text>
   <line class="open" x1="0" y1="40" x2="20" y2="40" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <line class="open" x1="30" y1="15" x2="30" y2="30" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />

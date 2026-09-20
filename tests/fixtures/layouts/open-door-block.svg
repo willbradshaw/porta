@@ -20,19 +20,15 @@
     <line x1="0" y1="35" x2="40" y2="35" />
     <line x1="0" y1="40" x2="40" y2="40" />
   </g>
-  <line data-room="porch" x1="20" y1="20" x2="20" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="porch" x1="20" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="porch" x1="20" y1="35" x2="20" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="porch" x1="20" y1="40" x2="40" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line data-room="porch" x1="40" y1="20" x2="40" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="20" y1="20" x2="20" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall interior" x1="20" y1="35" x2="20" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="20" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="40" x2="40" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="0" x2="20" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="40" y1="20" x2="40" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <text data-room="porch" x="30" y="30" text-anchor="middle" dominant-baseline="central" font-size="12">P</text>
-  <line x1="0" y1="0" x2="0" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line x1="0" y1="0" x2="20" y2="0" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line x1="0" y1="20" x2="0" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line x1="0" y1="40" x2="20" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line x1="20" y1="0" x2="20" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line x1="20" y1="20" x2="20" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line x1="20" y1="35" x2="20" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <text data-block="hall" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>
   <line class="open" x1="20" y1="25" x2="20" y2="35" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <text class="scale" x="-7" y="59.2" font-size="6">1 square = 5 ft</text>

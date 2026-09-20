@@ -145,13 +145,6 @@ def tag(name: str) -> str:
     return f"{{{SVG_NS}}}{name}"
 
 
-def rect_by_room(root: ET.Element, room_id: str) -> ET.Element:
-    for rect in root.iter(tag("rect")):
-        if rect.get("data-room") == room_id:
-            return rect
-    raise AssertionError(f"no rect for room {room_id!r}")
-
-
 def text_by_room(root: ET.Element, room_id: str) -> ET.Element:
     for text in root.iter(tag("text")):
         if text.get("data-room") == room_id:
@@ -187,18 +180,17 @@ def test_has_a_white_background() -> None:
     assert background.get("fill") == "white"
 
 
-def test_room_rects_are_transparent_so_the_grid_shows_through() -> None:
+def test_walls_do_not_cover_the_room_grid() -> None:
     root = ET.fromstring(svg_of(TWO))
-    room_rects = [r for r in root.iter(tag("rect")) if r.get("data-room")]
-    assert room_rects
-    assert all(r.get("fill") == "none" for r in room_rects)
+    assert len(list(root.iter(tag("rect")))) == 1  # background only
+    assert wall_lines(root)
 
 
 def test_grid_has_a_line_every_five_feet_across_the_plan() -> None:
     # TWO spans x[0,30] (7 verticals) and y[0,20] (5 horizontals); door lines
     # (class="door") are excluded.
     root = ET.fromstring(svg_of(TWO))
-    grid = [ln for ln in root.iter(tag("line")) if ln.get("class") != "door"]
+    grid = [ln for ln in root.iter(tag("line")) if ln.get("class") is None]
     assert len(grid) == 7 + 5
 
 
@@ -207,29 +199,19 @@ def test_scale_caption_states_the_grid_size() -> None:
     assert "5 ft" in texts
 
 
-@pytest.mark.parametrize(
-    ("room_id", "expected"),
-    [
-        ("entrance", (0, 0, 20, 20)),
-        ("hall", (0, -30, 40, 30)),
-        ("library", (-30, -30, 30, 30)),
-        ("pantry", (70, 0, 15, 25)),
-    ],
-)
-def test_one_rect_per_room_at_literal_feet_coords(
-    room_id: str, expected: tuple[int, int, int, int]
-) -> None:
-    source = Path("examples/manor.porta").read_text()
-    root = ET.fromstring(render_svg(solve(parse(source))))
-    rect = rect_by_room(root, room_id)
-    got = tuple(int(float(rect.get(a, ""))) for a in ("x", "y", "width", "height"))
-    assert got == expected
-
-
-def test_svg_rect_count_matches_room_count() -> None:
-    root = ET.fromstring(svg_of(DESIGN_MANOR))
-    room_rects = [r for r in root.iter(tag("rect")) if r.get("data-room")]
-    assert len(room_rects) == 3
+def test_exterior_is_stronger_and_shared_wall_is_drawn_once() -> None:
+    root = ET.fromstring(svg_of(TWO))
+    interior = [
+        ln for ln in root.iter(tag("line")) if ln.get("class") == "wall interior"
+    ]
+    exterior = [
+        ln for ln in root.iter(tag("line")) if ln.get("class") == "wall exterior"
+    ]
+    assert len(interior) == 1
+    assert interior[0].get("stroke-width") == "0.5"
+    assert exterior
+    assert all(ln.get("stroke-width") == "0.8" for ln in exterior)
+    assert (20, 0, 20, 10) in wall_lines(root)
 
 
 @pytest.mark.parametrize(
@@ -308,11 +290,11 @@ def open_lines(root: ET.Element) -> list[tuple[float, ...]]:
     ]
 
 
-def walls_by_room(root: ET.Element, room_id: str) -> set[tuple[float, ...]]:
+def wall_lines(root: ET.Element) -> set[tuple[float, ...]]:
     return {
         tuple(float(ln.get(k, "")) for k in ("x1", "y1", "x2", "y2"))
         for ln in root.iter(tag("line"))
-        if ln.get("data-room") == room_id
+        if ln.get("class", "").startswith("wall ")
     }
 
 
@@ -325,18 +307,14 @@ def test_open_door_renders_as_one_dashed_line_and_no_door_mark() -> None:
 
 
 def test_open_boundary_cuts_the_shared_wall_out_of_both_outlines() -> None:
-    # Neither room is a plain rect any more; each outline omits the open span.
+    # The merged envelope omits the fully open shared wall.
     root = ET.fromstring(svg_of(OPEN_TWO))
     assert [r for r in root.iter(tag("rect")) if r.get("data-room")] == []
-    assert walls_by_room(root, "a") == {
-        (0.0, 0.0, 20.0, 0.0),  # top
-        (0.0, 20.0, 20.0, 20.0),  # bottom
-        (0.0, 0.0, 0.0, 20.0),  # left; the right edge is fully open
-    }
-    assert walls_by_room(root, "b") == {
-        (20.0, 0.0, 40.0, 0.0),
-        (20.0, 20.0, 40.0, 20.0),
-        (40.0, 0.0, 40.0, 20.0),
+    assert wall_lines(root) == {
+        (0, 0, 40, 0),
+        (0, 20, 40, 20),
+        (0, 0, 0, 20),
+        (40, 0, 40, 20),
     }
 
 
@@ -345,15 +323,13 @@ def test_partial_opening_keeps_the_rest_of_the_wall() -> None:
     source = 'room a "A" 20x20 root\nroom b "Bee" 20x20 right-of a door=10 open'
     root = ET.fromstring(svg_of(source))
     assert open_lines(root) == [(20.0, 5.0, 20.0, 15.0)]
-    assert {(20.0, 0.0, 20.0, 5.0), (20.0, 15.0, 20.0, 20.0)} <= walls_by_room(
-        root, "a"
-    )
+    assert {(20.0, 0.0, 20.0, 5.0), (20.0, 15.0, 20.0, 20.0)} <= wall_lines(root)
 
 
-def test_rooms_away_from_the_opening_keep_their_plain_rects() -> None:
+def test_rooms_away_from_the_opening_keep_their_walls() -> None:
     source = OPEN_TWO + '\nroom c "Sea" 20x20 down-of a'
     root = ET.fromstring(svg_of(source))
-    assert rect_by_room(root, "c") is not None
+    assert (0, 20, 20, 20) in wall_lines(root)
 
 
 def test_open_rooms_keep_their_glyphs_and_key_entries() -> None:
@@ -385,9 +361,7 @@ def test_external_open_door_cuts_the_exterior_wall() -> None:
     source = 'room a "A" 20x20 root\ndoor=10 open a outside down'
     root = ET.fromstring(svg_of(source))
     assert open_lines(root) == [(5.0, 20.0, 15.0, 20.0)]
-    assert {(0.0, 20.0, 5.0, 20.0), (15.0, 20.0, 20.0, 20.0)} <= walls_by_room(
-        root, "a"
-    )
+    assert {(0.0, 20.0, 5.0, 20.0), (15.0, 20.0, 20.0, 20.0)} <= wall_lines(root)
 
 
 def test_open_door_across_a_block_boundary_renders_as_a_gap() -> None:
@@ -401,9 +375,7 @@ def test_open_door_across_a_block_boundary_renders_as_a_gap() -> None:
     )
     root = ET.fromstring(svg_of(source))
     assert open_lines(root) == [(40.0, 5.0, 40.0, 15.0)]
-    assert {(40.0, 0.0, 40.0, 5.0), (40.0, 15.0, 40.0, 20.0)} <= walls_by_room(
-        root, "side"
-    )
+    assert {(40.0, 0.0, 40.0, 5.0), (40.0, 15.0, 40.0, 20.0)} <= wall_lines(root)
     outline = [
         tuple(float(ln.get(k, "")) for k in ("x1", "y1", "x2", "y2"))
         for ln in root.iter(tag("line"))
@@ -445,10 +417,9 @@ def test_secret_door_renders_as_a_door_mark_plus_an_s() -> None:
     assert [ln for ln in root.iter(tag("line")) if ln.get("class") == "door"] == []
 
 
-def test_secret_door_leaves_both_room_rects_intact() -> None:
+def test_secret_door_leaves_shared_wall_intact() -> None:
     root = ET.fromstring(svg_of(SECRET_TWO))
-    assert rect_by_room(root, "a") is not None
-    assert rect_by_room(root, "b") is not None
+    assert (20, 0, 20, 20) in wall_lines(root)
     assert open_lines(root) == []
 
 
@@ -466,7 +437,7 @@ def test_external_secret_door_marks_the_exterior_wall() -> None:
     root = ET.fromstring(svg_of(source))
     assert secret_marks(root) == [(5.0, 20.0, 15.0, 20.0)]
     assert secret_markers(root) == [(10.0, 20.0, "S")]
-    assert rect_by_room(root, "a") is not None
+    assert (0, 20, 20, 20) in wall_lines(root)
 
 
 def test_secret_door_does_not_change_the_ascii_rendering() -> None:
@@ -619,9 +590,9 @@ def test_explicit_glyph_is_rendered_in_the_svg_room_and_key() -> None:
     assert key_lines == ["1  Guard Post", "H  Hall", "12  Prison Cells"]
 
 
-def test_unlabeled_room_keeps_its_rect_but_has_no_svg_label() -> None:
+def test_unlabeled_room_keeps_its_walls_but_has_no_svg_label() -> None:
     root = ET.fromstring(svg_of(GLYPHS))
-    assert rect_by_room(root, "store") is not None
+    assert wall_lines(root)
     with pytest.raises(AssertionError):
         text_by_room(root, "store")
 

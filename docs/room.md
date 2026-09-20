@@ -24,6 +24,10 @@ room kitchen "Kitchen" 20x20 right-of hall
 > Each room is a **rectangle**. To make a non-rectangular room, group several
 > rooms into one space with a [block](block.md).
 
+Exposed walls use a stronger stroke than shared interior walls. This follows
+the full plan, including partial adjacencies and [blocks](block.md); shared
+walls are drawn once. Walls facing courtyard gaps are exposed too.
+
 ## The `room` statement
 
 A room is declared in a `porta` plan as follows:

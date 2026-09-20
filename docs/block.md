@@ -1,7 +1,7 @@
 # Blocks
 
 A **block** joins several [rooms](room.md) into a single space, suppressing
-boundaries and doors between members of the same kind. They are most commonly used to create non-rectangular
+boundaries and doors between them. They are most commonly used to create non-rectangular
 spaces in the rendered SVG map:
 
 ```porta img/block-l.svg
@@ -20,9 +20,9 @@ level.
 
 Blocks may also group [exterior rooms](room.md#exterior-spaces), suppressing
 their automatic dividers. An exterior block has a shared glyph and key entry
-but no enclosing walls. Mixed interior/exterior blocks are allowed: walls and
-doors between interior and exterior members remain, as do those at contacts
-with rooms outside the block.
+but no enclosing walls. Each block must contain either all interior rooms or
+all exterior rooms; mixing the two is an error. Interior/exterior walls and
+doors remain at contacts between separate blocks or rooms.
 
 ## The `block` statement
 
@@ -63,8 +63,7 @@ The member rooms included in a block are ordinary
 [`room` statements](room.md#the-room-statement), with all the features that
 implies: relations, `align`/`shift`, `?` auto-dimensions, doors, etc.
 When a group of rooms are combined into a block, the walls and doors
-between members of the same kind are suppressed, but interior/exterior walls
-and doors remain. Walls and doors on the outer edge
+between those rooms are suppressed, but walls and doors on the outer edge
 of the block persist:
 
 ```porta img/block-neighbour.svg
@@ -88,14 +87,14 @@ specified in the `block` statement. Consequently, names of member rooms are
 typically empty (`""`); nonempty member names — and explicit member glyphs —
 are permitted but will raise a warning. Similarly, explicit
 [door declarations](door.md#door-declarations) and [statements](door.md#the-door-statement)
-targeting doors between members of the same kind raise a warning that they
-have been dropped. Doors between interior and exterior members remain.
+targeting doors between members raise a warning that they have been dropped.
 
 ## Invalid blocks
 
 `porta` rejects a block it can't form:
 
 - A member ID that isn't a room.
+- A mixture of interior and exterior member rooms.
 - A room listed in more than one block.
 - A `glyph=` target that isn't one of the members.
 - Members that don't form a single contiguous region.

@@ -1959,12 +1959,14 @@ def test_exterior_block_dividers(linked: bool, explicit: bool) -> None:
 
 @pytest.mark.parametrize("kind", ["", " open", " secret"])
 @pytest.mark.parametrize("standalone", [False, True])
-def test_mixed_block_retains_wall_and_doors(kind: str, standalone: bool) -> None:
+def test_interior_exterior_blocks_retain_wall_and_doors(
+    kind: str, standalone: bool
+) -> None:
     door = "no-door" if standalone else f"door{kind}"
     source = (
         'room hall "" 20x20 root\n'
         f'room yard "" 20x20 exterior right-of hall {door}\n'
-        'block house "" hall yard\n'
+        'block house "" hall\nblock grounds "" yard\n'
     )
     if standalone:
         source += f"door{kind} hall yard"
@@ -1985,7 +1987,7 @@ def test_mixed_block_retains_wall_and_doors(kind: str, standalone: bool) -> None
 
 
 @pytest.mark.parametrize("entrance_room", ["hall", "yard"])
-def test_mixed_block_wall_still_blocks_stair_entrance(entrance_room: str) -> None:
+def test_interior_exterior_wall_blocks_stair_entrance(entrance_room: str) -> None:
     stairs = (
         "stairs up hall down=right size=10x10 at=10,5"
         if entrance_room == "hall"
@@ -1994,7 +1996,7 @@ def test_mixed_block_wall_still_blocks_stair_entrance(entrance_room: str) -> Non
     source = (
         'room hall "" 20x20 root\n'
         'room yard "" 20x20 exterior right-of hall no-door\n'
-        f'block house "" hall yard\n{stairs}'
+        f"{stairs}"
     )
     with pytest.raises(LayoutError, match="wall with no door"):
         solve(parse(source))
@@ -2010,13 +2012,11 @@ def test_mixed_block_wall_still_blocks_stair_entrance(entrance_room: str) -> Non
             "two dividers",
         ),
         (
-            'room a "" 20x20 root\n'
-            'room b "" 20x20 exterior right-of a\n'
-            'block house "" a b\ndivider a b',
+            'room a "" 20x20 root\nroom b "" 20x20 exterior right-of a\ndivider a b',
             "interior/exterior wall",
         ),
     ],
-    ids=["duplicate-exterior-divider", "mixed-block-wall"],
+    ids=["duplicate-exterior-divider", "interior-exterior-wall"],
 )
 def test_invalid_exterior_dividers(source: str, message: str) -> None:
     with pytest.raises(LayoutError, match=message):
@@ -2038,3 +2038,17 @@ def test_exterior_incidental_divider_and_stair_cut() -> None:
         (20, 20, 25, 20),
         (35, 20, 40, 20),
     ]
+
+
+@pytest.mark.parametrize("members", ["hall yard", "yard hall"])
+@pytest.mark.parametrize("linked", [False, True], ids=["relation", "link"])
+def test_mixed_interior_exterior_block_is_rejected(members: str, linked: bool) -> None:
+    placement = "root\nlink yard right-of hall" if linked else "right-of hall"
+    source = (
+        'room hall "" 20x20 root\n'
+        f'room yard "" 20x20 exterior {placement}\n'
+        f'block house "" {members}'
+    )
+    with pytest.raises(LayoutError, match="cannot mix interior and exterior") as exc:
+        solve(parse(source))
+    assert exc.value.line == len(source.splitlines())

@@ -189,8 +189,8 @@ class Block:
     """A merged (possibly non-rectangular) room: a union of member rooms.
 
     The members are normal rooms placed by the usual relations; the block drops
-    boundaries between members of the same kind so they read as one space.
-    Interior/exterior walls and doors remain even within a block. The block
+    boundaries between members so they read as one space. Members must be all
+    interior or all exterior. The block
     carries a single glyph — explicit via ``glyph``, else derived from ``id`` —
     drawn in ``glyph_member`` (or the first member when unset), and ``name``
     (if any) labels the union in the key.

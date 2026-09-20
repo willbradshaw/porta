@@ -97,11 +97,6 @@ def _same_block(a: str, b: str, block_of: dict[str, str]) -> bool:
     return a in block_of and block_of.get(a) == block_of.get(b)
 
 
-def _merged_members(a: Room, b: Room, block_of: dict[str, str]) -> bool:
-    """Whether a block removes the boundary between two rooms of the same kind."""
-    return a.exterior == b.exterior and _same_block(a.id, b.id, block_of)
-
-
 def _validate_blocks(building: Building, by_id: dict[str, Room]) -> None:
     """Check each block: members exist, no room in two blocks, the glyph target is
     a member, and the union of members is contiguous. Assumes placed rooms.
@@ -125,6 +120,11 @@ def _validate_blocks(building: Building, by_id: dict[str, Room]) -> None:
             raise LayoutError(
                 f"block {block.id!r}: glyph member {block.glyph_member!r} is not "
                 f"one of its members",
+                line=block.line,
+            )
+        if len({by_id[member].exterior for member in block.members}) > 1:
+            raise LayoutError(
+                f"block {block.id!r} cannot mix interior and exterior rooms",
                 line=block.line,
             )
         _check_block_contiguous(block, by_id)
@@ -203,17 +203,13 @@ def _block_warnings(
         (by_id[link.room], link.relation) for link in building.links
     ]
     for room, rel in relations:
-        if rel.door is not None and _merged_members(room, by_id[rel.anchor], block_of):
+        if rel.door is not None and _same_block(room.id, rel.anchor, block_of):
             warnings.append(
                 f"explicit door from {room.id!r} to {rel.anchor!r} is "
                 f"suppressed (same block)"
             )
     for doorway in building.doors:
-        if (
-            doorway.a in by_id
-            and doorway.b in by_id
-            and _merged_members(by_id[doorway.a], by_id[doorway.b], block_of)
-        ):
+        if _same_block(doorway.a, doorway.b, block_of):
             warnings.append(
                 f"door between {doorway.a!r} and {doorway.b!r} is suppressed "
                 f"(same block)"
@@ -570,26 +566,20 @@ def _placed_doors(building: Building) -> list[tuple[Segment, Door]]:
     placed: list[tuple[Segment, Door]] = []
     for room in building.rooms:
         for rel in room.relations:
-            if rel.no_door or _merged_members(room, by_id[rel.anchor], block_of):
+            if rel.no_door or _same_block(room.id, rel.anchor, block_of):
                 continue  # ``no_door``, or an internal wall of a block (dropped)
             segment = _relation_door(room, by_id[rel.anchor], rel)
             if segment is not None:
                 placed.append((segment, rel.door if rel.door is not None else Door()))
     for link in building.links:
         rel = link.relation
-        if rel.no_door or _merged_members(
-            by_id[link.room], by_id[rel.anchor], block_of
-        ):
+        if rel.no_door or _same_block(link.room, rel.anchor, block_of):
             continue
         segment = _relation_door(by_id[link.room], by_id[rel.anchor], rel)
         if segment is not None:
             placed.append((segment, rel.door if rel.door is not None else Door()))
     for doorway in building.doors:
-        if (
-            doorway.a in by_id
-            and doorway.b in by_id
-            and _merged_members(by_id[doorway.a], by_id[doorway.b], block_of)
-        ):
+        if _same_block(doorway.a, doorway.b, block_of):
             continue  # internal wall of a block (dropped)
         placed.append((_doorway_door(doorway, by_id), doorway.door))
     for external in building.external_doors:
@@ -945,7 +935,7 @@ def _opens_into_block(
     return any(
         _flush_outside(room, side, by_id[member], span)
         for member in members
-        if member != room_id and by_id[member].exterior == room.exterior
+        if member != room_id
     )
 
 

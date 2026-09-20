@@ -65,9 +65,9 @@ or `door <interior-id> <exterior-id>`, rather than an `outside` door.
 
 A [block](block.md) can group exterior rooms into one labelled area, suppressing
 their automatic dividers. Use an explicit `divider` to restore a boundary within
-the block. Blocks may mix interior and exterior rooms: walls and doors between
-those two kinds remain, while boundaries between members of the same kind are
-suppressed (explicit doors there produce a warning).
+the block. A block must contain either all interior rooms or all exterior rooms;
+mixing the two is an error. Explicit doors between members are suppressed with
+a warning.
 Stairs may be placed in exterior spaces; an entrance facing a wall-free edge
 does not require a door.
 

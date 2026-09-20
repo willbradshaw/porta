@@ -30,15 +30,13 @@ room study   "Study"   20x20 down-of hall
 <img alt="Three rooms with a default door on each shared wall" src="img/door-overview.svg" width="70%">
 
 An important exception to this behavior is doors within [blocks](block.md).
-If two rooms of the same kind (both interior or both exterior) are members of
-the same block, doors between them are suppressed. Interior/exterior walls and
-doors remain even within a block.
+If two rooms are members of the same block, doors between them are suppressed.
+A block cannot mix interior and exterior rooms.
 
 [Exterior spaces](room.md#exterior-spaces) have no doors between them or on
 their exposed edges. Interior/exterior contact follows the usual door rules.
 An explicit door on a wall-free outdoor edge is an error; doors within one
-block retain the block's suppression-and-warning behavior when both members
-are of the same kind.
+block retain the block's suppression-and-warning behavior.
 
 ## Door declarations
 
@@ -189,7 +187,7 @@ door=10 open hall outside up
 <img alt="Open boundaries on a relation, between incidental neighbours, and to the outside" src="img/door-open-forms.svg" width="70%">
 
 Open doors interact with [blocks](block.md) the way solid doors do: between
-two members of the same kind in one block the opening is suppressed with a warning (the
+two members of the same block the opening is suppressed with a warning (the
 shared wall is already gone), while an open door between a member and a room
 outside the block cuts a gap into the block's outline.
 

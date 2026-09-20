@@ -1,0 +1,8 @@
+# Separate indoor/outdoor blocks retain walls and doors at their shared edge.
+room hall "" 30x20 root
+room porch "" 15x20 exterior right-of hall door=10 open
+room yard "" 15x20 exterior down-of porch
+room wing "" 30x20 down-of hall
+block house "House" glyph=hall hall wing
+block grounds "Grounds" glyph=porch porch yard
+door=5@5 wing yard

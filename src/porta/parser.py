@@ -95,6 +95,7 @@ _SIDES: dict[str, Direction] = {
 _RESERVED: frozenset[str] = frozenset(
     {
         "root",
+        "exterior",
         "door",
         "no-door",
         "open",
@@ -401,14 +402,15 @@ def _tokenize(raw: str, lineno: int) -> tuple[list[Token], bool]:
 
 
 def _parse_room(tokens: list[Token], lineno: int) -> Room:
-    """Turn a tokenised ``room`` line into a :class:`~porta.model.Room`.
+    """Turn a tokenised ``room`` line into a room model.
 
     The name slot is required but may be empty (``""``) for a room labelled only
     by its glyph and size.
     """
-    if tokens[0].value != "room":
+    if tokens[0].quoted or tokens[0].value != "room":
         raise ParseError(
-            f"unknown directive {tokens[0].value!r}; expected 'room'", line=lineno
+            f"unknown directive {tokens[0].value!r}; expected 'room'",
+            line=lineno,
         )
     if len(tokens) < 4:
         raise ParseError(
@@ -426,7 +428,7 @@ def _parse_room(tokens: list[Token], lineno: int) -> Room:
     width, height, auto_width, auto_height = _parse_dimensions(
         tokens[3].value, tokens[3].line
     )
-    is_root, glyph, relations = _parse_modifiers(tokens[4:])
+    is_root, exterior, glyph, relations = _parse_modifiers(tokens[4:])
 
     return Room(
         id=room_id,
@@ -434,6 +436,7 @@ def _parse_room(tokens: list[Token], lineno: int) -> Room:
         width=width,
         height=height,
         glyph=glyph,
+        exterior=exterior,
         auto_width=auto_width,
         auto_height=auto_height,
         is_root=is_root,
@@ -471,13 +474,16 @@ def _parse_dimension(raw: str, label: str, lineno: int) -> tuple[int, bool]:
     return value, False
 
 
-def _parse_modifiers(tokens: list[Token]) -> tuple[bool, str | None, list[Relation]]:
-    """Parse the trailing ``root``/``glyph=`` flags and relations (any order).
+def _parse_modifiers(
+    tokens: list[Token],
+) -> tuple[bool, bool, str | None, list[Relation]]:
+    """Parse room attributes and relations in any order.
 
     Errors (and each relation's recorded line) point at the physical line of
     the token concerned, which may be a continuation line.
     """
     is_root = False
+    exterior = False
     glyph: str | None = None
     relations: list[Relation] = []
     i = 0
@@ -485,6 +491,10 @@ def _parse_modifiers(tokens: list[Token]) -> tuple[bool, str | None, list[Relati
         value, quoted, line = tokens[i]
         if quoted:
             raise ParseError(f"unexpected quoted value {value!r}", line=line)
+        if value == "exterior":
+            exterior = True
+            i += 1
+            continue
         if value == "root":
             is_root = True
             i += 1
@@ -506,7 +516,7 @@ def _parse_modifiers(tokens: list[Token]) -> tuple[bool, str | None, list[Relati
             raise ParseError(f"unknown relation or keyword {value!r}", line=line)
         relation, i = _parse_relation_at(tokens, i)
         relations.append(relation)
-    return is_root, glyph, relations
+    return is_root, exterior, glyph, relations
 
 
 def _parse_relation_at(tokens: list[Token], i: int) -> tuple[Relation, int]:

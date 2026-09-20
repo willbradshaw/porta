@@ -27,13 +27,73 @@ room kitchen "Kitchen" 20x20 right-of hall
 Exposed walls use a stronger stroke than shared interior walls. This follows
 the full plan, including partial adjacencies and [blocks](block.md); shared
 walls are drawn once. Walls facing courtyard gaps are exposed too.
+Walls between interior and exterior rooms also use the stronger exposed stroke;
+outdoor boundaries never contribute structural walls.
+
+## Exterior spaces
+
+Add the `exterior` attribute to a `room` for an outdoor rectangle:
+
+```text
+room <id> "<name>" <dimensions> exterior [glyph="<glyph>"] <relations>
+```
+
+Exterior spaces follow the same ID, name, glyph, dimensions (including `?`),
+`root`, relation, alignment, shift, overlap, and component-link rules as rooms.
+Exposed edges on the outer edge of the plan grid need no extra line. Exposed
+edges inside that grid rectangle get a thin dashed outline so the room cannot
+be mistaken for the empty grid beyond it. Adjacent exterior rooms have a
+thin dashed [divider](divider.md) along their shared edge, with no wall or door.
+This applies to incidental contact as well as declared relations and links. Where they touch an interior room, that room retains its wall
+and the usual door rules apply: a relation or link adds a default door, while
+incidental contact alone does not.
+
+```porta img/exterior.svg
+room hall "Hall" 30x20 root
+room terrace "Terrace" ?x15 exterior down-of hall
+room yard "Yard" 20x15 exterior right-of terrace
+```
+
+<img alt="Hall with a door to the terrace; terrace and yard have no enclosing walls" src="img/exterior.svg" width="70%">
+
+The hall/terrace boundary has a wall and a door. A dashed divider distinguishes
+the terrace from the yard. The yard’s exposed top edge is also dashed because
+the grid continues above it. Exterior spaces still have glyphs and key entries,
+and contribute to the plan bounds and grid. The ASCII view shows
+their extents like room extents.
+
+An inset exterior room has a marked outline wherever the grid extends beyond
+it. Here the lower terrace starts 5 feet to the right and ends 5 feet short of
+the combined upper terraces; dashed lines make those insets visible:
+
+```porta img/exterior-inset.svg
+room upper "Upper terrace" 20x20 exterior root
+room side "Side terrace" 20x20 exterior right-of upper
+room lower "Lower terrace" 30x20 exterior down-of upper shift=5
+```
+
+<img alt="An inset lower terrace with dashed side edges distinguishing it from empty grid" src="img/exterior-inset.svg" width="70%">
+
+Explicit doors (solid, open, or secret) between exterior spaces or on an
+exterior space's `outside` edge are errors because there is no wall there.
+To connect an interior room to a named exterior space, use a relation, link,
+or `door <interior-id> <exterior-id>`, rather than an `outside` door.
+`no-door` is allowed on outdoor relations and links, where it has no effect.
+
+A [block](block.md) can group exterior rooms into one labelled area, suppressing
+their automatic dividers. Use an explicit `divider` to restore a boundary within
+the block. A block must contain either all interior rooms or all exterior rooms;
+mixing the two is an error. Explicit doors between members are suppressed with
+a warning.
+Stairs may be placed in exterior spaces; an entrance facing a wall-free edge
+does not require a door.
 
 ## The `room` statement
 
 A room is declared in a `porta` plan as follows:
 
 ```text
-room <id> "<name>" <dimensions> [glyph="<glyph>"] <relations>
+room <id> "<name>" <dimensions> [exterior] [glyph="<glyph>"] <relations>
 ```
 
 Each `room` statement consists of the following components in order:
@@ -42,7 +102,7 @@ Each `room` statement consists of the following components in order:
 2. A [room ID](#room-id) used to point to that room elsewhere in the plan;
 3. A [room name](#room-name) shown in the rendered map key (may be empty);
 4. A [dimension declaration](#dimensions) of the form `WxH`;
-5. An optional explicit [display glyph](#glyphs);
+5. Optional `exterior` and explicit [display glyph](#glyphs) attributes;
 6. One or more [relations](#relations).
 
 ### Room ID
@@ -59,7 +119,7 @@ reserved keywords.
 > [!WARNING]
 > At the time of writing, the following keywords are **reserved** in `porta`
 > plans and cannot be used for room IDs:
-> `root`, `door`, `no-door`, `open`, `secret`, `outside`, `shift`, `align`,
+> `root`, `exterior`, `door`, `no-door`, `open`, `secret`, `outside`, `shift`, `align`,
 > `link`, `stairs`, `in`, `divider`, `up-of`, `down-of`, `left-of`, `right-of`.
 > Other syntax words, such as `room`, `block`, and `glyph`, are not reserved.
 

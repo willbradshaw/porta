@@ -1,0 +1,7 @@
+# Partial contact to an outdoor block: automatic width cuts only the shared span.
+room hall "Hall" 30x20 root
+room terrace "Terrace" 20x20 exterior right-of hall shift=10 door=? open
+room yard "Yard" 20x15 exterior down-of terrace
+block grounds "Grounds" terrace yard
+room porch "Porch" 15x10 exterior down-of hall no-door
+door=? secret hall porch

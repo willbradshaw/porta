@@ -1,0 +1,4 @@
+# Packed components need dashed edges where the plan grid continues past them.
+room hall "Hall" 20x30 root
+room yard "Yard" 20x20 exterior root
+room terrace "Terrace" 10x10 exterior root

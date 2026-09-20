@@ -4,6 +4,12 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add a room `exterior` attribute using normal relational placement, dimensions,
+  and labels. Adjacent exterior rooms get automatic dashed dividers, and exposed
+  edges inside the plan grid get dashed demarcation. Blocks
+  suppress boundaries between members. Blocks cannot mix interior and exterior
+  rooms. Explicit doors on wall-free outdoor edges are rejected (existing block
+  suppression still applies).
 - Draw exposed building walls at 1.6 times the interior stroke width, deriving walls
   across the whole plan and drawing shared spans once while preserving block
   boundaries, openings, doors, dividers, and stairs.

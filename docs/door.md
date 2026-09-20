@@ -30,8 +30,13 @@ room study   "Study"   20x20 down-of hall
 <img alt="Three rooms with a default door on each shared wall" src="img/door-overview.svg" width="70%">
 
 An important exception to this behavior is doors within [blocks](block.md).
-If two rooms are members of the same block, any default doors between them
-will be suppressed along with their adjoining walls.
+If two rooms are members of the same block, doors between them are suppressed.
+A block cannot mix interior and exterior rooms.
+
+[Exterior spaces](room.md#exterior-spaces) have no doors between them or on
+their exposed edges. Interior/exterior contact follows the usual door rules.
+An explicit door on a wall-free outdoor edge is an error; doors within one
+block retain the block's suppression-and-warning behavior.
 
 ## Door declarations
 

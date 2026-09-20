@@ -1,0 +1,6 @@
+# Interior block outline keeps a gap opening onto an auto-sized terrace.
+room main "" 30x20 root
+room wing "" 15x20 down-of main
+block hall "Hall" main wing
+room terrace "Terrace" 20x? exterior right-of main door=10 open
+room yard "Yard" 20x20 exterior down-of terrace

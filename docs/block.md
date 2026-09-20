@@ -1,7 +1,7 @@
 # Blocks
 
 A **block** joins several [rooms](room.md) into a single space, suppressing
-walls and doors between them. They are most commonly used to create non-rectangular
+boundaries and doors between them. They are most commonly used to create non-rectangular
 spaces in the rendered SVG map:
 
 ```porta img/block-l.svg
@@ -17,6 +17,12 @@ The combined space is visualized in the SVG map as a single room, with a
 single glyph and key entry determined by the `block` statement. Relations
 with other spaces in the map (adjacency, doors, etc) are handled at the room
 level.
+
+Blocks may also group [exterior rooms](room.md#exterior-spaces), suppressing
+their automatic dividers. An exterior block has a shared glyph and key entry
+but no enclosing walls. Each block must contain either all interior rooms or
+all exterior rooms; mixing the two is an error. Interior/exterior walls and
+doors remain at contacts between separate blocks or rooms.
 
 ## The `block` statement
 
@@ -81,14 +87,14 @@ specified in the `block` statement. Consequently, names of member rooms are
 typically empty (`""`); nonempty member names — and explicit member glyphs —
 are permitted but will raise a warning. Similarly, explicit
 [door declarations](door.md#door-declarations) and [statements](door.md#the-door-statement)
-targeting doors on walls within the block will raise a warning that they have
-been dropped.
+targeting doors between members raise a warning that they have been dropped.
 
 ## Invalid blocks
 
 `porta` rejects a block it can't form:
 
 - A member ID that isn't a room.
+- A mixture of interior and exterior member rooms.
 - A room listed in more than one block.
 - A `glyph=` target that isn't one of the members.
 - Members that don't form a single contiguous region.

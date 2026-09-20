@@ -122,6 +122,11 @@ def _validate_blocks(building: Building, by_id: dict[str, Room]) -> None:
                 f"one of its members",
                 line=block.line,
             )
+        if len({by_id[member].exterior for member in block.members}) > 1:
+            raise LayoutError(
+                f"block {block.id!r} cannot mix interior and exterior rooms",
+                line=block.line,
+            )
         _check_block_contiguous(block, by_id)
 
 
@@ -194,13 +199,15 @@ def _block_warnings(
                     f"room {member!r}: glyph {glyph!r} is suppressed inside "
                     f"block {block.id!r}"
                 )
-    for room in building.rooms:
-        for rel in room.relations:
-            if rel.door is not None and _same_block(room.id, rel.anchor, block_of):
-                warnings.append(
-                    f"explicit door from {room.id!r} to {rel.anchor!r} is "
-                    f"suppressed (same block)"
-                )
+    relations = [(room, rel) for room in building.rooms for rel in room.relations] + [
+        (by_id[link.room], link.relation) for link in building.links
+    ]
+    for room, rel in relations:
+        if rel.door is not None and _same_block(room.id, rel.anchor, block_of):
+            warnings.append(
+                f"explicit door from {room.id!r} to {rel.anchor!r} is "
+                f"suppressed (same block)"
+            )
     for doorway in building.doors:
         if _same_block(doorway.a, doorway.b, block_of):
             warnings.append(
@@ -213,8 +220,9 @@ def _block_warnings(
 def wall_segments(building: Building) -> tuple[list[Segment], list[Segment]]:
     """Derive exterior and interior structural walls of a solved building.
 
-    One room on a span makes it exposed (including courtyard edges); two make
-    it interior, unless their common block suppresses the wall. Open doors cut
+    One interior room on a span makes it exposed (including courtyard edges
+    and contacts with exterior rooms); two make it interior, unless their
+    common block suppresses the wall. Exterior rooms contribute no walls. Open doors cut
     either kind. Shared walls are emitted once; adjacent spans are merged.
     Classification uses final coordinates, including linked components.
 
@@ -223,6 +231,8 @@ def wall_segments(building: Building) -> tuple[list[Segment], list[Segment]]:
     """
     edges: dict[tuple[bool, int], list[tuple[int, int, str]]] = {}
     for room in building.rooms:
+        if room.exterior:
+            continue
         for x1, y1, x2, y2 in _room_outline(room, [])[0]:
             horizontal = y1 == y2
             coord, lo, hi = (y1, x1, x2) if horizontal else (x1, y1, y2)
@@ -264,7 +274,7 @@ def block_wall_segments(building: Building) -> list[Segment]:
     """Wall segments tracing each block's outer boundary (internal walls dropped).
 
     For every block member, each of its four edges is emitted only over the parts
-    not shared with another member of the same block, so the union renders as one
+    not shared with another interior member of the same block, so interiors form one
     outline rather than separate rectangles. Open-door spans are dropped too, so
     an open boundary into a block is a real gap in its outline. Assumes a solved
     building.
@@ -273,28 +283,30 @@ def block_wall_segments(building: Building) -> list[Segment]:
     openings = open_door_segments(building)
     segments: list[Segment] = []
     for block in building.blocks:
-        members = [by_id[m] for m in block.members]
+        members = [by_id[m] for m in block.members if not by_id[m].exterior]
         for member in members:
             segments.extend(_member_boundary(member, members, openings))
     return segments
 
 
 def room_outline_segments(building: Building) -> dict[str, list[Segment]]:
-    """Outlines of the rooms whose walls are cut by an open door.
+    """Segment outlines for exterior spaces and rooms cut by an open door.
 
     Maps each such room's id to its four edges with every open-door span
     removed. Rooms untouched by an opening are absent; block members are
     covered by :func:`block_wall_segments`. For building-wide exterior/interior
     classification, use :func:`wall_segments` instead.
+    Exterior spaces map to empty outlines; adjacent interiors supply walls.
     Assumes a solved building.
     """
     openings = open_door_segments(building)
-    if not openings:
-        return {}
     member_of = _block_of(building)
     outlines: dict[str, list[Segment]] = {}
     for room in building.rooms:
         if room.id in member_of:
+            continue
+        if room.exterior:
+            outlines[room.id] = []  # adjoining interiors supply the shared walls
             continue
         segments, cut = _room_outline(room, openings)
         if cut:
@@ -564,7 +576,7 @@ def _placed_doors(building: Building) -> list[tuple[Segment, Door]]:
                 placed.append((segment, rel.door if rel.door is not None else Door()))
     for link in building.links:
         rel = link.relation
-        if rel.no_door:
+        if rel.no_door or _same_block(link.room, rel.anchor, block_of):
             continue
         segment = _relation_door(by_id[link.room], by_id[rel.anchor], rel)
         if segment is not None:
@@ -589,6 +601,11 @@ def _external_door_line(
     if room is None:
         raise LayoutError(
             f"external door references unknown room {external.room!r}",
+            line=external.line,
+        )
+    if room.exterior:
+        raise LayoutError(
+            f"external door on {room.id!r}: an exterior space has no outside wall",
             line=external.line,
         )
     horizontal, coord, lo, length = _edge(room, external.side)
@@ -670,7 +687,7 @@ def _relation_door(room: Room, anchor: Room, rel: Relation) -> Segment | None:
     *default* door is simply absent when there is no wall (a coordinate-pin).
     """
     horizontal, coord, lo, length = _relation_wall(room, anchor, rel)
-    if length <= 0:
+    if length <= 0 or (room.exterior and anchor.exterior):
         if rel.door is not None:
             raise LayoutError(
                 f"door on room {room.id!r}: it shares no wall with {anchor.id!r}",
@@ -689,7 +706,7 @@ def _doorway_door(doorway: Doorway, by_id: dict[str, Room]) -> Segment:
                 f"door references unknown room {room_id!r}", line=doorway.line
             )
     wall = _shared_wall(by_id[doorway.a], by_id[doorway.b])
-    if wall is None:
+    if wall is None or (by_id[doorway.a].exterior and by_id[doorway.b].exterior):
         raise LayoutError(
             f"door: rooms {doorway.a!r} and {doorway.b!r} share no wall",
             line=doorway.line,
@@ -864,6 +881,8 @@ def _check_stair_access(building: Building, door_lines: list[Segment]) -> None:
                 continue
             covered = any(_doors_overlap(edge, line) for line in door_lines)
             if side in open_sides and not covered:
+                if room.exterior and _opens_outdoors(building, room, side, edge):
+                    continue
                 if _opens_into_block(building, by_id, stairs.room, side, edge):
                     continue  # the block suppressed the wall; nothing blocks
                 raise LayoutError(
@@ -878,6 +897,21 @@ def _check_stair_access(building: Building, door_lines: list[Segment]) -> None:
                     f"flight",
                     line=stairs.line,
                 )
+
+
+def _opens_outdoors(
+    building: Building, room: Room, side: Direction, edge: Segment
+) -> bool:
+    """Whether any of an exterior stair entrance is free of interior walls."""
+    x1, y1, x2, y2 = edge
+    lo, hi = (x1, x2) if y1 == y2 else (y1, y2)
+    axis = _perp(side.axis)
+    blocked = [
+        (_axis_lo(other, axis), _axis_hi(other, axis))
+        for other in building.rooms
+        if not other.exterior and _flush_outside(room, side, other, (lo, hi))
+    ]
+    return bool(_exposed(lo, hi, blocked))
 
 
 def _opens_into_block(
@@ -911,8 +945,12 @@ def _opens_into_block(
 def divider_segments(building: Building) -> list[Segment]:
     """Place and validate every divider, as drawn line segments.
 
-    A divider marks the suppressed boundary between two members of the same
-    block as a dashed dividing line. The line spans the whole shared edge
+    Explicit dividers mark suppressed boundaries within a block. Exterior
+    pairs outside one block get automatic dividers, including incidental
+    contacts. Exposed exterior edges inside the grid rectangle are also marked.
+    Interior/exterior walls never become dividers. An explicit
+    exterior divider replaces its automatic counterpart. Each line spans the
+    whole shared edge
     except where a stair *entrance* (open side, in either room) lies on the
     boundary: the flight is entered across the boundary there, and a line
     over the open end would redraw it as closed. A closed side or flank
@@ -920,8 +958,8 @@ def divider_segments(building: Building) -> list[Segment]:
     the other half. Assumes a solved building.
 
     Raises:
-        LayoutError: On an unknown room, rooms not members of one block,
-            rooms that share no wall, or two dividers on the same boundary.
+        LayoutError: On an unknown room, an interior/exterior pair, interior rooms
+            not in one block, nonadjacent rooms, or duplicate explicit dividers.
     """
     by_id = {room.id: room for room in building.rooms}
     block_of = _block_of(building)
@@ -934,7 +972,15 @@ def divider_segments(building: Building) -> list[Segment]:
                 raise LayoutError(
                     f"divider references unknown room {room_id!r}", line=divider.line
                 )
-        if not _same_block(divider.a, divider.b, block_of):
+        a, b = by_id[divider.a], by_id[divider.b]
+        if a.exterior != b.exterior:
+            raise LayoutError(
+                "divider cannot replace an interior/exterior wall",
+                line=divider.line,
+            )
+        if not (a.exterior and b.exterior) and not _same_block(
+            divider.a, divider.b, block_of
+        ):
             raise LayoutError(
                 f"divider: rooms {divider.a!r} and {divider.b!r} are not "
                 f"members of the same block",
@@ -954,6 +1000,46 @@ def divider_segments(building: Building) -> list[Segment]:
             )
         seen.add(pair)
         segments.extend(_cut_divider(wall, pair, entrances))
+    exterior_rooms = [room for room in building.rooms if room.exterior]
+    for i, a in enumerate(exterior_rooms):
+        for b in exterior_rooms[i + 1 :]:
+            pair = frozenset((a.id, b.id))
+            if pair in seen or _same_block(a.id, b.id, block_of):
+                continue
+            wall = _shared_wall(a, b)
+            if wall is not None:
+                segments.extend(_cut_divider(wall, pair, entrances))
+    segments.extend(_exterior_edge_dividers(building, entrances))
+    return segments
+
+
+def _exterior_edge_dividers(
+    building: Building, entrances: list[tuple[str, Segment]]
+) -> list[Segment]:
+    """Mark exposed exterior edges that lie inside the plan's grid rectangle."""
+    exterior_rooms = [room for room in building.rooms if room.exterior]
+    if not exterior_rooms:
+        return []
+    min_x = min(_axis_lo(room, Axis.HORIZONTAL) for room in building.rooms)
+    max_x = max(_axis_hi(room, Axis.HORIZONTAL) for room in building.rooms)
+    min_y = min(_axis_lo(room, Axis.VERTICAL) for room in building.rooms)
+    max_y = max(_axis_hi(room, Axis.VERTICAL) for room in building.rooms)
+    segments: list[Segment] = []
+    for room in exterior_rooms:
+        # Contacts already have a wall, a divider, or a deliberately merged
+        # same-block boundary. Only room edges facing empty grid remain.
+        for x1, y1, x2, y2 in _member_boundary(room, building.rooms, []):
+            horizontal = y1 == y2
+            coord = y1 if horizontal else x1
+            bounds = (min_y, max_y) if horizontal else (min_x, max_x)
+            if coord in bounds:
+                continue  # the end of the grid already marks this boundary
+            lo, hi = (x1, x2) if horizontal else (y1, y2)
+            segments.extend(
+                _cut_divider(
+                    (horizontal, coord, lo, hi - lo), frozenset((room.id,)), entrances
+                )
+            )
     return segments
 
 

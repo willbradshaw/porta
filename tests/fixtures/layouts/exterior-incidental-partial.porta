@@ -1,0 +1,5 @@
+# Automatic lines follow every actual shared span, including incidental contact.
+room upper "Upper terrace" 20x20 exterior root
+room side "Side terrace" 20x20 exterior right-of upper
+room lower "Lower terrace" 30x20 exterior down-of upper shift=5
+divider upper lower

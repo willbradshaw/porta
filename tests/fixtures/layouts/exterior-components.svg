@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="976" viewBox="-10 -10 90 97.6">
+  <rect x="-10" y="-10" width="90" height="97.6" fill="white" />
+  <g stroke="#bbb" stroke-width="0.15">
+    <line x1="0" y1="0" x2="0" y2="30" />
+    <line x1="5" y1="0" x2="5" y2="30" />
+    <line x1="10" y1="0" x2="10" y2="30" />
+    <line x1="15" y1="0" x2="15" y2="30" />
+    <line x1="20" y1="0" x2="20" y2="30" />
+    <line x1="25" y1="0" x2="25" y2="30" />
+    <line x1="30" y1="0" x2="30" y2="30" />
+    <line x1="35" y1="0" x2="35" y2="30" />
+    <line x1="40" y1="0" x2="40" y2="30" />
+    <line x1="45" y1="0" x2="45" y2="30" />
+    <line x1="50" y1="0" x2="50" y2="30" />
+    <line x1="55" y1="0" x2="55" y2="30" />
+    <line x1="60" y1="0" x2="60" y2="30" />
+    <line x1="65" y1="0" x2="65" y2="30" />
+    <line x1="70" y1="0" x2="70" y2="30" />
+    <line x1="0" y1="0" x2="70" y2="0" />
+    <line x1="0" y1="5" x2="70" y2="5" />
+    <line x1="0" y1="10" x2="70" y2="10" />
+    <line x1="0" y1="15" x2="70" y2="15" />
+    <line x1="0" y1="20" x2="70" y2="20" />
+    <line x1="0" y1="25" x2="70" y2="25" />
+    <line x1="0" y1="30" x2="70" y2="30" />
+  </g>
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="20" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="30" x2="20" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="0" x2="20" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <text data-room="hall" x="10" y="15" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>
+  <text data-room="terrace" x="65" y="5" text-anchor="middle" dominant-baseline="central" font-size="6">T</text>
+  <text data-room="yard" x="40" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">Y</text>
+  <line class="divider" x1="30" y1="0" x2="30" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
+  <line class="divider" x1="30" y1="20" x2="50" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
+  <line class="divider" x1="50" y1="0" x2="50" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
+  <line class="divider" x1="60" y1="0" x2="60" y2="10" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
+  <line class="divider" x1="60" y1="10" x2="70" y2="10" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
+  <text class="scale" x="8" y="49.2" font-size="6">1 square = 5 ft</text>
+  <text class="key" x="8" y="58.8" font-size="6">H  Hall</text>
+  <text class="key" x="8" y="68.4" font-size="6">T  Terrace</text>
+  <text class="key" x="8" y="78" font-size="6">Y  Yard</text>
+</svg>

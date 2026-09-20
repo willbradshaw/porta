@@ -1,0 +1,5 @@
+# An exterior root can anchor interiors; outdoor adjacency has no door.
+room courtyard "Courtyard" 30x30 exterior root
+room hall "Hall" 20x20 left-of courtyard
+room lodge "Lodge" 20x20 up-of courtyard align=end
+room yard "Yard" 20x30 exterior right-of courtyard

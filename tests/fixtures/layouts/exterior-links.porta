@@ -1,0 +1,8 @@
+# Links retain interior boundaries; outdoor links never add walls or doors.
+room hall "Hall" 20x20 root
+room terrace "Terrace" 30x15 exterior root
+room yard "Yard" 15x15 exterior root
+room lodge "Lodge" 15x15 root
+link terrace down-of hall align=end shift=5 door=10 open
+link yard right-of terrace
+link lodge down-of yard door secret

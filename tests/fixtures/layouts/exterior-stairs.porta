@@ -1,0 +1,5 @@
+# Steps descend from a raised terrace to the yard, open at both ends.
+room terrace "Terrace" 30x20 exterior root
+room yard "Yard" 30x20 exterior down-of terrace
+room hall "Hall" 20x20 left-of terrace door=10@5
+stairs in terrace down=down size=10x10 at=10,10

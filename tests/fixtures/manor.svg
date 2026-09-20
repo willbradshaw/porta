@@ -62,32 +62,32 @@
   <line class="wall interior" x1="40" y1="25" x2="70" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line class="wall interior" x1="70" y1="0" x2="70" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line class="wall interior" x1="85" y1="5" x2="85" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line class="wall exterior" x1="-45" y1="-20" x2="-45" y2="-5" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="-45" y1="-20" x2="-30" y2="-20" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="-45" y1="-5" x2="-30" y2="-5" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="-30" y1="-30" x2="-30" y2="-20" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="-30" y1="-30" x2="20" y2="-30" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="-30" y1="-5" x2="-30" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="-30" y1="40" x2="0" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="30" x2="0" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="30" x2="15" y2="30" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="15" y1="20" x2="15" y2="30" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="15" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="20" y1="-40" x2="20" y2="-30" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="20" y1="-40" x2="40" y2="-40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="40" y1="-40" x2="40" y2="-30" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="40" y1="-30" x2="70" y2="-30" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="40" y1="20" x2="40" y2="45" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="40" y1="45" x2="70" y2="45" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="70" y1="-30" x2="70" y2="0" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="70" y1="0" x2="85" y2="0" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="70" y1="25" x2="70" y2="45" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="70" y1="25" x2="85" y2="25" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="85" y1="0" x2="85" y2="5" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="85" y1="5" x2="100" y2="5" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="85" y1="20" x2="85" y2="25" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="85" y1="20" x2="100" y2="20" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="100" y1="5" x2="100" y2="20" stroke="black" stroke-width="0.875" stroke-linecap="square" />
+  <line class="wall exterior" x1="-45" y1="-20" x2="-45" y2="-5" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="-45" y1="-20" x2="-30" y2="-20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="-45" y1="-5" x2="-30" y2="-5" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="-30" y1="-30" x2="-30" y2="-20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="-30" y1="-30" x2="20" y2="-30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="-30" y1="-5" x2="-30" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="-30" y1="40" x2="0" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="30" x2="0" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="30" x2="15" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="15" y1="20" x2="15" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="15" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="-40" x2="20" y2="-30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="-40" x2="40" y2="-40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="40" y1="-40" x2="40" y2="-30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="40" y1="-30" x2="70" y2="-30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="40" y1="20" x2="40" y2="45" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="40" y1="45" x2="70" y2="45" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="70" y1="-30" x2="70" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="70" y1="0" x2="85" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="70" y1="25" x2="70" y2="45" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="70" y1="25" x2="85" y2="25" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="85" y1="0" x2="85" y2="5" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="85" y1="5" x2="100" y2="5" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="85" y1="20" x2="85" y2="25" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="85" y1="20" x2="100" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="100" y1="5" x2="100" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <text data-room="cloak" x="30" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">C</text>
   <text data-room="corridor" x="-25" y="20" text-anchor="middle" dominant-baseline="central" font-size="6">O</text>
   <text data-room="dining" x="55" y="-15" text-anchor="middle" dominant-baseline="central" font-size="18">D</text>

@@ -24,10 +24,10 @@
   </g>
   <line class="wall interior" x1="20" y1="30" x2="20" y2="50" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line class="wall interior" x1="20" y1="30" x2="40" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="0" x2="0" y2="50" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="0" x2="40" y2="0" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="50" x2="40" y2="50" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="40" y1="0" x2="40" y2="50" stroke="black" stroke-width="0.875" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="40" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="50" x2="40" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="40" y1="0" x2="40" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <text data-room="cell" x="30" y="40" text-anchor="middle" dominant-baseline="central" font-size="12">20</text>
   <text data-block="hall" x="10" y="40" text-anchor="middle" dominant-baseline="central" font-size="12">19</text>
   <line class="door" x1="20" y1="35" x2="20" y2="40" stroke="black" stroke-width="1.5" />

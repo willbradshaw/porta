@@ -22,14 +22,14 @@
     <line x1="0" y1="45" x2="40" y2="45" />
     <line x1="0" y1="50" x2="40" y2="50" />
   </g>
-  <line class="wall exterior" x1="0" y1="0" x2="0" y2="50" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="0" x2="40" y2="0" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="50" x2="20" y2="50" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="20" y1="30" x2="20" y2="50" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="20" y1="30" x2="30" y2="30" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="30" y1="30" x2="30" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="30" y1="40" x2="40" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="40" y1="0" x2="40" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="40" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="50" x2="20" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="30" x2="20" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="30" x2="30" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="30" x2="30" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="40" x2="40" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="40" y1="0" x2="40" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <text data-block="hall" x="20" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
   <text class="scale" x="-7" y="69.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-7" y="78.8" font-size="6">H  Great Hall</text>

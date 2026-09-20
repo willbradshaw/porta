@@ -210,7 +210,7 @@ def test_exterior_is_stronger_and_shared_wall_is_drawn_once() -> None:
     assert len(interior) == 1
     assert interior[0].get("stroke-width") == "0.5"
     assert exterior
-    assert all(ln.get("stroke-width") == "0.875" for ln in exterior)
+    assert all(ln.get("stroke-width") == "0.8" for ln in exterior)
     assert (20, 0, 20, 10) in wall_lines(root)
 
 

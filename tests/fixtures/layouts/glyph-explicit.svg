@@ -24,10 +24,10 @@
   </g>
   <line class="wall interior" x1="0" y1="20" x2="50" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
   <line class="wall interior" x1="30" y1="0" x2="30" y2="20" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="0" x2="0" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="0" x2="50" y2="0" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="40" x2="50" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
-  <line class="wall exterior" x1="50" y1="0" x2="50" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="50" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="40" x2="50" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="50" y1="0" x2="50" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <text data-room="cells" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">12</text>
   <text data-room="guard" x="40" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">13</text>
   <text data-room="hall" x="25" y="30" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>

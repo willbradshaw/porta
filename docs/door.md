@@ -231,7 +231,7 @@ room porch    "Porch"         20x10 down-of hall
 room cloak    "Cloakroom"     10x10 down-of drawing left-of porch
 room scullery "Scullery"      15x10 down-of kitchen align=end shift=-5
 room passage  "Passage"       ?x10  right-of porch left-of scullery
-door=10@5 dining kitchen
+door=? open dining kitchen
 door porch outside down
 door dining outside up
 door drawing outside left

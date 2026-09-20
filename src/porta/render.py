@@ -526,8 +526,6 @@ def _pick_glyph(room_id: str, used: set[str]) -> str:
         if glyph not in used:
             return glyph
     raise ValueError(
-        f"automatic glyph pool exhausted for {room_id!r}: all 36 glyphs "
-        "(A-Z, 0-9) are in use; assign unique explicit multi-character glyphs "
-        '(e.g. glyph="12") to rooms or blocks, or use glyph="" for '
-        "intentionally unlabeled entities"
+        f"automatic glyphs exhausted for {room_id!r} (36 used); "
+        'use unique multi-character glyphs or glyph=""'
     )

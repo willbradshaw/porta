@@ -569,13 +569,12 @@ def test_automatic_glyph_capacity(
         assert len(glyphs) == capacity + offset + labeled_extra
         assert len(set(glyphs)) == len(glyphs)
     else:
-        with pytest.raises(ValueError, match="automatic glyph pool exhausted") as exc:
+        with pytest.raises(ValueError, match="automatic glyphs exhausted") as exc:
             renderer(source)
         message = str(exc.value)
-        assert "automatic glyph pool exhausted for 'r" in message
-        assert "36 glyphs (A-Z, 0-9)" in message
-        assert "unique explicit multi-character glyphs" in message
-        assert 'glyph="12"' in message
+        assert "automatic glyphs exhausted for 'r" in message
+        assert "36 used" in message
+        assert "unique multi-character glyphs" in message
         assert 'glyph=""' in message
         assert "ascii" not in message.lower()
         assert "svg" not in message.lower()

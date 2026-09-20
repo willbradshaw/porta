@@ -4,6 +4,9 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add a root `check.sh` shared by local development and CI, check documentation
+  figures without modifying them, and add `uv` setup to the README.
+  Remove downstream-repository assumptions from agent instructions.
 - Move shared coding-agent instructions to `AGENTS.md`, retaining `CLAUDE.md`
   as a compatibility entry point, and link all six DSL reference pages.
 

@@ -15,7 +15,7 @@ path lives in the fence, which GitHub doesn't render, so the reader sees only
 the code and the separate ``![](img/snug-fit.svg)`` image.
 
     uv run python src/build_figures.py           # render the figures
-    uv run python src/build_figures.py --check   # just validate the snippets
+    uv run python src/build_figures.py --check   # validate snippets and figures
 """
 
 import argparse
@@ -44,12 +44,13 @@ def main() -> None:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="validate every snippet but don't write any figures",
+        help="validate every snippet and check figures are current without writing",
     )
     args = parser.parse_args()
 
     root = Path(__file__).parent.parent
     md_files = [root / "README.md", *sorted((root / "docs").glob("*.md"))]
+    stale: list[Path] = []
     for md in md_files:
         for block in _BLOCK.finditer(md.read_text()):
             try:
@@ -58,12 +59,23 @@ def main() -> None:
                 first = block["body"].splitlines()[0]
                 raise SystemExit(f"{md.name}: in example '{first}': {err}") from None
             path = block["path"]
-            if path is None or args.check:
+            if path is None:
                 continue
             target = md.parent / path
+            rendered = render_svg(building, background=_BACKGROUND)
+            if args.check:
+                if not target.is_file() or target.read_text() != rendered:
+                    stale.append(target.relative_to(root))
+                continue
             target.parent.mkdir(parents=True, exist_ok=True)
-            target.write_text(render_svg(building, background=_BACKGROUND))
+            target.write_text(rendered)
             print(f"{md.name}: wrote {path}")
+    if stale:
+        paths = "\n".join(f"  {path}" for path in stale)
+        raise SystemExit(
+            f"Missing or stale figures:\n{paths}\n"
+            "Regenerate with: uv run python src/build_figures.py"
+        )
 
 
 if __name__ == "__main__":

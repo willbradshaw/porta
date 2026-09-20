@@ -84,7 +84,7 @@ between a room and its anchor, etc) will fail and raise an error.
 
 ## Installation
 
-`porta` is published on PyPI and can be installed with `pip`:
+`porta` requires Python 3.14 or newer and is published on PyPI:
 
 ```sh
 pip install porta
@@ -96,6 +96,12 @@ to pull in the test and lint tools as well:
 ```sh
 pip install -e .          # editable install
 pip install -e ".[dev]"   # ... plus pytest, ruff, and mypy
+```
+
+For development with `uv`, set up the environment from the repository root:
+
+```sh
+uv sync --extra dev
 ```
 
 ## Why `porta`?
@@ -127,4 +133,3 @@ No existing tool hits all of these:
   to-scale map.
 - **Hand-written SVG** is text, but neither concise nor relational — verbose and
   easy to get wrong.
-

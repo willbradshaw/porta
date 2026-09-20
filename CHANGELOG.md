@@ -4,7 +4,7 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
-- Draw exposed building walls at 1.5 times the interior stroke width, deriving walls
+- Draw exposed building walls at 1.75 times the interior stroke width, deriving walls
   across the whole plan and drawing shared spans once while preserving block
   boundaries, openings, doors, dividers, and stairs.
 - Add automatic door width (`door=?`) to span the full shared wall or exterior

@@ -26,10 +26,10 @@
     <line x1="0" y1="35" x2="70" y2="35" />
     <line x1="0" y1="40" x2="70" y2="40" />
   </g>
-  <line class="wall exterior" x1="0" y1="0" x2="0" y2="40" stroke="black" stroke-width="0.75" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="0" x2="70" y2="0" stroke="black" stroke-width="0.75" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="40" x2="70" y2="40" stroke="black" stroke-width="0.75" stroke-linecap="square" />
-  <line class="wall exterior" x1="70" y1="0" x2="70" y2="40" stroke="black" stroke-width="0.75" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="70" y2="0" stroke="black" stroke-width="0.875" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="40" x2="70" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
+  <line class="wall exterior" x1="70" y1="0" x2="70" y2="40" stroke="black" stroke-width="0.875" stroke-linecap="square" />
   <text data-room="work-hall" x="52.5" y="20" text-anchor="middle" dominant-baseline="central" font-size="21">19</text>
   <g class="stairs" data-room="work-hall">
     <line x1="30" y1="25" x2="35" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />

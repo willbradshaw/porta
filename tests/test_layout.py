@@ -1581,3 +1581,140 @@ def test_member_glyph_is_suppressed_with_a_warning_not_an_error() -> None:
     )
     building = solve(parse(src))
     assert any("glyph '9' is suppressed" in w and "'b'" in w for w in building.warnings)
+
+
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        pytest.param(
+            'room a "A" 30x20 root\nroom b "B" 20x30 right-of a shift=5 DOOR',
+            (30, 5, 30, 20),
+            id="relation-partial-vertical",
+        ),
+        pytest.param(
+            'room a "A" 30x20 root\nroom b "B" 20x30 down-of a shift=15 DOOR',
+            (15, 20, 30, 20),
+            id="relation-partial-horizontal",
+        ),
+        pytest.param(
+            'room a "A" 30x20 root\n'
+            'room b "B" 20x30 right-of a shift=5 no-door\nDOOR a b',
+            (30, 5, 30, 20),
+            id="standalone",
+        ),
+        pytest.param(
+            'room a "A" 30x20 root\nroom b "B" 20x30 root\n'
+            "link b right-of a shift=5 DOOR",
+            (30, 5, 30, 20),
+            id="link",
+        ),
+        pytest.param(
+            'room a "A" 30x20 root\nDOOR a outside up', (0, 0, 30, 0), id="external-up"
+        ),
+        pytest.param(
+            'room a "A" 30x20 root\nDOOR a outside down',
+            (0, 20, 30, 20),
+            id="external-down",
+        ),
+        pytest.param(
+            'room a "A" 30x20 root\nDOOR a outside left',
+            (0, 0, 0, 20),
+            id="external-left",
+        ),
+        pytest.param(
+            'room a "A" 30x20 root\nDOOR a outside right',
+            (30, 0, 30, 20),
+            id="external-right",
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    "kind", ["", " open", " secret"], ids=["solid", "open", "secret"]
+)
+@pytest.mark.parametrize(
+    "offset", ["", "@0", "@10"], ids=["centered", "zero", "positive"]
+)
+def test_auto_door_geometry(
+    source: str, expected: tuple[int, int, int, int], kind: str, offset: str
+) -> None:
+    building = parse(source.replace("DOOR", f"door=?{offset}{kind}"))
+    if offset == "@10":
+        with pytest.raises(LayoutError, match="does not fit the wall"):
+            solve(building)
+        return
+    solve(building)
+    for marker, segments in [
+        ("", door_segments),
+        (" open", open_door_segments),
+        (" secret", secret_door_segments),
+    ]:
+        assert segments(building) == ([expected] if kind == marker else [])
+
+
+@pytest.mark.parametrize(
+    "kind", ["", " open", " secret"], ids=["solid", "open", "secret"]
+)
+@pytest.mark.parametrize(
+    ("source", "message"),
+    [
+        pytest.param(
+            'room a "A" 30x20 root\n'
+            'room b "B" 10x10 down-of a shift=10 no-door\nDOOR a outside down',
+            "not exterior",
+            id="partially-occupied-exterior",
+        ),
+        pytest.param(
+            'room a "A" 20x20 root\nroom b "B" 20x20 right-of a DOOR\ndoor a b',
+            "two doors overlap",
+            id="overlap",
+        ),
+        pytest.param(
+            'room a "A" 10x10 root\nroom b "B" 10x10 right-of a\n'
+            'room c "C" 10x10 up-of b\nDOOR a c',
+            "share no wall",
+            id="corner",
+        ),
+        pytest.param(
+            'room a "A" 20x20 root\nDOOR a outside left\nstairs up a down=right at=0,0',
+            "opens into the closed",
+            id="closed-stairs",
+        ),
+    ],
+)
+def test_auto_door_preserves_validation(source: str, message: str, kind: str) -> None:
+    with pytest.raises(LayoutError, match=message):
+        solve(parse(source.replace("DOOR", f"door=?{kind}")))
+
+
+@pytest.mark.parametrize(
+    "kind", ["", " open", " secret"], ids=["solid", "open", "secret"]
+)
+@pytest.mark.parametrize("form", ["relation", "standalone"])
+def test_auto_door_inside_block_is_suppressed(kind: str, form: str) -> None:
+    spec = f"door=?{kind}"
+    source = 'room a "" 20x20 root\nroom b "" 20x20 right-of a '
+    source += spec if form == "relation" else f"no-door\n{spec} a b"
+    building = solve(parse(source + '\nblock hall "Hall" a b'))
+    assert door_segments(building) == []
+    assert open_door_segments(building) == []
+    assert secret_door_segments(building) == []
+    assert any("suppressed" in warning for warning in building.warnings)
+
+
+@pytest.mark.parametrize(
+    "kind", ["", " open", " secret"], ids=["solid", "open", "secret"]
+)
+def test_auto_door_allows_stair_entrance(kind: str) -> None:
+    building = solve(
+        parse(
+            f'room a "A" 20x20 root\ndoor=?{kind} a outside left\n'
+            "stairs up a down=left at=0,0"
+        )
+    )
+    assert building.warnings == []
+
+
+@pytest.mark.parametrize("height", [10, 20, 40], ids=["small", "medium", "large"])
+def test_auto_door_tracks_resolved_room_dimensions(height: int) -> None:
+    source = f'room a "A" 30x{height} root\nroom b "B" 20x? right-of a door=? open'
+    assert open_doors_of(source) == [(30, 0, 30, height)]

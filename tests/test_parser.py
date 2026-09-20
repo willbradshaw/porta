@@ -889,3 +889,52 @@ def test_invalid_continuation_raises_with_the_right_line(
     with pytest.raises(ParseError) as exc:
         parse(source)
     assert exc.value.line == error_line
+
+
+@pytest.mark.parametrize("form", ["relation", "standalone", "external", "link"])
+@pytest.mark.parametrize(
+    "kind", ["", " open", " secret"], ids=["solid", "open", "secret"]
+)
+@pytest.mark.parametrize(
+    "offset", ["", "@0", "@10"], ids=["centered", "zero", "positive"]
+)
+def test_auto_door_width(form: str, kind: str, offset: str) -> None:
+    spec = f"door=?{offset}{kind}"
+    source = {
+        "relation": f'room a "A" 20x20 right-of b {spec}',
+        "standalone": f"{spec} a b",
+        "external": f"{spec} a outside up",
+        "link": f"link a right-of b {spec}",
+    }[form]
+    building = parse(source)
+    if form == "relation":
+        door = building.rooms[0].relations[0].door
+    elif form == "standalone":
+        door = building.doors[0].door
+    elif form == "external":
+        door = building.external_doors[0].door
+    else:
+        door = building.links[0].relation.door
+    assert door == Door(
+        width=None,
+        offset=int(offset[1:]) if offset else None,
+        open=kind == " open",
+        secret=kind == " secret",
+    )
+
+
+@pytest.mark.parametrize(
+    "spec",
+    [
+        "door=??",
+        "door=?5",
+        "door=?@?",
+        "door=?@-5",
+        "door=?@3",
+        "door=? open secret",
+        "door=? secret open",
+    ],
+)
+def test_invalid_auto_door_spec(spec: str) -> None:
+    with pytest.raises(ParseError):
+        parse(f'room a "A" 20x20 right-of b {spec}')

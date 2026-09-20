@@ -1,0 +1,2 @@
+room hall "Hall" 30x20 root
+door=? secret hall outside up

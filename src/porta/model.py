@@ -47,6 +47,7 @@ class Align(Enum):
 class Door:
     """A door on the wall a relation's room shares with its anchor.
 
+    ``width=None`` spans the full shared wall (or the full exterior side).
     ``offset`` (feet from the wall's near end) defaults to ``None``, meaning
     "centred" — the layout computes it. An ``open`` door is a doorless
     opening: placed and validated like any door, but rendered as a gap in
@@ -55,7 +56,7 @@ class Door:
     marker over the door's span. A door is at most one of the two.
     """
 
-    width: int = 5
+    width: int | None = 5
     offset: int | None = None
     open: bool = False
     secret: bool = False

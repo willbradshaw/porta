@@ -1,0 +1,3 @@
+room hall "Hall" 30x20 root
+room wing "Wing" 20x30 root
+link wing right-of hall shift=5 door=? open

@@ -1,0 +1,3 @@
+room hall "Hall" 30x20 root
+room wing "Wing" 20x30 down-of hall shift=15 no-door
+door=?@0 open hall wing

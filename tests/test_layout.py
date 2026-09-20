@@ -20,6 +20,7 @@ from porta.layout import (
     solve,
     stair_footprints,
     wall_segments,
+    window_segments,
 )
 from porta.model import Building, Room
 from porta.parser import parse
@@ -2148,3 +2149,256 @@ def test_exposed_exterior_demarcation_leaves_stair_entrance_open() -> None:
         (20, 20, 20, 30),
         (35, 10, 40, 10),
     ]
+
+
+@pytest.mark.parametrize(
+    ("side", "expected"),
+    [
+        ("up", (5, 0, 10, 0)),
+        ("down", (5, 20, 10, 20)),
+        ("left", (0, 5, 0, 10)),
+        ("right", (20, 5, 20, 10)),
+    ],
+    ids=["up", "down", "left", "right"],
+)
+def test_default_window_placement(
+    side: str, expected: tuple[int, int, int, int]
+) -> None:
+    building = solve(parse(f'room a "" 20x20 root\nwindow a outside {side}'))
+    assert window_segments(building) == [expected]
+
+
+@pytest.mark.parametrize(
+    ("spec", "expected"),
+    [
+        ("window=10", (5, 0, 15, 0)),
+        ("window@0", (0, 0, 5, 0)),
+        ("window=10@10", (10, 0, 20, 0)),
+        ("window=20", (0, 0, 20, 0)),
+    ],
+    ids=["width", "offset", "both", "whole-wall"],
+)
+def test_window_overrides(spec: str, expected: tuple[int, int, int, int]) -> None:
+    assert window_segments(
+        solve(parse(f'room a "" 20x20 root\n{spec} a outside up'))
+    ) == [expected]
+
+
+@pytest.mark.parametrize(
+    ("extra", "statement", "message"),
+    [
+        ("", "window missing outside up", "unknown room"),
+        ("", "window=25 a outside up", "wider than"),
+        ("", "window=10@15 a outside up", "does not fit"),
+        ('room b "" 10x10 up-of a', "window a outside up", "not exterior"),
+        ('room b "" 10x10 up-of a', "window=10@5 a outside up", "not exterior"),
+        (
+            'room b "" 20x20 right-of a\nblock pair "" a b',
+            "window a outside right",
+            "not exterior",
+        ),
+        ('block pair "" a', "window pair outside up", "unknown room"),
+        ("window a outside up", "window a outside up", "overlaps"),
+        ("window=10@0 a outside up", "window@5 a outside up", "overlaps"),
+        ("door a outside up", "window a outside up", "overlaps"),
+        ("door open a outside up", "window a outside up", "overlaps"),
+        ("door secret a outside up", "window a outside up", "overlaps"),
+    ],
+    ids=[
+        "unknown",
+        "too-wide",
+        "past-end",
+        "interior",
+        "partly-interior",
+        "block-interior",
+        "block-id",
+        "duplicate",
+        "overlap",
+        "door",
+        "open",
+        "secret",
+    ],
+)
+def test_invalid_window_layout(extra: str, statement: str, message: str) -> None:
+    source = f'room a "" 20x20 root\n{extra}\n{statement}'
+    with pytest.raises(LayoutError, match=message) as error:
+        solve(parse(source))
+    assert error.value.line == len(source.splitlines())
+
+
+@pytest.mark.parametrize("extra", ["", 'block pair "" a b'], ids=["rooms", "block"])
+def test_windows_on_exposed_partial_wall(extra: str) -> None:
+    building = solve(
+        parse(
+            'room a "" 20x20 root\nroom b "" 10x10 up-of a\n'
+            f"{extra}\nwindow@10 a outside up\nwindow@15 a outside up\n"
+            "door@0 a outside down"
+        )
+    )
+    assert window_segments(building) == [(10, 0, 15, 0), (15, 0, 20, 0)]
+    if extra:
+        assert (10, 0, 20, 0) not in block_wall_segments(building)
+
+
+def test_window_does_not_provide_stair_access() -> None:
+    with pytest.raises(LayoutError, match="no door"):
+        solve(
+            parse(
+                'room a "" 20x20 root\nwindow=10@5 a outside up\n'
+                "stairs up a down=up size=10x10 at=5,0"
+            )
+        )
+
+
+@pytest.mark.parametrize("kind", ["door", "window"])
+@pytest.mark.parametrize(
+    ("relation", "spec", "expected"),
+    [
+        ("right-of a", "", (20, 5, 20, 10)),
+        ("down-of a", "=10@5", (5, 20, 15, 20)),
+        ("right-of a shift=10", "@0", (20, 10, 20, 15)),
+    ],
+    ids=["default", "override", "shared-wall-offset"],
+)
+def test_shared_wall_feature_placement(
+    kind: str, relation: str, spec: str, expected: tuple[int, int, int, int]
+) -> None:
+    building = solve(
+        parse(
+            f'room a "" 20x20 root\nroom b "" 20x20 {relation} no-door\n'
+            f"{kind}{spec} a b"
+        )
+    )
+    segments = door_segments if kind == "door" else window_segments
+    assert segments(building) == [expected]
+
+
+@pytest.mark.parametrize("kind", ["door", "window"])
+@pytest.mark.parametrize(
+    ("relation", "spec", "target", "message"),
+    [
+        ("right-of a", "", "a missing", "unknown room"),
+        ("right-of a", "=25", "a b", "wider than"),
+        ("right-of a", "@20", "a b", "does not fit"),
+    ],
+    ids=["unknown", "width", "offset"],
+)
+def test_shared_wall_feature_errors(
+    kind: str, relation: str, spec: str, target: str, message: str
+) -> None:
+    with pytest.raises(LayoutError, match=message) as error:
+        solve(
+            parse(
+                f'room a "" 20x20 root\nroom b "" 20x20 {relation} no-door\n'
+                f"{kind}{spec} {target}"
+            )
+        )
+    assert error.value.line == 3
+
+
+@pytest.mark.parametrize("kind", ["door", "window"])
+@pytest.mark.parametrize("attribute", ["", "exterior"], ids=["interior", "exterior"])
+def test_internal_block_feature_suppressed(kind: str, attribute: str) -> None:
+    building = solve(
+        parse(
+            f'room a "" 20x20 {attribute} root\n'
+            f'room b "" 20x20 {attribute} right-of a\n'
+            f'block hall "" a b\n{kind} a b'
+        )
+    )
+    assert window_segments(building) == door_segments(building) == []
+    assert any(
+        kind in warning and "suppressed" in warning for warning in building.warnings
+    )
+
+
+@pytest.mark.parametrize(
+    "modifier", ["", "door open", "door secret"], ids=["default", "open", "secret"]
+)
+def test_interior_window_conflicts_with_door(modifier: str) -> None:
+    with pytest.raises(LayoutError, match="overlaps"):
+        solve(
+            parse(
+                'room a "" 20x20 root\n'
+                f'room b "" 20x20 right-of a {modifier}\nwindow a b'
+            )
+        )
+
+
+@pytest.mark.parametrize("kind", ["door", "window"])
+def test_wall_feature_requires_shared_wall(kind: str) -> None:
+    with pytest.raises(LayoutError, match="share no wall") as error:
+        solve(parse(f'room a "" 20x20 root\nroom b "" 20x20 root\n{kind} a b'))
+    assert error.value.line == 3
+
+
+@pytest.mark.parametrize(
+    "kind", ["", " open", " secret"], ids=["solid", "open", "secret"]
+)
+@pytest.mark.parametrize("attribute", ["", "exterior"], ids=["indoors", "outdoors"])
+@pytest.mark.parametrize("form", ["relation", "standalone", "link", "outside"])
+def test_window_overlaps_automatic_door(kind: str, attribute: str, form: str) -> None:
+    spec = f"door=?{kind}"
+    source = 'room a "" 20x20 root\n'
+    if form == "outside":
+        source += f"{spec} a outside right\nwindow a outside right"
+    else:
+        placement = {
+            "relation": f"right-of a {spec}",
+            "standalone": f"right-of a no-door\n{spec} a b",
+            "link": f"root\nlink b right-of a {spec}",
+        }[form]
+        source += f'room b "" 20x20 {attribute} {placement}\nwindow a b'
+    with pytest.raises(LayoutError, match=r"window.*overlaps") as error:
+        solve(parse(source))
+    assert error.value.line == len(source.splitlines())
+
+
+@pytest.mark.parametrize("side", ["up", "down", "left", "right"])
+@pytest.mark.parametrize(
+    "reverse", [False, True], ids=["interior-first", "exterior-first"]
+)
+@pytest.mark.parametrize("linked", [False, True], ids=["relation", "link"])
+def test_window_to_outdoors_cuts_exterior_wall(
+    side: str, reverse: bool, linked: bool
+) -> None:
+    placement = (
+        f"root\nlink b {side}-of a no-door" if linked else f"{side}-of a no-door"
+    )
+    target = "b a" if reverse else "a b"
+    building = solve(
+        parse(
+            'room a "" 20x20 root\n'
+            f'room b "" 10x10 exterior {placement}\nwindow {target}'
+        )
+    )
+    exterior, interior = wall_segments(building)
+    assert interior == []
+    assert sum(x2 - x1 + y2 - y1 for x1, y1, x2, y2 in exterior) == 75
+    wx1, wy1, wx2, wy2 = window_segments(building)[0]
+    for x1, y1, x2, y2 in exterior:
+        if y1 == y2 == wy1 == wy2:
+            assert min(x2, wx2) <= max(x1, wx1)
+        if x1 == x2 == wx1 == wx2:
+            assert min(y2, wy2) <= max(y1, wy1)
+
+
+@pytest.mark.parametrize(
+    "statement", ["window a b", "window a outside up"], ids=["shared", "outside"]
+)
+def test_window_requires_structural_outdoor_wall(statement: str) -> None:
+    source = 'room a "" 20x20 exterior root\nroom b "" 20x20 exterior right-of a\n'
+    with pytest.raises(LayoutError, match=r"no wall|no outside wall") as error:
+        solve(parse(source + statement))
+    assert error.value.line == 3
+
+
+def test_outdoor_window_does_not_provide_indoor_stair_access() -> None:
+    with pytest.raises(LayoutError, match="no door"):
+        solve(
+            parse(
+                'room hall "" 20x20 root\n'
+                'room yard "" 20x20 exterior up-of hall no-door\n'
+                "window=10@5 hall yard\nstairs up hall down=up size=10x10 at=5,0"
+            )
+        )

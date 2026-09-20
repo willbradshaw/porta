@@ -910,3 +910,41 @@ def test_exterior_walls_and_labels(blocked: bool, door: str) -> None:
         )
     assert ("Garden" in render_svg(building)) == blocked
     assert "patio" in render_ascii(building) or "garden" in render_ascii(building)
+
+
+@pytest.mark.parametrize(
+    ("side", "expected"),
+    [
+        ("up", [(5, -0.25, 10, -0.25), (5, 0.25, 10, 0.25)]),
+        ("down", [(5, 19.75, 10, 19.75), (5, 20.25, 10, 20.25)]),
+        ("left", [(-0.25, 5, -0.25, 10), (0.25, 5, 0.25, 10)]),
+        ("right", [(19.75, 5, 19.75, 10), (20.25, 5, 20.25, 10)]),
+    ],
+    ids=["up", "down", "left", "right"],
+)
+@pytest.mark.parametrize("block", [False, True], ids=["room", "block"])
+@pytest.mark.parametrize("background", ["white", "#e0e0e0", "#222"])
+def test_window_double_lines(
+    side: str, expected: list[tuple[float, ...]], block: bool, background: str
+) -> None:
+    source = 'room a "" 20x20 root\n' + ('block hall "" a\n' if block else "")
+    building = solve(parse(source + f"window a outside {side}"))
+    root = ET.fromstring(render_svg(building, background=background))
+    fills = root.findall('.//{*}line[@class="window-fill"]')
+    assert len(fills) == 1
+    assert fills[0].attrib["stroke"] == "white"
+    assert fills[0].attrib["stroke-width"] == "0.5"
+    marks = root.findall('.//{*}line[@class="window"]')
+    assert [
+        tuple(float(mark.attrib[key]) for key in ("x1", "y1", "x2", "y2"))
+        for mark in marks
+    ] == expected
+    assert all(mark.attrib["stroke-width"] == "0.25" for mark in marks)
+    assert not root.findall('.//{*}rect[@data-room="a"]')
+    assert render_ascii(building) == ascii_of(source)
+
+
+def test_windows_on_coloured_background_golden() -> None:
+    source = Path("tests/fixtures/layouts/windows.porta").read_text()
+    expected = Path("tests/fixtures/windows-background.svg").read_text()
+    assert render_svg(solve(parse(source)), background="#e0e0e0") == expected

@@ -119,7 +119,7 @@ reserved keywords.
 > [!WARNING]
 > At the time of writing, the following keywords are **reserved** in `porta`
 > plans and cannot be used for room IDs:
-> `root`, `exterior`, `door`, `no-door`, `open`, `secret`, `outside`, `shift`, `align`,
+> `root`, `exterior`, `door`, `window`, `no-door`, `open`, `secret`, `outside`, `shift`, `align`,
 > `link`, `stairs`, `in`, `divider`, `up-of`, `down-of`, `left-of`, `right-of`.
 > Other syntax words, such as `room`, `block`, and `glyph`, are not reserved.
 

@@ -49,6 +49,7 @@ For more on the `porta` DSL specification, see the following documentation:
 - [**Rooms**](docs/room.md) — the `room` statement, room positioning,
   auto-dimensions (`?`), disconnected components, and the layout
   resolution procedure.
+- [**Windows**](docs/window.md) — interior and exterior windows, widths and offsets.
 - [**Doors**](docs/door.md) — default doors & how to modify them, and
   the `door` statement for explicitly adding non-default doors.
 - [**Blocks**](docs/block.md) — the `block` statement for joining

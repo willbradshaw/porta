@@ -4,6 +4,12 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add standalone `window` statements between rooms or to the outside, rendered
+  as double lines with white interiors, with shared sizing and placement code.
+  Document placement and block boundaries, including a manor capstone mixing
+  doors and windows; reserve `window` as a keyword.
+  Integrate windows with derived interior/exterior walls, outdoor rooms, and
+  automatic door widths, with interaction examples and regression goldens.
 - Add a room `exterior` attribute using normal relational placement, dimensions,
   and labels. Adjacent exterior rooms get automatic dashed dividers, and exposed
   edges inside the plan grid get dashed demarcation. Blocks

@@ -110,12 +110,11 @@ uv sync --extra dev
 
 The script runs tests, lint, formatting checks, type checks, documentation
 checks, and a package build. It stops at the first failure and reports which
-check failed. CI runs the same script, with individual checks in parallel.
+check failed. CI runs the same complete sequence.
 `uv` can download a compatible Python and dependencies when needed, so the
 initial setup may require network access.
 
-For a narrower check, use `./check.sh test` (or `lint`, `format`, `types`,
-`docs`, or `build`). To select individual tests, run, for example:
+While iterating on a change, run the relevant tests directly, for example:
 
 ```sh
 uv run --extra dev pytest tests/test_layout.py
@@ -128,11 +127,12 @@ examples in this README and `docs/*.md`. Edit the examples and regenerate:
 uv run python src/build_figures.py
 ```
 
-Review and include the resulting SVG changes. `./check.sh docs` validates
+Review and include the resulting SVG changes. `./check.sh` validates
 every example and checks that the figures match, without overwriting them.
 
 SVG golden fixtures in `tests/fixtures/` are separate from documentation
-figures. For an intentional rendering change, regenerate the affected fixture
+figures; `src/build_figures.py` does not update them. For an intentional
+rendering change, regenerate the affected fixture
 with the renderer, review the SVG and its diff, and include it with the test
 change. Layout cases pair a `.porta` input with a same-named `.svg` under
 `tests/fixtures/layouts/`; `tests/fixtures/manor.svg` covers
@@ -140,7 +140,6 @@ change. Layout cases pair a `.porta` input with a same-named `.svg` under
 
 Every PR must add an entry under `Unreleased` in `CHANGELOG.md`, including
 documentation-only changes. CI enforces this separately from `check.sh`.
-Project architecture and coding conventions are in [AGENTS.md](AGENTS.md).
 
 ## Why `porta`?
 

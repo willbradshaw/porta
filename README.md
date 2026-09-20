@@ -104,32 +104,6 @@ For development with `uv`, set up the environment from the repository root:
 uv sync --extra dev
 ```
 
-## Development
-
-Run the same checks as CI (tests, lint, formatting, types, documentation
-figures, and package build):
-
-```sh
-./check.sh
-```
-
-Documentation figures in `docs/img/` are generated from fenced `porta`
-examples in this README and `docs/*.md`. To regenerate them:
-
-```sh
-uv run python src/build_figures.py
-```
-
-The figure generator does not update SVG golden fixtures in `tests/fixtures/`.
-To compare rendered output against all goldens:
-
-```sh
-uv run --extra dev pytest tests/test_render.py
-```
-
-`./check.sh` includes both the documentation figure check and golden tests;
-neither check overwrites SVGs.
-
 ## Why `porta`?
 
 `porta` is built to be:

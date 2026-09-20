@@ -24,19 +24,19 @@ source of truth. The body below is just working conventions.
 
 - Run with **`uv`**: `uv run porta draw <in>.porta -o <out>.svg`.
 - Run `./check.sh` before pushing; CI uses the same script. See
-  [Installation](README.md#installation) for setup and
-  [Development](README.md#development) for figure and golden-test commands.
+  [Installation](README.md#installation) for setup.
 - Doc figures (`docs/img/`) are generated from fenced ` ```porta ` examples
   (those with a path on the fence) in `README.md` and `docs/*.md` by
   `src/build_figures.py` — don't hand-edit them, and keep the examples valid
   (every one is solved on each build). Review and include regenerated SVGs
-  with the source changes.
+  with the source changes. Regenerate with `uv run python src/build_figures.py`.
 - SVG goldens in `tests/fixtures/` are separate from documentation figures.
   Layout cases pair a `.porta` input with a same-named `.svg` under
   `tests/fixtures/layouts/`; `tests/fixtures/manor.svg` covers
   `examples/manor.porta`. For intentional rendering changes, regenerate only
   affected goldens with the renderer and review the SVGs and diffs. Do not
-  refresh goldens merely to make a failing test pass.
+  refresh goldens merely to make a failing test pass. Compare all goldens with
+  `uv run --extra dev pytest tests/test_render.py`; this does not update them.
 - Every PR must add an entry under `Unreleased` in `CHANGELOG.md`, including
   documentation-only changes. Keep consecutive bullets together without blank
   lines. CI enforces the changelog update separately from `check.sh`.

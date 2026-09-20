@@ -24,12 +24,22 @@ source of truth. The body below is just working conventions.
 
 - Run with **`uv`**: `uv run porta draw <in>.porta -o <out>.svg`.
 - Run `./check.sh` before pushing; CI uses the same script. See
-  [Development](README.md#development) for setup, targeted checks, generated
-  artifacts, and the required changelog update.
+  [Installation](README.md#installation) for setup and
+  [Development](README.md#development) for figure and golden-test commands.
 - Doc figures (`docs/img/`) are generated from fenced ` ```porta ` examples
   (those with a path on the fence) in `README.md` and `docs/*.md` by
   `src/build_figures.py` — don't hand-edit them, and keep the examples valid
-  (every one is solved on each build).
+  (every one is solved on each build). Review and include regenerated SVGs
+  with the source changes.
+- SVG goldens in `tests/fixtures/` are separate from documentation figures.
+  Layout cases pair a `.porta` input with a same-named `.svg` under
+  `tests/fixtures/layouts/`; `tests/fixtures/manor.svg` covers
+  `examples/manor.porta`. For intentional rendering changes, regenerate only
+  affected goldens with the renderer and review the SVGs and diffs. Do not
+  refresh goldens merely to make a failing test pass.
+- Every PR must add an entry under `Unreleased` in `CHANGELOG.md`, including
+  documentation-only changes. Keep consecutive bullets together without blank
+  lines. CI enforces the changelog update separately from `check.sh`.
 - Run project Python commands through **`uv run python`**.
 - Use **relative paths** in shell/git commands, from the repository root.
 - Quote shell paths and provide usable file links when referencing files.

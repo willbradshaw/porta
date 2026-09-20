@@ -43,7 +43,7 @@ types of door declaration:
 - A `door*` declaration changes the **width** and/or **offset** of the
   door: `door=W` sets the door width to `W` feet, `door@O` sets the
   start of the door to `O` feet from the start of the wall, and
-  `door=W@O` sets both.
+  `door=W@O` sets both. Use `door=?` to span the full shared wall.
 
 Widths must be positive integer multiples of 5 ft (`5`, `10`, etc.);
 offsets must be nonnegative integer multiples of 5 ft (`0`, `5`, `10`, etc.).
@@ -61,6 +61,33 @@ room c "Room C" 20x20 right-of b door@15
 ```
 
 <img alt="Four rooms with various modifications to their doors" src="img/door-declarations.svg" width="70%">
+
+### Automatic width
+
+`door=?` resolves its width after room placement to the entire shared wall
+interval. If rooms are shifted or differ in size, this is only the part of
+the wall where they touch. The width follows changes to either room's size
+or placement, including [automatic room dimensions](room.md).
+
+```porta img/door-auto.svg
+room hall "Hall" 30x30 root
+room dining "Dining" 20x20 right-of hall shift=15 door=? open
+room porch "Porch" 20x10 down-of hall no-door
+door=? hall porch
+door=? open porch outside down
+```
+
+<img alt="A full shared-wall opening, a full-width solid door to a porch, and a full exterior opening" src="img/door-auto.svg" width="70%">
+
+Automatic width works on relations, standalone doors, external doors, and
+[component links](link.md#doors-on-links), with solid, `open`, or `secret`
+doors. An external `door=?` spans the selected room side in full; if a
+neighbor occupies any part of that side, the door is rejected rather than
+shrunk to the exposed portion.
+
+A full-span door fits centered or with `@0`. A positive offset such as
+`door=?@10` pushes it past the wall's end and is rejected. The usual door
+overlap, block suppression, and stair access rules still apply.
 
 ## The `door` statement
 
@@ -134,7 +161,7 @@ begins, with no door drawn.
 
 ```porta img/door-open.svg
 room kitchen "Kitchen" 30x20 root
-room dining  "Dining Room" 30x20 right-of kitchen door=20 open
+room dining  "Dining Room" 30x20 right-of kitchen door=? open
 ```
 
 <img alt="A kitchen and dining room whose shared boundary is fully open" src="img/door-open.svg" width="70%">

@@ -687,13 +687,17 @@ def _parse_stair_at(raw: str, lineno: int) -> tuple[int, int]:
 def _parse_door(token: str, lineno: int) -> Door:
     """Parse a ``door[=W][@O]`` modifier (width default 5, offset default centred)."""
     rest = token[len("door") :]
-    width = _DEFAULT_DOOR_FT
+    width: int | None = _DEFAULT_DOOR_FT
     offset: int | None = None
     if "@" in rest:
         rest, _, raw = rest.partition("@")
         offset = _door_dimension(raw, "door offset", lineno, allow_zero=True)
     if rest.startswith("="):
-        width = _door_dimension(rest[1:], "door width", lineno, allow_zero=False)
+        width = (
+            None
+            if rest[1:] == "?"
+            else _door_dimension(rest[1:], "door width", lineno, allow_zero=False)
+        )
     elif rest:
         raise ParseError(f"malformed door modifier {token!r}", line=lineno)
     return Door(width=width, offset=offset)

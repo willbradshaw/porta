@@ -697,23 +697,24 @@ def _door_on_wall(
     line: int,
 ) -> Segment:
     """Place ``door`` on a wall segment of ``length``; raise if it doesn't fit."""
-    if door.width > length:
+    width = length if door.width is None else door.width
+    if width > length:
         raise LayoutError(
-            f"door on {label!r} ({door.width} ft) is wider than the wall ({length} ft)",
+            f"door on {label!r} ({width} ft) is wider than the wall ({length} ft)",
             line=line,
         )
     offset = (
         door.offset
         if door.offset is not None
-        else ((length - door.width) // (2 * _GRID_FT)) * _GRID_FT
+        else ((length - width) // (2 * _GRID_FT)) * _GRID_FT
     )
-    if offset < 0 or offset + door.width > length:
+    if offset < 0 or offset + width > length:
         raise LayoutError(
             f"door on {label!r} does not fit the wall "
-            f"(offset {offset} + width {door.width} > {length} ft)",
+            f"(offset {offset} + width {width} > {length} ft)",
             line=line,
         )
-    start, end = lo + offset, lo + offset + door.width
+    start, end = lo + offset, lo + offset + width
     if horizontal:
         return (start, coord, end, coord)
     return (coord, start, coord, end)

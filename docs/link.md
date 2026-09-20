@@ -42,7 +42,7 @@ of `<room-b>`, precisely where the equivalent relation would place it:
 
 The linked wall behaves like any relation's shared wall: it takes a default
 5-foot door, and the full range of
-[door declarations](door.md#door-declarations) — `door=W@O`, `no-door`,
+[door declarations](door.md#door-declarations) — `door=W@O`, `door=?`, `no-door`,
 `open`, `secret` — is available on the link:
 
 ```porta img/link-door.svg

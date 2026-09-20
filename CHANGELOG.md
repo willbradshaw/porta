@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add automatic door width (`door=?`) to span the full shared wall or exterior
+  side, including open and secret doors and component-link doors.
 - Report an actionable, format-neutral error when automatic room/block glyphs
   run out in SVG or ASCII rendering, and document the capacity and workarounds.
 - Correct the room, block, and door references for reserved IDs, forward

@@ -884,3 +884,30 @@ def test_layout_renders_to_svg_golden(porta_file: Path) -> None:
     expected = porta_file.with_suffix(".svg").read_text()
     actual = render_svg(solve(parse(porta_file.read_text())))
     assert actual == expected
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        pytest.param(
+            'room a "A" 30x20 root\nroom b "B" 20x30 right-of a shift=5 DOOR',
+            id="relation",
+        ),
+        pytest.param(
+            'room a "A" 30x20 root\nroom b "B" 20x30 down-of a shift=15 no-door\nDOOR a b',
+            id="standalone",
+        ),
+        pytest.param('room a "A" 15x20 root\nDOOR a outside up', id="external"),
+        pytest.param(
+            'room a "A" 30x20 root\nroom b "B" 20x30 root\nlink b right-of a shift=5 DOOR',
+            id="link",
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    "kind", ["", " open", " secret"], ids=["solid", "open", "secret"]
+)
+def test_auto_door_svg_matches_explicit_full_span(source: str, kind: str) -> None:
+    assert svg_of(source.replace("DOOR", f"door=?{kind}")) == svg_of(
+        source.replace("DOOR", f"door=15{kind}")
+    )

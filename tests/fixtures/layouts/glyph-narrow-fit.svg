@@ -21,12 +21,12 @@
     <line x1="0" y1="50" x2="30" y2="50" />
   </g>
   <line class="wall interior" x1="0" y1="40" x2="10" y2="40" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="0" x2="0" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="0" x2="10" y2="0" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="50" x2="30" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="10" y1="0" x2="10" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="10" y1="40" x2="30" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="30" y1="40" x2="30" y2="50" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="50" stroke="black" stroke-width="0.75" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="10" y2="0" stroke="black" stroke-width="0.75" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="50" x2="30" y2="50" stroke="black" stroke-width="0.75" stroke-linecap="square" />
+  <line class="wall exterior" x1="10" y1="0" x2="10" y2="40" stroke="black" stroke-width="0.75" stroke-linecap="square" />
+  <line class="wall exterior" x1="10" y1="40" x2="30" y2="40" stroke="black" stroke-width="0.75" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="40" x2="30" y2="50" stroke="black" stroke-width="0.75" stroke-linecap="square" />
   <text data-room="base" x="15" y="45" text-anchor="middle" dominant-baseline="central" font-size="6">B</text>
   <text data-room="tower" x="5" y="20" text-anchor="middle" dominant-baseline="central" font-size="5">12a</text>
   <line class="door" x1="0" y1="40" x2="5" y2="40" stroke="black" stroke-width="1.5" />

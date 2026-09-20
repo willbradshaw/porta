@@ -119,6 +119,11 @@ plan's rooms and [blocks](block.md) — a duplicate raises an error. Rooms
 without an explicit glyph still receive automatic glyphs, which never collide
 with the explicit ones.
 
+Rooms and blocks share 36 automatic glyphs (`A`–`Z`, `0`–`9`), with explicit
+single-character glyphs reserving their entries. If these run out, SVG and
+ASCII rendering raise an error. To free entries, assign unique multi-character
+glyphs (such as `glyph="12"`) or suppress labels with `glyph=""`.
+
 The empty glyph `glyph=""` marks the room as **unlabeled**: no glyph is
 drawn, and the room gets no key entry at all (`store` above). In the
 [debug-ascii grid](../README.md#the-porta-tool), an unlabeled room's cells

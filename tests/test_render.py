@@ -8,6 +8,7 @@ pool; ties are broken by source order.
 """
 
 import xml.etree.ElementTree as ET
+from collections.abc import Callable
 from pathlib import Path
 
 import pytest
@@ -515,6 +516,69 @@ def test_block_cells_carry_the_block_glyph_in_ascii() -> None:
 
 
 # --- display glyphs --------------------------------------------------------
+
+
+@pytest.mark.parametrize("renderer", [ascii_of, svg_of], ids=["ascii", "svg"])
+@pytest.mark.parametrize(
+    ("extra", "capacity"),
+    [
+        pytest.param("", 36, id="rooms"),
+        pytest.param('room fixed "" 5x5 root glyph="A"', 35, id="reserved-letter"),
+        pytest.param('room fixed "" 5x5 root glyph="0"', 35, id="reserved-digit"),
+        pytest.param('room fixed "" 5x5 root glyph="12"', 36, id="multi-character"),
+        pytest.param('room fixed "" 5x5 root glyph=""', 36, id="unlabeled-room"),
+        pytest.param(L_BLOCK, 35, id="automatic-block"),
+        pytest.param(
+            L_BLOCK.replace('block hall "Great Hall"', 'block hall "" glyph="A"'),
+            35,
+            id="reserved-block",
+        ),
+        pytest.param(
+            L_BLOCK.replace('block hall "Great Hall"', 'block hall "" glyph="12"'),
+            36,
+            id="multi-character-block",
+        ),
+        pytest.param(
+            L_BLOCK.replace('block hall "Great Hall"', 'block hall "" glyph=""'),
+            36,
+            id="unlabeled-block",
+        ),
+    ],
+)
+@pytest.mark.parametrize("offset", [-1, 0, 1], ids=["below", "at", "over"])
+def test_automatic_glyph_capacity(
+    renderer: Callable[[str], str], extra: str, capacity: int, offset: int
+) -> None:
+    source = "\n".join(
+        [extra, *(f'room r{i} "" 5x5 root' for i in range(capacity + offset))]
+    )
+    if offset <= 0:
+        rendered = renderer(source)
+        assert rendered == renderer(source)
+        if renderer is ascii_of:
+            glyphs = [
+                entry.split("=")[0] for entry in rendered.split("\n\n")[1].split()
+            ]
+        else:
+            glyphs = [
+                node.text or ""
+                for node in ET.fromstring(rendered).iter(tag("text"))
+                if node.get("data-room") or node.get("data-block")
+            ]
+        labeled_extra = bool(extra) and 'glyph=""' not in extra
+        assert len(glyphs) == capacity + offset + labeled_extra
+        assert len(set(glyphs)) == len(glyphs)
+    else:
+        with pytest.raises(ValueError, match="automatic glyphs exhausted") as exc:
+            renderer(source)
+        message = str(exc.value)
+        assert "automatic glyphs exhausted for 'r" in message
+        assert "36 used" in message
+        assert "unique multi-character glyphs" in message
+        assert 'glyph=""' in message
+        assert "ascii" not in message.lower()
+        assert "svg" not in message.lower()
+
 
 # Explicit multi-char glyphs ("12", "1"), an automatic one (hall -> H), and an
 # unlabeled room (store, glyph="") together in one small plan.

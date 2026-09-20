@@ -78,7 +78,7 @@ def render_ascii(building: Building) -> str:
         The multi-line ASCII rendering (no trailing newline).
 
     Raises:
-        ValueError: If any room has not been placed.
+        ValueError: If any room has not been placed or automatic glyphs run out.
     """
     placed = _placed_rooms(building)
     glyphs = _assign_glyphs(building)
@@ -127,7 +127,7 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         The SVG document as a string.
 
     Raises:
-        ValueError: If any room has not been placed.
+        ValueError: If any room has not been placed or automatic glyphs run out.
     """
     placed = _placed_rooms(building)
     glyphs = _assign_glyphs(building)
@@ -525,4 +525,7 @@ def _pick_glyph(room_id: str, used: set[str]) -> str:
     for glyph in _FALLBACK_GLYPHS:
         if glyph not in used:
             return glyph
-    raise ValueError("ran out of glyphs for the ascii legend")  # pragma: no cover
+    raise ValueError(
+        f"automatic glyphs exhausted for {room_id!r} (36 used); "
+        'use unique multi-character glyphs or glyph=""'
+    )

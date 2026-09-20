@@ -745,7 +745,8 @@ def _parse_span(token: str, kind: str, lineno: int) -> tuple[int | None, int | N
         offset = _span_dimension(raw, f"{kind} offset", lineno, allow_zero=True)
     if rest.startswith("="):
         width = (
-            None if kind == "door" and rest[1:] == "?"
+            None
+            if kind == "door" and rest[1:] == "?"
             else _span_dimension(rest[1:], f"{kind} width", lineno, allow_zero=False)
         )
     elif rest:

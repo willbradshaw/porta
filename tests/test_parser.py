@@ -1030,6 +1030,8 @@ def test_window_spec(spec: str, width: int, offset: int | None, side: str) -> No
         "window@-5 hall up",
         "window@3 hall up",
         "window=foo hall up",
+        "window=? hall up",
+        "window=?@0 hall outside up",
         "window@ hall up",
         "window= hall up",
         "window@5@5 hall up",

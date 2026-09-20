@@ -19,7 +19,8 @@ The default is 5 feet wide and centred, with its start rounded down to the
 5-foot grid (leftward or upward), exactly like a door. Width is a positive
 multiple of 5 feet; offset is a non-negative multiple of 5 feet. Offsets
 are measured from the left or top of the shared wall for interior windows,
-or the room's full selected side for exterior windows.
+or the room's full selected side for exterior windows. Automatic width (`?`) is
+supported for doors only; give windows a numeric width.
 
 Windows are always explicitly declared. They do not replace default doors
 automatically: use `no-door` when replacing a relation's door with a window.
@@ -53,6 +54,30 @@ door gallery outside right
 ```
 
 <img alt="A gallery with widened and offset windows and an exterior door" src="img/window-overrides.svg" width="55%">
+
+## Windows facing outdoor spaces
+
+A window between an interior room and a named [exterior room](room.md#exterior-spaces)
+cuts the stronger exterior wall. Use both room IDs, even when naming the outdoor
+room first. Windows between two exterior rooms, or from an exterior room to
+`outside`, are errors because those boundaries have no structural wall. Windows
+inside one block remain suppressed with a warning, including outdoor blocks.
+
+```porta img/window-outdoors.svg
+room hall "Hall" 30x20 root
+room terrace "Terrace" ?x15 exterior down-of hall no-door
+room yard "Yard" 20x15 exterior right-of terrace
+room study "Study" 20x20 right-of hall door=? open
+window=10@5 hall terrace
+window yard study
+window study outside up
+```
+
+<img alt="Windows through stronger walls facing a terrace and yard, alongside an automatic full-wall opening between indoor rooms" src="img/window-outdoors.svg" width="70%">
+
+An automatic full-wall door occupies its entire shared span, so a window cannot
+share that span with it, whether the door is solid, open, or secret. Windows
+never provide stair access through an indoor/outdoor wall.
 
 ## Valid wall spans
 

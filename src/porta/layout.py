@@ -233,8 +233,9 @@ def wall_segments(building: Building) -> tuple[list[Segment], list[Segment]]:
 
     One interior room on a span makes it exposed (including courtyard edges
     and contacts with exterior rooms); two make it interior, unless their
-    common block suppresses the wall. Exterior rooms contribute no walls. Open doors cut
-    either kind. Shared walls are emitted once; adjacent spans are merged.
+    common block suppresses the wall. Exterior rooms contribute no walls.
+    Open doors and windows cut either kind. Shared walls are emitted once;
+    adjacent spans are merged.
     Classification uses final coordinates, including linked components.
 
     Returns:

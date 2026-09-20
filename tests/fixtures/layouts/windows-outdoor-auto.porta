@@ -1,0 +1,18 @@
+# Windows on both wall weights, partial outdoor contact, blocks, and an auto door.
+room hall "Hall" 30x30 root
+room study "Study" 20x30 right-of hall door=? open
+block house "House" hall study
+room terrace "Terrace" 30x20 exterior down-of hall no-door
+room yard "Yard" 20x20 exterior right-of terrace
+block garden "Garden" terrace yard
+room porch "Porch" 10x20 exterior left-of hall shift=15 no-door
+room tower "Tower" 15x20 right-of study no-door
+window=10@5 hall terrace
+window=10@5 yard study
+window hall study
+window terrace yard
+window@0 porch hall
+window=10@5 study tower
+window@0 tower outside right
+window=10 hall outside up
+door=? tower outside down

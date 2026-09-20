@@ -96,3 +96,47 @@ Exterior currently means there is no adjacent room across the window span.
 Explicit exterior areas ([issue #46](https://github.com/willbradshaw/porta/issues/46))
 are not implemented in this version, so windows facing such areas have no
 separate policy yet. Repeated-window groups and window styles are not supported.
+
+## Putting it together
+
+This manor combines broad exterior windows in the drawing room, smaller
+windows in service rooms, and interior windows beside doors. The dining
+room has both an exterior door and a window on its north wall; its shared
+wall with the kitchen also has a door and window placed end to end.
+The pantry's height and passage's width are resolved from their neighbours.
+
+```porta img/window-capstone.svg
+room hall     "Hall"          20x40 root
+room drawing  "Drawing Room"  30x40 left-of hall door=20
+room dining   "Dining Room"   30x20 right-of hall door@10
+room kitchen  "Kitchen"       30x20 right-of hall align=end
+room pantry   "Pantry"        10x?  right-of dining right-of kitchen
+room porch    "Porch"         20x10 down-of hall
+room cloak    "Cloakroom"     10x10 down-of drawing left-of porch
+room scullery "Scullery"      15x10 down-of kitchen align=end shift=-5
+room passage  "Passage"       ?x10  right-of porch left-of scullery
+
+door=10@5 dining kitchen
+door porch outside down
+door dining outside up
+door drawing outside left
+
+window=10 hall outside up
+window=15 drawing outside up
+window=10@0 drawing outside left
+window=10@25 drawing outside left
+window=10@5 drawing outside down
+window@0 dining outside up
+window=10 pantry outside up
+window@5 pantry outside right
+window@30 pantry outside right
+window scullery outside down
+window cloak outside down
+window@0 porch outside down
+
+window@0 hall dining
+window=10@15 dining kitchen
+window@35 drawing hall
+```
+
+<img alt="A nine-room manor with wide and narrow exterior windows, interior windows beside doors, and offset windows around its irregular perimeter" src="img/window-capstone.svg" width="100%">

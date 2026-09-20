@@ -944,7 +944,8 @@ def divider_segments(building: Building) -> list[Segment]:
 
     Explicit dividers mark suppressed boundaries within a block. Exterior
     pairs outside one block get automatic dividers, including incidental
-    contacts. Interior/exterior walls never become dividers. An explicit
+    contacts. Exposed exterior edges inside the grid rectangle are also marked.
+    Interior/exterior walls never become dividers. An explicit
     exterior divider replaces its automatic counterpart. Each line spans the
     whole shared edge
     except where a stair *entrance* (open side, in either room) lies on the
@@ -1005,6 +1006,37 @@ def divider_segments(building: Building) -> list[Segment]:
             wall = _shared_wall(a, b)
             if wall is not None:
                 segments.extend(_cut_divider(wall, pair, entrances))
+    segments.extend(_exterior_edge_dividers(building, entrances))
+    return segments
+
+
+def _exterior_edge_dividers(
+    building: Building, entrances: list[tuple[str, Segment]]
+) -> list[Segment]:
+    """Mark exposed exterior edges that lie inside the plan's grid rectangle."""
+    exterior_rooms = [room for room in building.rooms if room.exterior]
+    if not exterior_rooms:
+        return []
+    min_x = min(_axis_lo(room, Axis.HORIZONTAL) for room in building.rooms)
+    max_x = max(_axis_hi(room, Axis.HORIZONTAL) for room in building.rooms)
+    min_y = min(_axis_lo(room, Axis.VERTICAL) for room in building.rooms)
+    max_y = max(_axis_hi(room, Axis.VERTICAL) for room in building.rooms)
+    segments: list[Segment] = []
+    for room in exterior_rooms:
+        # Contacts already have a wall, a divider, or a deliberately merged
+        # same-block boundary. Only room edges facing empty grid remain.
+        for x1, y1, x2, y2 in _member_boundary(room, building.rooms, []):
+            horizontal = y1 == y2
+            coord = y1 if horizontal else x1
+            bounds = (min_y, max_y) if horizontal else (min_x, max_x)
+            if coord in bounds:
+                continue  # the end of the grid already marks this boundary
+            lo, hi = (x1, x2) if horizontal else (y1, y2)
+            segments.extend(
+                _cut_divider(
+                    (horizontal, coord, lo, hi - lo), frozenset((room.id,)), entrances
+                )
+            )
     return segments
 
 

@@ -38,7 +38,9 @@ room <id> "<name>" <dimensions> exterior [glyph="<glyph>"] <relations>
 
 Exterior spaces follow the same ID, name, glyph, dimensions (including `?`),
 `root`, relation, alignment, shift, overlap, and component-link rules as rooms.
-Their exposed edges have no enclosing lines. Adjacent exterior rooms have a
+Exposed edges on the outer edge of the plan grid need no extra line. Exposed
+edges inside that grid rectangle get a thin dashed outline so the room cannot
+be mistaken for the empty grid beyond it. Adjacent exterior rooms have a
 thin dashed [divider](divider.md) along their shared edge, with no wall or door.
 This applies to incidental contact as well as declared relations and links. Where they touch an interior room, that room retains its wall
 and the usual door rules apply: a relation or link adds a default door, while
@@ -53,9 +55,22 @@ room yard "Yard" 20x15 exterior right-of terrace
 <img alt="Hall with a door to the terrace; terrace and yard have no enclosing walls" src="img/exterior.svg" width="70%">
 
 The hall/terrace boundary has a wall and a door. A dashed divider distinguishes
-the terrace from the yard; exposed outdoor edges remain unmarked. Exterior spaces still have glyphs and
-key entries, and contribute to the plan bounds and grid. The ASCII view shows
+the terrace from the yard. The yard’s exposed top edge is also dashed because
+the grid continues above it. Exterior spaces still have glyphs and key entries,
+and contribute to the plan bounds and grid. The ASCII view shows
 their extents like room extents.
+
+An inset exterior room has a marked outline wherever the grid extends beyond
+it. Here the lower terrace starts 5 feet to the right and ends 5 feet short of
+the combined upper terraces; dashed lines make those insets visible:
+
+```porta img/exterior-inset.svg
+room upper "Upper terrace" 20x20 exterior root
+room side "Side terrace" 20x20 exterior right-of upper
+room lower "Lower terrace" 30x20 exterior down-of upper shift=5
+```
+
+<img alt="An inset lower terrace with dashed side edges distinguishing it from empty grid" src="img/exterior-inset.svg" width="70%">
 
 Explicit doors (solid, open, or secret) between exterior spaces or on an
 exterior space's `outside` edge are errors because there is no wall there.

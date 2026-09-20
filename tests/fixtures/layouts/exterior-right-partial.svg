@@ -24,6 +24,8 @@
   <rect data-room="hall" x="0" y="0" width="30" height="30" fill="none" stroke="black" stroke-width="0.5" />
   <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
   <text data-room="terrace" x="40" y="25" text-anchor="middle" dominant-baseline="central" font-size="12">T</text>
+  <line class="divider" x1="30" y1="15" x2="50" y2="15" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
+  <line class="divider" x1="30" y1="30" x2="30" y2="35" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="door" x1="30" y1="20" x2="30" y2="25" stroke="black" stroke-width="1.5" />
   <text class="scale" x="-2" y="54.2" font-size="6">1 square = 5 ft</text>
   <text class="key" x="-2" y="63.8" font-size="6">H  Hall</text>

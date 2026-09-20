@@ -1939,7 +1939,9 @@ def test_exterior_automatic_dividers(
     )
     if explicit:
         source += "divider a b"
-    assert divider_segments(solve(parse(source))) == [expected]
+    segments = divider_segments(solve(parse(source)))
+    assert segments.count(expected) == 1
+    assert len(segments) == 5  # shared boundary plus four exposed inset edges
 
 
 @pytest.mark.parametrize("linked", [False, True])
@@ -2052,3 +2054,61 @@ def test_mixed_interior_exterior_block_is_rejected(members: str, linked: bool) -
     with pytest.raises(LayoutError, match="cannot mix interior and exterior") as exc:
         solve(parse(source))
     assert exc.value.line == len(source.splitlines())
+
+
+@pytest.mark.parametrize(
+    ("direction", "expected"),
+    [
+        ("right", [(20, 10, 40, 10), (20, 20, 20, 30)]),
+        ("left", [(-20, 10, 0, 10), (0, 20, 0, 30)]),
+        ("up", [(10, -20, 10, 0), (20, 0, 30, 0)]),
+        ("down", [(10, 20, 10, 40), (20, 20, 30, 20)]),
+    ],
+)
+def test_exposed_exterior_edges_inside_grid(
+    direction: str, expected: list[tuple[int, int, int, int]]
+) -> None:
+    building = solve(
+        parse(
+            'room hall "" 20x20 root\n'
+            f'room yard "" 20x20 exterior {direction}-of hall shift=10'
+        )
+    )
+    assert sorted(divider_segments(building)) == sorted(expected)
+
+
+@pytest.mark.parametrize("blocked", [False, True], ids=["room", "block"])
+def test_exterior_grid_aligned_outline_needs_no_dividers(blocked: bool) -> None:
+    source = 'room yard "" 20x20 exterior root'
+    if blocked:
+        source += '\nblock grounds "" yard'
+    assert divider_segments(solve(parse(source))) == []
+
+
+def test_exterior_l_block_marks_only_inset_outline() -> None:
+    building = solve(
+        parse(
+            'room main "" 20x20 exterior root\n'
+            'room wing "" 10x10 exterior down-of main\n'
+            'block garden "" main wing'
+        )
+    )
+    assert sorted(divider_segments(building)) == [
+        (10, 20, 10, 30),
+        (10, 20, 20, 20),
+    ]
+
+
+def test_exposed_exterior_demarcation_leaves_stair_entrance_open() -> None:
+    building = solve(
+        parse(
+            'room hall "" 20x20 root\n'
+            'room yard "" 20x20 exterior right-of hall shift=10 no-door\n'
+            "stairs up yard down=up size=10x10 at=5,0"
+        )
+    )
+    assert sorted(divider_segments(building)) == [
+        (20, 10, 25, 10),
+        (20, 20, 20, 30),
+        (35, 10, 40, 10),
+    ]

@@ -16,7 +16,9 @@ door low outside up
 Adjacent [exterior rooms](room.md#exterior-spaces) automatically get the same
 thin dashed divider, including incidental contacts and component links.
 Exterior members of the same block merge without an automatic divider;
-an explicit statement restores it. Exposed outdoor edges remain unmarked.
+an explicit statement restores it. Exposed outdoor edges inside the plan’s grid
+rectangle also get dashed demarcation; edges at the grid’s outer boundary need
+no extra line. This includes the exposed outline of an exterior block.
 
 An explicit divider on a boundary that already has an automatic one draws
 only one line. Two explicit declarations on the same boundary are still an error.
@@ -35,7 +37,7 @@ divider <room-id> <room-id>
   rendering. It is a dividing line, not a wall. Members of a block still share
   one glyph and one key entry.
 
-The divider runs the whole shared edge; when the two members overlap
+For a shared boundary, the divider runs the whole shared edge; when the two members overlap
 partially, that is only the overlapping span:
 
 ```porta img/divider-offset.svg

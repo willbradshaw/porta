@@ -23,15 +23,15 @@
     <line x1="0" y1="40" x2="50" y2="40" />
   </g>
   <line class="wall interior" x1="0" y1="30" x2="20" y2="30" stroke="black" stroke-width="0.5" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="0" x2="0" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="20" y1="30" x2="20" y2="40" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="20" y1="30" x2="30" y2="30" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="30" y1="0" x2="30" y2="15" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="30" y1="15" x2="50" y2="15" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="30" y1="30" x2="30" y2="35" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="30" y1="35" x2="50" y2="35" stroke="black" stroke-width="1" stroke-linecap="square" />
-  <line class="wall exterior" x1="50" y1="15" x2="50" y2="35" stroke="black" stroke-width="1" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="0" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="30" x2="20" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="20" y1="30" x2="30" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="0" x2="30" y2="15" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="15" x2="50" y2="15" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="30" x2="30" y2="35" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="30" y1="35" x2="50" y2="35" stroke="black" stroke-width="0.8" stroke-linecap="square" />
+  <line class="wall exterior" x1="50" y1="15" x2="50" y2="35" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <text data-room="dining" x="40" y="25" text-anchor="middle" dominant-baseline="central" font-size="12">D</text>
   <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
   <text data-room="porch" x="10" y="35" text-anchor="middle" dominant-baseline="central" font-size="6">P</text>

@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+## 1.7.0 (2026-09-20)
+
 - Add standalone `window` statements between rooms or to the outside, rendered
   as double lines with white interiors, with shared sizing and placement code.
   Document placement and block boundaries, including a manor capstone mixing

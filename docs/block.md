@@ -24,9 +24,9 @@ level.
 block <id> "<name>" [glyph="<glyph>"] [glyph=<member-id>] <member-id>...
 ```
 
-- **`<id>`**: the block's own ID; its first letter is the union's default
-  glyph. Same rules as a [room ID](room.md#room-id), in the same namespace
-  (unique across all rooms and blocks).
+- **`<id>`**: the block's own ID, used for automatic
+  [glyph assignment](room.md#glyphs). Same rules as a [room ID](room.md#room-id),
+  in the same namespace (unique across all rooms and blocks).
 - **`"<name>"`**: labels the union in the key, with the same rules as a
   [room name](room.md#room-name). As for a room, the slot is **required** but
   may be empty (`""`); an empty name keys the union by its glyph alone.
@@ -38,9 +38,18 @@ block <id> "<name>" [glyph="<glyph>"] [glyph=<member-id>] <member-id>...
   room ID.
 - **`<member-id>...`**: one or more member rooms, specified by [ID](room.md#room-id).
   Each ID must correspond to a room declared elsewhere in the plan, and specified
-  rooms must be **contiguous**: each must be adjacent to at least one other room
-  in the block. Adjacency is determined from the solved floorplan; two adjacent
-  rooms can share a block even if neither is anchored to the other.
+  rooms must form **one connected region through shared walls**: every member
+  must be reachable from every other through shared walls between members.
+  Two disconnected adjacent pairs fail this rule, as do corner-only contacts.
+  A single-member block is valid. Adjacency is determined from the solved
+  floorplan; two adjacent rooms can share a block even if neither is anchored
+  to the other.
+
+Automatic glyphs are assigned to blocks and rooms outside blocks together
+in alphabetical ID order, after reserving explicit glyphs. Assignment scans
+each ID's alphanumeric characters from left to right, uppercased, for an
+unused glyph before trying the fallback pool. A block's members inherit its
+glyph; their IDs do not compete for automatic glyphs.
 
 ## Member rooms
 

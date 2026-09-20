@@ -4,6 +4,9 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Correct the room, block, and door references for reserved IDs, forward
+  references, automatic glyphs, block connectivity, and door dimensions and
+  offsets, with examples of forward references and a partially exposed wall.
 - Add a root `check.sh` shared by local development and CI, check documentation
   figures without modifying them, and add `uv` setup to the README.
   Remove downstream-repository assumptions from agent instructions.

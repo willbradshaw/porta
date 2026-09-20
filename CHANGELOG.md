@@ -4,6 +4,9 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Move shared coding-agent instructions to `AGENTS.md`, retaining `CLAUDE.md`
+  as a compatibility entry point, and link all six DSL reference pages.
+
 ## 1.6.0 (2026-08-05)
 
 - Dividers: `divider <a> <b>` draws the suppressed boundary between two

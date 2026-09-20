@@ -18,6 +18,11 @@ single glyph and key entry determined by the `block` statement. Relations
 with other spaces in the map (adjacency, doors, etc) are handled at the room
 level.
 
+Blocks may also group [exterior spaces](room.md#exterior-spaces). An exterior
+block has a shared glyph and key entry but no enclosing walls; adjacent
+interiors retain their walls and doors. A block cannot mix interior and exterior
+members.
+
 ## The `block` statement
 
 ```

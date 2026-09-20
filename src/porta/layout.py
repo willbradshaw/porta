@@ -122,6 +122,11 @@ def _validate_blocks(building: Building, by_id: dict[str, Room]) -> None:
                 f"one of its members",
                 line=block.line,
             )
+        if len({by_id[member].exterior for member in block.members}) > 1:
+            raise LayoutError(
+                f"block {block.id!r} cannot mix interior and exterior spaces",
+                line=block.line,
+            )
         _check_block_contiguous(block, by_id)
 
 
@@ -275,26 +280,29 @@ def block_wall_segments(building: Building) -> list[Segment]:
     for block in building.blocks:
         members = [by_id[m] for m in block.members]
         for member in members:
-            segments.extend(_member_boundary(member, members, openings))
+            if not member.exterior:
+                segments.extend(_member_boundary(member, members, openings))
     return segments
 
 
 def room_outline_segments(building: Building) -> dict[str, list[Segment]]:
-    """Outlines of the rooms whose walls are cut by an open door.
+    """Segment outlines for exterior spaces and rooms cut by an open door.
 
     Maps each such room's id to its four edges with every open-door span
     removed. Rooms untouched by an opening are absent; block members are
     covered by :func:`block_wall_segments`. For building-wide exterior/interior
     classification, use :func:`wall_segments` instead.
+    Exterior spaces map to empty outlines; adjacent interiors supply walls.
     Assumes a solved building.
     """
     openings = open_door_segments(building)
-    if not openings:
-        return {}
     member_of = _block_of(building)
     outlines: dict[str, list[Segment]] = {}
     for room in building.rooms:
         if room.id in member_of:
+            continue
+        if room.exterior:
+            outlines[room.id] = []  # adjoining interiors supply the shared walls
             continue
         segments, cut = _room_outline(room, openings)
         if cut:
@@ -591,6 +599,11 @@ def _external_door_line(
             f"external door references unknown room {external.room!r}",
             line=external.line,
         )
+    if room.exterior:
+        raise LayoutError(
+            f"external door on {room.id!r}: an exterior space has no outside wall",
+            line=external.line,
+        )
     horizontal, coord, lo, length = _edge(room, external.side)
     segment = _door_on_wall(
         external.door, horizontal, coord, lo, length, external.room, external.line
@@ -670,7 +683,7 @@ def _relation_door(room: Room, anchor: Room, rel: Relation) -> Segment | None:
     *default* door is simply absent when there is no wall (a coordinate-pin).
     """
     horizontal, coord, lo, length = _relation_wall(room, anchor, rel)
-    if length <= 0:
+    if length <= 0 or (room.exterior and anchor.exterior):
         if rel.door is not None:
             raise LayoutError(
                 f"door on room {room.id!r}: it shares no wall with {anchor.id!r}",
@@ -689,7 +702,7 @@ def _doorway_door(doorway: Doorway, by_id: dict[str, Room]) -> Segment:
                 f"door references unknown room {room_id!r}", line=doorway.line
             )
     wall = _shared_wall(by_id[doorway.a], by_id[doorway.b])
-    if wall is None:
+    if wall is None or (by_id[doorway.a].exterior and by_id[doorway.b].exterior):
         raise LayoutError(
             f"door: rooms {doorway.a!r} and {doorway.b!r} share no wall",
             line=doorway.line,
@@ -864,6 +877,8 @@ def _check_stair_access(building: Building, door_lines: list[Segment]) -> None:
                 continue
             covered = any(_doors_overlap(edge, line) for line in door_lines)
             if side in open_sides and not covered:
+                if room.exterior and _opens_outdoors(building, room, side, edge):
+                    continue
                 if _opens_into_block(building, by_id, stairs.room, side, edge):
                     continue  # the block suppressed the wall; nothing blocks
                 raise LayoutError(
@@ -878,6 +893,21 @@ def _check_stair_access(building: Building, door_lines: list[Segment]) -> None:
                     f"flight",
                     line=stairs.line,
                 )
+
+
+def _opens_outdoors(
+    building: Building, room: Room, side: Direction, edge: Segment
+) -> bool:
+    """Whether any of an exterior stair entrance is free of interior walls."""
+    x1, y1, x2, y2 = edge
+    lo, hi = (x1, x2) if y1 == y2 else (y1, y2)
+    axis = _perp(side.axis)
+    blocked = [
+        (_axis_lo(other, axis), _axis_hi(other, axis))
+        for other in building.rooms
+        if not other.exterior and _flush_outside(room, side, other, (lo, hi))
+    ]
+    return bool(_exposed(lo, hi, blocked))
 
 
 def _opens_into_block(

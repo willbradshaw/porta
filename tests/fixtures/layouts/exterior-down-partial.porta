@@ -1,0 +1,3 @@
+# Partial contact: retain the complete interior outline, no outdoor outline.
+room hall "Hall" 30x30 root
+exterior terrace "Terrace" 20x20 down-of hall align=end shift=5

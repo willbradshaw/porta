@@ -101,6 +101,8 @@ class Room:
     # Filled by the layout engine (top-left corner, in feet); None until solved.
     x: int | None = None
     y: int | None = None
+    # Exterior spaces use room geometry but contribute no enclosing walls.
+    exterior: bool = False
 
 
 class StairSense(Enum):

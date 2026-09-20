@@ -33,6 +33,11 @@ An important exception to this behavior is doors within [blocks](block.md).
 If two rooms are members of the same block, any default doors between them
 will be suppressed along with their adjoining walls.
 
+[Exterior spaces](room.md#exterior-spaces) have no doors between them or on
+their exposed edges. Interior/exterior contact follows the usual door rules.
+An explicit door on a wall-free outdoor edge is an error; doors within one
+block retain the block's suppression-and-warning behavior.
+
 ## Door declarations
 
 The door drawn by a [relation](room.md#relations) can be modified by

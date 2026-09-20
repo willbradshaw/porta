@@ -28,6 +28,47 @@ Exposed walls use a stronger stroke than shared interior walls. This follows
 the full plan, including partial adjacencies and [blocks](block.md); shared
 walls are drawn once. Walls facing courtyard gaps are exposed too.
 
+## Exterior spaces
+
+Use `exterior` in place of `room` for an outdoor rectangle:
+
+```text
+exterior <id> "<name>" <dimensions> [glyph="<glyph>"] <relations>
+```
+
+Exterior spaces follow the same ID, name, glyph, dimensions (including `?`),
+`root`, relation, alignment, shift, overlap, and component-link rules as rooms.
+Their exposed edges and boundaries with other exterior spaces have no walls
+or default doors. Where they touch an interior room, that room retains its wall
+and the usual door rules apply: a relation or link adds a default door, while
+incidental contact alone does not.
+
+```porta img/exterior.svg
+room hall "Hall" 30x20 root
+exterior terrace "Terrace" ?x15 down-of hall
+exterior yard "Yard" 20x15 right-of terrace
+```
+
+<img alt="Hall with a door to the terrace; terrace and yard have no enclosing walls" src="img/exterior.svg" width="70%">
+
+The hall/terrace boundary has a wall and a door. The terrace/yard boundary and
+all exposed outdoor edges remain open. Exterior spaces still have glyphs and
+key entries, and contribute to the plan bounds and grid. The ASCII view shows
+their extents like room extents.
+
+Explicit doors (solid, open, or secret) between exterior spaces or on an
+exterior space's `outside` edge are errors because there is no wall there.
+To connect an interior room to a named exterior space, use a relation, link,
+or `door <interior-id> <exterior-id>`, rather than an `outside` door.
+`no-door` is allowed on outdoor relations and links, where it has no effect.
+
+A [block](block.md) can group exterior spaces into one labelled area. All
+members must be exterior, or all must be interior; mixed blocks are errors.
+Existing block conventions apply, including suppressing explicit doors between
+members with a warning and permitting explicit [dividers](divider.md).
+Stairs may be placed in exterior spaces; an entrance facing a wall-free edge
+does not require a door.
+
 ## The `room` statement
 
 A room is declared in a `porta` plan as follows:

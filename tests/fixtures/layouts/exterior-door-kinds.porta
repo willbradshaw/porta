@@ -1,0 +1,6 @@
+# Solid offset, full open, secret and suppressed doors on interior boundaries.
+room hall "Hall" 30x30 root
+exterior porch "Porch" 20x10 up-of hall door=10@5
+exterior terrace "Terrace" ?x15 down-of hall door=30 open
+exterior yard "Yard" 15x? right-of hall door=10@5 secret
+exterior court "Court" 15x30 left-of hall no-door

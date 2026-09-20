@@ -882,3 +882,26 @@ def test_auto_door_svg_matches_explicit_full_span(source: str, kind: str) -> Non
     assert svg_of(source.replace("DOOR", f"door=?{kind}")) == svg_of(
         source.replace("DOOR", f"door=15{kind}")
     )
+
+
+@pytest.mark.parametrize("blocked", [False, True], ids=["separate", "block"])
+@pytest.mark.parametrize("door", ["", " no-door", " door open", " door secret"])
+def test_exterior_walls_and_labels(blocked: bool, door: str) -> None:
+    source = (
+        'room hall "Hall" 20x20 root\n'
+        f'exterior patio "" 30x20 down-of hall{door}\n'
+        'exterior lawn "" 20x20 right-of patio\n'
+    )
+    if blocked:
+        source += 'block garden "Garden" patio lawn'
+    building = solve(parse(source))
+    svg = ET.fromstring(render_svg(building))
+    ns = {"s": "http://www.w3.org/2000/svg"}
+    for room_id in ("patio", "lawn"):
+        assert svg.findall(f'.//s:rect[@data-room="{room_id}"]', ns) == []
+        assert svg.findall(f'.//s:line[@data-room="{room_id}"]', ns) == []
+    assert svg.findall('.//s:rect[@data-room="hall"]', ns) or svg.findall(
+        './/s:line[@data-room="hall"]', ns
+    )
+    assert ("Garden" in render_svg(building)) == blocked
+    assert "patio" in render_ascii(building) or "garden" in render_ascii(building)

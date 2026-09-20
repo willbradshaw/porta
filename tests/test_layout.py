@@ -1842,3 +1842,77 @@ def test_partial_adjacency_splits_exposed_wall_at_both_ends() -> None:
         (30, 5, 30, 15),
     ]
     assert interior == [(20, 5, 20, 15)]
+
+
+@pytest.mark.parametrize(
+    ("first", "second", "expected"),
+    [
+        ("room", "exterior", [(20, 5, 20, 10)]),
+        ("exterior", "room", [(20, 5, 20, 10)]),
+        ("exterior", "exterior", []),
+    ],
+    ids=["interior-anchor", "exterior-anchor", "both-exterior"],
+)
+@pytest.mark.parametrize("linked", [False, True], ids=["relation", "link"])
+def test_exterior_default_doors(
+    first: str, second: str, expected: list[tuple[int, int, int, int]], linked: bool
+) -> None:
+    placement = "root\nlink b right-of a" if linked else "right-of a"
+    building = solve(parse(f'{first} a "" 20x20 root\n{second} b "" 10x20 {placement}'))
+    assert door_segments(building) == expected
+    assert (building.room("b").x, building.room("b").y) == (20, 0)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        'exterior a "" 20x20 root\nexterior b "" 20x20 right-of a door',
+        'exterior a "" 20x20 root\nexterior b "" 20x20 right-of a\ndoor a b',
+        'exterior a "" 20x20 root\ndoor a outside up',
+        'exterior a "" 20x20 root\nexterior b "" 20x20 root\nlink b right-of a door',
+        'room a "" 20x20 root\nexterior b "" 20x20 right-of a\nblock both "" a b',
+    ],
+    ids=["inline", "standalone", "outside", "link", "mixed-block"],
+)
+def test_exterior_invalid_walls(source: str) -> None:
+    with pytest.raises(LayoutError, match=r"no wall|no outside wall|cannot mix"):
+        solve(parse(source))
+
+
+def test_exterior_auto_dimensions_and_shift() -> None:
+    building = solve(
+        parse('room a "" 30x20 root\nexterior b "" ?x10 down-of a shift=5')
+    )
+    room = building.room("b")
+    assert (room.x, room.y, room.width, room.height) == (5, 20, 25, 10)
+
+
+def test_exterior_block_preserves_existing_suppression() -> None:
+    building = solve(
+        parse(
+            'exterior a "" 20x20 root\n'
+            'exterior b "" 20x20 right-of a door\n'
+            'block terrace "Terrace" a b\n'
+            "divider a b"
+        )
+    )
+    assert block_wall_segments(building) == []
+    assert door_segments(building) == []
+    assert divider_segments(building) == [(20, 0, 20, 20)]
+    assert any("suppressed" in warning for warning in building.warnings)
+
+
+@pytest.mark.parametrize(
+    "neighbor",
+    ["", 'exterior b "" 20x20 down-of a', 'room b "" 20x20 down-of a no-door'],
+)
+def test_exterior_stair_access(neighbor: str) -> None:
+    source = (
+        f'exterior a "" 20x20 root\n{neighbor}\n'
+        "stairs up a down=down size=10x10 at=5,10"
+    )
+    if neighbor.startswith("room"):
+        with pytest.raises(LayoutError, match="wall with no door"):
+            solve(parse(source))
+    else:
+        solve(parse(source))

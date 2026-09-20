@@ -1,0 +1,5 @@
+# Court touches hall incidentally: only the explicit door connects them.
+room hall "Hall" 30x20 root
+exterior terrace "Terrace" 15x20 down-of hall no-door
+exterior court "Court" 15x20 right-of terrace
+door=5@5 hall court

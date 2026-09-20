@@ -401,14 +401,15 @@ def _tokenize(raw: str, lineno: int) -> tuple[list[Token], bool]:
 
 
 def _parse_room(tokens: list[Token], lineno: int) -> Room:
-    """Turn a tokenised ``room`` line into a :class:`~porta.model.Room`.
+    """Turn a tokenised ``room`` or ``exterior`` line into a room model.
 
     The name slot is required but may be empty (``""``) for a room labelled only
     by its glyph and size.
     """
-    if tokens[0].value != "room":
+    if tokens[0].quoted or tokens[0].value not in ("room", "exterior"):
         raise ParseError(
-            f"unknown directive {tokens[0].value!r}; expected 'room'", line=lineno
+            f"unknown directive {tokens[0].value!r}; expected 'room' or 'exterior'",
+            line=lineno,
         )
     if len(tokens) < 4:
         raise ParseError(
@@ -434,6 +435,7 @@ def _parse_room(tokens: list[Token], lineno: int) -> Room:
         width=width,
         height=height,
         glyph=glyph,
+        exterior=tokens[0].value == "exterior",
         auto_width=auto_width,
         auto_height=auto_height,
         is_root=is_root,

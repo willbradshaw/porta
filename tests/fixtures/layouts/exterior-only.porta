@@ -1,0 +1,4 @@
+# No room wall strokes or doors anywhere; keep grid, labels and bounds.
+exterior lawn "Lawn" 30x20 root glyph="1"
+exterior terrace "Terrace" 10x? right-of lawn glyph="2"
+exterior clearing "" 20x10 down-of lawn glyph=""

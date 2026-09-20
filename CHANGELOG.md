@@ -4,6 +4,11 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add `exterior` spaces with room-style relational placement, dimensions, and
+  labels, retaining walls and doors only at interior boundaries. Exterior
+  blocks are supported; mixed interior/exterior blocks and explicit doors on
+  wall-free outdoor edges are rejected (existing block suppression still applies).
+
 - Draw exposed building walls at 1.6 times the interior stroke width, deriving walls
   across the whole plan and drawing shared spans once while preserving block
   boundaries, openings, doors, dividers, and stairs.

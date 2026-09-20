@@ -938,3 +938,30 @@ def test_auto_door_width(form: str, kind: str, offset: str) -> None:
 def test_invalid_auto_door_spec(spec: str) -> None:
     with pytest.raises(ParseError):
         parse(f'room a "A" 20x20 right-of b {spec}')
+
+
+@pytest.mark.parametrize("directive", ["room", "exterior"])
+def test_space_declaration(directive: str) -> None:
+    room = parse(
+        f'{directive} terrace "Terrace" ?x20 glyph="T" right-of hall align=end shift=-5'
+    ).rooms[0]
+    assert room.exterior == (directive == "exterior")
+    assert room.auto_width
+    assert room.height == 20
+    assert room.glyph == "T"
+    assert room.relations[0].anchor == "hall"
+    assert room.relations[0].shift == -5
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        'exterior a "A" 12x20 root',
+        "exterior a 20x20 root",
+        'exterior a "A" 20x20 nonsense',
+    ],
+    ids=["off-grid", "missing-name", "unknown-modifier"],
+)
+def test_invalid_exterior_declaration(source: str) -> None:
+    with pytest.raises(ParseError):
+        parse(source)

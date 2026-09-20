@@ -19,23 +19,20 @@ source of truth. The body below is just working conventions.
   coordinates, validation), `render.py` (model → SVG/ASCII), `errors.py` (the
   `PortaError` hierarchy, each carrying a source line). Tests in `tests/`.
   `src/build_figures.py` regenerates the doc figures (a dev tool, not shipped).
-- **Consumer** — the `isles` D&D vault (sibling repo) installs porta via
-  `uv add --editable ../porta`. The `.porta` sources and rendered SVGs live in
-  *that* repo, not here. porta knows nothing about isles.
 
 ## Workflow
 
 - Run with **`uv`**: `uv run porta draw <in>.porta -o <out>.svg`.
-- Gates (all run in CI on push/PR; run them locally before pushing):
-  `uv run --extra dev pytest` · `ruff check .` · `ruff format --check .` ·
-  `mypy` · and a `docs` job that rebuilds the figures and fails on any drift.
+- Run `./check.sh` before pushing; CI uses the same script. See
+  [Development](README.md#development) for setup, targeted checks, generated
+  artifacts, and the required changelog update.
 - Doc figures (`docs/img/`) are generated from fenced ` ```porta ` examples
   (those with a path on the fence) in `README.md` and `docs/*.md` by
   `src/build_figures.py` — don't hand-edit them, and keep the examples valid
   (every one is solved on each build).
-- Use **`python`**, never `python3`.
-- Use **relative paths** in shell/git commands.
-- When handing the user a path to open, avoid spaces in it.
+- Run project Python commands through **`uv run python`**.
+- Use **relative paths** in shell/git commands, from the repository root.
+- Quote shell paths and provide usable file links when referencing files.
 
 ## Conventions
 

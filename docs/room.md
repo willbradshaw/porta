@@ -166,6 +166,21 @@ Equal values (such as explicit `"01"` and `"1"`) sort by verbatim glyph text.
 Nonnumeric glyphs follow in Unicode code-point order, case-sensitive; IDs break
 any remaining ties.
 
+For example, Vault reserves `2` even though it comes last both alphabetically
+and in the source. Atrium receives `1`; Library skips the reserved `2` and
+receives `3`. The IDs deliberately differ from display-name order:
+
+```porta img/glyph-reservation.svg
+room z "Atrium"  20x20 root
+room a "Library" 20x20 right-of z
+room m "Vault"   20x20 down-of z glyph="2"
+```
+
+<img alt="Atrium labeled 1, Vault explicitly labeled 2, and Library labeled 3 after skipping the reserved number" src="img/glyph-reservation.svg" width="70%">
+
+The key reads `1 Atrium`, `2 Vault`, `3 Library`: explicit and automatic labels
+are interleaved in numerical order.
+
 An explicit glyph can be set instead with `glyph="..."`, placed after the
 dimensions:
 

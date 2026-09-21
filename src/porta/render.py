@@ -22,14 +22,13 @@ from porta.layout import (
     wall_segments,
     window_segments,
 )
-from porta.model import Axis, Building, Direction, Room, Stairs
+from porta.model import Axis, Block, Building, Direction, Room, Stairs
 from porta.style import DEFAULT_STYLE, Style
 from porta.text_metrics import TextMetrics, text_bounds
 
 _GRID_FT = 5
 _EMPTY = "."
 _NO_GLYPH = "_"  # ascii cell fill for an unlabeled (glyph="") room
-_FALLBACK_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
 _SVG_NS = "http://www.w3.org/2000/svg"
 
@@ -40,8 +39,8 @@ def render_ascii(building: Building) -> str:
     One cell per 5-ft square, space-separated, north at the top; every cell is
     padded to the widest glyph in the plan. Empty cells are ``.``; an unlabeled
     room's cells are ``_``. A blank line then a ``glyph=id`` legend
-    (shortest-glyph-first, then lexicographic) follows. Like doors, stairs
-    are not rendered in the ascii grid (it shows room extents only).
+    (numeric value first, then nonnumeric glyphs lexicographically) follows.
+    Like doors, stairs are not rendered in the ascii grid (room extents only).
 
     Args:
         building: A building whose rooms have been placed by
@@ -51,7 +50,7 @@ def render_ascii(building: Building) -> str:
         The multi-line ASCII rendering (no trailing newline).
 
     Raises:
-        ValueError: If any room has not been placed or automatic glyphs run out.
+        ValueError: If any room has not been placed.
     """
     placed = _placed_rooms(building)
     glyphs = _assign_glyphs(building)
@@ -103,7 +102,7 @@ def render_svg(
         The SVG document as a string.
 
     Raises:
-        ValueError: If any room has not been placed or automatic glyphs run out.
+        ValueError: If any room has not been placed.
     """
     style = DEFAULT_STYLE if style is None else style
     background = style["page"]["background"] if background is None else background
@@ -535,11 +534,17 @@ def _legend_ids(
 ) -> list[str]:
     """Entities that earn a key line: those with a non-empty glyph.
 
-    Ordered shortest-glyph-first then lexicographic, so numeric glyphs read
-    ``1``..``9`` before ``10``.
+    Numeric glyphs sort by value, then verbatim text; nonnumeric glyphs follow
+    in Unicode code-point order. IDs break any remaining ties.
     """
     ids = [eid for eid in _entity_ids(building, member_block) if glyphs[eid]]
-    return sorted(ids, key=lambda eid: (len(glyphs[eid]), glyphs[eid]))
+
+    def key(eid: str) -> tuple[bool, int, str, str]:
+        glyph = glyphs[eid]
+        number = _glyph_number(glyph)
+        return number is None, number if number is not None else 0, glyph, eid
+
+    return sorted(ids, key=key)
 
 
 def _glyph_spot(
@@ -651,44 +656,41 @@ def _assign_glyphs(building: Building) -> dict[str, str]:
     """Assign a glyph to each non-member room and each block; members inherit
     their block's glyph.
 
-    An explicit ``glyph="..."`` is used verbatim (``""`` = unlabeled). The rest
-    are automatic — processed in id order, so contention for a letter resolves
-    alphabetically and the result is independent of statement order — and never
-    collide with an explicit glyph.
+    Explicit glyphs are preserved and ASCII digit glyphs reserve their numeric
+    values. Automatic numbers start at 1 in casefolded name order, then ID order.
+    Empty names sort first; suppressed member glyphs do not reserve numbers.
     """
     member_block = _member_block(building)
-    explicit = [
-        (room.id, room.glyph) for room in building.rooms if room.id not in member_block
+    entities: list[Room | Block] = [
+        room for room in building.rooms if room.id not in member_block
     ]
-    explicit += [(block.id, block.glyph) for block in building.blocks]
-    glyphs: dict[str, str] = {
-        eid: glyph for eid, glyph in explicit if glyph is not None
+    entities.extend(building.blocks)
+    glyphs = {
+        entity.id: entity.glyph for entity in entities if entity.glyph is not None
     }
-    used = {glyph for glyph in glyphs.values() if glyph}
-    for entity_id in sorted(_entity_ids(building, member_block)):
-        if entity_id in glyphs:
+    used = {
+        number
+        for glyph in glyphs.values()
+        if (number := _glyph_number(glyph)) is not None
+    }
+    next_number = 1
+    for entity in sorted(
+        entities, key=lambda entity: ((entity.name or "").casefold(), entity.id)
+    ):
+        if entity.id in glyphs:
             continue
-        chosen = _pick_glyph(entity_id, used)
-        used.add(chosen)
-        glyphs[entity_id] = chosen
+        while next_number in used:
+            next_number += 1
+        glyphs[entity.id] = str(next_number)
+        next_number += 1
     for member, block_id in member_block.items():
         glyphs[member] = glyphs[block_id]
     return glyphs
 
 
-def _pick_glyph(room_id: str, used: set[str]) -> str:
-    """First unused uppercased alphanumeric of ``room_id``, else from the pool."""
-    for char in room_id:
-        glyph = char.upper()
-        if glyph.isalnum() and glyph not in used:
-            return glyph
-    for glyph in _FALLBACK_GLYPHS:
-        if glyph not in used:
-            return glyph
-    raise ValueError(
-        f"automatic glyphs exhausted for {room_id!r} (36 used); "
-        'use unique multi-character glyphs or glyph=""'
-    )
+def _glyph_number(glyph: str) -> int | None:
+    """Numeric value of a nonempty ASCII digit glyph, including leading zeros."""
+    return int(glyph) if glyph.isascii() and glyph.isdecimal() else None
 
 
 def _attr(value: str) -> str:

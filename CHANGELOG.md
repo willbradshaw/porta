@@ -4,6 +4,10 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Number rooms and blocks by case-insensitive display name across the whole map,
+  skipping explicit numerical glyphs and removing the automatic 36-label limit.
+  Sort SVG keys and ASCII legends numerically, followed by custom glyphs;
+  document ordering, leading zeros, suppressed labels, and large numbers.
 - Add `porta draw --style` for grouped JSON overrides, using plain values or
   documented value/description records.
 - Read renderer defaults from documented, grouped JSON. Share background and

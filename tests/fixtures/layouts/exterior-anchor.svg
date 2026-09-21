@@ -37,10 +37,10 @@
   <line class="wall exterior" x1="10" y1="-20" x2="30" y2="-20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="10" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="30" y1="-20" x2="30" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="courtyard" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">C</text>
-  <text data-room="hall" x="-10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">H</text>
-  <text data-room="lodge" x="20" y="-10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">L</text>
-  <text data-room="yard" x="40" y="15" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">Y</text>
+  <text data-room="courtyard" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">1</text>
+  <text data-room="hall" x="-10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">2</text>
+  <text data-room="lodge" x="20" y="-10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">3</text>
+  <text data-room="yard" x="40" y="15" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">4</text>
   <line class="divider" x1="0" y1="0" x2="10" y2="0" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="0" y1="20" x2="0" y2="30" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="30" y1="0" x2="30" y2="30" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
@@ -55,16 +55,16 @@
     <rect x="5" y="40.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="15" y="40.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="-11.675" y="60">C</text>
-    <text x="-6.443" y="60">Courtyard</text>
+  <g class="key" font-size="5" fill="#333333"><text x="-10.392" y="60">1</text>
+    <text x="-6.486" y="60">Courtyard</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="-12.303" y="68">H</text>
-    <text x="-6.39" y="68">Hall</text>
+  <g class="key" font-size="5" fill="#333333"><text x="-10.644" y="68">2</text>
+    <text x="-6.433" y="68">Hall</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="23.543" y="60">L</text>
-    <text x="28.338" y="60">Lodge</text>
+  <g class="key" font-size="5" fill="#333333"><text x="22.499" y="60">3</text>
+    <text x="26.716" y="60">Lodge</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="23.188" y="68">Y</text>
-    <text x="28.372" y="68">Yard</text>
+  <g class="key" font-size="5" fill="#333333"><text x="22.443" y="68">4</text>
+    <text x="26.75" y="68">Yard</text>
   </g>
 </svg>

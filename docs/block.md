@@ -30,7 +30,7 @@ doors remain at contacts between separate blocks or rooms.
 block <id> "<name>" [glyph="<glyph>"] [glyph=<member-id>] <member-id>...
 ```
 
-- **`<id>`**: the block's own ID, used for automatic
+- **`<id>`**: the block's own ID, used to break display-name ties in automatic
   [glyph assignment](room.md#glyphs). Same rules as a [room ID](room.md#room-id),
   in the same namespace (unique across all rooms and blocks).
 - **`"<name>"`**: labels the union in the key, with the same rules as a
@@ -51,11 +51,12 @@ block <id> "<name>" [glyph="<glyph>"] [glyph=<member-id>] <member-id>...
   floorplan; two adjacent rooms can share a block even if neither is anchored
   to the other.
 
-Automatic glyphs are assigned to blocks and rooms outside blocks together
-in alphabetical ID order, after reserving explicit glyphs. Assignment scans
-each ID's alphanumeric characters from left to right, uppercased, for an
-unused glyph before trying the fallback pool. A block's members inherit its
-glyph; their IDs do not compete for automatic glyphs.
+Automatic numerical glyphs are assigned to blocks and rooms outside blocks
+in one sequence, by case-insensitive display name with ID tie-breaking, after
+reserving explicit numerical glyphs. A block participates under its own name.
+Its members inherit its glyph, consume no numbers, and reserve no numbers from
+their suppressed explicit glyphs. See [room glyphs](room.md#glyphs) for ordering,
+custom labels, and empty names.
 
 ## Member rooms
 

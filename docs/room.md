@@ -146,16 +146,25 @@ is valid within a name, subject to the restrictions above.
 ### Glyphs
 
 Each room is labeled on the rendered map by a short **glyph**, which the key
-below the map maps back to the room's name. Automatic assignment considers
-rooms outside blocks and the [blocks](block.md) themselves together, in
-alphabetical [ID](#room-id) order, regardless of source order. Explicit
-glyphs reserve their values first. For each remaining entity, `porta` scans
-its ID from left to right for the first unused alphanumeric character,
-uppercased, skipping hyphens and underscores. Only if none is available
-does it use the first unused glyph from the fallback pool. For example,
-`hall` gets `A` if `H` is already reserved and `A` is free; digits in IDs
-are also candidates. Entities with `glyph=""` and rooms inside blocks do
-not receive their own automatic glyphs.
+below the map maps back to the room's name. Automatic labels are consecutive
+positive integers starting at `1`, skipping reserved numbers. Rooms outside
+blocks and the [blocks](block.md) themselves share one sequence across the
+whole map, including disconnected components and exterior rooms. Assignment
+sorts by display name using Unicode case folding (case-insensitive, with no
+locale-specific collation), then by ID for ties, regardless of declaration
+order. Empty names sort first. A block participates under its own name; its
+members inherit its glyph and consume no numbers.
+
+Explicit numerical glyphs reserve their values before any automatic assignment.
+A numerical glyph contains only ASCII digits `0`–`9`: `"01"` reserves `1` but
+is displayed verbatim; `"0"` reserves zero without changing the start at `1`.
+Unicode digits, signs, and mixed labels like `"12a"` are nonnumeric custom glyphs
+and reserve no numbers. Suppressed member glyphs reserve nothing.
+
+SVG keys and ASCII legends list numerical glyphs first, by numerical value.
+Equal values (such as explicit `"01"` and `"1"`) sort by verbatim glyph text.
+Nonnumeric glyphs follow in Unicode code-point order, case-sensitive; IDs break
+any remaining ties.
 
 An explicit glyph can be set instead with `glyph="..."`, placed after the
 dimensions:
@@ -169,9 +178,8 @@ room hall  "Hall"         60x20 down-of cells
 
 <img alt="Rooms with explicit numeric glyphs, an automatic glyph, and an unlabeled room" src="img/glyphs.svg" width="70%">
 
-This is chiefly useful for transcribing source material whose areas are
-already numbered: glyphs like `10` or `12a` can't be produced by automatic
-assignment. An explicit glyph must be:
+This is chiefly useful for transcribing source material with existing room
+numbers or custom labels such as `12a`. An explicit glyph must be:
 
 - 1-3 characters long;
 - Double-quoted;
@@ -183,15 +191,15 @@ plan's rooms and [blocks](block.md) — a duplicate raises an error. Rooms
 without an explicit glyph still receive automatic glyphs, which never collide
 with the explicit ones.
 
-Rooms and blocks share 36 automatic glyphs (`A`–`Z`, `0`–`9`), with explicit
-single-character glyphs reserving their entries. If these run out, SVG and
-ASCII rendering raise an error. To free entries, assign unique multi-character
-glyphs (such as `glyph="12"`) or suppress labels with `glyph=""`.
+Automatic numbering has no fixed capacity or three-character limit: after
+`999` comes `1000`. Labels shrink as needed to fit the room width. The
+three-character limit applies only to explicit glyphs. There is currently no
+setting to start automatic numbering above `1`.
 
 The empty glyph `glyph=""` marks the room as **unlabeled**: no glyph is
 drawn, and the room gets no key entry at all (`store` above). In the
 [debug-ascii grid](../README.md#the-porta-tool), an unlabeled room's cells
-render as `_`.
+render as `_`. Unlabeled entities consume no number.
 
 ### Dimensions
 

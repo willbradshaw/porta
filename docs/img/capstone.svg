@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1335" viewBox="-40 -10 110 133.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-40" y="-10" width="110" height="133.5" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1305.461" height="1175" viewBox="-50.273 -10 130.546 117.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-50.273" y="-10" width="130.546" height="117.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M-10 40h10v10h-10z M20 0h30v20h-30z M-30 0h30v40h-30z M0 0h20v40h-20z M20 20h30v20h-30z M50 0h10v40h-10z M20 40h10v10h-10z M0 40h20v10h-20z M30 40h15v10h-15z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="black" opacity="0.23" stroke-width="0.125">
     <line x1="-30" y1="0" x2="-30" y2="50" />
@@ -47,15 +47,15 @@
   <line class="wall exterior" x1="45" y1="40" x2="45" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="45" y1="40" x2="60" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="60" y1="0" x2="60" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="cloak" x="-5" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">C</text>
-  <text data-room="dining" x="35" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">D</text>
-  <text data-room="drawing" x="-15" y="20" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">R</text>
-  <text data-room="hall" x="10" y="20" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">H</text>
-  <text data-room="kitchen" x="35" y="30" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">K</text>
-  <text data-room="pantry" x="55" y="20" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">P</text>
-  <text data-room="passage" x="25" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">A</text>
-  <text data-room="porch" x="10" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">O</text>
-  <text data-room="scullery" x="37.5" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">S</text>
+  <text data-room="cloak" x="-5" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">1</text>
+  <text data-room="dining" x="35" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">2</text>
+  <text data-room="drawing" x="-15" y="20" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">3</text>
+  <text data-room="hall" x="10" y="20" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">4</text>
+  <text data-room="kitchen" x="35" y="30" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">5</text>
+  <text data-room="pantry" x="55" y="20" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">6</text>
+  <text data-room="passage" x="25" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">7</text>
+  <text data-room="porch" x="10" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">8</text>
+  <text data-room="scullery" x="37.5" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">9</text>
   <line class="door" x1="-10" y1="40" x2="-5" y2="40" stroke="black" stroke-width="1.5" />
   <line class="door" x1="0" y1="15" x2="0" y2="20" stroke="black" stroke-width="1.5" />
   <line class="door" x1="0" y1="40" x2="0" y2="45" stroke="black" stroke-width="1.5" />
@@ -75,32 +75,31 @@
     <rect x="5" y="60.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="15" y="60.5" width="10" height="1.5" fill="#e0e0e0" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="-18.388" y="80">A</text>
-    <text x="-12.748" y="80">Passage</text>
+  <g class="key" font-size="5" fill="#333333"><text x="-40.104" y="80">1</text>
+    <text x="-36.198" y="80">Cloakroom</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="-18.022" y="88">C</text>
-    <text x="-12.789" y="88">Cloakroom</text>
+  <g class="key" font-size="5" fill="#333333"><text x="-40.356" y="88">2</text>
+    <text x="-36.088" y="88">Dining Room</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="-18.278" y="96">D</text>
-    <text x="-12.679" y="96">Dining Room</text>
+  <g class="key" font-size="5" fill="#333333"><text x="-40.332" y="96">3</text>
+    <text x="-36.088" y="96">Drawing Room</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="-18.65" y="104">H</text>
-    <text x="-12.736" y="104">Hall</text>
+  <g class="key" font-size="5" fill="#333333"><text x="3.921" y="80">4</text>
+    <text x="8.164" y="80">Hall</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="-18.208" y="112">K</text>
-    <text x="-12.741" y="112">Kitchen</text>
+  <g class="key" font-size="5" fill="#333333"><text x="3.984" y="88">5</text>
+    <text x="8.159" y="88">Kitchen</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="23.178" y="80">O</text>
-    <text x="28.86" y="80">Porch</text>
+  <g class="key" font-size="5" fill="#333333"><text x="3.953" y="96">6</text>
+    <text x="8.152" y="96">Pantry</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="24.097" y="88">P</text>
-    <text x="28.86" y="88">Pantry</text>
+  <g class="key" font-size="5" fill="#333333"><text x="48.118" y="80">7</text>
+    <text x="52.461" y="80">Passage</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="23.677" y="96">R</text>
-    <text x="28.929" y="96">Drawing</text>
-    <text x="28.882" y="104">Room</text>
+  <g class="key" font-size="5" fill="#333333"><text x="48.279" y="88">8</text>
+    <text x="52.461" y="88">Porch</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="24.511" y="112">S</text>
-    <text x="28.855" y="112">Scullery</text>
+  <g class="key" font-size="5" fill="#333333"><text x="48.293" y="96">9</text>
+    <text x="52.456" y="96">Scullery</text>
   </g>
 </svg>

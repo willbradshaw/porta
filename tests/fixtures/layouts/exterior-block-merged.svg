@@ -21,8 +21,8 @@
     <line x1="0" y1="35" x2="40" y2="35" />
     <line x1="0" y1="40" x2="40" y2="40" />
   </g>
-  <text data-block="approach" x="10" y="30" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">A</text>
-  <text data-block="garden" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">G</text>
+  <text data-block="approach" x="10" y="30" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">1</text>
+  <text data-block="garden" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">2</text>
   <line class="divider" x1="0" y1="20" x2="20" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="20" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <g class="scale" font-size="5" fill="#333333">
@@ -33,10 +33,10 @@
     <rect x="10" y="50.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="20" y="50.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="6.072" y="70">A</text>
-    <text x="11.759" y="70">Approach</text>
+  <g class="key" font-size="5" fill="#333333"><text x="7.045" y="70">1</text>
+    <text x="11.04" y="70">Approach</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="6.184" y="78">G</text>
-    <text x="11.688" y="78">Garden</text>
+  <g class="key" font-size="5" fill="#333333"><text x="6.793" y="78">2</text>
+    <text x="10.969" y="78">Garden</text>
   </g>
 </svg>

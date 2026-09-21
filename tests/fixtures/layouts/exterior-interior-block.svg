@@ -30,9 +30,9 @@
   <line class="wall exterior" x1="15" y1="20" x2="30" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="30" y1="0" x2="30" y2="5" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="30" y1="15" x2="30" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="terrace" x="40" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">T</text>
-  <text data-room="yard" x="40" y="30" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">Y</text>
-  <text data-block="hall" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">H</text>
+  <text data-room="terrace" x="40" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">2</text>
+  <text data-room="yard" x="40" y="30" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">3</text>
+  <text data-block="hall" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">1</text>
   <line class="divider" x1="30" y1="20" x2="30" y2="40" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="30" y1="20" x2="50" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="open" x1="30" y1="5" x2="30" y2="15" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
@@ -44,13 +44,13 @@
     <rect x="15" y="50.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="25" y="50.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="14.027" y="70">H</text>
-    <text x="19.941" y="70">Hall</text>
+  <g class="key" font-size="5" fill="#333333"><text x="15.149" y="70">1</text>
+    <text x="19.109" y="70">Hall</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="15.1" y="78">T</text>
-    <text x="19.956" y="78">Terrace</text>
+  <g class="key" font-size="5" fill="#333333"><text x="14.897" y="78">2</text>
+    <text x="19.124" y="78">Terrace</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="14.821" y="86">Y</text>
-    <text x="20.005" y="86">Yard</text>
+  <g class="key" font-size="5" fill="#333333"><text x="14.921" y="86">3</text>
+    <text x="19.173" y="86">Yard</text>
   </g>
 </svg>

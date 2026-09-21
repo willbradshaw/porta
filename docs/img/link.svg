@@ -42,10 +42,10 @@
   <line class="wall exterior" x1="30" y1="70" x2="40" y2="70" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="40" y1="0" x2="40" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="40" y1="50" x2="40" y2="70" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="cache" x="35" y="60" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">C</text>
-  <text data-room="north-gate" x="20" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">N</text>
-  <text data-room="north-hall" x="15" y="35" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">O</text>
-  <text data-room="south-vault" x="15" y="65" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">S</text>
+  <text data-room="cache" x="35" y="60" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">1</text>
+  <text data-room="north-gate" x="20" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">2</text>
+  <text data-room="north-hall" x="15" y="35" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">3</text>
+  <text data-room="south-vault" x="15" y="65" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">4</text>
   <line class="door" x1="10" y1="20" x2="15" y2="20" stroke="black" stroke-width="1.5" />
   <line class="door" x1="10" y1="50" x2="15" y2="50" stroke="black" stroke-width="1.5" />
   <line class="door" x1="30" y1="55" x2="30" y2="60" stroke="black" stroke-width="1.5" />
@@ -57,16 +57,16 @@
     <rect x="10" y="90.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="20" y="90.5" width="10" height="1.5" fill="#e0e0e0" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="4.662" y="110">C</text>
-    <text x="9.895" y="110">Cache</text>
+  <g class="key" font-size="5" fill="#333333"><text x="5.221" y="110">1</text>
+    <text x="9.128" y="110">Cache</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="4.081" y="118">N</text>
-    <text x="9.948" y="118">North Gate</text>
+  <g class="key" font-size="5" fill="#333333"><text x="4.97" y="118">2</text>
+    <text x="9.181" y="118">North Gate</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="4.254" y="126">O</text>
-    <text x="9.948" y="126">North Hall</text>
+  <g class="key" font-size="5" fill="#333333"><text x="4.994" y="126">3</text>
+    <text x="9.181" y="126">North Hall</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="5.587" y="134">S</text>
-    <text x="9.931" y="134">South Vault</text>
+  <g class="key" font-size="5" fill="#333333"><text x="4.938" y="134">4</text>
+    <text x="9.164" y="134">South Vault</text>
   </g>
 </svg>

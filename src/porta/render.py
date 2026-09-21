@@ -10,6 +10,7 @@ from itertools import pairwise
 from unicodedata import category, east_asian_width
 from xml.sax.saxutils import escape
 
+from porta.errors import RenderError
 from porta.key_layout import choose_layout
 from porta.layout import (
     Rect,
@@ -22,7 +23,7 @@ from porta.layout import (
     wall_segments,
     window_segments,
 )
-from porta.model import Axis, Block, Building, Direction, Room, Stairs
+from porta.model import MAX_GLYPH_LENGTH, Axis, Block, Building, Direction, Room, Stairs
 from porta.style import DEFAULT_STYLE, Style
 from porta.text_metrics import TextMetrics, text_bounds
 
@@ -51,6 +52,7 @@ def render_ascii(building: Building) -> str:
 
     Raises:
         ValueError: If any room has not been placed.
+        RenderError: If automatic numbers exceed the glyph length limit.
     """
     placed = _placed_rooms(building)
     glyphs = _assign_glyphs(building)
@@ -103,6 +105,7 @@ def render_svg(
 
     Raises:
         ValueError: If any room has not been placed.
+        RenderError: If automatic numbers exceed the glyph length limit.
     """
     style = DEFAULT_STYLE if style is None else style
     background = style["page"]["background"] if background is None else background
@@ -681,6 +684,13 @@ def _assign_glyphs(building: Building) -> dict[str, str]:
             continue
         while next_number in used:
             next_number += 1
+        if next_number >= 10**MAX_GLYPH_LENGTH:
+            raise RenderError(
+                f"automatic numbers exhausted for {entity.id!r}: "
+                f"all glyphs are limited to {MAX_GLYPH_LENGTH} characters; "
+                'use nonnumeric custom glyphs or glyph="" to free numbers',
+                line=entity.line,
+            )
         glyphs[entity.id] = str(next_number)
         next_number += 1
     for member, block_id in member_block.items():

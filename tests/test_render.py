@@ -13,6 +13,7 @@ from pathlib import Path
 
 import pytest
 
+from porta.errors import RenderError
 from porta.layout import block_wall_segments, solve
 from porta.parser import parse
 from porta.render import render_ascii, render_svg
@@ -516,8 +517,8 @@ def test_block_cells_carry_the_block_glyph_in_ascii() -> None:
 
 
 @pytest.mark.parametrize("renderer", [ascii_of, svg_of], ids=["ascii", "svg"])
-@pytest.mark.parametrize("count", [37, 1000], ids=["past-old-pool", "four-digits"])
-def test_automatic_numbering_has_no_fixed_capacity(
+@pytest.mark.parametrize("count", [37, 999], ids=["past-old-pool", "three-digit-limit"])
+def test_automatic_numbering_within_glyph_length_limit(
     renderer: Callable[[str], str], count: int
 ) -> None:
     # Construct a placed row directly so this tests rendering, not solver scaling.
@@ -538,6 +539,37 @@ def test_automatic_numbering_has_no_fixed_capacity(
             "  ".join(span.text or "" for span in group)
             for group in root.findall('.//{*}g[@class="key"]')
         ] == [f"{i + 1}  {i:04}" for i in range(count)]
+
+
+@pytest.mark.parametrize("renderer", [render_ascii, render_svg], ids=["ascii", "svg"])
+@pytest.mark.parametrize(
+    ("count", "explicit", "exhausted"),
+    [
+        pytest.param(1000, None, True, id="four-digits"),
+        pytest.param(999, "999", True, id="last-number-reserved"),
+        pytest.param(998, "999", False, id="last-number-reserved-at-capacity"),
+        pytest.param(999, "A", False, id="custom-glyph-frees-number"),
+        pytest.param(999, "", False, id="hidden-glyph-frees-number"),
+    ],
+)
+def test_automatic_number_exhaustion(
+    renderer: Callable[..., str], count: int, explicit: str | None, exhausted: bool
+) -> None:
+    rows = [f'room r{i:04} "{i:04}" 5x5 root' for i in range(count)]
+    if explicit is not None:
+        rows.append(f'room fixed "Last" 5x5 root glyph="{explicit}"')
+    building = parse("\n".join(rows))
+    for i, room in enumerate(building.rooms):
+        room.x, room.y = i * 5, 0
+    if exhausted:
+        with pytest.raises(RenderError, match="automatic numbers exhausted") as exc:
+            renderer(building)
+        assert exc.value.line == count
+        assert f"'r{count - 1:04}'" in exc.value.message
+        assert "3 characters" in exc.value.message
+        assert 'nonnumeric custom glyphs or glyph=""' in exc.value.message
+    else:
+        assert renderer(building)
 
 
 @pytest.mark.parametrize(

@@ -12,6 +12,8 @@ are just a parser-side keyword mapping with no change to the model.
 from dataclasses import dataclass, field
 from enum import Enum
 
+MAX_GLYPH_LENGTH = 3
+
 
 class Axis(Enum):
     """The two in-plane axes a relation can pin."""

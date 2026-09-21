@@ -206,10 +206,11 @@ plan's rooms and [blocks](block.md) — a duplicate raises an error. Rooms
 without an explicit glyph still receive automatic glyphs, which never collide
 with the explicit ones.
 
-Automatic numbering has no fixed capacity or three-character limit: after
-`999` comes `1000`. Labels shrink as needed to fit the room width. The
-three-character limit applies only to explicit glyphs. There is currently no
-setting to start automatic numbering above `1`.
+All glyphs are limited to three characters, so automatic numbers range from
+`1` to `999`, skipping reserved values. If these run out, rendering reports an
+error; assign nonnumeric custom glyphs or use `glyph=""` to free numbers.
+Labels shrink as needed to fit the room width. There is currently no setting
+to start automatic numbering above `1`.
 
 The empty glyph `glyph=""` marks the room as **unlabeled**: no glyph is
 drawn, and the room gets no key entry at all (`store` above). In the

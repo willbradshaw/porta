@@ -25,6 +25,7 @@ from typing import NamedTuple
 
 from porta.errors import ParseError
 from porta.model import (
+    MAX_GLYPH_LENGTH,
     Align,
     Block,
     Building,
@@ -83,7 +84,6 @@ _DIM_RE = re.compile(r"(\?|[0-9]+)x(\?|[0-9]+)\Z")
 _GRID_FT = 5
 _DEFAULT_DOOR_FT = 5
 _MAX_NAME = 40  # room name length cap (the name drives the rendered key's width)
-_MAX_GLYPH = 3  # display glyph length cap (fits multi-digit room numbers)
 _MODIFIERS = ("shift=", "align=", "door", "no-door")  # relation-modifier prefixes
 _KEYWORDS: dict[str, Direction] = {
     direction.value: direction for direction in Direction
@@ -267,9 +267,10 @@ def _parse_glyph(tokens: list[Token], i: int) -> str:
     value = tokens[i + 1].value
     if value == "":
         return value  # empty quotes: explicitly unlabeled
-    if len(value) > _MAX_GLYPH:
+    if len(value) > MAX_GLYPH_LENGTH:
         raise ParseError(
-            f"glyph must be 1-{_MAX_GLYPH} characters, got {len(value)}", line=lineno
+            f"glyph must be 1-{MAX_GLYPH_LENGTH} characters, got {len(value)}",
+            line=lineno,
         )
     if any(char.isspace() for char in value):
         raise ParseError("glyph cannot contain whitespace", line=lineno)

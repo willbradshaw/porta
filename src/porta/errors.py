@@ -28,6 +28,10 @@ class ParseError(PortaError):
     """A syntax error in ``.porta`` source (wrong shape, bad token, bad value)."""
 
 
+class RenderError(PortaError):
+    """A map cannot be rendered within the display constraints."""
+
+
 class LayoutError(PortaError):
     """A semantic error found while resolving placement.
 

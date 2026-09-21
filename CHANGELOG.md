@@ -5,7 +5,8 @@ Notable changes per release, newest first.
 ## Unreleased
 
 - Number rooms and blocks by case-insensitive display name across the whole map,
-  skipping explicit numerical glyphs and removing the automatic 36-label limit.
+  skipping explicit numerical glyphs and expanding automatic labels to `1`–`999`
+  under the shared three-character glyph limit.
   Sort SVG keys and ASCII legends numerically, followed by custom glyphs;
   document ordering, leading zeros, suppressed labels, and large numbers,
   with a rendered example showing explicit number reservation and skipping.

@@ -1,0 +1,18 @@
+# Medium house with varied names
+# 16 entries; long names, Unicode, an unbroken token, and mixed-width glyphs.
+room r0 "Entrance Hall" 25x20 root glyph="1"
+room r1 "Great Hall" 25x20 right-of r0 glyph="2"
+room r2 "Northern observation gallery" 25x20 right-of r1 glyph="3"
+room r3 "Kitchen" 25x20 right-of r2 glyph="4"
+room r4 "Pantry" 25x20 down-of r0 glyph="5"
+room r5 "Servants quarters" 25x20 right-of r4 glyph="6"
+room r6 "Library" 25x20 right-of r5 glyph="7"
+room r7 "Chapel" 25x20 right-of r6 glyph="8"
+room r8 "Upper guest chamber" 25x20 down-of r4 glyph="9"
+room r9 "Lower guest chamber" 25x20 right-of r8 glyph="10"
+room r10 "Élodie’s library & archive" 25x20 right-of r9 glyph="11"
+room r11 "Winter garden" 25x20 right-of r10 glyph="12"
+room r12 "Treasury" 25x20 down-of r8 glyph="13"
+room r13 "SupercalifragilisticexpialidociousVault" 25x20 right-of r12 glyph="99"
+room r14 "Guardroom" 25x20 right-of r13 glyph="100"
+room r15 "Store" 25x20 right-of r14 glyph="Ab"

@@ -4,6 +4,15 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Refine default SVGs with normal-weight Palatino/Georgia/Times typography,
+  room-proportional labels, and a quieter grid clipped to room footprints.
+  Retain symbol weights, black text, the original scale caption, and 10-ft margins.
+- Set key and scale type to 5 ft, align key glyphs and names separately, and
+  choose equal-width key columns and wrapping with a scored layout: height
+  coefficient 0.7, internal-word break penalty 0.5, and inter-word penalty 0.1.
+  Use portable Palatino metrics without adding runtime dependencies or fonts.
+  Include six fixed review maps, before/after previews, and regenerated references.
+
 ## 1.7.0 (2026-09-20)
 
 - Add standalone `window` statements between rooms or to the outside, rendered

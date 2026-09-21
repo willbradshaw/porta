@@ -195,7 +195,9 @@ def test_grid_has_a_line_every_five_feet_across_the_plan() -> None:
 
 
 def test_scale_caption_states_the_grid_size() -> None:
-    texts = " ".join(t.text or "" for t in ET.fromstring(svg_of(TWO)).iter(tag("text")))
+    texts = " ".join(
+        " ".join(t.itertext()) for t in ET.fromstring(svg_of(TWO)).iter(tag("text"))
+    )
     assert "5 ft" in texts
 
 
@@ -233,14 +235,15 @@ def test_each_room_is_lettered_at_its_centre(
 
 def test_svg_key_lists_each_room_name() -> None:
     root = ET.fromstring(svg_of(DESIGN_MANOR))
-    key_text = " ".join(t.text or "" for t in root.iter(tag("text")))
+    key_text = " ".join(" ".join(t.itertext()) for t in root.iter(tag("text")))
     for name in ("Entrance Hall", "Kitchen", "Great Hall"):
         assert name in key_text
 
 
 def test_key_shows_names_not_dimensions() -> None:
     key_text = " ".join(
-        t.text or "" for t in ET.fromstring(svg_of(DESIGN_MANOR)).iter(tag("text"))
+        " ".join(t.itertext())
+        for t in ET.fromstring(svg_of(DESIGN_MANOR)).iter(tag("text"))
     )
     assert "Entrance Hall" in key_text  # names are shown
     assert "ft)" not in key_text  # per-room dimensions are not
@@ -248,21 +251,27 @@ def test_key_shows_names_not_dimensions() -> None:
 
 def test_unnamed_room_keys_as_just_its_glyph() -> None:
     root = ET.fromstring(svg_of('room a "" 20x30 root'))
-    key_lines = [t.text for t in root.iter(tag("text")) if t.get("class") == "key"]
+    key_lines = [
+        "  ".join(span.text or "" for span in t)
+        for t in root.iter(tag("g"))
+        if t.get("class") == "key"
+    ]
     assert key_lines == ["A"]  # glyph only: no name, no dimensions
 
 
 def test_special_characters_in_names_are_escaped() -> None:
     # Raw & or < would make the document malformed; fromstring proves escaping.
     root = ET.fromstring(svg_of('room a "Hall & Co <X>" 20x20 root'))
-    texts = [t.text for t in root.iter(tag("text"))]
-    assert any(t is not None and "Hall & Co <X>" in t for t in texts)
+    key = root.find('.//{*}g[@class="key"]')
+    assert key is not None
+    assert " ".join(t.text or "" for t in list(key)[1:]) == "Hall & Co <X>"
 
 
 def test_door_renders_as_a_door_line() -> None:
     root = ET.fromstring(svg_of('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door'))
     door_lines = [ln for ln in root.iter(tag("line")) if ln.get("class") == "door"]
     assert len(door_lines) == 1
+    assert door_lines[0].attrib["stroke-width"] == "1.5"
     got = tuple(float(door_lines[0].get(k, "")) for k in ("x1", "y1", "x2", "y2"))
     assert got == (0.0, 0.0, 5.0, 0.0)
 
@@ -336,7 +345,11 @@ def test_open_rooms_keep_their_glyphs_and_key_entries() -> None:
     root = ET.fromstring(svg_of(OPEN_TWO))
     assert text_by_room(root, "a").text == "A"
     assert text_by_room(root, "b").text == "B"
-    key_lines = [t.text for t in root.iter(tag("text")) if t.get("class") == "key"]
+    key_lines = [
+        "  ".join(span.text or "" for span in t)
+        for t in root.iter(tag("g"))
+        if t.get("class") == "key"
+    ]
     assert key_lines == ["A  A", "B  Bee"]
 
 
@@ -413,6 +426,12 @@ def test_secret_door_renders_as_a_door_mark_plus_an_s() -> None:
     # The mark shows the door's size and position; the S says it's secret.
     root = ET.fromstring(svg_of(SECRET_TWO))
     assert secret_marks(root) == [(20.0, 5.0, 20.0, 15.0)]
+    mark = root.find('.//{*}line[@class="secret"]')
+    marker = root.find('.//{*}text[@class="secret"]')
+    assert mark is not None
+    assert marker is not None
+    assert mark.attrib["stroke-width"] == "1.5"
+    assert marker.attrib["font-size"] == "5"
     assert secret_markers(root) == [(20.0, 10.0, "S")]  # midpoint of y[5,15]
     assert [ln for ln in root.iter(tag("line")) if ln.get("class") == "door"] == []
 
@@ -475,7 +494,7 @@ def test_block_outline_drops_the_internal_wall() -> None:
 def test_block_legend_and_key_use_the_block_not_its_members() -> None:
     assert ascii_of(L_BLOCK).split("\n\n")[1] == "H=hall"
     root = ET.fromstring(svg_of(L_BLOCK))
-    key_text = " ".join(t.text or "" for t in root.iter(tag("text")))
+    key_text = " ".join(" ".join(t.itertext()) for t in root.iter(tag("text")))
     assert "Great Hall" in key_text
 
 
@@ -586,7 +605,11 @@ def test_automatic_glyphs_avoid_explicit_ones() -> None:
 def test_explicit_glyph_is_rendered_in_the_svg_room_and_key() -> None:
     root = ET.fromstring(svg_of(GLYPHS))
     assert text_by_room(root, "cells").text == "12"
-    key_lines = [t.text for t in root.iter(tag("text")) if t.get("class") == "key"]
+    key_lines = [
+        "  ".join(span.text or "" for span in t)
+        for t in root.iter(tag("g"))
+        if t.get("class") == "key"
+    ]
     assert key_lines == ["1  Guard Post", "H  Hall", "12  Prison Cells"]
 
 
@@ -600,8 +623,9 @@ def test_unlabeled_room_keeps_its_walls_but_has_no_svg_label() -> None:
 @pytest.mark.parametrize(
     ("glyph", "expected_font"),
     [
-        ("9", 6.0),  # single char: the usual 0.6 x shorter side
-        ("123", 5.0),  # three chars overflow a 10-ft-wide room: shrink to fit
+        ("9", 6.0),  # single character: 60% of the shorter dimension
+        ("123", 4.286),  # shrink wide labels to fit the room
+        ("WWW", 3.0),  # wide custom labels shrink to fit
     ],
 )
 def test_svg_glyph_font_shrinks_to_fit_the_room_width(
@@ -948,3 +972,119 @@ def test_windows_on_coloured_background_golden() -> None:
     source = Path("tests/fixtures/layouts/windows.porta").read_text()
     expected = Path("tests/fixtures/windows-background.svg").read_text()
     assert render_svg(solve(parse(source)), background="#e0e0e0") == expected
+
+
+@pytest.mark.parametrize(
+    "glyph", ["1", "7", "0", "10", "99", "100", "WWW", "庭", "\u0301"]
+)
+@pytest.mark.parametrize("size", [5, 10, 100], ids=["tiny", "small", "large"])
+def test_default_labels_are_proportional_and_fit(glyph: str, size: int) -> None:
+    from porta.render import _text_width
+
+    root = ET.fromstring(svg_of(f'room a "" {size}x{size} root glyph="{glyph}"'))
+    label = text_by_room(root, "a")
+    font = float(label.attrib["font-size"])
+    assert font <= size * 0.6
+    if glyph in ("1", "7", "0"):
+        assert font == size * 0.6
+    assert font * _text_width(glyph) <= size * 0.9 + 0.002
+    assert root.attrib["font-family"] == "Palatino, Georgia, Times New Roman, serif"
+    assert root.attrib["font-weight"] == "400"
+    assert all(node.get("font-weight", "400") == "400" for node in root.iter())
+    assert "paint-order" not in label.attrib
+    assert "stroke" not in label.attrib
+
+
+@pytest.mark.parametrize(
+    ("source", "expected"),
+    [
+        (
+            'room a "" 10x10 root\nroom b "" 10x10 root',
+            "M0 0h10v10h-10z M20 0h10v10h-10z",
+        ),
+        (
+            'room a "" 20x10 root\nroom b "" 10x10 down-of a',
+            "M0 0h20v10h-20z M0 10h10v10h-10z",
+        ),
+        ('room a "" 10x10 exterior root', "M0 0h10v10h-10z"),
+    ],
+    ids=["component-gutter", "courtyard-void", "declared-outdoors"],
+)
+def test_grid_is_clipped_to_exact_room_union(source: str, expected: str) -> None:
+    root = ET.fromstring(svg_of(source))
+    grid = root.find('.//{*}g[@class="grid"]')
+    clip = root.find('.//{*}clipPath[@id="plan-grid"]/{*}path')
+    assert grid is not None
+    assert clip is not None
+    assert grid.attrib["clip-path"] == "url(#plan-grid)"
+    assert clip.attrib["d"] == expected
+    assert grid.attrib["stroke-width"] == "0.125"
+    assert grid.attrib["stroke"] == "#c4c4c4"
+
+
+@pytest.mark.parametrize(
+    ("count", "width"),
+    [(0, 20), (1, 5), (10, 150), (11, 150), (42, 150), (42, 20)],
+    ids=["empty", "tiny", "short", "medium", "large", "narrow"],
+)
+def test_key_columns_preserve_order_and_readable_size(count: int, width: int) -> None:
+    from porta.render import _key_layout
+
+    entries = [(str(i), f"Room {i}") for i in range(count)]
+    layout = _key_layout(entries, width)
+    assert [e.glyph for e in layout.entries] == [e[0] for e in entries]
+    assert len({e.x for e in layout.entries}) <= count
+    for entry in layout.entries:
+        assert 0 < entry.y < layout.height
+        assert 0 < entry.x <= layout.width
+
+
+@pytest.mark.parametrize(
+    "name",
+    ["Élodie\u2019s bibliothèque — northern archive", "W" * 40, "庭園" * 20],
+    ids=["word-boundaries", "unbroken-token", "wide-unicode"],
+)
+def test_wrapped_key_names_keep_hanging_alignment_and_space(name: str) -> None:
+    from porta.render import _KEY_FONT_FT
+    from porta.text_metrics import text_bounds
+
+    source = f'room a "{name}" 20x20 root glyph="100"\nroom b "Next" 20x20 down-of a'
+    root = ET.fromstring(svg_of(source))
+    keys = root.findall('.//{*}g[@class="key"]')
+    wrapped = next(key for key in keys if key[0].text == "100")
+    rows = list(wrapped)[1:]
+    assert len(rows) > 1
+    assert "".join(row.text or "" for row in rows).replace(" ", "") == name.replace(
+        " ", ""
+    )
+    positions = [float(row.attrib["x"]) + text_bounds(row.text or "").x for row in rows]
+    assert max(positions) - min(positions) < 0.002
+    _, top, _, height = map(float, root.attrib["viewBox"].split())
+    assert float(rows[-1].attrib["y"]) + _KEY_FONT_FT < top + height
+
+
+def test_wrapped_entries_reserve_height_and_reduce_columns() -> None:
+    from porta.render import _key_layout
+
+    entries = [(str(i), "W" * 40) for i in range(42)]
+    layout = _key_layout(entries, 140)
+    assert len({entry.x for entry in layout.entries}) == 2
+    for previous, current in zip(layout.entries, layout.entries[1:], strict=False):
+        if previous.x == current.x:
+            assert current.y - previous.y >= len(previous.names) * 4
+
+
+def test_original_scale_caption_survives_no_key() -> None:
+    root = ET.fromstring(svg_of('room a "" 10x10 root glyph=""'))
+    assert root.findall('.//{*}g[@class="key"]') == []
+    scale = root.find('.//{*}g[@class="scale"]')
+    assert scale is not None
+    assert [mark.text for mark in scale.iter(tag("text"))] == ["1 square = 5 ft"]
+    assert scale.find(tag("path")) is None
+
+
+def test_key_and_scale_share_five_foot_type() -> None:
+    root = ET.fromstring(svg_of(TWO))
+    groups = [g for g in root.iter(tag("g")) if g.get("class") in ("key", "scale")]
+    assert groups
+    assert all(g.attrib["font-size"] == "5" for g in groups)

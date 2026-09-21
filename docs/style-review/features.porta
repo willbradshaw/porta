@@ -1,0 +1,16 @@
+room hall "Entrance & reception" 30x30 root glyph="1"
+room wing "" 15x15 left-of hall no-door
+block great "Great Hall — upper and lower levels" hall wing glyph="10"
+divider hall wing
+stairs up hall down=right at=10,10
+room study "Élodie's study" 20x30 right-of hall door=10 secret glyph="99"
+room passage "Narrow corridor" 5x30 right-of study door open glyph="100"
+room court "Courtyard" 30x15 exterior down-of hall door=? open glyph="0"
+room garden "Jardin / 庭園" 20x15 exterior right-of court glyph="7"
+window hall outside up
+window study outside up
+window study garden
+door@20 hall outside up
+room store "Store" 5x5 root glyph="W"
+stairs down study down=down at=10,5
+stairs in garden down=left at=5,5

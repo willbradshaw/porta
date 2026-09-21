@@ -67,7 +67,8 @@ Once a valid floorplan has been written, `porta draw` converts it into an
 SVG map in a two-step process. First, the dependency graph is traversed
 and the relations in the floorplan are converted into a coordinate system.
 Second, that coordinate system is used to deterministically generate an
-SVG file.
+SVG file. The [default visual treatment](docs/svg-style.md) uses a quiet grid,
+portable serif typography and a room key that balances columns and wrapping.
 
 ```sh
 porta draw plan.porta -o plan.svg

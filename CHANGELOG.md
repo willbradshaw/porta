@@ -7,6 +7,8 @@ Notable changes per release, newest first.
 - Refine default SVGs with normal-weight Palatino/Georgia/Times typography,
   room-proportional labels, and a quieter grid clipped to room footprints.
   Retain symbol weights, black text, the original scale caption, and 10-ft margins.
+  Use 12-ft spacing from the map edge to the scale baseline and from the scale
+  baseline to the first key baseline.
 - Set key and scale type to 5 ft, align key glyphs and names separately, and
   choose equal-width key columns and wrapping with a scored layout: height
   coefficient 0.7, internal-word break penalty 0.5, and inter-word penalty 0.1.

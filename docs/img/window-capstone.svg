@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1345" viewBox="-40 -10 110 134.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-40" y="-10" width="110" height="134.5" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1275" viewBox="-40 -10 110 127.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-40" y="-10" width="110" height="127.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M-10 40h10v10h-10z M20 0h30v20h-30z M-30 0h30v40h-30z M0 0h20v40h-20z M20 20h30v20h-30z M50 0h10v40h-10z M20 40h10v10h-10z M0 40h20v10h-20z M30 40h15v10h-15z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="-30" y1="0" x2="-30" y2="50" />
@@ -128,33 +128,33 @@
   <line class="door" x1="50" y1="5" x2="50" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="50" y1="25" x2="50" y2="30" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="-0.652" y="65">1 square = 5 ft</text>
+    <text x="-0.652" y="62">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="-27.746" y="81">A</text>
-    <text x="-22.107" y="81">Passage</text>
+  <g class="key" font-size="5"><text x="-27.746" y="74">A</text>
+    <text x="-22.107" y="74">Passage</text>
   </g>
-  <g class="key" font-size="5"><text x="-27.38" y="89">C</text>
-    <text x="-22.148" y="89">Cloakroom</text>
+  <g class="key" font-size="5"><text x="-27.38" y="82">C</text>
+    <text x="-22.148" y="82">Cloakroom</text>
   </g>
-  <g class="key" font-size="5"><text x="-27.637" y="97">D</text>
-    <text x="-22.038" y="97">Dining Room</text>
+  <g class="key" font-size="5"><text x="-27.637" y="90">D</text>
+    <text x="-22.038" y="90">Dining Room</text>
   </g>
-  <g class="key" font-size="5"><text x="-28.008" y="105">H</text>
-    <text x="-22.095" y="105">Hall</text>
+  <g class="key" font-size="5"><text x="-28.008" y="98">H</text>
+    <text x="-22.095" y="98">Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="-27.567" y="113">K</text>
-    <text x="-22.1" y="113">Kitchen</text>
+  <g class="key" font-size="5"><text x="-27.567" y="106">K</text>
+    <text x="-22.1" y="106">Kitchen</text>
   </g>
-  <g class="key" font-size="5"><text x="18.1" y="81">O</text>
-    <text x="23.782" y="81">Porch</text>
+  <g class="key" font-size="5"><text x="18.1" y="74">O</text>
+    <text x="23.782" y="74">Porch</text>
   </g>
-  <g class="key" font-size="5"><text x="19.018" y="89">P</text>
-    <text x="23.782" y="89">Pantry</text>
+  <g class="key" font-size="5"><text x="19.018" y="82">P</text>
+    <text x="23.782" y="82">Pantry</text>
   </g>
-  <g class="key" font-size="5"><text x="18.598" y="97">R</text>
-    <text x="23.851" y="97">Drawing Room</text>
+  <g class="key" font-size="5"><text x="18.598" y="90">R</text>
+    <text x="23.851" y="90">Drawing Room</text>
   </g>
-  <g class="key" font-size="5"><text x="19.433" y="105">S</text>
-    <text x="23.777" y="105">Scullery</text>
+  <g class="key" font-size="5"><text x="19.433" y="98">S</text>
+    <text x="23.777" y="98">Scullery</text>
   </g>
 </svg>

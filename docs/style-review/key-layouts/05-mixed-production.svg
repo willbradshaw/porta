@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2093.366" height="1885" viewBox="-54.668 -10 209.337 188.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-54.668" y="-10" width="209.337" height="188.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="2093.366" height="1815" viewBox="-54.668 -10 209.337 181.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-54.668" y="-10" width="209.337" height="181.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h25v20h-25z M25 0h25v20h-25z M50 40h25v20h-25z M75 40h25v20h-25z M0 60h25v20h-25z M25 60h25v20h-25z M50 60h25v20h-25z M75 60h25v20h-25z M50 0h25v20h-25z M75 0h25v20h-25z M0 20h25v20h-25z M25 20h25v20h-25z M50 20h25v20h-25z M75 20h25v20h-25z M0 40h25v20h-25z M25 40h25v20h-25z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="80" />
@@ -83,54 +83,54 @@
   <line class="door" x1="75" y1="45" x2="75" y2="50" stroke="black" stroke-width="1.5" />
   <line class="door" x1="75" y1="65" x2="75" y2="70" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="34.348" y="95">1 square = 5 ft</text>
+    <text x="34.348" y="92">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="-44.414" y="111">1</text>
-    <text x="-40.456" y="111">Entrance Hall</text>
+  <g class="key" font-size="5"><text x="-44.414" y="104">1</text>
+    <text x="-40.456" y="104">Entrance Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="-44.666" y="119">2</text>
-    <text x="-40.49" y="119">Great Hall</text>
+  <g class="key" font-size="5"><text x="-44.666" y="112">2</text>
+    <text x="-40.49" y="112">Great Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="-44.641" y="127">3</text>
-    <text x="-40.454" y="127">Northern observation gallery</text>
+  <g class="key" font-size="5"><text x="-44.641" y="120">3</text>
+    <text x="-40.454" y="120">Northern observation gallery</text>
   </g>
-  <g class="key" font-size="5"><text x="-44.697" y="135">4</text>
-    <text x="-40.459" y="135">Kitchen</text>
+  <g class="key" font-size="5"><text x="-44.697" y="128">4</text>
+    <text x="-40.459" y="128">Kitchen</text>
   </g>
-  <g class="key" font-size="5"><text x="-44.634" y="143">5</text>
-    <text x="-40.466" y="143">Pantry</text>
+  <g class="key" font-size="5"><text x="-44.634" y="136">5</text>
+    <text x="-40.466" y="136">Pantry</text>
   </g>
-  <g class="key" font-size="5"><text x="-44.666" y="151">6</text>
-    <text x="-40.471" y="151">Servants quarters</text>
+  <g class="key" font-size="5"><text x="-44.666" y="144">6</text>
+    <text x="-40.471" y="144">Servants quarters</text>
   </g>
-  <g class="key" font-size="5"><text x="-44.809" y="159">7</text>
-    <text x="-40.424" y="159">Library</text>
+  <g class="key" font-size="5"><text x="-44.809" y="152">7</text>
+    <text x="-40.424" y="152">Library</text>
   </g>
-  <g class="key" font-size="5"><text x="-44.649" y="167">8</text>
-    <text x="-40.507" y="167">Chapel</text>
+  <g class="key" font-size="5"><text x="-44.649" y="160">8</text>
+    <text x="-40.507" y="160">Chapel</text>
   </g>
-  <g class="key" font-size="5"><text x="55.373" y="111">9</text>
-    <text x="59.6" y="111">Upper guest chamber</text>
+  <g class="key" font-size="5"><text x="55.373" y="104">9</text>
+    <text x="59.6" y="104">Upper guest chamber</text>
   </g>
-  <g class="key" font-size="5"><text x="52.855" y="119">10</text>
-    <text x="59.583" y="119">Lower guest chamber</text>
+  <g class="key" font-size="5"><text x="52.855" y="112">10</text>
+    <text x="59.583" y="112">Lower guest chamber</text>
   </g>
-  <g class="key" font-size="5"><text x="53.367" y="127">11</text>
-    <text x="59.551" y="127">Élodie’s library &amp; archive</text>
+  <g class="key" font-size="5"><text x="53.367" y="120">11</text>
+    <text x="59.551" y="120">Élodie’s library &amp; archive</text>
   </g>
-  <g class="key" font-size="5"><text x="52.842" y="135">12</text>
-    <text x="59.617" y="135">Winter garden</text>
+  <g class="key" font-size="5"><text x="52.842" y="128">12</text>
+    <text x="59.617" y="128">Winter garden</text>
   </g>
-  <g class="key" font-size="5"><text x="52.867" y="143">13</text>
-    <text x="59.568" y="143">Treasury</text>
+  <g class="key" font-size="5"><text x="52.867" y="136">13</text>
+    <text x="59.568" y="136">Treasury</text>
   </g>
-  <g class="key" font-size="5"><text x="52.874" y="151">99</text>
-    <text x="59.536" y="151">SupercalifragilisticexpialidociousVault</text>
+  <g class="key" font-size="5"><text x="52.874" y="144">99</text>
+    <text x="59.536" y="144">SupercalifragilisticexpialidociousVault</text>
   </g>
-  <g class="key" font-size="5"><text x="51.231" y="159">Ab</text>
-    <text x="59.536" y="159">Store</text>
+  <g class="key" font-size="5"><text x="51.231" y="152">Ab</text>
+    <text x="59.536" y="152">Store</text>
   </g>
-  <g class="key" font-size="5"><text x="50.356" y="167">100</text>
-    <text x="59.517" y="167">Guardroom</text>
+  <g class="key" font-size="5"><text x="50.356" y="160">100</text>
+    <text x="59.517" y="160">Guardroom</text>
   </g>
 </svg>

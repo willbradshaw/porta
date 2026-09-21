@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="2285" viewBox="-15.347 -10 50.695 228.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-15.347" y="-10" width="50.695" height="228.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="2215" viewBox="-15.347 -10 50.695 221.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-15.347" y="-10" width="50.695" height="221.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h20v15h-20z M0 15h20v15h-20z M0 30h20v15h-20z M0 45h20v15h-20z M0 60h20v15h-20z M0 75h20v15h-20z M0 90h20v15h-20z M0 105h20v15h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="120" />
@@ -60,30 +60,30 @@
   <line class="door" x1="5" y1="90" x2="10" y2="90" stroke="black" stroke-width="1.5" />
   <line class="door" x1="5" y1="105" x2="10" y2="105" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="-5.652" y="135">1 square = 5 ft</text>
+    <text x="-5.652" y="132">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="-4.81" y="151">1</text>
-    <text x="-0.886" y="151">Guardroom</text>
+  <g class="key" font-size="5"><text x="-4.81" y="144">1</text>
+    <text x="-0.886" y="144">Guardroom</text>
   </g>
-  <g class="key" font-size="5"><text x="-5.061" y="159">2</text>
-    <text x="-0.815" y="159">Armory</text>
+  <g class="key" font-size="5"><text x="-5.061" y="152">2</text>
+    <text x="-0.815" y="152">Armory</text>
   </g>
-  <g class="key" font-size="5"><text x="-5.037" y="167">3</text>
-    <text x="-0.886" y="167">Gallery</text>
+  <g class="key" font-size="5"><text x="-5.037" y="160">3</text>
+    <text x="-0.886" y="160">Gallery</text>
   </g>
-  <g class="key" font-size="5"><text x="-5.093" y="175">4</text>
-    <text x="-0.903" y="175">Chapel</text>
+  <g class="key" font-size="5"><text x="-5.093" y="168">4</text>
+    <text x="-0.903" y="168">Chapel</text>
   </g>
-  <g class="key" font-size="5"><text x="-5.03" y="183">5</text>
-    <text x="-0.82" y="183">Library</text>
+  <g class="key" font-size="5"><text x="-5.03" y="176">5</text>
+    <text x="-0.82" y="176">Library</text>
   </g>
-  <g class="key" font-size="5"><text x="-5.061" y="191">6</text>
-    <text x="-0.855" y="191">Kitchen</text>
+  <g class="key" font-size="5"><text x="-5.061" y="184">6</text>
+    <text x="-0.855" y="184">Kitchen</text>
   </g>
-  <g class="key" font-size="5"><text x="-5.205" y="199">7</text>
-    <text x="-0.862" y="199">Pantry</text>
+  <g class="key" font-size="5"><text x="-5.205" y="192">7</text>
+    <text x="-0.862" y="192">Pantry</text>
   </g>
-  <g class="key" font-size="5"><text x="-5.044" y="207">8</text>
-    <text x="-0.781" y="207">Vault</text>
+  <g class="key" font-size="5"><text x="-5.044" y="200">8</text>
+    <text x="-0.781" y="200">Vault</text>
   </g>
 </svg>

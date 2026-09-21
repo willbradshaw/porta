@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1085" viewBox="-10 -10 60 108.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10" y="-10" width="60" height="108.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1015" viewBox="-10 -10 60 101.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="60" height="101.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M5 20h30v20h-30z M20 0h20v20h-20z M0 0h20v20h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="40" />
@@ -32,15 +32,15 @@
   <line class="divider" x1="35" y1="20" x2="35" y2="40" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="35" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <g class="scale" font-size="5">
-    <text x="4.348" y="55">1 square = 5 ft</text>
+    <text x="4.348" y="52">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="2.774" y="71">L</text>
-    <text x="7.57" y="71">Lower terrace</text>
+  <g class="key" font-size="5"><text x="2.774" y="64">L</text>
+    <text x="7.57" y="64">Lower terrace</text>
   </g>
-  <g class="key" font-size="5"><text x="3.179" y="79">S</text>
-    <text x="7.523" y="79">Side terrace</text>
+  <g class="key" font-size="5"><text x="3.179" y="72">S</text>
+    <text x="7.523" y="72">Side terrace</text>
   </g>
-  <g class="key" font-size="5"><text x="1.863" y="87">U</text>
-    <text x="7.587" y="87">Upper terrace</text>
+  <g class="key" font-size="5"><text x="1.863" y="80">U</text>
+    <text x="7.587" y="80">Upper terrace</text>
   </g>
 </svg>

@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="885" viewBox="-25.347 -20 50.695 88.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-25.347" y="-20" width="50.695" height="88.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="815" viewBox="-25.347 -20 50.695 81.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-25.347" y="-20" width="50.695" height="81.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h10v10h-10z M-10 -10h10v20h-10z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="-10" y1="-10" x2="-10" y2="10" />
@@ -24,13 +24,13 @@
   <text data-room="b" x="-5" y="0" text-anchor="middle" dominant-baseline="central" font-size="6">B</text>
   <line class="door" x1="0" y1="0" x2="0" y2="5" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="-15.652" y="25">1 square = 5 ft</text>
+    <text x="-15.652" y="22">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="-11.505" y="41">A</text>
-    <text x="-5.844" y="41">Room</text>
-    <text x="-5.819" y="49">A</text>
+  <g class="key" font-size="5"><text x="-11.505" y="34">A</text>
+    <text x="-5.844" y="34">Room</text>
+    <text x="-5.819" y="42">A</text>
   </g>
-  <g class="key" font-size="5"><text x="-10.537" y="57">B</text>
-    <text x="-5.844" y="57">Room B</text>
+  <g class="key" font-size="5"><text x="-10.537" y="50">B</text>
+    <text x="-5.844" y="50">Room B</text>
   </g>
 </svg>

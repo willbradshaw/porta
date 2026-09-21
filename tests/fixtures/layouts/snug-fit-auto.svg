@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="733.993" height="1085" viewBox="-11.7 -10 73.399 108.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-11.7" y="-10" width="73.399" height="108.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="733.993" height="1015" viewBox="-11.7 -10 73.399 101.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-11.7" y="-10" width="73.399" height="101.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h40v20h-40z M0 20h20v20h-20z M20 20h10v20h-10z M30 20h20v20h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="40" />
@@ -41,19 +41,19 @@
   <line class="door" x1="30" y1="20" x2="35" y2="20" stroke="black" stroke-width="1.5" />
   <line class="door" x1="30" y1="25" x2="30" y2="30" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="9.348" y="55">1 square = 5 ft</text>
+    <text x="9.348" y="52">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="-1.785" y="71">A</text>
-    <text x="3.877" y="71">Room</text>
-    <text x="3.902" y="79">A</text>
+  <g class="key" font-size="5"><text x="-1.785" y="64">A</text>
+    <text x="3.877" y="64">Room</text>
+    <text x="3.902" y="72">A</text>
   </g>
-  <g class="key" font-size="5"><text x="-0.816" y="87">B</text>
-    <text x="3.877" y="87">Room B</text>
+  <g class="key" font-size="5"><text x="-0.816" y="80">B</text>
+    <text x="3.877" y="80">Room B</text>
   </g>
-  <g class="key" font-size="5"><text x="28.281" y="71">C</text>
-    <text x="33.577" y="71">Room C</text>
+  <g class="key" font-size="5"><text x="28.281" y="64">C</text>
+    <text x="33.577" y="64">Room C</text>
   </g>
-  <g class="key" font-size="5"><text x="28.025" y="79">D</text>
-    <text x="33.577" y="79">Room D</text>
+  <g class="key" font-size="5"><text x="28.025" y="72">D</text>
+    <text x="33.577" y="72">Room D</text>
   </g>
 </svg>

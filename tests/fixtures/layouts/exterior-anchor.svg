@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1054.138" height="1105" viewBox="-37.707 -30 105.414 110.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-37.707" y="-30" width="105.414" height="110.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1054.138" height="1035" viewBox="-37.707 -30 105.414 103.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-37.707" y="-30" width="105.414" height="103.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h30v30h-30z M-20 0h20v20h-20z M10 -20h20v20h-20z M30 0h20v30h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="-20" y1="-20" x2="-20" y2="30" />
@@ -48,18 +48,18 @@
   <line class="door" x1="0" y1="5" x2="0" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="15" y1="0" x2="20" y2="0" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="-0.652" y="45">1 square = 5 ft</text>
+    <text x="-0.652" y="42">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="-27.199" y="61">C</text>
-    <text x="-21.966" y="61">Courtyard</text>
+  <g class="key" font-size="5"><text x="-27.199" y="54">C</text>
+    <text x="-21.966" y="54">Courtyard</text>
   </g>
-  <g class="key" font-size="5"><text x="-27.827" y="69">H</text>
-    <text x="-21.913" y="69">Hall</text>
+  <g class="key" font-size="5"><text x="-27.827" y="62">H</text>
+    <text x="-21.913" y="62">Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="8.019" y="61">L</text>
-    <text x="12.814" y="61">Lodge</text>
+  <g class="key" font-size="5"><text x="8.019" y="54">L</text>
+    <text x="12.814" y="54">Lodge</text>
   </g>
-  <g class="key" font-size="5"><text x="42.363" y="61">Y</text>
-    <text x="47.546" y="61">Yard</text>
+  <g class="key" font-size="5"><text x="42.363" y="54">Y</text>
+    <text x="47.546" y="54">Yard</text>
   </g>
 </svg>

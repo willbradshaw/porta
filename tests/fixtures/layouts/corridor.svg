@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="1265" viewBox="-10.347 -10 50.695 126.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10.347" y="-10" width="50.695" height="126.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="1195" viewBox="-10.347 -10 50.695 119.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10.347" y="-10" width="50.695" height="119.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M10 10h20v20h-20z M10 30h20v20h-20z M0 10h10v40h-10z M0 0h30v10h-30z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="50" />
@@ -38,18 +38,18 @@
   <line class="door" x1="15" y1="10" x2="20" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="15" y1="30" x2="20" y2="30" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="-0.652" y="65">1 square = 5 ft</text>
+    <text x="-0.652" y="62">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="2.491" y="81">A</text>
-    <text x="8.152" y="81">Room A</text>
+  <g class="key" font-size="5"><text x="2.491" y="74">A</text>
+    <text x="8.152" y="74">Room A</text>
   </g>
-  <g class="key" font-size="5"><text x="3.459" y="89">B</text>
-    <text x="8.152" y="89">Room B</text>
+  <g class="key" font-size="5"><text x="3.459" y="82">B</text>
+    <text x="8.152" y="82">Room B</text>
   </g>
-  <g class="key" font-size="5"><text x="2.857" y="97">C</text>
-    <text x="8.089" y="97">Corridor</text>
+  <g class="key" font-size="5"><text x="2.857" y="90">C</text>
+    <text x="8.089" y="90">Corridor</text>
   </g>
-  <g class="key" font-size="5"><text x="3.377" y="105">L</text>
-    <text x="8.172" y="105">Library</text>
+  <g class="key" font-size="5"><text x="3.377" y="98">L</text>
+    <text x="8.172" y="98">Library</text>
   </g>
 </svg>

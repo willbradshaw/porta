@@ -22,7 +22,7 @@ Dimensions are SVG user units (map feet).
 | Margins | 10 ft |
 | Key/scale text | 5 ft, with 8-ft key baseline spacing |
 | Key alignment | Right-aligned visible glyphs, 2-ft gap, left-aligned names; 6-ft column gutters |
-| Scale | Original “1 square = 5 ft” caption |
+| Scale | Original “1 square = 5 ft” caption; 12 ft from map bottom to scale baseline, then 12 ft to first key baseline |
 
 Grid lines remain globally aligned. Gaps between components and courtyard voids
 are blank; declared outdoor rooms retain the grid and their dashed boundaries.
@@ -88,6 +88,6 @@ PNG exports and refreshing font measurements. Review both complete compositions
 and enlarged text; a print proof and fallback-font review remain useful.
 
 A follow-up to #99/#16 will review the scale bar proposal, text color, background,
-and map/scale/key spacing. This PR retains the original caption and colors.
+and any further spacing refinements. This PR retains the original caption and colors.
 [Column-height imbalance](https://github.com/willbradshaw/porta/issues/102) is a
 separate investigation; it is not an extra term in this formula.

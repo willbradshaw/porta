@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="506.982" height="1065" viewBox="-10.3491 -10 50.6982 106.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10.3491" y="-10" width="50.6982" height="106.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="506.982" height="995" viewBox="-10.3491 -10 50.6982 99.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10.3491" y="-10" width="50.6982" height="99.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h15v15h-15z M15 0h15v15h-15z M0 15h15v15h-15z M15 15h15v15h-15z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="30" />
@@ -30,4 +30,4 @@
   <line class="door" x1="5" y1="15" x2="10" y2="15" stroke="black" stroke-width="1.5" />
   <line class="door" x1="15" y1="5" x2="15" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="15" y1="20" x2="15" y2="25" stroke="black" stroke-width="1.5" />
-  <text class="scale" font-size="5.0" x="-0.6540999999999999" y="45.0">1 square = 5 ft</text><g class="key" font-size="5.0"><text x="3.02849" y="61.0">1</text><text x="6.98839" y="61.0">Hall</text></g><g class="key" font-size="5.0"><text x="2.7768499999999996" y="69.0">2</text><text x="6.98339" y="69.0">Kitchen</text></g><g class="key" font-size="5.0"><text x="2.8012699999999997" y="77.0">3</text><text x="7.04239" y="77.0">Bedroom</text></g><g class="key" font-size="5.0"><text x="2.74541" y="85.0">4</text><text x="6.9713899999999995" y="85.0">Store</text></g></svg>
+  <text class="scale" font-size="5.0" x="-0.6540999999999999" y="42">1 square = 5 ft</text><g class="key" font-size="5.0"><text x="3.02849" y="54.0">1</text><text x="6.98839" y="54.0">Hall</text></g><g class="key" font-size="5.0"><text x="2.7768499999999996" y="62.0">2</text><text x="6.98339" y="62.0">Kitchen</text></g><g class="key" font-size="5.0"><text x="2.8012699999999997" y="70.0">3</text><text x="7.04239" y="70.0">Bedroom</text></g><g class="key" font-size="5.0"><text x="2.74541" y="78.0">4</text><text x="6.9713899999999995" y="78.0">Store</text></g></svg>

@@ -139,8 +139,8 @@ def _review_svg(
     max_y = max(room.y + room.height for room in building.rooms if room.y is not None)
     center = (min_x + max_x) / 2
     caption = "1 square = 5 ft"
-    caption_y = max_y + _MARGIN + _FONT
-    key_y = caption_y + 2 * _LINE
+    caption_y = max_y + render._SCALE_GAP_FT
+    key_y = caption_y + render._SCALE_GAP_FT
     width = max(max_x - min_x, candidate.width, metrics[caption].width) + 2 * _MARGIN
     bottom = key_y + (candidate.lines - 1) * _LINE + _FONT * 0.3 + _MARGIN
     x, y, height = center - width / 2, min_y - _MARGIN, bottom - min_y + _MARGIN

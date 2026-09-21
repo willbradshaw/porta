@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="825" viewBox="-10.347 -10 50.695 82.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10.347" y="-10" width="50.695" height="82.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="755" viewBox="-10.347 -10 50.695 75.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10.347" y="-10" width="50.695" height="75.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h30v30h-30z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="30" />
@@ -55,9 +55,9 @@
     <line x1="21.225" y1="23.333" x2="23.775" y2="23.333" stroke="black" stroke-width="0.25" />
   </g>
   <g class="scale" font-size="5">
-    <text x="-0.652" y="45">1 square = 5 ft</text>
+    <text x="-0.652" y="42">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="6.383" y="61">V</text>
-    <text x="11.855" y="61">Vault</text>
+  <g class="key" font-size="5"><text x="6.383" y="54">V</text>
+    <text x="11.855" y="54">Vault</text>
   </g>
 </svg>

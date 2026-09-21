@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="539.701" height="1015" viewBox="-14.485 -10 53.97 101.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-14.485" y="-10" width="53.97" height="101.5" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="539.701" height="945" viewBox="-14.485 -10 53.97 94.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-14.485" y="-10" width="53.97" height="94.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M10 0h15v10h-15z M0 10h10v15h-10z M10 10h10v10h-10z M0 0h10v10h-10z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="25" />
@@ -34,18 +34,18 @@
   <line class="door" x1="10" y1="10" x2="10" y2="15" stroke="black" stroke-width="1.5" />
   <line class="door" x1="10" y1="10" x2="15" y2="10" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="-3.152" y="40">1 square = 5 ft</text>
+    <text x="-3.152" y="37">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="-4.57" y="56">A</text>
-    <text x="1.091" y="56">Right room</text>
+  <g class="key" font-size="5"><text x="-4.57" y="49">A</text>
+    <text x="1.091" y="49">Right room</text>
   </g>
-  <g class="key" font-size="5"><text x="-3.601" y="64">B</text>
-    <text x="1.138" y="64">Down room</text>
+  <g class="key" font-size="5"><text x="-3.601" y="57">B</text>
+    <text x="1.138" y="57">Down room</text>
   </g>
-  <g class="key" font-size="5"><text x="-4.204" y="72">C</text>
-    <text x="1.028" y="72">Corner room</text>
+  <g class="key" font-size="5"><text x="-4.204" y="65">C</text>
+    <text x="1.028" y="65">Corner room</text>
   </g>
-  <g class="key" font-size="5"><text x="-4.114" y="80">R</text>
-    <text x="1.091" y="80">Root room</text>
+  <g class="key" font-size="5"><text x="-4.114" y="73">R</text>
+    <text x="1.091" y="73">Root room</text>
   </g>
 </svg>

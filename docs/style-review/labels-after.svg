@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1426.997" height="1255" viewBox="-38.85 -10 142.7 125.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-38.85" y="-10" width="142.7" height="125.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1426.997" height="1185" viewBox="-38.85 -10 142.7 118.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-38.85" y="-10" width="142.7" height="118.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h10v10h-10z M10 0h10v10h-10z M20 0h10v10h-10z M30 0h10v10h-10z M40 0h10v10h-10z M50 0h10v10h-10z M60 0h5v10h-5z M0 10h20v15h-20z M20 10h20v15h-20z M40 10h20v15h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="25" />
@@ -56,39 +56,39 @@
   <line class="door" x1="50" y1="0" x2="50" y2="5" stroke="black" stroke-width="1.5" />
   <line class="door" x1="60" y1="0" x2="60" y2="5" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="16.848" y="40">1 square = 5 ft</text>
+    <text x="16.848" y="37">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="-25.669" y="56">0</text>
-    <text x="-21.438" y="56">Zero</text>
+  <g class="key" font-size="5"><text x="-25.669" y="49">0</text>
+    <text x="-21.438" y="49">Zero</text>
   </g>
-  <g class="key" font-size="5"><text x="-25.43" y="64">1</text>
-    <text x="-21.47" y="64">One</text>
+  <g class="key" font-size="5"><text x="-25.43" y="57">1</text>
+    <text x="-21.47" y="57">One</text>
   </g>
-  <g class="key" font-size="5"><text x="-25.825" y="72">7</text>
-    <text x="-21.487" y="72">Seven</text>
+  <g class="key" font-size="5"><text x="-25.825" y="65">7</text>
+    <text x="-21.487" y="65">Seven</text>
   </g>
-  <g class="key" font-size="5"><text x="-26.194" y="80">É</text>
-    <text x="-21.472" y="80">Élodie’s bibliothèque</text>
-    <text x="-21.35" y="88">— northern archive</text>
+  <g class="key" font-size="5"><text x="-26.194" y="73">É</text>
+    <text x="-21.472" y="73">Élodie’s bibliothèque</text>
+    <text x="-21.35" y="81">— northern archive</text>
   </g>
-  <g class="key" font-size="5"><text x="-28.85" y="96">庭</text>
-    <text x="-21.35" y="96">庭園 / 日本語 /</text>
-    <text x="-21.35" y="104">Ελληνικά</text>
+  <g class="key" font-size="5"><text x="-28.85" y="89">庭</text>
+    <text x="-21.35" y="89">庭園 / 日本語 /</text>
+    <text x="-21.35" y="97">Ελληνικά</text>
   </g>
-  <g class="key" font-size="5"><text x="41.063" y="56">10</text>
-    <text x="47.777" y="56">Ten</text>
+  <g class="key" font-size="5"><text x="41.063" y="49">10</text>
+    <text x="47.777" y="49">Ten</text>
   </g>
-  <g class="key" font-size="5"><text x="41.082" y="64">99</text>
-    <text x="47.762" y="64">Ninety-nine</text>
+  <g class="key" font-size="5"><text x="41.082" y="57">99</text>
+    <text x="47.762" y="57">Ninety-nine</text>
   </g>
-  <g class="key" font-size="5"><text x="39.44" y="72">Ab</text>
-    <text x="47.745" y="72">Supercalifragilisticex</text>
-    <text x="47.794" y="80">pialidociousVault</text>
+  <g class="key" font-size="5"><text x="39.44" y="65">Ab</text>
+    <text x="47.745" y="65">Supercalifragilisticex</text>
+    <text x="47.794" y="73">pialidociousVault</text>
   </g>
-  <g class="key" font-size="5"><text x="38.564" y="88">100</text>
-    <text x="47.762" y="88">One hundred</text>
+  <g class="key" font-size="5"><text x="38.564" y="81">100</text>
+    <text x="47.762" y="81">One hundred</text>
   </g>
-  <g class="key" font-size="5"><text x="30.973" y="96">WWW</text>
-    <text x="47.826" y="96">Wide custom label</text>
+  <g class="key" font-size="5"><text x="30.973" y="89">WWW</text>
+    <text x="47.826" y="89">Wide custom label</text>
   </g>
 </svg>

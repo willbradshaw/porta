@@ -8,6 +8,7 @@ _GLYPH_GAP = 2.0
 _COLUMN_GAP = 6.0
 _WORD_SPLIT_PENALTY = 0.5
 _HEIGHT_COEFFICIENT = 0.7
+_SHORT_HEIGHT_MULTIPLIER = 0.7
 _INTERWORD_PENALTY = 0.15
 _IMBALANCE_COEFFICIENT = 1.0
 _NARROWNESS_COEFFICIENT = 0.5
@@ -173,7 +174,8 @@ def with_interword_penalty(
     """Apply approved weights, optionally overriding the inter-word break cost."""
     return replace(
         penalized(candidate, _WORD_SPLIT_PENALTY),
-        height_coefficient=_HEIGHT_COEFFICIENT,
+        height_coefficient=_HEIGHT_COEFFICIENT
+        * (_SHORT_HEIGHT_MULTIPLIER if candidate.lines < 4 else 1),
         interword_cost=penalty * interword_breaks(candidate),
         imbalance_cost=_IMBALANCE_COEFFICIENT * candidate.imbalance_ratio,
     )

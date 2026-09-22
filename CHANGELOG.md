@@ -11,7 +11,8 @@ Notable changes per release, newest first.
   baseline to the first key baseline.
 - Set key and scale type to 5 ft, align key glyphs and names separately, and
   choose equal-width key columns and wrapping with a scored layout: height
-  coefficient 0.7, internal-word break penalty 0.5, and inter-word penalty 0.15.
+  coefficient 0.7 (discounted by 0.7 below four lines), internal-word break
+  penalty 0.5, and inter-word penalty 0.15.
   Use portable Palatino metrics without adding runtime dependencies or fonts.
   Include seven key-layout cases in the standard SVG golden suite and regenerate
   the documentation references.

@@ -169,7 +169,7 @@ def test_interword_penalty_excludes_internal_breaks_and_counts_each_entry(
         ordinary = total_breaks - c.splits
         assert interword_breaks(c) == ordinary
         assert with_interword_penalty(c, penalty).score == pytest.approx(
-            0.7 * c.height_cost
+            0.7 * (0.7 if c.lines < 4 else 1) * c.height_cost
             + c.width_cost
             + 0.5 * c.splits
             + penalty * ordinary
@@ -239,14 +239,33 @@ def test_block_capstone_prefers_one_unwrapped_column() -> None:
     assert chosen.rows["Great Hall"] == ["Great Hall"]
 
 
-def test_short_key_does_not_wrap_just_to_approach_four_lines() -> None:
+@pytest.mark.parametrize(
+    ("glyph", "name", "map_width"),
+    [("H", "Great Hall", 40), ("R", "Ruined Hall", 30)],
+)
+def test_short_key_does_not_wrap_just_to_approach_four_lines(
+    glyph: str, name: str, map_width: int
+) -> None:
     from porta.key_layout import choose_layout
     from porta.text_metrics import TextMetrics
 
     metrics = TextMetrics()
     chosen = choose_layout(
-        [("H", "Great Hall")], 40, metrics, metrics["1 square = 5 ft"].width
+        [(glyph, name)], map_width, metrics, metrics["1 square = 5 ft"].width
     )
     assert chosen is not None
     assert chosen.column_lines == [1]
-    assert chosen.rows["Great Hall"] == ["Great Hall"]
+    assert chosen.rows[name] == [name]
+
+
+@pytest.mark.parametrize("lines", [1, 2, 3, 4, 5, 8])
+def test_short_height_discount_applies_only_below_four_lines(lines: int) -> None:
+    from porta.key_layout import with_interword_penalty
+
+    entries = [(str(i), "A") for i in range(lines)]
+    candidate = candidates(entries, 30, sample_metrics(entries), wrap=False)[0]
+    weighted = with_interword_penalty(candidate)
+    assert weighted.height_coefficient == pytest.approx(0.49 if lines < 4 else 0.7)
+    assert weighted.height_coefficient * weighted.height_cost == pytest.approx(
+        (0.49 if lines < 4 else 0.7) * ((lines - 4) / 4) ** 2
+    )

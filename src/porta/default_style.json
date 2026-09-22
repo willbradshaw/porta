@@ -70,7 +70,7 @@
   "key": {
     "columns": {
       "value": "auto",
-      "description": "SVG key column count: \"auto\" or a positive integer, capped at the number of entries. Requested counts retain equal-width columns, reading order, and the existing wrapping score. Text never shrinks; the canvas expands to fit overflow rather than clipping."
+      "description": "Number of SVG key columns: \"auto\" or a positive integer. Counts larger than the number of entries use one column per entry. Long names wrap; the image widens if needed to fit the key at the chosen font size."
     },
     "visible": {
       "value": true,

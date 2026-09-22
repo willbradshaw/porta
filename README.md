@@ -109,23 +109,14 @@ Optional SVG presentation controls use the same style file:
 }
 ```
 
-All three `visible` settings accept only JSON booleans and default to `true`.
-`key.visible` hides only the key: room/block labels, glyph assignment, and
-`glyph=""` semantics remain unchanged. `scale_bar.visible` controls the entire
-scale annotation (bar, distance labels, and grid-size note), independently of
-the key and grid lines. `grid.visible: false` removes the grid lines and size
-note while retaining an accurate scale bar when enabled. Grid spacing still
-sets stair tread spacing; zero grid opacity or stroke retains the size note.
+Set `visible` to `false` to hide the key, scale annotation, or grid; all default
+to `true`. Hiding the key keeps room labels. Hiding the grid also removes its
+size note, while keeping the scale bar.
 
-`key.columns` defaults to `"auto"` and also accepts a positive integer.
-Requested counts are capped at the number of key entries (no empty columns).
-Columns preserve reading order down each column, then left to right, and balance
-wrapped line counts without splitting entries. The existing layout score chooses
-wrapping for that count, using equal column widths and the configured font size.
-Map width is a preference, not a hard limit: the SVG canvas expands to contain
-overflow, rather than shrinking or clipping text. Hidden keys ignore the count
-for layout, but the value must still be valid. All these controls are ignored
-by ASCII rendering.
+`key.columns` accepts `"auto"` (the default) or a positive integer; extra
+columns beyond the number of entries are omitted. Long names wrap, and the image
+widens if needed to fit the key at the chosen font size. These settings affect SVG
+only.
 
 The solved coordinate system can also be viewed and debugged directly
 as an ASCII grid:

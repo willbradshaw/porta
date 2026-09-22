@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add `porta draw --style` for grouped JSON overrides, using plain values or
+  documented value/description records.
 - Read renderer defaults from documented, grouped JSON. Share background and
   symbol colors, use grid opacity, and derive scale proportions from key text size.
 - Add a labeled 20-ft scale bar and use dark-grey text for room labels, key,

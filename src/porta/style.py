@@ -1,8 +1,10 @@
 """Read and validate the documented SVG defaults as one nested dictionary."""
 
 import json
+from copy import deepcopy
 from importlib.resources import files
 from math import isfinite
+from pathlib import Path
 from typing import Any
 
 # JSON values are checked once at load time; rendering uses their native types.
@@ -138,3 +140,49 @@ def _load_defaults() -> Style:
 
 
 DEFAULT_STYLE = _load_defaults()
+
+
+def _unique_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    result: dict[str, Any] = {}
+    for name, value in pairs:
+        _require(name not in result, name, "duplicate key")
+        result[name] = value
+    return result
+
+
+def _merge(style: dict[str, Any], overrides: Any, prefix: str = "") -> None:
+    _require(isinstance(overrides, dict), prefix or "style", "expected a JSON object")
+    for name, value in overrides.items():
+        path = f"{prefix}.{name}" if prefix else name
+        _require(name in style, path, "unknown style parameter")
+        if isinstance(style[name], dict):
+            _merge(style[name], value, path)
+            continue
+        if isinstance(value, dict):
+            _require(
+                "value" in value and not value.keys() - {"value", "description"},
+                path,
+                "expected value and optional description",
+            )
+            _require(
+                "description" not in value or isinstance(value["description"], str),
+                path,
+                "description must be a string",
+            )
+            value = value["value"]
+        style[name] = value
+
+
+def load_style(path: str | Path) -> Style:
+    """Merge a JSON file over a fresh copy of the defaults and validate it.
+
+    Leaves may be plain values or objects with value and optional description.
+    Invalid files raise ValueError; unreadable files raise OSError.
+    """
+    overrides = json.loads(
+        Path(path).read_text(encoding="utf-8"), object_pairs_hook=_unique_keys
+    )
+    style = deepcopy(DEFAULT_STYLE)
+    _merge(style, overrides)
+    _validate(style)
+    return style

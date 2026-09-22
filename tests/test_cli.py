@@ -137,3 +137,40 @@ def test_missing_input_file_is_a_clean_error(
     err = capsys.readouterr().err
     assert "error:" in err
     assert "nope.porta" in err
+
+
+@pytest.mark.parametrize("documented", [False, True], ids=["concise", "documented"])
+def test_style_file_changes_svg(documented: bool, tmp_path: Path) -> None:
+    import json
+
+    style = tmp_path / "style.json"
+    value: object = (
+        {"value": "#fff8e7", "description": "Paper"} if documented else "#fff8e7"
+    )
+    style.write_text(json.dumps({"page": {"background": value}}))
+    output = tmp_path / "styled.svg"
+    assert main(["draw", MANOR, "--style", str(style), "-o", str(output)]) == 0
+    assert 'fill="#fff8e7"' in output.read_text()
+
+
+@pytest.mark.parametrize(
+    "source", [None, "{", '{"unknown": 3}', '{"key": {"font_ft": 0}}']
+)
+def test_bad_style_does_not_write_output(
+    source: str | None, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    style = tmp_path / "style.json"
+    if source is not None:
+        style.write_text(source)
+    output = tmp_path / "out.svg"
+    output.write_text("previous output")
+    assert main(["draw", MANOR, "--style", str(style), "-o", str(output)]) == 1
+    assert f"{style}: error:" in capsys.readouterr().err
+    assert output.read_text() == "previous output"
+
+
+def test_style_rejected_for_ascii(capsys: pytest.CaptureFixture[str]) -> None:
+    with pytest.raises(SystemExit) as exc:
+        main(["draw", MANOR, "--style", "style.json", "--debug-ascii"])
+    assert exc.value.code == 2
+    assert "--style cannot be used with --debug-ascii" in capsys.readouterr().err

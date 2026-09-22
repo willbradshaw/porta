@@ -73,6 +73,31 @@ SVG file.
 porta draw plan.porta -o plan.svg
 ```
 
+Override SVG appearance with a grouped JSON file:
+
+```sh
+porta draw plan.porta --style sepia.json -o plan.svg
+```
+
+```json
+{
+  "page": {"background": "#fff8e7", "line_color": "#332211"},
+  "typography": {
+    "text_color": {"value": "#654321", "description": "Sepia ink"}
+  }
+}
+```
+
+[default_style.json](src/porta/default_style.json) documents the supported settings.
+Both plain values and value/description records are accepted, including mixtures.
+Omitted settings retain their defaults; groups merge without replacing their other
+settings. Unknown keys and invalid values produce an error. `--style` applies only
+to SVG output and cannot be combined with `--debug-ascii`.
+
+Window and scale fills follow the background; symbols and grid use the shared line
+color, with separate grid opacity. Font fitting uses Palatino-based estimates, so
+other fonts may fit differently in the SVG viewer.
+
 The solved coordinate system can also be viewed and debugged directly
 as an ASCII grid:
 

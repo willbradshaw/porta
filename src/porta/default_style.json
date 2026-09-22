@@ -32,6 +32,10 @@
     }
   },
   "grid": {
+    "visible": {
+      "value": true,
+      "description": "Draw the SVG grid and its size note. False removes both; spacing_ft still determines stair tread spacing."
+    },
     "spacing_ft": {
       "value": 5,
       "description": "Grid-line spacing in whole map feet. Changes the grid caption and stair tread spacing, but not room dimensions."
@@ -64,6 +68,14 @@
     }
   },
   "key": {
+    "columns": {
+      "value": "auto",
+      "description": "Number of SVG key columns: \"auto\" or a positive integer. Counts larger than the number of entries use one column per entry. Long names wrap; the image widens if needed to fit the key at the chosen font size."
+    },
+    "visible": {
+      "value": true,
+      "description": "Draw the SVG room key independently of room labels and the scale annotation."
+    },
     "font_ft": {
       "value": 5.0,
       "description": "Room-key font size in map feet, used for identifiers and names. Affects wrapping and columns."
@@ -82,6 +94,10 @@
     }
   },
   "scale_bar": {
+    "visible": {
+      "value": true,
+      "description": "Draw the SVG scale bar, distance labels, and (when grid.visible is true) grid-size note, independently of the key."
+    },
     "length_ft": {
       "value": 20,
       "description": "Scale bar length in map feet. Text matches the key; bar thickness and label spacing scale with that text size."

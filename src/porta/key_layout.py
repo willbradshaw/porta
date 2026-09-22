@@ -257,9 +257,15 @@ def candidates(
             if signature not in seen:
                 seen.add(signature)
                 row_options.append(rows)
+    requested = style["key"]["columns"]
+    counts = (
+        range(1, len(entries) + 1)
+        if requested == "auto"
+        else [min(requested, len(entries))]
+    )
     result = []
     for rows in row_options:
-        for count in range(1, len(entries) + 1):
+        for count in counts:
             columns = partition_entries(entries, rows, count)
             glyph_width = max(metrics[g].width for g, _ in entries)
             name_width = max(

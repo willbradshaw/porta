@@ -40,7 +40,7 @@ The lowest score wins; exact ties prefer fewer columns:
 ```
 B = 0.7 b ((L - 4) / 4)² + a ((W - T) / T)² + 0.5 S + 0.15 R + L / l
 a = 0.5 when W < T, otherwise 1
-b = 0.7 when L < 4, otherwise 1
+b = 0.85 when L < 4, otherwise 1
 ```
 
 - `L`: rendered line count in the tallest column, including wrapped lines.
@@ -50,8 +50,8 @@ b = 0.7 when L < 4, otherwise 1
 - `S`: line breaks inside words, summed across key entries.
 - `R`: between-word line breaks within entries, excluding internal-word breaks.
 
-Both shorter and taller keys are penalized relative to four lines, with a 0.7
-multiplier below four (effective coefficient 0.49 rather than 0.7). Both narrower
+Both shorter and taller keys are penalized relative to four lines, with a 0.85
+multiplier below four (effective coefficient 0.595 rather than 0.7). Both narrower
 and wider keys are penalized relative to the target width, with half the cost
 for being narrower. The longest/shortest ratio has coefficient 1. Single-column
 and equal-height layouts both add 1; an empty key has no layout to score. Wrapping prefers words,

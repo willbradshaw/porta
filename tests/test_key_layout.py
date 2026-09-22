@@ -169,7 +169,7 @@ def test_interword_penalty_excludes_internal_breaks_and_counts_each_entry(
         ordinary = total_breaks - c.splits
         assert interword_breaks(c) == ordinary
         assert with_interword_penalty(c, penalty).score == pytest.approx(
-            0.7 * (0.7 if c.lines < 4 else 1) * c.height_cost
+            0.7 * (0.85 if c.lines < 4 else 1) * c.height_cost
             + c.width_cost
             + 0.5 * c.splits
             + penalty * ordinary
@@ -265,7 +265,7 @@ def test_short_height_discount_applies_only_below_four_lines(lines: int) -> None
     entries = [(str(i), "A") for i in range(lines)]
     candidate = candidates(entries, 30, sample_metrics(entries), wrap=False)[0]
     weighted = with_interword_penalty(candidate)
-    assert weighted.height_coefficient == pytest.approx(0.49 if lines < 4 else 0.7)
+    assert weighted.height_coefficient == pytest.approx(0.595 if lines < 4 else 0.7)
     assert weighted.height_coefficient * weighted.height_cost == pytest.approx(
-        (0.49 if lines < 4 else 0.7) * ((lines - 4) / 4) ** 2
+        (0.595 if lines < 4 else 0.7) * ((lines - 4) / 4) ** 2
     )

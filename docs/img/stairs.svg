@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="895" viewBox="-10 -10 80 89.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
   <rect x="-10" y="-10" width="80" height="89.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M0 0h40v30h-40z M40 0h20v20h-20z" /></clipPath></defs>
-  <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
+  <g class="grid" clip-path="url(#plan-grid)" stroke="black" opacity="0.23" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="30" />
     <line x1="5" y1="0" x2="5" y2="30" />
     <line x1="10" y1="0" x2="10" y2="30" />
@@ -72,7 +72,7 @@
     <text x="35.206" y="39">20 ft</text>
     <text x="17.273" y="48">5-ft squares</text>
     <rect x="20" y="40.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
-    <rect x="30" y="40.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
+    <rect x="30" y="40.5" width="10" height="1.5" fill="#e0e0e0" stroke="black" stroke-width="0.2" />
   </g>
   <g class="key" font-size="5" fill="#333333"><text x="17.666" y="60">H</text>
     <text x="23.58" y="60">Hall</text>

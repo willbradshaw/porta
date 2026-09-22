@@ -1,0 +1,152 @@
+{
+  "page": {
+    "background": {
+      "value": "white",
+      "description": "Color behind the drawing, including window interiors, the light scale-bar half, and secret-marker halos."
+    },
+    "margin_ft": {
+      "value": 10,
+      "description": "Empty space around the complete drawing, in map feet."
+    },
+    "display_scale": {
+      "value": 10,
+      "description": "Pixels per map foot at the initial display size. Enlarges the image without changing map distances."
+    },
+    "line_color": {
+      "value": "black",
+      "description": "Color of map symbols, the scale bar, and grid lines. The grid uses reduced opacity; text has its own color."
+    }
+  },
+  "typography": {
+    "font_family": {
+      "value": "Palatino, Georgia, Times New Roman, serif",
+      "description": "Font choices in preference order. Text fitting uses Palatino-based estimates, so other fonts may fit differently."
+    },
+    "font_weight": {
+      "value": 400,
+      "description": "Weight of all text, from 1 to 1000; 400 is normal and 700 is bold."
+    },
+    "text_color": {
+      "value": "#333333",
+      "description": "Color of room labels, key, and scale text. Secret-door markers follow the map symbols."
+    }
+  },
+  "grid": {
+    "spacing_ft": {
+      "value": 5,
+      "description": "Grid-line spacing in whole map feet. Changes the grid caption and stair tread spacing, but not room dimensions."
+    },
+    "opacity": {
+      "value": 0.23,
+      "description": "Opacity of grid lines drawn in page.line_color, from 0 (invisible) to 1 (solid)."
+    },
+    "stroke_ft": {
+      "value": 0.125,
+      "description": "Grid-line thickness in map feet. Zero hides the lines but retains the grid-size note."
+    }
+  },
+  "labels": {
+    "ratio": {
+      "value": 0.6,
+      "description": "Starting label font size as a fraction of the shorter available room dimension. labels.fit may shrink it further."
+    },
+    "fit": {
+      "value": 0.9,
+      "description": "Maximum label width as a fraction of available room width. Labels shrink to fit this limit."
+    }
+  },
+  "key": {
+    "font_ft": {
+      "value": 5.0,
+      "description": "Room-key font size in map feet, used for identifiers and names. Affects wrapping and columns."
+    },
+    "identifier_gap_ft": {
+      "value": 2,
+      "description": "Horizontal gap between identifiers and names in the room key, in map feet."
+    },
+    "column_gap_ft": {
+      "value": 6,
+      "description": "Horizontal gap between key columns, in map feet. Wider gaps may result in fewer columns."
+    },
+    "line_spacing_ft": {
+      "value": 8,
+      "description": "Vertical distance between successive key text lines, in map feet. Must be at least key.font_ft."
+    }
+  },
+  "scale_bar": {
+    "length_ft": {
+      "value": 20,
+      "description": "Scale bar length in map feet. Text matches the key; bar thickness and label spacing scale with that text size."
+    },
+    "gap_ft": {
+      "value": 12,
+      "description": "Vertical spacing in feet: lowest room edge to scale rectangle’s lower edge, and grid-note baseline to first key-row baseline. A baseline is the line letters sit on."
+    }
+  },
+  "walls": {
+    "interior_stroke_ft": {
+      "value": 0.5,
+      "description": "Thickness of interior walls, stair edges, and open-door dots, in map feet."
+    },
+    "exterior_stroke_ft": {
+      "value": 0.8,
+      "description": "Thickness of exposed outer walls, in map feet; shared walls use walls.interior_stroke_ft."
+    }
+  },
+  "doors": {
+    "stroke_ft": {
+      "value": 1.5,
+      "description": "Thickness of solid and secret door bars, in map feet; opening widths stay unchanged."
+    },
+    "open_dash": {
+      "value": "0.01 1.5",
+      "description": "Alternating mark and gap lengths for open-door dots, in map feet. Default: 0.01-ft marks, 1.5-ft gaps."
+    },
+    "secret_font_ft": {
+      "value": 5,
+      "description": "Font size of secret-door S markers, in map feet."
+    },
+    "secret_halo_ft": {
+      "value": 0.6,
+      "description": "Thickness of the background-colored outline separating each secret-door S from its door bar, in feet."
+    }
+  },
+  "windows": {
+    "gap_ft": {
+      "value": 0.5,
+      "description": "Distance between the centers of a window’s two lines, in feet; clear space is smaller by windows.stroke_ft."
+    },
+    "stroke_ft": {
+      "value": 0.25,
+      "description": "Thickness of each window line, in map feet."
+    }
+  },
+  "stairs": {
+    "treads_per_grid": {
+      "value": 3,
+      "description": "Stair tread intervals per grid square; 3 with a 5-ft grid gives roughly 1.67-ft spacing."
+    },
+    "stroke_ft": {
+      "value": 0.25,
+      "description": "Stair tread-line thickness in map feet. Side edges use walls.interior_stroke_ft."
+    },
+    "max_ratio": {
+      "value": 0.7,
+      "description": "Tread length at the high end of stairs, as a fraction of the space between side edges."
+    },
+    "min_ratio": {
+      "value": 0.3,
+      "description": "Tread length at the downhill end, as a fraction of the space between side edges. Cannot exceed stairs.max_ratio."
+    }
+  },
+  "dividers": {
+    "stroke_ft": {
+      "value": 0.25,
+      "description": "Thickness of dashed internal block dividers, in map feet."
+    },
+    "dash": {
+      "value": "1.5 1",
+      "description": "Alternating divider dash and gap lengths, in map feet. Default: 1.5-ft dashes, 1-ft gaps."
+    }
+  }
+}

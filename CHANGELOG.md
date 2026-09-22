@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Read renderer defaults from documented, grouped JSON. Share background and
+  symbol colors, use grid opacity, and derive scale proportions from key text size.
 - Add a labeled 20-ft scale bar and use dark-grey text for room labels, key,
   and scale.
 - Refine SVG typography, grid, and spacing, and automatically balance room-key

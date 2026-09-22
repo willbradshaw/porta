@@ -64,7 +64,11 @@ def text_bounds(text: str, size: float = 5) -> TextBounds:
 class TextMetrics(dict[str, TextBounds]):
     """Cache bounds for the lifetime of one layout calculation."""
 
+    def __init__(self, *, size: float = 5) -> None:
+        super().__init__()
+        self.size = size
+
     def __missing__(self, text: str) -> TextBounds:
-        bounds = text_bounds(text)
+        bounds = text_bounds(text, self.size)
         self[text] = bounds
         return bounds

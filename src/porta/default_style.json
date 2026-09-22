@@ -46,6 +46,14 @@
     }
   },
   "labels": {
+    "scheme": {
+      "value": "numeric",
+      "description": "Must be exactly one of the case-sensitive strings \"numeric\" or \"mnemonic\". For SVG and ASCII, numeric assigns numbers from labels.start through 999 by display name; mnemonic uses unused characters from entity IDs, then A–Z and 0–9. Explicit glyphs override either scheme."
+    },
+    "start": {
+      "value": 1,
+      "description": "First automatic number in numeric mode, an integer from 1 to 999. Reserved numbers are skipped; explicit glyphs are unchanged. Ignored in mnemonic mode. Applies to SVG and ASCII."
+    },
     "ratio": {
       "value": 0.6,
       "description": "Starting label font size as a fraction of the shorter available room dimension. labels.fit may shrink it further."

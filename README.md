@@ -91,8 +91,9 @@ porta draw plan.porta --style sepia.json -o plan.svg
 [default_style.json](src/porta/default_style.json) documents the supported settings.
 Both plain values and value/description records are accepted, including mixtures.
 Omitted settings retain their defaults; groups merge without replacing their other
-settings. Unknown keys and invalid values produce an error. `--style` applies only
-to SVG output and cannot be combined with `--debug-ascii`.
+settings. Unknown keys and invalid values produce an error. With `--debug-ascii`,
+`--style` applies label settings and ignores visual settings. See
+[glyphs](docs/room.md#glyphs) for label schemes and numbering starts.
 
 Window and scale fills follow the background; symbols and grid use the shared line
 color, with separate grid opacity. Font fitting uses Palatino-based estimates, so

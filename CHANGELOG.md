@@ -4,6 +4,9 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Default to numeric room/block labels ordered by display name, skipping reserved
+  numbers. Add style options for mnemonic labels and numbering starts, supported
+  in SVG and ASCII.
 - Add `porta draw --style` for grouped JSON overrides, using plain values or
   documented value/description records.
 - Read renderer defaults from documented, grouped JSON. Share background and

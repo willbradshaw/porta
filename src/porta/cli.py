@@ -41,7 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
     draw = sub.add_parser("draw", help="Render a .porta file to SVG.")
     draw.add_argument("input", help="Path to the input .porta file.")
     draw.add_argument(
-        "--style", help="JSON file overriding default SVG style parameters."
+        "--style", help="JSON file overriding rendering style parameters."
     )
     draw.add_argument("-o", "--output", help="Output file (default: stdout).")
     draw.add_argument(
@@ -64,8 +64,6 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     if args.command == "draw":
-        if args.style and args.debug_ascii:
-            parser.error("--style cannot be used with --debug-ascii")
         return _draw(args.input, args.output, args.debug_ascii, args.style)
     return 0
 
@@ -102,9 +100,15 @@ def _draw(
         print(f"{style_path}: error: {exc}", file=sys.stderr)
         return 1
 
-    output = (
-        render_ascii(building) if debug_ascii else render_svg(building, style=style)
-    )
+    try:
+        output = (
+            render_ascii(building, style=style)
+            if debug_ascii
+            else render_svg(building, style=style)
+        )
+    except PortaError as exc:
+        print(_format_diagnostic(input_path, exc), file=sys.stderr)
+        return 1
     if output_path is None:
         print(output)
     else:

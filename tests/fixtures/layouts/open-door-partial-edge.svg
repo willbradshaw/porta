@@ -25,8 +25,8 @@
   <line class="wall exterior" x1="20" y1="20" x2="20" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="20" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="40" y1="0" x2="40" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="aisle" x="30" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">A</text>
-  <text data-room="nave" x="10" y="15" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">N</text>
+  <text data-room="aisle" x="30" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">1</text>
+  <text data-room="nave" x="10" y="15" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">2</text>
   <line class="open" x1="20" y1="0" x2="20" y2="20" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <g class="scale" font-size="5" fill="#333333">
     <text x="8.765" y="39">0</text>
@@ -36,10 +36,10 @@
     <rect x="10" y="40.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="20" y="40.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="11.368" y="60">A</text>
-    <text x="17.055" y="60">Aisle</text>
+  <g class="key" font-size="5" fill="#333333"><text x="12.25" y="60">1</text>
+    <text x="16.245" y="60">Aisle</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="11.152" y="68">N</text>
-    <text x="17.02" y="68">Nave</text>
+  <g class="key" font-size="5" fill="#333333"><text x="11.999" y="68">2</text>
+    <text x="16.21" y="68">Nave</text>
   </g>
 </svg>

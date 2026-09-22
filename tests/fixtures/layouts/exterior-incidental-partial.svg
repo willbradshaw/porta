@@ -21,9 +21,9 @@
     <line x1="0" y1="35" x2="40" y2="35" />
     <line x1="0" y1="40" x2="40" y2="40" />
   </g>
-  <text data-room="lower" x="20" y="30" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">L</text>
-  <text data-room="side" x="30" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">S</text>
-  <text data-room="upper" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">U</text>
+  <text data-room="lower" x="20" y="30" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">1</text>
+  <text data-room="side" x="30" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">2</text>
+  <text data-room="upper" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">3</text>
   <line class="divider" x1="0" y1="20" x2="5" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="5" y1="20" x2="5" y2="40" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="5" y1="20" x2="20" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
@@ -39,13 +39,13 @@
     <rect x="10" y="50.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="20" y="50.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="2.774" y="70">L</text>
-    <text x="7.57" y="70">Lower terrace</text>
+  <g class="key" font-size="5" fill="#333333"><text x="2.842" y="70">1</text>
+    <text x="6.832" y="70">Lower terrace</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="3.179" y="78">S</text>
-    <text x="7.523" y="78">Side terrace</text>
+  <g class="key" font-size="5" fill="#333333"><text x="2.591" y="78">2</text>
+    <text x="6.785" y="78">Side terrace</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="1.863" y="86">U</text>
-    <text x="7.587" y="86">Upper terrace</text>
+  <g class="key" font-size="5" fill="#333333"><text x="2.615" y="86">3</text>
+    <text x="6.849" y="86">Upper terrace</text>
   </g>
 </svg>

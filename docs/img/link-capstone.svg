@@ -52,11 +52,11 @@
   <line class="wall exterior" x1="50" y1="50" x2="50" y2="60" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="50" y1="50" x2="70" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="70" y1="20" x2="70" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="cellar" x="40" y="55" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">C</text>
-  <text data-room="chapel" x="15" y="60" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">H</text>
-  <text data-room="gate" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">G</text>
-  <text data-room="keep" x="50" y="35" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">K</text>
-  <text data-room="yard" x="15" y="35" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">Y</text>
+  <text data-room="cellar" x="40" y="55" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">1</text>
+  <text data-room="chapel" x="15" y="60" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">2</text>
+  <text data-room="gate" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">4</text>
+  <text data-room="keep" x="50" y="35" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">5</text>
+  <text data-room="yard" x="15" y="35" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">3</text>
   <line class="open" x1="10" y1="50" x2="20" y2="50" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <line class="door" x1="10" y1="20" x2="15" y2="20" stroke="black" stroke-width="1.5" />
   <line class="door" x1="30" y1="30" x2="30" y2="35" stroke="black" stroke-width="1.5" />
@@ -69,19 +69,19 @@
     <rect x="25" y="80.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="35" y="80.5" width="10" height="1.5" fill="#e0e0e0" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="20.959" y="100">C</text>
-    <text x="26.191" y="100">Cellar</text>
+  <g class="key" font-size="5" fill="#333333"><text x="21.495" y="100">1</text>
+    <text x="25.402" y="100">Cellar</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="20.705" y="108">G</text>
-    <text x="26.208" y="108">Gatehouse</text>
+  <g class="key" font-size="5" fill="#333333"><text x="21.243" y="108">2</text>
+    <text x="25.402" y="108">Chapel</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="20.331" y="116">H</text>
-    <text x="26.191" y="116">Chapel</text>
+  <g class="key" font-size="5" fill="#333333"><text x="21.267" y="116">3</text>
+    <text x="25.402" y="116">Courtyard</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="20.773" y="124">K</text>
-    <text x="26.239" y="124">Keep</text>
+  <g class="key" font-size="5" fill="#333333"><text x="21.212" y="124">4</text>
+    <text x="25.419" y="124">Gatehouse</text>
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="21.125" y="132">Y</text>
-    <text x="26.191" y="132">Courtyard</text>
+  <g class="key" font-size="5" fill="#333333"><text x="21.275" y="132">5</text>
+    <text x="25.45" y="132">Keep</text>
   </g>
 </svg>

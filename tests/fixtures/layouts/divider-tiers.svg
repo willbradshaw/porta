@@ -25,7 +25,7 @@
   <line class="wall exterior" x1="0" y1="0" x2="40" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="0" y1="40" x2="40" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="40" y1="0" x2="40" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-block="terraces" x="20" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">T</text>
+  <text data-block="terraces" x="20" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">1</text>
   <line class="divider" x1="0" y1="20" x2="15" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="0" y1="30" x2="15" y2="30" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="25" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
@@ -49,7 +49,7 @@
     <rect x="10" y="50.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="20" y="50.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5" fill="#333333"><text x="8.509" y="70">T</text>
-    <text x="13.366" y="70">Terraces</text>
+  <g class="key" font-size="5" fill="#333333"><text x="8.85" y="70">1</text>
+    <text x="12.825" y="70">Terraces</text>
   </g>
 </svg>

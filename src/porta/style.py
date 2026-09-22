@@ -1,4 +1,4 @@
-"""Read and validate the documented SVG defaults as one nested dictionary."""
+"""Read and validate the documented rendering defaults as one nested dictionary."""
 
 import json
 from copy import deepcopy
@@ -6,6 +6,8 @@ from importlib.resources import files
 from math import isfinite
 from pathlib import Path
 from typing import Any
+
+from porta.model import MAX_GLYPH_LENGTH
 
 # JSON values are checked once at load time; rendering uses their native types.
 type Style = dict[str, dict[str, Any]]
@@ -85,6 +87,12 @@ def _validate(style: Style) -> None:
     _number(style, "grid.stroke_ft", positive=False)
     _number(style, "grid.opacity", positive=False, maximum=1)
 
+    _require(
+        _text(style, "labels.scheme") in ("numeric", "mnemonic"),
+        "labels.scheme",
+        "expected numeric or mnemonic",
+    )
+    _number(style, "labels.start", integer=True, maximum=10**MAX_GLYPH_LENGTH - 1)
     _number(style, "labels.ratio", maximum=1)
     _number(style, "labels.fit", maximum=1)
 

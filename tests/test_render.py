@@ -2,9 +2,7 @@
 
 The ascii grid doubles as the layout test oracle.
 One character per 5-ft cell, space-separated, north at top; empty cells are
-``.``. A blank line then a legend follows. Glyphs are mnemonic-first: the
-first unused letter of the room id (uppercased), falling back to a generic
-pool; ties are broken by source order.
+``.``. A blank line then a legend follows. Glyphs are numbers assigned by casefolded display name, then ID.
 """
 
 import xml.etree.ElementTree as ET
@@ -15,6 +13,7 @@ from pathlib import Path
 
 import pytest
 
+from porta.errors import RenderError
 from porta.layout import block_wall_segments, solve
 from porta.parser import parse
 from porta.render import render_ascii, render_svg
@@ -24,7 +23,7 @@ def ascii_of(text: str) -> str:
     return render_ascii(solve(parse(text)))
 
 
-# Confidently hand-derived: entrance(E)/kitchen(K)/hall(H) on an 8x12 grid.
+# Confidently hand-derived: entrance(1)/kitchen(3)/hall(2) on an 8x12 grid.
 # 'hall' is pinned on both axes (x from right-of kitchen, y from down-of
 # entrance) and shares a real wall with each.
 DESIGN_MANOR = (
@@ -34,20 +33,20 @@ DESIGN_MANOR = (
 )
 
 DESIGN_MANOR_ASCII = """\
-E E E E E E E E
-E E E E E E E E
-E E E E E E E E
-E E E E E E E E
-K K K K H H H H
-K K K K H H H H
-K K K K H H H H
-K K K K H H H H
-K K K K . . . .
-K K K K . . . .
-K K K K . . . .
-K K K K . . . .
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+3 3 3 3 2 2 2 2
+3 3 3 3 2 2 2 2
+3 3 3 3 2 2 2 2
+3 3 3 3 2 2 2 2
+3 3 3 3 . . . .
+3 3 3 3 . . . .
+3 3 3 3 . . . .
+3 3 3 3 . . . .
 
-E=entrance  H=hall  K=kitchen"""
+1=entrance  2=hall  3=kitchen"""
 
 
 def test_design_manor_renders_to_expected_grid() -> None:
@@ -62,20 +61,27 @@ def test_empty_cells_use_dots() -> None:
     assert "." in grid
 
 
-def test_glyphs_are_mnemonic_first_with_tie_breaking() -> None:
-    # Both want K; contention resolves by id order, so kennel takes K and kitchen
-    # falls to its next letter, I — regardless of statement order.
-    text = (
-        'room kitchen "Kitchen" 10x10 root\nroom kennel "Kennel" 10x10 right-of kitchen'
+def test_glyphs_follow_names_and_reserve_later_explicit_numbers() -> None:
+    source = (
+        'room z "Atrium" 20x20 root\n'
+        'room a "Library" 20x20 right-of z\n'
+        'room m "Vault" 20x20 down-of z glyph="2"'
     )
-    legend = ascii_of(text).split("\n\n")[1]
-    assert "K=kennel" in legend
-    assert "I=kitchen" in legend
+    assert ascii_of(source).split("\n\n")[1] == "1=z  2=m  3=a"
+    root = ET.fromstring(svg_of(source))
+    assert [
+        "  ".join(span.text or "" for span in group)
+        for group in root.findall('.//{*}g[@class="key"]')
+    ] == [
+        "1  Atrium",
+        "2  Vault",
+        "3  Library",
+    ]
 
 
 def test_legend_is_sorted_by_glyph() -> None:
     legend = ascii_of(DESIGN_MANOR).split("\n\n")[1]
-    assert legend == "E=entrance  H=hall  K=kitchen"
+    assert legend == "1=entrance  2=hall  3=kitchen"
 
 
 def test_render_is_independent_of_statement_order() -> None:
@@ -98,25 +104,25 @@ def test_render_is_independent_of_statement_order() -> None:
 # --- the north-star manor (golden) ----------------------------------------
 
 MANOR_ASCII = """\
-. . . . . . . . . . . . . G G G G . . . . . . . . . . . .
-. . . . . . . . . . . . . G G G G . . . . . . . . . . . .
-. . . I I I I I I H H H H H H H H D D D D D D . . . . . .
-. . . I I I I I I H H H H H H H H D D D D D D . . . . . .
-B B B I I I I I I H H H H H H H H D D D D D D . . . . . .
-B B B I I I I I I H H H H H H H H D D D D D D . . . . . .
-B B B I I I I I I H H H H H H H H D D D D D D . . . . . .
-. . . I I I I I I H H H H H H H H D D D D D D . . . . . .
-. . . O O A A A A E E E E C C C C K K K K K K P P P . . .
-. . . O O A A A A E E E E C C C C K K K K K K P P P L L L
-. . . O O A A A A E E E E C C C C K K K K K K P P P L L L
-. . . O O A A A A E E E E C C C C K K K K K K P P P L L L
-. . . O O T T T T S R R . . . . . K K K K K K P P P . . .
-. . . O O T T T T S R R . . . . . U U U U U U . . . . . .
-. . . O O T T T T . . . . . . . . U U U U U U . . . . . .
-. . . O O T T T T . . . . . . . . U U U U U U . . . . . .
-. . . . . . . . . . . . . . . . . U U U U U U . . . . . .
+.  .  .  .  .  .  .  .  .  .  .  .  .  5  5  5  5  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  5  5  5  5  .  .  .  .  .  .  .  .  .  .  .  .
+.  .  .  9  9  9  9  9  9  6  6  6  6  6  6  6  6  3  3  3  3  3  3  .  .  .  .  .  .
+.  .  .  9  9  9  9  9  9  6  6  6  6  6  6  6  6  3  3  3  3  3  3  .  .  .  .  .  .
+16 16 16 9  9  9  9  9  9  6  6  6  6  6  6  6  6  3  3  3  3  3  3  .  .  .  .  .  .
+16 16 16 9  9  9  9  9  9  6  6  6  6  6  6  6  6  3  3  3  3  3  3  .  .  .  .  .  .
+16 16 16 9  9  9  9  9  9  6  6  6  6  6  6  6  6  3  3  3  3  3  3  .  .  .  .  .  .
+.  .  .  9  9  9  9  9  9  6  6  6  6  6  6  6  6  3  3  3  3  3  3  .  .  .  .  .  .
+.  .  .  2  2  11 11 11 11 4  4  4  4  1  1  1  1  7  7  7  7  7  7  10 10 10 .  .  .
+.  .  .  2  2  11 11 11 11 4  4  4  4  1  1  1  1  7  7  7  7  7  7  10 10 10 8  8  8
+.  .  .  2  2  11 11 11 11 4  4  4  4  1  1  1  1  7  7  7  7  7  7  10 10 10 8  8  8
+.  .  .  2  2  11 11 11 11 4  4  4  4  1  1  1  1  7  7  7  7  7  7  10 10 10 8  8  8
+.  .  .  2  2  15 15 15 15 12 13 13 .  .  .  .  .  7  7  7  7  7  7  10 10 10 .  .  .
+.  .  .  2  2  15 15 15 15 12 13 13 .  .  .  .  .  14 14 14 14 14 14 .  .  .  .  .  .
+.  .  .  2  2  15 15 15 15 .  .  .  .  .  .  .  .  14 14 14 14 14 14 .  .  .  .  .  .
+.  .  .  2  2  15 15 15 15 .  .  .  .  .  .  .  .  14 14 14 14 14 14 .  .  .  .  .  .
+.  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  14 14 14 14 14 14 .  .  .  .  .  .
 
-A=parlour  B=turret  C=cloak  D=dining  E=entrance  G=gallery  H=hall  I=library  K=kitchen  L=larder  O=corridor  P=pantry  R=porch  S=passage  T=study  U=scullery"""
+1=cloak  2=corridor  3=dining  4=entrance  5=gallery  6=hall  7=kitchen  8=larder  9=library  10=pantry  11=parlour  12=passage  13=porch  14=scullery  15=study  16=turret"""
 
 
 def test_manor_example_renders_to_golden() -> None:
@@ -129,7 +135,7 @@ def test_manor_example_renders_to_golden() -> None:
 # Geometry is drawn directly in feet (1 user unit = 1 foot); no scaling or
 # y-flip (the layout's x-east/y-south coords are already SVG-native). The
 # viewBox frames the bounding box plus a margin, so rooms are emitted at their
-# literal (possibly negative) coordinates. Rooms are lettered (reusing the
+# literal (possibly negative) coordinates. Rooms are numbered (reusing the
 # ascii glyph scheme) with a key below; full in-room names are deferred (#13).
 
 SVG_NS = "http://www.w3.org/2000/svg"
@@ -221,12 +227,12 @@ def test_exterior_is_stronger_and_shared_wall_is_drawn_once() -> None:
 @pytest.mark.parametrize(
     ("room_id", "glyph", "center"),
     [
-        ("entrance", "E", (20.0, 10.0)),
-        ("kitchen", "K", (10.0, 40.0)),
-        ("hall", "H", (30.0, 30.0)),
+        ("entrance", "1", (20.0, 10.0)),
+        ("kitchen", "3", (10.0, 40.0)),
+        ("hall", "2", (30.0, 30.0)),
     ],
 )
-def test_each_room_is_lettered_at_its_centre(
+def test_each_room_is_numbered_at_its_centre(
     room_id: str, glyph: str, center: tuple[float, float]
 ) -> None:
     root = ET.fromstring(svg_of(DESIGN_MANOR))
@@ -258,7 +264,7 @@ def test_unnamed_room_keys_as_just_its_glyph() -> None:
         for t in root.iter(tag("g"))
         if t.get("class") == "key"
     ]
-    assert key_lines == ["A"]  # glyph only: no name, no dimensions
+    assert key_lines == ["1"]  # glyph only: no name, no dimensions
 
 
 def test_special_characters_in_names_are_escaped() -> None:
@@ -345,14 +351,14 @@ def test_rooms_away_from_the_opening_keep_their_walls() -> None:
 
 def test_open_rooms_keep_their_glyphs_and_key_entries() -> None:
     root = ET.fromstring(svg_of(OPEN_TWO))
-    assert text_by_room(root, "a").text == "A"
-    assert text_by_room(root, "b").text == "B"
+    assert text_by_room(root, "a").text == "1"
+    assert text_by_room(root, "b").text == "2"
     key_lines = [
         "  ".join(span.text or "" for span in t)
         for t in root.iter(tag("g"))
         if t.get("class") == "key"
     ]
-    assert key_lines == ["A  A", "B  Bee"]
+    assert key_lines == ["1  A", "2  Bee"]
 
 
 def test_open_door_does_not_change_the_ascii_rendering() -> None:
@@ -481,10 +487,10 @@ def test_block_members_are_not_drawn_as_separate_rects() -> None:
     assert ids == set()  # members render as one outline, not per-room rects
 
 
-def test_block_draws_one_glyph_from_the_block_id() -> None:
+def test_block_draws_one_numerical_glyph() -> None:
     root = ET.fromstring(svg_of(L_BLOCK))
     block_glyphs = [t for t in root.iter(tag("text")) if t.get("data-block") == "hall"]
-    assert [t.text for t in block_glyphs] == ["H"]
+    assert [t.text for t in block_glyphs] == ["1"]
 
 
 def test_block_outline_drops_the_internal_wall() -> None:
@@ -494,7 +500,7 @@ def test_block_outline_drops_the_internal_wall() -> None:
 
 
 def test_block_legend_and_key_use_the_block_not_its_members() -> None:
-    assert ascii_of(L_BLOCK).split("\n\n")[1] == "H=hall"
+    assert ascii_of(L_BLOCK).split("\n\n")[1] == "1=hall"
     root = ET.fromstring(svg_of(L_BLOCK))
     key_text = " ".join(" ".join(t.itertext()) for t in root.iter(tag("text")))
     assert "Great Hall" in key_text
@@ -502,7 +508,7 @@ def test_block_legend_and_key_use_the_block_not_its_members() -> None:
 
 def test_block_cells_carry_the_block_glyph_in_ascii() -> None:
     grid = ascii_of(L_BLOCK).split("\n\n")[0]
-    assert "H" in grid
+    assert "1" in grid
     assert "M" not in grid
     assert "W" not in grid
 
@@ -511,68 +517,179 @@ def test_block_cells_carry_the_block_glyph_in_ascii() -> None:
 
 
 @pytest.mark.parametrize("renderer", [ascii_of, svg_of], ids=["ascii", "svg"])
+@pytest.mark.parametrize("count", [37, 999], ids=["past-old-pool", "three-digit-limit"])
+def test_automatic_numbering_within_glyph_length_limit(
+    renderer: Callable[[str], str], count: int
+) -> None:
+    # Construct a placed row directly so this tests rendering, not solver scaling.
+    building = parse("\n".join(f'room r{i:04} "" 5x5 root' for i in range(count)))
+    for i, room in enumerate(building.rooms):
+        room.x, room.y = i * 5, 0
+    if renderer is ascii_of:
+        rendered = render_ascii(building)
+        assert rendered.split("\n\n")[1].split() == [
+            f"{i + 1}=r{i:04}" for i in range(count)
+        ]
+    else:
+        root = ET.fromstring(render_svg(building))
+        assert [t.text for t in root.iter(tag("text")) if t.get("data-room")] == [
+            str(i + 1) for i in range(count)
+        ]
+        assert [
+            "  ".join(span.text or "" for span in group)
+            for group in root.findall('.//{*}g[@class="key"]')
+        ] == [str(i + 1) for i in range(count)]
+
+
+@pytest.mark.parametrize("renderer", [render_ascii, render_svg], ids=["ascii", "svg"])
 @pytest.mark.parametrize(
-    ("extra", "capacity"),
+    ("count", "explicit", "exhausted"),
     [
-        pytest.param("", 36, id="rooms"),
-        pytest.param('room fixed "" 5x5 root glyph="A"', 35, id="reserved-letter"),
-        pytest.param('room fixed "" 5x5 root glyph="0"', 35, id="reserved-digit"),
-        pytest.param('room fixed "" 5x5 root glyph="12"', 36, id="multi-character"),
-        pytest.param('room fixed "" 5x5 root glyph=""', 36, id="unlabeled-room"),
-        pytest.param(L_BLOCK, 35, id="automatic-block"),
-        pytest.param(
-            L_BLOCK.replace('block hall "Great Hall"', 'block hall "" glyph="A"'),
-            35,
-            id="reserved-block",
-        ),
-        pytest.param(
-            L_BLOCK.replace('block hall "Great Hall"', 'block hall "" glyph="12"'),
-            36,
-            id="multi-character-block",
-        ),
-        pytest.param(
-            L_BLOCK.replace('block hall "Great Hall"', 'block hall "" glyph=""'),
-            36,
-            id="unlabeled-block",
-        ),
+        pytest.param(1000, None, True, id="four-digits"),
+        pytest.param(999, "999", True, id="last-number-reserved"),
+        pytest.param(998, "999", False, id="last-number-reserved-at-capacity"),
+        pytest.param(999, "A", False, id="custom-glyph-frees-number"),
+        pytest.param(999, "", False, id="hidden-glyph-frees-number"),
     ],
 )
-@pytest.mark.parametrize("offset", [-1, 0, 1], ids=["below", "at", "over"])
-def test_automatic_glyph_capacity(
-    renderer: Callable[[str], str], extra: str, capacity: int, offset: int
+def test_automatic_number_exhaustion(
+    renderer: Callable[..., str], count: int, explicit: str | None, exhausted: bool
 ) -> None:
-    source = "\n".join(
-        [extra, *(f'room r{i} "" 5x5 root' for i in range(capacity + offset))]
-    )
-    if offset <= 0:
-        rendered = renderer(source)
-        assert rendered == renderer(source)
-        if renderer is ascii_of:
-            glyphs = [
-                entry.split("=")[0] for entry in rendered.split("\n\n")[1].split()
-            ]
-        else:
-            glyphs = [
-                node.text or ""
-                for node in ET.fromstring(rendered).iter(tag("text"))
-                if node.get("data-room") or node.get("data-block")
-            ]
-        labeled_extra = bool(extra) and 'glyph=""' not in extra
-        assert len(glyphs) == capacity + offset + labeled_extra
-        assert len(set(glyphs)) == len(glyphs)
+    rows = [f'room r{i:04} "" 5x5 root' for i in range(count)]
+    if explicit is not None:
+        rows.append(f'room fixed "" 5x5 root glyph="{explicit}"')
+    building = parse("\n".join(rows))
+    for i, room in enumerate(building.rooms):
+        room.x, room.y = i * 5, 0
+    if exhausted:
+        with pytest.raises(RenderError, match="automatic numbers exhausted") as exc:
+            renderer(building)
+        assert exc.value.line == count
+        assert f"'r{count - 1:04}'" in exc.value.message
+        assert "3 characters" in exc.value.message
+        assert 'nonnumeric custom glyphs or glyph=""' in exc.value.message
     else:
-        with pytest.raises(ValueError, match="automatic glyphs exhausted") as exc:
-            renderer(source)
-        message = str(exc.value)
-        assert "automatic glyphs exhausted for 'r" in message
-        assert "36 used" in message
-        assert "unique multi-character glyphs" in message
-        assert 'glyph=""' in message
-        assert "ascii" not in message.lower()
-        assert "svg" not in message.lower()
+        assert renderer(building)
 
 
-# Explicit multi-char glyphs ("12", "1"), an automatic one (hall -> H), and an
+@pytest.mark.parametrize(
+    ("glyph", "automatic"),
+    [
+        ("01", "2"),
+        ("0", "1"),
+        ("001", "2"),
+        ("\u0661", "1"),
+        ("²", "1"),
+        ("+1", "1"),
+        ("1a", "1"),
+        ("", "1"),
+    ],
+    ids=[
+        "leading-zero",
+        "zero",
+        "two-zeros",
+        "unicode-decimal",
+        "unicode-digit",
+        "sign",
+        "mixed",
+        "suppressed",
+    ],
+)
+def test_custom_number_reservation(glyph: str, automatic: str) -> None:
+    source = f'room a "Auto" 5x5 root\nroom z "Z" 5x5 root glyph="{glyph}"'
+    assert f"{automatic}=a" in ascii_of(source).split("\n\n")[1].split()
+    root = ET.fromstring(svg_of(source))
+    assert text_by_room(root, "a").text == automatic
+    if glyph:
+        assert text_by_room(root, "z").text == glyph
+
+
+@pytest.mark.parametrize("reverse", [False, True], ids=["forward", "reverse"])
+def test_name_order_handles_empty_casefolded_and_duplicate_names(reverse: bool) -> None:
+    rows = [
+        'room z "" 5x5 root',
+        'room a "" 5x5 root',
+        'room y "alpha" 5x5 root',
+        'room b "ALPHA" 5x5 root',
+        'room x "Straße" 5x5 root',
+        'room c "STRASSE" 5x5 root',
+    ]
+    source = "\n".join(reversed(rows) if reverse else rows)
+    assert ascii_of(source).split("\n\n")[1] == "1=a  2=z  3=b  4=y  5=c  6=x"
+
+
+@pytest.mark.parametrize(
+    "block_glyph", [None, "2", ""], ids=["auto", "explicit", "hidden"]
+)
+def test_blocks_exterior_and_components_share_numbering(
+    block_glyph: str | None,
+) -> None:
+    modifier = "" if block_glyph is None else f' glyph="{block_glyph}"'
+    source = (
+        'room member "Aardvark" 5x5 root glyph="1"\n'
+        'room wing "" 5x5 right-of member glyph="3"\n'
+        f'block z "Beta" member wing{modifier}\n'
+        'room y "Alpha" 5x5 root exterior\n'
+        'room x "Gamma" 5x5 root\n'
+        'room hidden "" 5x5 root glyph=""'
+    )
+    block_number = "2" if block_glyph is None else block_glyph
+    last = "3" if block_number else "2"
+    legend = f"1=y  2=z  {last}=x" if block_number else f"1=y  {last}=x"
+    rendered = ascii_of(source)
+    assert rendered.split("\n\n")[1] == legend
+    assert rendered.splitlines()[0].split()[:2] == [block_number or "_"] * 2
+    root = ET.fromstring(svg_of(source))
+    assert text_by_room(root, "y").text == "1"
+    assert text_by_room(root, "x").text == last
+    assert [t.text for t in root.iter(tag("text")) if t.get("data-block")] == (
+        [block_number] if block_number else []
+    )
+
+
+def test_numeric_key_interleaves_reservations_before_custom_glyphs() -> None:
+    custom = ["9", "10", "100", "01", "1", "0", "Z", "Ab", "a", "\u0661"]
+    source = "\n".join(
+        [
+            *(
+                f'room r{i} "R{i}" 5x5 root glyph="{glyph}"'
+                for i, glyph in enumerate(custom)
+            ),
+            *(f'room a{i:02} "Auto{i:02}" 5x5 root' for i in range(10)),
+        ]
+    )
+    expected = [
+        "0",
+        "01",
+        "1",
+        "2",
+        "3",
+        "4",
+        "5",
+        "6",
+        "7",
+        "8",
+        "9",
+        "10",
+        "11",
+        "12",
+        "13",
+        "100",
+        "Ab",
+        "Z",
+        "a",
+        "\u0661",
+    ]
+    assert [
+        entry.split("=")[0] for entry in ascii_of(source).split("\n\n")[1].split()
+    ] == expected
+    root = ET.fromstring(svg_of(source))
+    assert [
+        group[0].text for group in root.findall('.//{*}g[@class="key"]')
+    ] == expected
+
+
+# Explicit multi-char glyphs ("12", "1"), an automatic one (hall -> 2), and an
 # unlabeled room (store, glyph="") together in one small plan.
 GLYPHS = (
     'room cells "Prison Cells" 20x10 root glyph="12"\n'
@@ -584,24 +701,24 @@ GLYPHS = (
 GLYPHS_ASCII = """\
 12 12 12 12 1  1  _  _
 12 12 12 12 1  1  _  _
-H  H  H  H  H  H  H  H
-H  H  H  H  H  H  H  H
+2  2  2  2  2  2  2  2
+2  2  2  2  2  2  2  2
 
-1=guard  H=hall  12=cells"""
+1=guard  2=hall  12=cells"""
 
 
 def test_explicit_glyphs_pad_the_grid_and_fill_the_legend() -> None:
     # Cells pad to the widest glyph, the unlabeled room fills with '_' and has
-    # no legend entry, and the legend sorts shortest-glyph-first.
+    # no legend entry, and the legend sorts numerically.
     assert ascii_of(GLYPHS) == GLYPHS_ASCII
 
 
 def test_automatic_glyphs_avoid_explicit_ones() -> None:
-    # 'beta' claims A explicitly, so 'alpha' falls through to its next letter.
+    # A nonnumeric custom glyph leaves the automatic sequence starting at 1.
     text = 'room beta "" 10x10 root glyph="A"\nroom alpha "" 10x10 right-of beta'
     legend = ascii_of(text).split("\n\n")[1]
     assert "A=beta" in legend
-    assert "L=alpha" in legend
+    assert "1=alpha" in legend
 
 
 def test_explicit_glyph_is_rendered_in_the_svg_room_and_key() -> None:
@@ -612,7 +729,7 @@ def test_explicit_glyph_is_rendered_in_the_svg_room_and_key() -> None:
         for t in root.iter(tag("g"))
         if t.get("class") == "key"
     ]
-    assert key_lines == ["1  Guard Post", "H  Hall", "12  Prison Cells"]
+    assert key_lines == ["1  Guard Post", "2  Hall", "12  Prison Cells"]
 
 
 def test_unlabeled_room_keeps_its_walls_but_has_no_svg_label() -> None:
@@ -861,7 +978,7 @@ def test_divider_does_not_change_the_ascii_rendering() -> None:
 
 def test_ascii_renders_packed_components_with_a_gap() -> None:
     text = 'room a "A" 10x10 root\nroom b "B" 10x10 root'
-    assert ascii_of(text) == ("A A . . B B\nA A . . B B\n\nA=a  B=b")
+    assert ascii_of(text) == ("1 1 . . 2 2\n1 1 . . 2 2\n\n1=a  2=b")
 
 
 def test_manor_renders_to_golden_svg_fixture() -> None:
@@ -1361,3 +1478,221 @@ def test_supplied_style_is_local_to_one_render(tmp_path: Path) -> None:
     assert background is not None
     assert background.attrib["fill"] == "white"
     assert style["page"]["background"] == "#fff8e7"
+
+
+@pytest.mark.parametrize("font_size", [3, 8], ids=["small-key", "large-key"])
+def test_custom_styles_preserve_numeric_assignments_and_key_order(
+    tmp_path: Path, font_size: int
+) -> None:
+    from porta.style import load_style
+
+    style_path = tmp_path / "style.json"
+    style_path.write_text(
+        '{"labels": {"ratio": 0.4, "fit": 0.7}, '
+        f'"key": {{"font_ft": {font_size}, "line_spacing_ft": 12}}, '
+        '"typography": {"text_color": "#123456"}}'
+    )
+    source = (
+        'room z "Atrium" 20x20 root\n'
+        'room a "Library" 20x20 right-of z\n'
+        'room m "Vault" 20x20 down-of z glyph="2"'
+    )
+    building = solve(parse(source))
+    root = ET.fromstring(render_svg(building, style=load_style(style_path)))
+    assert {rid: text_by_room(root, rid).text for rid in ("z", "m", "a")} == {
+        "z": "1",
+        "m": "2",
+        "a": "3",
+    }
+    keys = root.findall('.//{*}g[@class="key"]')
+    assert [key[0].text for key in keys] == ["1", "2", "3"]
+    assert all(key.attrib["font-size"] == str(font_size) for key in keys)
+    assert ascii_of(source).split("\n\n")[1] == "1=z  2=m  3=a"
+
+
+@pytest.mark.parametrize(
+    ("source", "legend"),
+    [
+        pytest.param(
+            'room z "Atrium" 5x5 root\nroom a "Vault" 5x5 root',
+            "A=a  Z=z",
+            id="id-order-not-name-order",
+        ),
+        pytest.param(
+            'room kitchen "A" 5x5 root\nroom kennel "Z" 5x5 root',
+            "I=kitchen  K=kennel",
+            id="id-contention",
+        ),
+        pytest.param(
+            'room hall "Hall" 5x5 root\nroom z "Z" 5x5 root glyph="H"',
+            "A=hall  H=z",
+            id="reserve-later-explicit",
+        ),
+        pytest.param(
+            'room a "" 5x5 root glyph="A"\nroom a-a "" 5x5 root',
+            "A=a  B=a-a",
+            id="fallback-skips-punctuation",
+        ),
+        pytest.param(
+            'room a "" 5x5 root glyph="A"\nroom a1 "" 5x5 root',
+            "1=a1  A=a",
+            id="id-digit-and-numeric-key-order",
+        ),
+        pytest.param(
+            'room main "" 5x5 root glyph="H"\n'
+            'block hall "Hall" main\nroom z "" 5x5 root exterior',
+            "H=hall  Z=z",
+            id="members-suppressed-exterior-component",
+        ),
+        pytest.param(
+            'room main "" 5x5 root\nblock hall "" main glyph="12"\n'
+            'room a "" 5x5 root glyph=""\nroom z "" 5x5 root',
+            "12=hall  Z=z",
+            id="explicit-block-and-hidden-room",
+        ),
+    ],
+)
+def test_mnemonic_assignments_match_in_svg_and_ascii(source: str, legend: str) -> None:
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["labels"]["scheme"] = "mnemonic"
+    for text in (source, "\n".join(reversed(source.splitlines()))):
+        building = solve(parse(text))
+        assert render_ascii(building, style=style).split("\n\n")[1] == legend
+        root = ET.fromstring(render_svg(building, style=style))
+        expected = dict(entry.split("=")[::-1] for entry in legend.split())
+        assert {
+            node.get("data-room") or node.get("data-block"): node.text
+            for node in root.iter(tag("text"))
+            if node.get("data-room") or node.get("data-block")
+        } == expected
+        assert [key[0].text for key in root.findall('.//{*}g[@class="key"]')] == list(
+            expected.values()
+        )
+        assert render_ascii(building) == ascii_of(text)
+        assert render_svg(building) == svg_of(text)
+
+
+@pytest.mark.parametrize("renderer", [render_ascii, render_svg], ids=["ascii", "svg"])
+@pytest.mark.parametrize("count", [36, 37], ids=["full", "exhausted"])
+def test_mnemonic_pool_capacity(renderer: Callable[..., str], count: int) -> None:
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["labels"]["scheme"] = "mnemonic"
+    building = solve(
+        parse("\n".join(f'room r{i:02} "" 5x5 root' for i in range(count)))
+    )
+    if count == 36:
+        assert renderer(building, style=style)
+    else:
+        with pytest.raises(RenderError, match="mnemonic glyphs exhausted") as exc:
+            renderer(building, style=style)
+        assert exc.value.line == 37
+        assert 'labels.scheme="numeric"' in exc.value.message
+        assert renderer(building)
+
+
+@pytest.mark.parametrize(
+    ("start", "reserved", "expected"),
+    [
+        pytest.param(10, "11", {"z": "10", "a": "12", "m": "11"}, id="skip-reserved"),
+        pytest.param(
+            10, "5", {"z": "10", "a": "11", "m": "5"}, id="explicit-below-start"
+        ),
+        pytest.param(
+            10,
+            "010",
+            {"z": "11", "a": "12", "m": "010"},
+            id="reserved-start-leading-zero",
+        ),
+        pytest.param(
+            998, "0", {"z": "998", "a": "999", "m": "0"}, id="last-two-numbers"
+        ),
+    ],
+)
+def test_numeric_start_preserves_reservations_and_key_order(
+    start: int, reserved: str, expected: dict[str, str]
+) -> None:
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["labels"]["start"] = start
+    source = (
+        'room z "Atrium" 20x20 root\n'
+        'room a "Library" 20x20 right-of z\n'
+        f'room m "Vault" 20x20 down-of z glyph="{reserved}"'
+    )
+    building = solve(parse(source))
+    entries = sorted(expected.items(), key=lambda item: int(item[1]))
+    assert render_ascii(building, style=style).split("\n\n")[1] == "  ".join(
+        f"{glyph}={eid}" for eid, glyph in entries
+    )
+    root = ET.fromstring(render_svg(building, style=style))
+    assert {eid: text_by_room(root, eid).text for eid in expected} == expected
+    assert [key[0].text for key in root.findall('.//{*}g[@class="key"]')] == [
+        glyph for _, glyph in entries
+    ]
+    assert render_ascii(building) == ascii_of(source)
+    assert DEFAULT_STYLE["labels"]["start"] == 1
+
+
+@pytest.mark.parametrize("renderer", [render_ascii, render_svg], ids=["ascii", "svg"])
+@pytest.mark.parametrize(
+    ("start", "source", "exhausted"),
+    [
+        pytest.param(999, 'room a "" 5x5 root', False, id="last-number"),
+        pytest.param(
+            999, 'room a "" 5x5 root\nroom b "" 5x5 root', True, id="no-wraparound"
+        ),
+        pytest.param(
+            999,
+            'room a "" 5x5 root\nroom b "" 5x5 root glyph="999"',
+            True,
+            id="last-number-reserved",
+        ),
+        pytest.param(
+            999,
+            'room a "" 5x5 root glyph=""\nroom b "" 5x5 root',
+            False,
+            id="hidden-frees-last-number",
+        ),
+    ],
+)
+def test_start_near_numeric_limit(
+    renderer: Callable[..., str], start: int, source: str, exhausted: bool
+) -> None:
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["labels"]["start"] = start
+    building = solve(parse(source))
+    if exhausted:
+        with pytest.raises(RenderError, match=r"lower labels\.start"):
+            renderer(building, style=style)
+    else:
+        assert "999" in renderer(building, style=style)
+
+
+def test_numeric_start_is_shared_by_blocks_and_components() -> None:
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["labels"]["start"] = 10
+    building = solve(
+        parse(
+            'room member "" 5x5 root glyph="10"\n'
+            'block b "Beta" member\n'
+            'room a "Alpha" 5x5 root exterior\n'
+            'room c "Charlie" 5x5 root\n'
+            'room hidden "" 5x5 root glyph=""'
+        )
+    )
+    assert render_ascii(building, style=style).split("\n\n")[1] == "10=a  11=b  12=c"
+    root = ET.fromstring(render_svg(building, style=style))
+    label = root.find('.//{*}text[@data-block="b"]')
+    assert label is not None
+    assert label.text == "11"
+    assert text_by_room(root, "a").text == "10"
+    assert text_by_room(root, "c").text == "12"

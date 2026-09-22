@@ -9,80 +9,120 @@ from typing import Any
 type Style = dict[str, dict[str, Any]]
 
 
+def _require(condition: bool, path: str, message: str) -> None:
+    """An assertion-like check that remains active under python -O."""
+    if not condition:
+        raise ValueError(f"{path}: {message}")
+
+
+def _value(style: Style, path: str) -> Any:
+    group, name = path.split(".")
+    _require(group in style and name in style[group], path, "missing parameter")
+    return style[group][name]
+
+
+def _text(style: Style, path: str) -> str:
+    value = _value(style, path)
+    _require(
+        isinstance(value, str) and bool(value.strip()),
+        path,
+        "expected a nonempty string",
+    )
+    return str(value)
+
+
+def _number(
+    style: Style,
+    path: str,
+    *,
+    positive: bool = True,
+    integer: bool = False,
+    maximum: float | None = None,
+) -> None:
+    value = _value(style, path)
+    _require(
+        type(value) in (int, float) and isfinite(value),
+        path,
+        "expected a finite number",
+    )
+    if integer:
+        _require(type(value) is int, path, "expected an integer")
+    if positive:
+        _require(value > 0, path, "expected a positive number")
+    else:
+        _require(value >= 0, path, "expected a nonnegative number")
+    if maximum is not None:
+        _require(value <= maximum, path, f"must not exceed {maximum:g}")
+
+
+def _dash(style: Style, path: str) -> None:
+    pattern = _text(style, path)
+    try:
+        lengths = [float(part) for part in pattern.replace(",", " ").split()]
+    except ValueError:
+        raise ValueError(f"{path}: expected a numeric dash pattern") from None
+    _require(
+        all(isfinite(n) and n >= 0 for n in lengths) and any(lengths),
+        path,
+        "dash lengths must be finite and nonnegative, with at least one positive",
+    )
+
+
 def _validate(style: Style) -> None:
-    for group, parameters in style.items():
-        for name, value in parameters.items():
-            path = f"{group}.{name}"
-            is_string = name.endswith("color") or path in {
-                "page.background",
-                "typography.font_family",
-                "doors.open_dash",
-                "dividers.dash",
-            }
-            if is_string:
-                if not isinstance(value, str) or not value.strip():
-                    raise ValueError(f"{path}: expected a nonempty string")
-                if name.endswith("dash"):
-                    try:
-                        lengths = [
-                            float(part) for part in value.replace(",", " ").split()
-                        ]
-                    except ValueError:
-                        raise ValueError(
-                            f"{path}: expected a numeric dash pattern"
-                        ) from None
-                    if not all(isfinite(n) and n >= 0 for n in lengths) or not any(
-                        lengths
-                    ):
-                        raise ValueError(
-                            f"{path}: dash lengths must be nonnegative and finite, "
-                            "with at least one positive"
-                        )
-                continue
-            if type(value) not in (int, float) or not isfinite(value):
-                raise ValueError(f"{path}: expected a finite number")
-            if (
-                path
-                in {
-                    "grid.spacing_ft",
-                    "stairs.treads_per_grid",
-                    "typography.font_weight",
-                }
-                and type(value) is not int
-            ):
-                raise ValueError(f"{path}: expected an integer")
-            zero_allowed = name.endswith("stroke_ft") or path in {
-                "grid.opacity",
-                "page.margin_ft",
-                "key.identifier_gap_ft",
-                "key.column_gap_ft",
-                "doors.secret_halo_ft",
-                "scale_bar.gap_ft",
-            }
-            if value < 0 or (value == 0 and not zero_allowed):
-                kind = "nonnegative" if zero_allowed else "positive"
-                raise ValueError(f"{path}: expected a {kind} number")
-            if (
-                path
-                in {
-                    "labels.ratio",
-                    "labels.fit",
-                    "stairs.min_ratio",
-                    "stairs.max_ratio",
-                }
-                and value > 1
-            ):
-                raise ValueError(f"{path}: expected a fraction no greater than 1")
-            if path == "grid.opacity" and value > 1:
-                raise ValueError("grid.opacity: must be between 0 and 1")
-            if path == "typography.font_weight" and value > 1000:
-                raise ValueError(
-                    "typography.font_weight: expected an integer from 1 to 1000"
-                )
-    if style["key"]["line_spacing_ft"] < style["key"]["font_ft"]:
-        raise ValueError("key.line_spacing_ft must be at least key.font_ft")
-    if style["stairs"]["min_ratio"] > style["stairs"]["max_ratio"]:
-        raise ValueError("stairs.min_ratio must not exceed stairs.max_ratio")
+    """Check each group explicitly, then relationships between parameters."""
+    _text(style, "page.background")
+    _text(style, "page.line_color")
+    _number(style, "page.margin_ft", positive=False)
+    _number(style, "page.display_scale")
+
+    _text(style, "typography.font_family")
+    _text(style, "typography.text_color")
+    _number(style, "typography.font_weight", integer=True, maximum=1000)
+
+    _number(style, "grid.spacing_ft", integer=True)
+    _number(style, "grid.stroke_ft", positive=False)
+    _number(style, "grid.opacity", positive=False, maximum=1)
+
+    _number(style, "labels.ratio", maximum=1)
+    _number(style, "labels.fit", maximum=1)
+
+    _number(style, "key.font_ft")
+    _number(style, "key.identifier_gap_ft", positive=False)
+    _number(style, "key.column_gap_ft", positive=False)
+    _number(style, "key.line_spacing_ft")
+
+    _number(style, "scale_bar.length_ft")
+    _number(style, "scale_bar.gap_ft", positive=False)
+
+    _number(style, "walls.interior_stroke_ft", positive=False)
+    _number(style, "walls.exterior_stroke_ft", positive=False)
+
+    _number(style, "doors.stroke_ft", positive=False)
+    _dash(style, "doors.open_dash")
+    _number(style, "doors.secret_font_ft")
+    _number(style, "doors.secret_halo_ft", positive=False)
+
+    _number(style, "windows.gap_ft")
+    _number(style, "windows.stroke_ft", positive=False)
+
+    _number(style, "stairs.treads_per_grid", integer=True)
+    _number(style, "stairs.stroke_ft", positive=False)
+    _number(style, "stairs.max_ratio", maximum=1)
+    _number(style, "stairs.min_ratio", maximum=1)
+
+    _number(style, "dividers.stroke_ft", positive=False)
+    _dash(style, "dividers.dash")
+
+    _require(
+        style["key"]["line_spacing_ft"] >= style["key"]["font_ft"],
+        "key.line_spacing_ft",
+        "must be at least key.font_ft",
+    )
+    _require(
+        style["stairs"]["min_ratio"] <= style["stairs"]["max_ratio"],
+        "stairs.min_ratio",
+        "must not exceed stairs.max_ratio",
+    )
 
 
 def _load_defaults() -> Style:

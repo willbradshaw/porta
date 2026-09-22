@@ -45,8 +45,8 @@ def test_grid_opacity_range(opacity: float) -> None:
         ("doors.open_dash", "a b", "numeric dash"),
         ("dividers.dash", "0 0", "dash lengths"),
         ("stairs.min_ratio", 0.9, "must not exceed"),
-        ("labels.fit", 2, "fraction"),
-        ("typography.font_weight", 1001, "1 to 1000"),
+        ("labels.fit", 2, "must not exceed 1"),
+        ("typography.font_weight", 1001, "must not exceed 1000"),
         ("key.line_spacing_ft", 0.5, "at least key.font_ft"),
     ],
 )
@@ -56,3 +56,11 @@ def test_invalid_default_values(parameter: str, value: object, message: str) -> 
     values[group][name] = value
     with pytest.raises(ValueError, match=message):
         _validate(values)
+
+
+@pytest.mark.parametrize("group", list(DEFAULT_STYLE))
+def test_missing_default_group_reports_its_path(group: str) -> None:
+    style = deepcopy(DEFAULT_STYLE)
+    del style[group]
+    with pytest.raises(ValueError, match=rf"{group}\..*: missing parameter"):
+        _validate(style)

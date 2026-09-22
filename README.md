@@ -99,25 +99,6 @@ Window and scale fills follow the background; symbols and grid use the shared li
 color, with separate grid opacity. Font fitting uses Palatino-based estimates, so
 other fonts may fit differently in the SVG viewer.
 
-Optional SVG presentation controls use the same style file:
-
-```json
-{
-  "key": {"visible": true, "columns": 2},
-  "scale_bar": {"visible": true},
-  "grid": {"visible": false}
-}
-```
-
-Set `visible` to `false` to hide the key, scale annotation, or grid; all default
-to `true`. Hiding the key keeps room labels. Hiding the grid also removes its
-size note, while keeping the scale bar.
-
-`key.columns` accepts `"auto"` (the default) or a positive integer; extra
-columns beyond the number of entries are omitted. Long names wrap, and the image
-widens if needed to fit the key at the chosen font size. These settings affect SVG
-only.
-
 The solved coordinate system can also be viewed and debugged directly
 as an ASCII grid:
 

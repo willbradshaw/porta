@@ -145,46 +145,16 @@ is valid within a name, subject to the restrictions above.
 
 ### Glyphs
 
-Each room is labeled on the rendered map by a short **glyph**, which the key
-below the map maps back to the room's name. By default (`labels.scheme` set to
-`"numeric"`), automatic labels are consecutive
-positive integers starting at `1`, skipping reserved numbers. Rooms outside
-blocks and the [blocks](block.md) themselves share one sequence across the
-whole map, including disconnected components and exterior rooms. Assignment
-sorts by display name using Unicode case folding (case-insensitive, with no
-locale-specific collation), then by ID for ties, regardless of declaration
-order. Empty names sort first. A block participates under its own name; its
-members inherit its glyph and consume no numbers.
+A **glyph** is a short room label, matched to its name in the map's key. All
+glyphs are limited to three characters and shrink to fit the room width.
+Choose automatic assignment with `labels.scheme` in a
+[style file](../README.md#the-porta-tool): exactly `"numeric"` (default) or
+`"mnemonic"`, case-sensitive. Both schemes work in SVG and ASCII.
 
-In numeric mode, explicit numerical glyphs reserve their values before any
-automatic assignment.
-A numerical glyph contains only ASCII digits `0`–`9`: `"01"` reserves `1` but
-is displayed verbatim; `"0"` reserves zero without changing the starting number.
-Unicode digits, signs, and mixed labels like `"12a"` are nonnumeric custom glyphs
-and reserve no numbers. Suppressed member glyphs reserve nothing.
-
-SVG keys and ASCII legends list numerical glyphs first, by numerical value.
-Equal values (such as explicit `"01"` and `"1"`) sort by verbatim glyph text.
-Nonnumeric glyphs follow in Unicode code-point order, case-sensitive; IDs break
-any remaining ties.
-
-For example, Vault reserves `2` even though it comes last both alphabetically
-and in the source. Atrium receives `1`; Library skips the reserved `2` and
-receives `3`. The IDs deliberately differ from display-name order:
-
-```porta img/glyph-reservation.svg
-room z "Atrium"  20x20 root
-room a "Library" 20x20 right-of z
-room m "Vault"   20x20 down-of z glyph="2"
-```
-
-<img alt="Atrium labeled 1, Vault explicitly labeled 2, and Library labeled 3 after skipping the reserved number" src="img/glyph-reservation.svg" width="70%">
-
-The key reads `1 Atrium`, `2 Vault`, `3 Library`: explicit and automatic labels
-are interleaved in numerical order.
-
-An explicit glyph can be set instead with `glyph="..."`, placed after the
-dimensions:
+Set `glyph="..."` after the room dimensions to override either scheme. Explicit
+glyphs must be unique, double-quoted, and printable without whitespace; they
+are displayed verbatim. Use `glyph=""` to hide both the label and key entry,
+consume no automatic label, and fill the room with `_` in ASCII:
 
 ```porta img/glyphs.svg
 room cells "Prison Cells" 30x20 root glyph="12"
@@ -195,64 +165,65 @@ room hall  "Hall"         60x20 down-of cells
 
 <img alt="Rooms with explicit numeric glyphs, an automatic glyph, and an unlabeled room" src="img/glyphs.svg" width="70%">
 
-This is chiefly useful for transcribing source material with existing room
-numbers or custom labels such as `12a`. An explicit glyph must be:
+Rooms and [blocks](block.md) share one assignment across the whole map, including
+exterior rooms and disconnected components. A block participates once under its
+own name and ID; members inherit its label, and their suppressed glyphs reserve
+nothing. Assignment is independent of declaration order.
 
-- 1-3 characters long;
-- Double-quoted;
-- Printable, with no whitespace.
+In both schemes, keys list ASCII-digit glyphs first by numerical value, then
+nonnumeric glyphs in case-sensitive Unicode code-point order. Equal numerical
+values sort by verbatim text (`"01"` before `"1"`); IDs break remaining ties.
 
-The glyph is drawn verbatim in the room and in the key, scaled down when
-needed to fit the room's width. Explicit glyphs must be **unique** across the
-plan's rooms and [blocks](block.md) — a duplicate raises an error. Rooms
-without an explicit glyph still receive automatic glyphs, which never collide
-with the explicit ones.
+#### Numeric labels
 
-All glyphs are limited to three characters, so automatic numbers range from
-`1` to `999`, skipping reserved values. If these run out, rendering reports an
-error; assign nonnumeric custom glyphs or use `glyph=""` to free numbers.
-Labels shrink as needed to fit the room width.
+Automatic numbers run from `labels.start` (default `1`) through `999`, skipping
+reserved values. Rooms and blocks are ordered by display name using Unicode
+case folding, with no locale-specific collation; IDs break ties and empty names
+sort first.
 
-To start higher, set `labels.start` in a [style file](../README.md#the-porta-tool):
+Explicit ASCII-digit glyphs reserve their numerical values before assignment:
+`"01"` reserves `1`, while `"0"` has no effect on positive numbering. Unicode
+digits, signs, and mixed labels such as `"12a"` reserve no numbers.
+
+Here Vault reserves `2` despite appearing last alphabetically and in the source.
+Atrium gets `1` and Library skips to `3`; the key reads `1 Atrium`, `2 Vault`,
+`3 Library`:
+
+```porta img/glyph-reservation.svg
+room z "Atrium"  20x20 root
+room a "Library" 20x20 right-of z
+room m "Vault"   20x20 down-of z glyph="2"
+```
+
+<img alt="Atrium labeled 1, Vault explicitly labeled 2, and Library labeled 3 after skipping the reserved number" src="img/glyph-reservation.svg" width="70%">
+
+To continue numbering from another map, set an integer from `1` to `999` in
+your style file:
 
 ```json
 {"labels": {"start": 10}}
 ```
 
-The value must be an integer from `1` to `999` (default `1`). This changes only
-automatic numeric labels, in both SVG and ASCII. Explicit glyphs remain unchanged,
-including numbers below the start, and reserved numbers are still skipped. For
-example, with `start` set to `10` and Vault explicitly labeled `11`, Atrium gets
-`10`, Vault keeps `11`, and Library gets `12`. There is no wraparound after `999`;
-lower the start or free numbers if the available range is exhausted. Mnemonic
-mode ignores `labels.start`.
-
-The empty glyph `glyph=""` marks the room as **unlabeled**: no glyph is
-drawn, and the room gets no key entry at all (`store` above). In the
-[debug-ascii grid](../README.md#the-porta-tool), an unlabeled room's cells
-render as `_`. Unlabeled entities consume no number.
+Explicit labels remain unchanged, including numbers below the start. Numbering
+never wraps after `999`: if exhausted, lower the start, assign nonnumeric custom
+glyphs, or hide labels with `glyph=""`.
 
 #### Mnemonic labels
 
-To restore the previous ID-based assignment, use a [style file](../README.md#the-porta-tool)
-with `{"labels": {"scheme": "mnemonic"}}`. This works with both SVG and
-`--debug-ascii` output.
+Restore ID-based assignment with this style setting (`labels.start` is ignored):
 
-Rooms outside blocks and blocks are processed together in alphabetical ID order.
-Each receives the first unused alphanumeric character of its ID, uppercased,
-ignoring hyphens and underscores. If none is available, assignment tries `A`–`Z`,
-then `0`–`9`. For example, `kennel` gets `K` and `kitchen` gets `I`, regardless
-of display names or declaration order.
+```json
+{"labels": {"scheme": "mnemonic"}}
+```
 
-Explicit glyphs reserve their exact text before assignment. For example, an
-explicit `"H"` makes `hall` try `A` next; `"01"` does not reserve the single
-character `"1"` in this mode. Block members inherit their block's glyph, and
-suppressed member glyphs reserve nothing. `glyph=""` consumes no label.
+Rooms and blocks are processed in alphabetical ID order. Each receives its ID's
+first unused alphanumeric character, uppercased, ignoring hyphens and underscores.
+If none is available, assignment tries `A`–`Z`, then `0`–`9`. For example,
+`kennel` gets `K` and `kitchen` gets `I`, regardless of their display names.
 
-The mnemonic pool has 36 labels. If exhausted, rendering reports an error;
-use explicit multi-character glyphs, hide labels with `glyph=""`, or switch to
-`"numeric"`. The three-character glyph limit still applies. Both schemes use
-the numerical-first key ordering described above.
+Explicit glyphs reserve their exact text: `"H"` makes `hall` try `A` next, while
+`"01"` does not reserve `"1"`. If the 36-label pool is exhausted, use explicit
+multi-character glyphs, hide labels with `glyph=""`, or switch to `"numeric"`.
 
 ### Dimensions
 

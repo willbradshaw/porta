@@ -9,11 +9,8 @@ from dataclasses import dataclass, fields, replace
 from importlib.resources import files
 from math import isfinite
 
-from porta.style import DEFAULT_STYLE
+from porta.style import DEFAULT_STYLE, Style
 from porta.text_metrics import TextBounds
-
-_GLYPH_GAP = DEFAULT_STYLE["key"]["identifier_gap_ft"]
-_COLUMN_GAP = DEFAULT_STYLE["key"]["column_gap_ft"]
 
 
 @dataclass(frozen=True)
@@ -225,8 +222,7 @@ def candidates(
     *,
     wrap: bool = True,
     scale_width: float = 0,
-    glyph_gap: float = _GLYPH_GAP,
-    column_gap: float = _COLUMN_GAP,
+    style: Style = DEFAULT_STYLE,
 ) -> list[Candidate]:
     """Vary all nonempty column counts and text-wrap breakpoints.
 
@@ -270,7 +266,9 @@ def candidates(
                 (metrics[line].width for name in names for line in rows[name]),
                 default=0,
             )
-            column_width = glyph_width + (glyph_gap + name_width if name_width else 0)
+            column_width = glyph_width + (
+                style["key"]["identifier_gap_ft"] + name_width if name_width else 0
+            )
             glyph_widths = [glyph_width] * count
             widths = [column_width] * count
             # Equal column pitches; center and score the visible ink, excluding
@@ -282,11 +280,16 @@ def candidates(
             )
             right_trim = column_width - glyph_width
             if last_name_width:
-                right_trim -= glyph_gap + last_name_width
+                right_trim -= style["key"]["identifier_gap_ft"] + last_name_width
             lines = max(
                 sum(max(1, len(rows[name])) for _, name in col) for col in columns
             )
-            width = sum(widths) + (count - 1) * column_gap - left_trim - right_trim
+            width = (
+                sum(widths)
+                + (count - 1) * style["key"]["column_gap_ft"]
+                - left_trim
+                - right_trim
+            )
             result.append(
                 Candidate(
                     columns,
@@ -312,8 +315,7 @@ def choose_layout(
     metrics: dict[str, TextBounds],
     scale_width: float,
     *,
-    glyph_gap: float = _GLYPH_GAP,
-    column_gap: float = _COLUMN_GAP,
+    style: Style = DEFAULT_STYLE,
 ) -> Candidate | None:
     """Choose the lowest approved score, breaking exact ties by column count."""
     return min(
@@ -324,8 +326,7 @@ def choose_layout(
                 map_width,
                 metrics,
                 scale_width=scale_width,
-                glyph_gap=glyph_gap,
-                column_gap=column_gap,
+                style=style,
             )
         ),
         key=lambda c: (c.score, len(c.columns)),

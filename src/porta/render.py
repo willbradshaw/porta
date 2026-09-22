@@ -478,8 +478,7 @@ def _key_layout(
         plan_width,
         metrics,
         _scale_width(style),
-        glyph_gap=style["key"]["identifier_gap_ft"],
-        column_gap=style["key"]["column_gap_ft"],
+        style=style,
     )
     if candidate is None:
         return _KeyLayout([], 0, 0)

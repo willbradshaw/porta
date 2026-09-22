@@ -28,15 +28,15 @@
   <line class="wall exterior" x1="0" y1="15" x2="10" y2="15" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="10" y1="10" x2="10" y2="15" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="20" y1="0" x2="20" y2="25" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="a" x="-5" y="12.5" text-anchor="middle" dominant-baseline="central" font-size="6">A</text>
-  <text data-room="b" x="15" y="12.5" text-anchor="middle" dominant-baseline="central" font-size="6">B</text>
-  <text data-room="c" x="5" y="20" text-anchor="middle" dominant-baseline="central" font-size="6">C</text>
-  <text data-room="r" x="5" y="5" text-anchor="middle" dominant-baseline="central" font-size="6">R</text>
+  <text data-room="a" x="-5" y="12.5" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">A</text>
+  <text data-room="b" x="15" y="12.5" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">B</text>
+  <text data-room="c" x="5" y="20" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">C</text>
+  <text data-room="r" x="5" y="5" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">R</text>
   <line class="door" x1="0" y1="0" x2="0" y2="5" stroke="black" stroke-width="1.5" />
   <line class="door" x1="0" y1="15" x2="0" y2="20" stroke="black" stroke-width="1.5" />
   <line class="door" x1="10" y1="0" x2="10" y2="5" stroke="black" stroke-width="1.5" />
   <line class="door" x1="10" y1="15" x2="10" y2="20" stroke="black" stroke-width="1.5" />
-  <g class="scale" font-size="5">
+  <g class="scale" font-size="5" fill="#333333">
     <text x="-6.235" y="34">0</text>
     <text x="2.438" y="34">10</text>
     <text x="10.206" y="34">20 ft</text>
@@ -44,16 +44,16 @@
     <rect x="-5" y="35.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="5" y="35.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="-13.276" y="55">A</text>
+  <g class="key" font-size="5" fill="#333333"><text x="-13.276" y="55">A</text>
     <text x="-7.594" y="55">Left room</text>
   </g>
-  <g class="key" font-size="5"><text x="-12.307" y="63">B</text>
+  <g class="key" font-size="5" fill="#333333"><text x="-12.307" y="63">B</text>
     <text x="-7.614" y="63">Right room</text>
   </g>
-  <g class="key" font-size="5"><text x="-12.91" y="71">C</text>
+  <g class="key" font-size="5" fill="#333333"><text x="-12.91" y="71">C</text>
     <text x="-7.611" y="71">Flanked room</text>
   </g>
-  <g class="key" font-size="5"><text x="-12.82" y="79">R</text>
+  <g class="key" font-size="5" fill="#333333"><text x="-12.82" y="79">R</text>
     <text x="-7.614" y="79">Root room</text>
   </g>
 </svg>

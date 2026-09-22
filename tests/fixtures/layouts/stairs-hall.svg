@@ -31,7 +31,7 @@
   <line class="wall exterior" x1="0" y1="0" x2="70" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="0" y1="40" x2="70" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="70" y1="0" x2="70" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="work-hall" x="52.5" y="20" text-anchor="middle" dominant-baseline="central" font-size="21">19</text>
+  <text data-room="work-hall" x="52.5" y="20" text-anchor="middle" dominant-baseline="central" font-size="21" fill="#333333">19</text>
   <g class="stairs" data-room="work-hall">
     <line x1="30" y1="25" x2="35" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="30" y1="15" x2="30" y2="25" stroke="black" stroke-width="0.5" stroke-linecap="square" />
@@ -43,7 +43,7 @@
     <line x1="31.525" y1="21.667" x2="33.475" y2="21.667" stroke="black" stroke-width="0.25" />
     <line x1="31.675" y1="23.333" x2="33.325" y2="23.333" stroke="black" stroke-width="0.25" />
   </g>
-  <g class="scale" font-size="5">
+  <g class="scale" font-size="5" fill="#333333">
     <text x="23.765" y="49">0</text>
     <text x="32.438" y="49">10</text>
     <text x="40.206" y="49">20 ft</text>
@@ -51,7 +51,7 @@
     <rect x="25" y="50.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="35" y="50.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="16.54" y="70">19</text>
+  <g class="key" font-size="5" fill="#333333"><text x="16.54" y="70">19</text>
     <text x="23.283" y="70">Working Hall</text>
   </g>
 </svg>

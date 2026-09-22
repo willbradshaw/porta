@@ -19,9 +19,9 @@
   <line class="wall exterior" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="0" y1="20" x2="30" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="30" y1="0" x2="30" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-block="chamber" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">C</text>
+  <text data-block="chamber" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">C</text>
   <line class="divider" x1="20" y1="0" x2="20" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
-  <g class="scale" font-size="5">
+  <g class="scale" font-size="5" fill="#333333">
     <text x="3.765" y="29">0</text>
     <text x="12.438" y="29">10</text>
     <text x="20.206" y="29">20 ft</text>
@@ -29,7 +29,7 @@
     <rect x="5" y="30.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="15" y="30.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="2.096" y="50">C</text>
+  <g class="key" font-size="5" fill="#333333"><text x="2.096" y="50">C</text>
     <text x="7.328" y="50">Chamber</text>
   </g>
 </svg>

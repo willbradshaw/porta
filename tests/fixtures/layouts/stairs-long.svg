@@ -25,7 +25,7 @@
   <line class="wall exterior" x1="0" y1="0" x2="50" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="0" y1="30" x2="50" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="50" y1="0" x2="50" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="gallery" x="25" y="15" text-anchor="middle" dominant-baseline="central" font-size="6">G</text>
+  <text data-room="gallery" x="25" y="15" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">G</text>
   <g class="stairs" data-room="gallery">
     <line x1="0" y1="5" x2="15" y2="5" stroke="black" stroke-width="0.5" stroke-linecap="square" />
     <line x1="0" y1="10" x2="15" y2="10" stroke="black" stroke-width="0.5" stroke-linecap="square" />
@@ -57,7 +57,7 @@
     <line x1="46.667" y1="21.075" x2="46.667" y2="23.925" stroke="black" stroke-width="0.25" />
     <line x1="48.333" y1="21" x2="48.333" y2="24" stroke="black" stroke-width="0.25" />
   </g>
-  <g class="scale" font-size="5">
+  <g class="scale" font-size="5" fill="#333333">
     <text x="13.765" y="39">0</text>
     <text x="22.438" y="39">10</text>
     <text x="30.206" y="39">20 ft</text>
@@ -65,7 +65,7 @@
     <rect x="15" y="40.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="25" y="40.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="14.033" y="60">G</text>
+  <g class="key" font-size="5" fill="#333333"><text x="14.033" y="60">G</text>
     <text x="19.536" y="60">Gallery</text>
   </g>
 </svg>

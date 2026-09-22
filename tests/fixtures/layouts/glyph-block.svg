@@ -29,10 +29,10 @@
   <line class="wall exterior" x1="0" y1="0" x2="40" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="0" y1="50" x2="40" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="40" y1="0" x2="40" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="cell" x="30" y="40" text-anchor="middle" dominant-baseline="central" font-size="12">20</text>
-  <text data-block="hall" x="10" y="40" text-anchor="middle" dominant-baseline="central" font-size="12">19</text>
+  <text data-room="cell" x="30" y="40" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">20</text>
+  <text data-block="hall" x="10" y="40" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">19</text>
   <line class="door" x1="20" y1="35" x2="20" y2="40" stroke="black" stroke-width="1.5" />
-  <g class="scale" font-size="5">
+  <g class="scale" font-size="5" fill="#333333">
     <text x="8.765" y="59">0</text>
     <text x="17.438" y="59">10</text>
     <text x="25.206" y="59">20 ft</text>
@@ -40,10 +40,10 @@
     <rect x="10" y="60.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="20" y="60.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="1.661" y="80">19</text>
+  <g class="key" font-size="5" fill="#333333"><text x="1.661" y="80">19</text>
     <text x="8.404" y="80">Working Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="1.641" y="88">20</text>
+  <g class="key" font-size="5" fill="#333333"><text x="1.641" y="88">20</text>
     <text x="8.287" y="88">Cell 20</text>
   </g>
 </svg>

@@ -33,13 +33,13 @@
   <line class="wall exterior" x1="30" y1="30" x2="30" y2="35" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="30" y1="35" x2="50" y2="35" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="50" y1="15" x2="50" y2="35" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="dining" x="40" y="25" text-anchor="middle" dominant-baseline="central" font-size="12">D</text>
-  <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
-  <text data-room="porch" x="10" y="35" text-anchor="middle" dominant-baseline="central" font-size="6">P</text>
+  <text data-room="dining" x="40" y="25" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">D</text>
+  <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">H</text>
+  <text data-room="porch" x="10" y="35" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">P</text>
   <line class="open" x1="0" y1="40" x2="20" y2="40" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <line class="open" x1="30" y1="15" x2="30" y2="30" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <line class="door" x1="0" y1="30" x2="20" y2="30" stroke="black" stroke-width="1.5" />
-  <g class="scale" font-size="5">
+  <g class="scale" font-size="5" fill="#333333">
     <text x="13.765" y="49">0</text>
     <text x="22.438" y="49">10</text>
     <text x="30.206" y="49">20 ft</text>
@@ -47,13 +47,13 @@
     <rect x="15" y="50.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="25" y="50.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="14.666" y="70">D</text>
+  <g class="key" font-size="5" fill="#333333"><text x="14.666" y="70">D</text>
     <text x="20.265" y="70">Dining</text>
   </g>
-  <g class="key" font-size="5"><text x="14.294" y="78">H</text>
+  <g class="key" font-size="5" fill="#333333"><text x="14.294" y="78">H</text>
     <text x="20.208" y="78">Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="15.432" y="86">P</text>
+  <g class="key" font-size="5" fill="#333333"><text x="15.432" y="86">P</text>
     <text x="20.196" y="86">Porch</text>
   </g>
 </svg>

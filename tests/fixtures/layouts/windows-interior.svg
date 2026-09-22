@@ -36,9 +36,9 @@
   <line class="wall exterior" x1="30" y1="30" x2="30" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="30" y1="30" x2="50" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="50" y1="10" x2="50" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
-  <text data-room="south" x="15" y="40" text-anchor="middle" dominant-baseline="central" font-size="12">S</text>
-  <text data-room="study" x="40" y="20" text-anchor="middle" dominant-baseline="central" font-size="12">T</text>
+  <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">H</text>
+  <text data-room="south" x="15" y="40" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">S</text>
+  <text data-room="study" x="40" y="20" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">T</text>
   <line class="window-fill" x1="0" y1="30" x2="5" y2="30" stroke="white" stroke-width="0.5" />
   <line class="window" x1="0" y1="29.75" x2="5" y2="29.75" stroke="black" stroke-width="0.25" />
   <line class="window" x1="0" y1="30.25" x2="5" y2="30.25" stroke="black" stroke-width="0.25" />
@@ -52,7 +52,7 @@
   <line class="door" x1="30" y1="10" x2="30" y2="15" stroke="black" stroke-width="1.5" />
   <line class="secret" x1="20" y1="30" x2="25" y2="30" stroke="black" stroke-width="1.5" />
   <text class="secret" x="22.5" y="30" text-anchor="middle" dominant-baseline="central" font-size="5" stroke="white" stroke-width="0.6" paint-order="stroke">S</text>
-  <g class="scale" font-size="5">
+  <g class="scale" font-size="5" fill="#333333">
     <text x="13.765" y="59">0</text>
     <text x="22.438" y="59">10</text>
     <text x="30.206" y="59">20 ft</text>
@@ -60,13 +60,13 @@
     <rect x="15" y="60.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
     <rect x="25" y="60.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="15.49" y="80">H</text>
+  <g class="key" font-size="5" fill="#333333"><text x="15.49" y="80">H</text>
     <text x="21.404" y="80">Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="17.043" y="88">S</text>
+  <g class="key" font-size="5" fill="#333333"><text x="17.043" y="88">S</text>
     <text x="21.387" y="88">South</text>
   </g>
-  <g class="key" font-size="5"><text x="16.562" y="96">T</text>
+  <g class="key" font-size="5" fill="#333333"><text x="16.562" y="96">T</text>
     <text x="21.387" y="96">Study</text>
   </g>
 </svg>

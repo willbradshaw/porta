@@ -37,6 +37,7 @@ _EXTERIOR_WALL_STROKE_FT = 0.8  # exposed envelope; 160% of interior walls, in f
 _LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
 _LABEL_FIT = 0.9  # widest fraction of the room width a glyph may span
 _FONT_FAMILY = "Palatino, Georgia, Times New Roman, serif"
+_TEXT_COLOUR = "#333333"
 _KEY_FONT_FT = 5.0  # fixed readable key size, in feet
 _SCALE_FONT_FT = _KEY_FONT_FT
 _SCALE_GAP_FT = 12  # map edge to bar bottom; caption to first key baseline
@@ -242,7 +243,8 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         lines.append(
             f'  <text data-room="{room.id}" x="{_num(x + lx)}" '
             f'y="{_num(y + ly)}" text-anchor="middle" '
-            f'dominant-baseline="central" font-size="{_num(font)}">'
+            f'dominant-baseline="central" font-size="{_num(font)}" '
+            f'fill="{_TEXT_COLOUR}">'
             f"{escape(glyph)}</text>"
         )
 
@@ -259,7 +261,8 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         lines.append(
             f'  <text data-block="{block.id}" x="{_num(mx + lx)}" '
             f'y="{_num(my + ly)}" text-anchor="middle" '
-            f'dominant-baseline="central" font-size="{_num(font)}">'
+            f'dominant-baseline="central" font-size="{_num(font)}" '
+            f'fill="{_TEXT_COLOUR}">'
             f"{escape(glyph)}</text>"
         )
 
@@ -341,7 +344,9 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f'paint-order="stroke">S</text>'
         )
 
-    lines.append(f'  <g class="scale" font-size="{_num(_SCALE_FONT_FT)}">')
+    lines.append(
+        f'  <g class="scale" font-size="{_num(_SCALE_FONT_FT)}" fill="{_TEXT_COLOUR}">'
+    )
     for dx, dy, label in _scale_labels():
         bounds = text_bounds(label, _SCALE_FONT_FT)
         lines.append(
@@ -363,7 +368,7 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         glyph_bounds = text_bounds(entry.glyph)
         glyph_x = key_x - glyph_bounds.width - glyph_bounds.x
         lines.append(
-            f'  <g class="key" font-size="{_num(_KEY_FONT_FT)}">'
+            f'  <g class="key" font-size="{_num(_KEY_FONT_FT)}" fill="{_TEXT_COLOUR}">'
             f'<text x="{_num(glyph_x)}" '
             f'y="{_num(key_y)}">{escape(entry.glyph)}</text>'
         )

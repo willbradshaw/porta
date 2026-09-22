@@ -8,7 +8,7 @@ auto-dimensions, validation), [`docs/door.md`](docs/door.md) (doors),
 [`docs/window.md`](docs/window.md) (windows),
 [`docs/block.md`](docs/block.md) (blocks), [`docs/divider.md`](docs/divider.md)
 (dividers), [`docs/link.md`](docs/link.md) (links), and
-[`docs/stairs.md`](docs/stairs.md) (stairs). For exact behaviour the code is the
+[`docs/stairs.md`](docs/stairs.md) (stairs). For exact behavior the code is the
 source of truth. The body below is just working conventions.
 
 ## Orientation
@@ -47,6 +47,8 @@ source of truth. The body below is just working conventions.
 
 ## Conventions
 
+- Use US English for project-authored prose and identifiers. Preserve quoted
+  source material and proper names, and maintain compatibility for public names.
 - Modern type hints (`list[str]`, `X | None`); dataclasses for the model.
 - Google-style docstrings on public functions.
 - Keep the runtime dependency-free: SVG via stdlib string/XML templating.

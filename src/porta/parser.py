@@ -12,7 +12,7 @@ One line per room::
 A statement may span several physical lines: a trailing whitespace-separated
 backslash (outside quotes and comments) continues it on the next line.
 
-The name slot is required but may be empty (``""``) for a room labelled only by
+The name slot is required but may be empty (``""``) for a room labeled only by
 its glyph and size.
 
 Reference resolution (does ``anchor`` exist? is there exactly one root?) is a
@@ -402,7 +402,7 @@ def _parse_block(tokens: list[Token], lineno: int) -> Block:
 
 
 def _tokenize(raw: str, lineno: int) -> tuple[list[Token], bool]:
-    """Split one source line into tokens, honouring quotes and ``#`` comments.
+    """Split one source line into tokens, honoring quotes and ``#`` comments.
 
     A ``#`` outside quotes starts a comment to end of line; inside a quoted
     string it is literal. Each token is tagged with whether it was quoted and
@@ -438,9 +438,9 @@ def _tokenize(raw: str, lineno: int) -> tuple[list[Token], bool]:
 
 
 def _parse_room(tokens: list[Token], lineno: int) -> Room:
-    """Turn a tokenised ``room`` line into a room model.
+    """Turn a tokenized ``room`` line into a room model.
 
-    The name slot is required but may be empty (``""``) for a room labelled only
+    The name slot is required but may be empty (``""``) for a room labeled only
     by its glyph and size.
     """
     if tokens[0].quoted or tokens[0].value != "room":
@@ -660,7 +660,7 @@ def _parse_stairs(tokens: list[Token], lineno: int) -> Stairs:
 
     ``down=`` (required) is the plan direction that leads downward on the
     flight. Optional modifiers: ``size=WxH`` and ``at=X,Y`` (offset from
-    the room's NW corner; default centred). Whether the room exists and
+    the room's NW corner; default centered). Whether the room exists and
     the footprint fits are left to layout.
     """
     if len(tokens) < 3:
@@ -731,7 +731,7 @@ def _parse_stair_at(raw: str, lineno: int) -> tuple[int, int]:
 
 
 def _parse_door(token: str, lineno: int) -> Door:
-    """Parse a ``door[=W][@O]`` modifier (width default 5, offset default centred)."""
+    """Parse a ``door[=W][@O]`` modifier (width default 5, offset default centered)."""
     width, offset = _parse_span(token, "door", lineno)
     return Door(width=width, offset=offset)
 

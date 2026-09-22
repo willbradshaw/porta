@@ -34,9 +34,9 @@ side  = up | down | left | right
   grid square across the run and two along it (`10x5` for a horizontal run,
   `5x10` for a vertical one).
 - **`at=<X,Y>`**: the footprint's top-left corner in feet from the room's
-  own top-left (NW) corner, on the grid. Defaults to centred in the room
+  own top-left (NW) corner, on the grid. Defaults to centered in the room
   (rounded down to the grid).
-Where a flight leads (which floor, which room) is not modelled.
+Where a flight leads (which floor, which room) is not modeled.
 
 ## Reading the symbol
 

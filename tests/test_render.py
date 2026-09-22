@@ -122,7 +122,7 @@ MANOR_ASCII = """\
 .  .  .  2  2  15 15 15 15 .  .  .  .  .  .  .  .  14 14 14 14 14 14 .  .  .  .  .  .
 .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  14 14 14 14 14 14 .  .  .  .  .  .
 
-1=cloak  2=corridor  3=dining  4=entrance  5=gallery  6=hall  7=kitchen  8=larder  9=library  10=pantry  11=parlour  12=passage  13=porch  14=scullery  15=study  16=turret"""
+1=cloak  2=corridor  3=dining  4=entrance  5=gallery  6=hall  7=kitchen  8=larder  9=library  10=pantry  11=parlor  12=passage  13=porch  14=scullery  15=study  16=turret"""
 
 
 def test_manor_example_renders_to_golden() -> None:
@@ -171,7 +171,7 @@ def test_svg_root_is_svg_with_viewbox_and_matching_size() -> None:
     assert view_box is not None
     vb_x, vb_y, vbw, vbh = (float(n) for n in view_box.split())
     # TWO's plan spans x[0,30], y[0,20]; the viewBox encloses it with at least a
-    # margin on every side (it may be wider and centred to fit the key).
+    # margin on every side (it may be wider and centered to fit the key).
     assert vb_y == -MARGIN
     assert vb_x <= -MARGIN
     assert vb_x + vbw >= 30 + MARGIN
@@ -232,7 +232,7 @@ def test_exterior_is_stronger_and_shared_wall_is_drawn_once() -> None:
         ("hall", "2", (30.0, 30.0)),
     ],
 )
-def test_each_room_is_numbered_at_its_centre(
+def test_each_room_is_numbered_at_its_center(
     room_id: str, glyph: str, center: tuple[float, float]
 ) -> None:
     root = ET.fromstring(svg_of(DESIGN_MANOR))
@@ -336,7 +336,7 @@ def test_open_boundary_cuts_the_shared_wall_out_of_both_outlines() -> None:
 
 
 def test_partial_opening_keeps_the_rest_of_the_wall() -> None:
-    # A centred 10-ft archway: the shared edge keeps a 5-ft stub at each end.
+    # A centered 10-ft archway: the shared edge keeps a 5-ft stub at each end.
     source = 'room a "A" 20x20 root\nroom b "Bee" 20x20 right-of a door=10 open'
     root = ET.fromstring(svg_of(source))
     assert open_lines(root) == [(20.0, 5.0, 20.0, 15.0)]
@@ -386,7 +386,7 @@ def test_external_open_door_cuts_the_exterior_wall() -> None:
 
 
 def test_open_door_across_a_block_boundary_renders_as_a_gap() -> None:
-    # 'side' opens into the block through a centred archway: one dashed line,
+    # 'side' opens into the block through a centered archway: one dashed line,
     # stubs on side's outline, and no solid block-outline line across the span.
     source = (
         'room main "" 20x20 root\n'
@@ -408,7 +408,7 @@ def test_open_door_across_a_block_boundary_renders_as_a_gap() -> None:
 # --- secret doors ------------------------------------------------------------
 #
 # A secret door keeps the wall fully intact (that is the point) and draws an
-# "S" marker (class="secret") centred on the door's span instead of a door
+# "S" marker (class="secret") centered on the door's span instead of a door
 # mark.
 
 SECRET_TWO = 'room a "A" 20x20 root\nroom b "Bee" 20x20 right-of a door=10@5 secret'
@@ -779,7 +779,7 @@ def test_unlabeled_block_draws_no_glyph_and_no_key_line() -> None:
 # --- stairs ----------------------------------------------------------------
 #
 # A 30x30 room at the origin; the default footprint is (10, 10, 10, 5) for a
-# horizontal run and (10, 10, 5, 10) for a vertical one (centred, one square
+# horizontal run and (10, 10, 5, 10) for a vertical one (centered, one square
 # across the run, two along it). Hard sides use the wall stroke (0.5); treads
 # use the thin stroke (0.25), cross the run every third of a grid square ends
 # included, and narrow toward the down= end.
@@ -830,7 +830,7 @@ def test_in_steps_are_open_at_both_ends() -> None:
 
 def test_treads_narrow_toward_the_downhill_end() -> None:
     # Run is 10 ft east; treads shrink linearly from 80% of the 5 ft breadth
-    # at the high (west) end to 40% at the low end, centred on y=12.5. The
+    # at the high (west) end to 40% at the low end, centered on y=12.5. The
     # closed west end has no tread (the hard edge draws that line); the open
     # east end gets the narrowest tread, marking the entrance.
     # Ratios apply to the visible breadth between the flank walls' inner
@@ -880,7 +880,7 @@ def test_vertical_run_treads() -> None:
 
 
 def test_glyph_moves_off_the_stairs() -> None:
-    # The centred footprint blocks the room centre; the glyph settles in the
+    # The centered footprint blocks the room center; the glyph settles in the
     # largest free band (below the stairs) at that band's size.
     root = ET.fromstring(svg_of(STAIR_ROOM + "stairs up hall down=right"))
     label = text_by_room(root, "hall")

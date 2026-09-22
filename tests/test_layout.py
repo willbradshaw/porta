@@ -191,7 +191,7 @@ def doors_of(text: str) -> list[tuple[int, int, int, int]]:
     ("source", "expected"),
     [
         # b (10x10) against a (20x20); shared wall is 10 ft long.
-        # up-of: horizontal wall at y=0; 5-ft door centres (round down) to x[0,5].
+        # up-of: horizontal wall at y=0; 5-ft door centers (round down) to x[0,5].
         ('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door', (0, 0, 5, 0)),
         # door=10 fills the wall.
         ('room a "A" 20x20 root\nroom b "B" 10x10 up-of a door=10', (0, 0, 10, 0)),
@@ -305,11 +305,11 @@ def open_doors_of(text: str) -> list[tuple[int, int, int, int]]:
             (20, 0, 20, 20),
             id="full-wall",
         ),
-        # a centred 10-ft archway leaves solid wall either side.
+        # a centered 10-ft archway leaves solid wall either side.
         pytest.param(
             'room a "A" 20x20 root\nroom b "B" 20x20 right-of a door=10 open',
             (20, 5, 20, 15),
-            id="archway-centred",
+            id="archway-centered",
         ),
         # explicit offset pins the opening to the wall's near end.
         pytest.param(
@@ -432,7 +432,7 @@ def test_open_door_across_a_block_boundary_is_cut_from_the_outline() -> None:
 
 
 def test_partial_open_door_leaves_stubs_in_the_block_outline() -> None:
-    # A centred 10-ft archway into the block keeps a 5-ft stub at each end of
+    # A centered 10-ft archway into the block keeps a 5-ft stub at each end of
     # the shared wall.
     text = (
         'room main "" 20x20 root\n'
@@ -460,7 +460,7 @@ def secret_doors_of(text: str) -> list[tuple[int, int, int, int]]:
 @pytest.mark.parametrize(
     ("source", "expected"),
     [
-        # default 5-ft width, centred on the 10-ft shared wall.
+        # default 5-ft width, centered on the 10-ft shared wall.
         pytest.param(
             'room a "A" 20x20 root\nroom b "B" 10x10 up-of a door secret',
             (0, 0, 5, 0),
@@ -473,7 +473,7 @@ def secret_doors_of(text: str) -> list[tuple[int, int, int, int]]:
             (30, 5, 30, 10),
             id="explicit-width-and-offset",
         ),
-        # standalone form between incidental neighbours.
+        # standalone form between incidental neighbors.
         pytest.param(
             'room a "A" 40x20 root\n'
             'room b "B" 20x20 down-of a\n'
@@ -585,7 +585,7 @@ def test_auto_height_shrinks_by_a_shift() -> None:
     assert coords(text, "b") == (20, 10)
 
 
-def test_auto_fills_the_wall_below_a_neighbour() -> None:
+def test_auto_fills_the_wall_below_a_neighbor() -> None:
     # c is dropped below b by down-of b, then '?' fills the rest of a's east wall.
     text = (
         'room a "A" 20x40 root\n'
@@ -751,7 +751,7 @@ def test_same_direction_not_aligned_raises() -> None:
 @pytest.mark.parametrize(
     ("side", "expected"),
     [
-        # a 20x20 root; default 5-ft door centres (round down) to offset 5.
+        # a 20x20 root; default 5-ft door centers (round down) to offset 5.
         ("down", (5, 20, 10, 20)),
         ("up", (5, 0, 10, 0)),
         ("left", (0, 5, 0, 10)),
@@ -763,7 +763,7 @@ def test_external_door_geometry(side: str, expected: tuple[int, int, int, int]) 
     assert doors_of(text) == [expected]
 
 
-def test_external_door_into_a_neighbour_raises() -> None:
+def test_external_door_into_a_neighbor_raises() -> None:
     # b is flush below a, so a's down edge is interior there, not exterior.
     text = 'room a "A" 20x20 root\nroom b "B" 20x20 down-of a\ndoor a outside down'
     with pytest.raises(LayoutError):
@@ -1086,7 +1086,7 @@ def footprints(text: str) -> list[tuple[int, int, int, int]]:
     ("statement", "expected"),
     [
         # A 30x30 room at the origin. Default footprint is one grid square
-        # across the run and two along it, centred (rounded down to the grid).
+        # across the run and two along it, centered (rounded down to the grid).
         pytest.param("stairs up hall down=right", (10, 10, 10, 5), id="run-east"),
         pytest.param("stairs down hall down=up", (10, 10, 5, 10), id="run-north"),
         # Explicit size and position, measured from the room's NW corner.
@@ -1201,7 +1201,7 @@ def test_door_into_a_closed_stair_side_is_rejected() -> None:
     assert exc.value.line == 3
 
 
-def test_stair_entrance_into_a_block_neighbour_is_fine() -> None:
+def test_stair_entrance_into_a_block_neighbor_is_fine() -> None:
     # The hall-dais wall is suppressed by the block, so the steps' north
     # entrance opens into the shared space, not into a wall.
     text = (

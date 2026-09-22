@@ -1,7 +1,7 @@
 """Data model for porta.
 
 Plain dataclasses passed between the parser, layout engine, and renderers.
-These carry no behaviour beyond holding parsed/solved state. See
+These carry no behavior beyond holding parsed/solved state. See
 ``docs/room.md`` and ``docs/door.md`` for the model these structures encode.
 
 Relations are stored axis-first: a :class:`Direction` knows its :class:`Axis`,
@@ -59,7 +59,7 @@ class Door(WallSpan):
 
     ``width=None`` spans the full shared wall (or the full exterior side).
     ``offset`` (feet from the wall's near end) defaults to ``None``, meaning
-    "centred" — the layout computes it. An ``open`` door is a doorless
+    "centered" — the layout computes it. An ``open`` door is a doorless
     opening: placed and validated like any door, but rendered as a gap in
     the wall (dashed) instead of a door mark — a non-blocking boundary.
     A ``secret`` door is concealed: the wall renders intact with an "S"
@@ -87,7 +87,7 @@ class Relation:
 
 @dataclass
 class Room:
-    """A room: a labelled rectangle plus how it attaches to its neighbours.
+    """A room: a labeled rectangle plus how it attaches to its neighbors.
 
     Coordinates are not held here yet; the layout engine (Stage 2) derives them.
     """
@@ -136,7 +136,7 @@ class Stairs:
     down: Direction
     size: tuple[int, int] | None = None  # (w, h) in feet; None = default
     at: tuple[int, int] | None = (
-        None  # offset from the room's NW corner; None = centred
+        None  # offset from the room's NW corner; None = centered
     )
     line: int = 0
 

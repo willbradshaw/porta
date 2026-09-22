@@ -77,7 +77,7 @@ door wing outside left
 block hall "Great Hall" main wing
 ```
 
-<img alt="An L-shaped hall with a neighbouring study and chapel" src="img/block-neighbour.svg" width="70%">
+<img alt="An L-shaped hall with a neighboring study and chapel" src="img/block-neighbour.svg" width="70%">
 
 The suppressed boundary between two members can be drawn back in as a
 dashed dividing line with a [divider](divider.md).

@@ -1,0 +1,10 @@
+{
+  "target_lines": 4,
+  "height_coefficient": 0.7,
+  "short_height_multiplier": 0.85,
+  "width_coefficient": 1.0,
+  "narrow_width_multiplier": 0.5,
+  "word_split_penalty": 0.5,
+  "interword_penalty": 0.15,
+  "imbalance_coefficient": 1.0
+}

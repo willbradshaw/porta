@@ -269,3 +269,63 @@ def test_short_height_discount_applies_only_below_four_lines(lines: int) -> None
     assert weighted.height_coefficient * weighted.height_cost == pytest.approx(
         (0.595 if lines < 4 else 0.7) * ((lines - 4) / 4) ** 2
     )
+
+
+def test_custom_scoring_parameters(monkeypatch: pytest.MonkeyPatch) -> None:
+    from dataclasses import replace
+
+    from porta import key_layout
+
+    monkeypatch.setattr(
+        key_layout,
+        "_SCORING",
+        replace(
+            key_layout._SCORING,
+            target_lines=2,
+            height_coefficient=3,
+            short_height_multiplier=0.25,
+            width_coefficient=2,
+            narrow_width_multiplier=0.1,
+            word_split_penalty=4,
+            interword_penalty=5,
+            imbalance_coefficient=6,
+        ),
+    )
+    entries = [("A", "One Two")]
+    candidate = candidates(entries, 100, sample_metrics(entries), wrap=False)[0]
+    assert candidate.height_cost == pytest.approx(0.25)
+    assert candidate.width_cost == pytest.approx(
+        2 * 0.1 * ((candidate.width - 100) / 100) ** 2
+    )
+    weighted = key_layout.with_interword_penalty(candidate)
+    assert weighted.height_coefficient == pytest.approx(0.75)
+    assert weighted.imbalance_cost == 6
+    wrapped = replace(
+        candidate, rows={"One Two": ["O", "ne", "Two"]}, lines=3, splits=1
+    )
+    weighted = key_layout.with_interword_penalty(wrapped)
+    assert weighted.height_coefficient == 3
+    assert weighted.split_cost == 4
+    assert weighted.interword_cost == 5
+
+
+@pytest.mark.parametrize(
+    ("parameter", "value"),
+    [
+        ("target_lines", 0),
+        ("height_coefficient", -1),
+        ("width_coefficient", float("inf")),
+        ("interword_penalty", float("nan")),
+        ("imbalance_coefficient", True),
+        ("word_split_penalty", "0.5"),
+    ],
+)
+def test_invalid_scoring_parameters(parameter: str, value: object) -> None:
+    from dataclasses import asdict
+
+    from porta import key_layout
+
+    parameters = asdict(key_layout._SCORING)
+    parameters[parameter] = value
+    with pytest.raises(ValueError, match=parameter):
+        key_layout._Scoring(**parameters)

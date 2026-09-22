@@ -29,13 +29,29 @@ The renderer's default page remains white; documentation retains its grey page.
 
 ## Key layout
 
+Scoring parameters live in [`src/porta/key_layout.json`](../src/porta/key_layout.json).
+Edit that file to tune the metric; it is bundled with the package and read when
+the renderer module loads, so restart a running Python process after editing it.
+All values must be finite, nonnegative numbers; `target_lines` must be positive.
+
+| Parameter | Meaning |
+| --- | --- |
+| `target_lines` | Ideal tallest-column line count; also normalizes the height error |
+| `height_coefficient` | Overall squared height-error weight |
+| `short_height_multiplier` | Additional multiplier below the target line count |
+| `width_coefficient` | Overall squared width-error weight |
+| `narrow_width_multiplier` | Additional multiplier below the map/scale width |
+| `word_split_penalty` | Cost per line break inside a word |
+| `interword_penalty` | Cost per line break between words within an entry |
+| `imbalance_coefficient` | Weight of the longest/shortest column ratio |
+
 The renderer searches column counts and one common wrapping width. Every column
 has the same glyph reservation, name width, and gutter. Entries read down columns,
 then left to right, and stay whole within a column. Contiguous partitions minimize
 the tallest column's rendered line count. This is a deterministic partition rule,
 not an exhaustive search of every partition.
 
-The lowest score wins; exact ties prefer fewer columns:
+The lowest score wins; exact ties prefer fewer columns. With the default parameters:
 
 ```
 B = 0.7 b ((L - 4) / 4)² + a ((W - T) / T)² + 0.5 S + 0.15 R + L / l

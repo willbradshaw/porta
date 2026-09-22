@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Keep key-layout scoring parameters in packaged `key_layout.json` so the metric
+  can be tuned without changing Python code.
 - Refine default SVGs with normal-weight Palatino/Georgia/Times typography,
   room-proportional labels, and a quieter grid clipped to room footprints.
   Retain symbol weights, black text, the original scale caption, and 10-ft margins.

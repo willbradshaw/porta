@@ -1,17 +1,44 @@
 """Score equal-width legend columns using portable or measured text bounds."""
 
-from dataclasses import dataclass, replace
+import json
+from dataclasses import dataclass, fields, replace
+from importlib.resources import files
+from math import isfinite
 
 from porta.text_metrics import TextBounds
 
 _GLYPH_GAP = 2.0
 _COLUMN_GAP = 6.0
-_WORD_SPLIT_PENALTY = 0.5
-_HEIGHT_COEFFICIENT = 0.7
-_SHORT_HEIGHT_MULTIPLIER = 0.85
-_INTERWORD_PENALTY = 0.15
-_IMBALANCE_COEFFICIENT = 1.0
-_NARROWNESS_COEFFICIENT = 0.5
+
+
+@dataclass(frozen=True)
+class _Scoring:
+    target_lines: float
+    height_coefficient: float
+    short_height_multiplier: float
+    width_coefficient: float
+    narrow_width_multiplier: float
+    word_split_penalty: float
+    interword_penalty: float
+    imbalance_coefficient: float
+
+    def __post_init__(self) -> None:
+        for field in fields(self):
+            value = getattr(self, field.name)
+            if (
+                type(value) not in (int, float)
+                or not isfinite(value)
+                or value < 0
+                or (field.name == "target_lines" and value == 0)
+            ):
+                raise ValueError(
+                    f"Invalid key_layout.json parameter {field.name}: {value!r}"
+                )
+
+
+_SCORING = _Scoring(
+    **json.loads(files("porta").joinpath("key_layout.json").read_text(encoding="utf-8"))
+)
 
 
 def text_fragments(name: str) -> set[str]:
@@ -169,15 +196,20 @@ def interword_breaks(candidate: Candidate) -> int:
 
 
 def with_interword_penalty(
-    candidate: Candidate, penalty: float = _INTERWORD_PENALTY
+    candidate: Candidate, penalty: float | None = None
 ) -> Candidate:
     """Apply approved weights, optionally overriding the inter-word break cost."""
     return replace(
-        penalized(candidate, _WORD_SPLIT_PENALTY),
-        height_coefficient=_HEIGHT_COEFFICIENT
-        * (_SHORT_HEIGHT_MULTIPLIER if candidate.lines < 4 else 1),
-        interword_cost=penalty * interword_breaks(candidate),
-        imbalance_cost=_IMBALANCE_COEFFICIENT * candidate.imbalance_ratio,
+        penalized(candidate, _SCORING.word_split_penalty),
+        height_coefficient=_SCORING.height_coefficient
+        * (
+            _SCORING.short_height_multiplier
+            if candidate.lines < _SCORING.target_lines
+            else 1
+        ),
+        interword_cost=(_SCORING.interword_penalty if penalty is None else penalty)
+        * interword_breaks(candidate),
+        imbalance_cost=_SCORING.imbalance_coefficient * candidate.imbalance_ratio,
     )
 
 
@@ -257,9 +289,10 @@ def candidates(
                     lines,
                     width,
                     left_trim,
-                    ((lines - 4) / 4) ** 2,
+                    ((lines - _SCORING.target_lines) / _SCORING.target_lines) ** 2,
                     ((width - target_width) / target_width) ** 2
-                    * (_NARROWNESS_COEFFICIENT if width < target_width else 1),
+                    * _SCORING.width_coefficient
+                    * (_SCORING.narrow_width_multiplier if width < target_width else 1),
                     sum(word_splits(name, rows[name]) for _, name in entries),
                 )
             )

@@ -1,6 +1,6 @@
 # Key-layout review cases
 
-Six fixed `.porta` inputs in `tests/fixtures/key-layouts/` exercise the approved
+Seven fixed `.porta` inputs in `tests/fixtures/key-layouts/` exercise the approved
 production key algorithm. The [gallery](index.html) compares recorded full-string
 Palatino measurements with the portable metrics used by the renderer.
 [Results](results.md) report the selected layouts and scores.
@@ -13,9 +13,12 @@ Palatino measurements with the portable metrics used by the renderer.
 | Tall barracks | 8 | 20 × 120 ft | Same names, narrower map |
 | Medium house | 16 | 100 × 80 ft | Varied names, Unicode, mixed glyphs, long token |
 | Large keep | 42 | 140 × 90 ft | Column count, wrapping, and width/height tradeoffs |
+| Block capstone | 3 | 80 × 50 ft | Uneven columns and excessive spreading of a short key |
 
 The approved formula is
-`B = 0.7((L - 4)/4)² + ((W - T)/T)² + 0.5S + 0.1R`.
+`B = 0.7((L - 4)/4)² + a((W - T)/T)² + 0.5S + 0.1R + L/l`,
+where `a = 0.5` for keys narrower than the target, otherwise 1, and `l` is the
+shortest column’s rendered line count.
 See [the visual specification](../../svg-style.md) for definitions, candidate
 search, and metric limitations. No further coefficient is under test here.
 Production and measured-reference cases share the same scoring implementation.
@@ -28,7 +31,7 @@ uv run python src/build_key_review.py --check
 uv run python src/build_key_review.py --export-png /path/to/inkscape
 ```
 
-The last command exports the six standalone production PNGs. It needs Inkscape
+The last command exports the seven standalone production PNGs. It needs Inkscape
 and Palatino installed; normal generation and rendering require neither.
 To refresh recorded whole-string measurements or portable character metrics:
 

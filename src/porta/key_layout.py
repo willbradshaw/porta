@@ -9,6 +9,8 @@ _COLUMN_GAP = 6.0
 _WORD_SPLIT_PENALTY = 0.5
 _HEIGHT_COEFFICIENT = 0.7
 _INTERWORD_PENALTY = 0.1
+_IMBALANCE_COEFFICIENT = 1.0
+_NARROWNESS_COEFFICIENT = 0.5
 
 
 def text_fragments(name: str) -> set[str]:
@@ -105,15 +107,31 @@ class Candidate:
     split_cost: float = 0
     height_coefficient: float = 1
     interword_cost: float = 0
+    imbalance_cost: float = 0
+
+    @property
+    def column_lines(self) -> list[int]:
+        """Return rendered line counts, including glyph-only entries."""
+        return [
+            sum(max(1, len(self.rows[name])) for _, name in column)
+            for column in self.columns
+        ]
+
+    @property
+    def imbalance_ratio(self) -> float:
+        """Return longest/shortest; one column or equal heights give one."""
+        lengths = self.column_lines
+        return max(lengths) / min(lengths)
 
     @property
     def score(self) -> float:
-        """Return normalized height/width errors plus internal-word-break cost."""
+        """Return height, asymmetric width, wrapping, and imbalance costs."""
         return (
             self.height_coefficient * self.height_cost
             + self.width_cost
             + self.split_cost
             + self.interword_cost
+            + self.imbalance_cost
         )
 
 
@@ -157,6 +175,7 @@ def with_interword_penalty(
         penalized(candidate, _WORD_SPLIT_PENALTY),
         height_coefficient=_HEIGHT_COEFFICIENT,
         interword_cost=penalty * interword_breaks(candidate),
+        imbalance_cost=_IMBALANCE_COEFFICIENT * candidate.imbalance_ratio,
     )
 
 
@@ -237,7 +256,8 @@ def candidates(
                     width,
                     left_trim,
                     ((lines - 4) / 4) ** 2,
-                    ((width - target_width) / target_width) ** 2,
+                    ((width - target_width) / target_width) ** 2
+                    * (_NARROWNESS_COEFFICIENT if width < target_width else 1),
                     sum(word_splits(name, rows[name]) for _, name in entries),
                 )
             )

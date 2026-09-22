@@ -31,11 +31,10 @@
   <g class="scale" font-size="5">
     <text x="14.348" y="32">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="6.559" y="44">1</text>
-    <text x="10.514" y="44">Kitchen</text>
+  <g class="key" font-size="5"><text x="13.197" y="44">1</text>
+    <text x="17.152" y="44">Kitchen</text>
   </g>
-  <g class="key" font-size="5"><text x="33.547" y="44">2</text>
-    <text x="37.815" y="44">Dining</text>
-    <text x="37.768" y="52">Room</text>
+  <g class="key" font-size="5"><text x="12.945" y="52">2</text>
+    <text x="17.214" y="52">Dining Room</text>
   </g>
 </svg>

@@ -53,7 +53,9 @@ def test_candidates_preserve_entries_and_do_not_wrap(count: int) -> None:
             len(candidate.columns) - 1
         )
         assert candidate.score == pytest.approx(
-            ((candidate.lines - 4) / 4) ** 2 + ((candidate.width - 100) / 100) ** 2
+            ((candidate.lines - 4) / 4) ** 2
+            + ((candidate.width - 100) / 100) ** 2
+            * (0.5 if candidate.width < 100 else 1)
         )
 
 
@@ -176,7 +178,9 @@ def test_scale_width_sets_target_and_split_penalty_counts_duplicate_entries() ->
     entries = [("1", "Store"), ("2", "Store")]
     options = candidates(entries, 5, sample_metrics(entries), scale_width=30)
     for c in options:
-        assert c.width_cost == pytest.approx(((c.width - 30) / 30) ** 2)
+        assert c.width_cost == pytest.approx(
+            ((c.width - 30) / 30) ** 2 * (0.5 if c.width < 30 else 1)
+        )
         assert penalized(c, 4).score == pytest.approx(c.score + 4 * c.splits)
     narrow = max(options, key=lambda c: c.splits)
     assert narrow.splits == 8
@@ -193,7 +197,7 @@ def test_height_coefficient_only_scales_height_cost(coefficient: float) -> None:
         weighted = replace(penalized(c, 0.5), height_coefficient=coefficient)
         assert weighted.score == pytest.approx(
             coefficient * ((c.lines - 4) / 4) ** 2
-            + ((c.width - 30) / 30) ** 2
+            + ((c.width - 30) / 30) ** 2 * (0.5 if c.width < 30 else 1)
             + 0.5 * c.splits
         )
         assert weighted.rows == c.rows
@@ -214,7 +218,11 @@ def test_interword_penalty_excludes_internal_breaks_and_counts_each_entry(
         ordinary = total_breaks - c.splits
         assert interword_breaks(c) == ordinary
         assert with_interword_penalty(c, penalty).score == pytest.approx(
-            0.7 * c.height_cost + c.width_cost + 0.5 * c.splits + penalty * ordinary
+            0.7 * c.height_cost
+            + c.width_cost
+            + 0.5 * c.splits
+            + penalty * ordinary
+            + c.imbalance_ratio
         )
 
 
@@ -257,3 +265,58 @@ def test_production_metrics_preserve_reviewed_layout_choices(case: Path) -> None
     assert actual.columns == reference.columns
     assert actual.rows == reference.rows
     assert actual.width == pytest.approx(reference.width, abs=0.05)
+
+
+@pytest.mark.parametrize(
+    ("heights", "expected"),
+    [
+        ([3], 1),
+        ([4, 4], 1),
+        ([1, 2, 1], 2),
+        ([3, 3, 2], 1.5),
+    ],
+)
+def test_imbalance_counts_wrapped_lines_and_glyph_only_entries(
+    heights: list[int],
+    expected: float,
+) -> None:
+    from dataclasses import replace
+
+    from porta.key_layout import with_interword_penalty
+
+    entries = [(str(i), str(i)) for i in range(len(heights))]
+    base = candidates(entries, 30, sample_metrics(entries), wrap=False)[-1]
+    rows = {
+        name: [name] * height if height > 1 else []
+        for (_, name), height in zip(entries, heights, strict=True)
+    }
+    candidate = replace(base, rows=rows)
+    assert candidate.column_lines == heights
+    assert candidate.imbalance_ratio == expected
+    assert with_interword_penalty(candidate).imbalance_cost == expected
+
+
+@pytest.mark.parametrize(("target", "expected"), [(18, 0.125), (9, 0), (6, 0.25)])
+def test_asymmetric_width_cost(target: float, expected: float) -> None:
+    # Synthetic glyph + gap + name occupy exactly nine feet.
+    entries = [("1", "A")]
+    candidate = candidates(entries, target, sample_metrics(entries), wrap=False)[0]
+    assert candidate.width == 9
+    assert candidate.width_cost == pytest.approx(expected)
+
+
+def test_block_capstone_prefers_one_unwrapped_column() -> None:
+    from build_key_review import _entries
+    from porta.key_layout import choose_layout
+    from porta.text_metrics import TextMetrics
+
+    building = solve(
+        parse(Path("tests/fixtures/key-layouts/07-block-capstone.porta").read_text())
+    )
+    metrics = TextMetrics()
+    chosen = choose_layout(
+        _entries(building), 80, metrics, metrics["1 square = 5 ft"].width
+    )
+    assert chosen is not None
+    assert chosen.column_lines == [3]
+    assert chosen.rows["Great Hall"] == ["Great Hall"]

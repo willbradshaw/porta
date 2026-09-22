@@ -214,7 +214,8 @@ def main() -> None:
         "<style>body{font:16px sans-serif;margin:24px}.pair{display:flex;gap:20px}"
         "figure{flex:1;margin:0}img{width:100%}</style>",
         "<h1>Production key layouts</h1>",
-        "<p>B = 0.7((L - 4)/4)² + ((W - T)/T)² + 0.5S + 0.1R. "
+        "<p>B = 0.7((L - 4)/4)² + a((W - T)/T)² + 0.5S + 0.1R + L/l. "
+        "a = 0.5 when W &lt; T, otherwise 1; l is the shortest column. "
         "T = max(map width, scale-line width). S counts internal-word breaks; "
         "R counts between-word breaks. Equal-width columns.</p>",
         "<p>Recorded Inkscape bounds on the left; portable production metrics "
@@ -224,8 +225,8 @@ def main() -> None:
     report = [
         "# Approved production key layouts\n",
         "| Case | Columns | Lines | Width (ft) | Internal breaks | "
-        "Inter-word breaks | Score | Measured width (ft) |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "Inter-word breaks | Column lines | Imbalance | Score | Measured width (ft) |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | --- | ---: | ---: | ---: |",
     ]
     for path in sorted(_INPUT.glob("*.porta")):
         source = path.read_text()
@@ -262,7 +263,8 @@ def main() -> None:
         report.append(
             f"| {title} | {len(production.columns)} | {production.lines} "
             f"| {production.width:.3f} | {production.splits} "
-            f"| {interword_breaks(production)} | {production.score:.3f} "
+            f"| {interword_breaks(production)} | {production.column_lines} "
+            f"| {production.imbalance_ratio:.3f} | {production.score:.3f} "
             f"| {measured.width:.3f} |"
         )
     outputs[_OUTPUT / "index.html"] = "\n".join(html)

@@ -69,11 +69,10 @@
   <g class="scale" font-size="5">
     <text x="14.348" y="52">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="7.672" y="64">G</text>
-    <text x="13.175" y="64">Great</text>
-    <text x="13.211" y="72">Hall</text>
+  <g class="key" font-size="5"><text x="15.706" y="64">G</text>
+    <text x="21.209" y="64">Great Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="33.542" y="64">T</text>
-    <text x="38.398" y="64">Tower</text>
+  <g class="key" font-size="5"><text x="16.404" y="72">T</text>
+    <text x="21.26" y="72">Tower</text>
   </g>
 </svg>

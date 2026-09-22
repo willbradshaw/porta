@@ -4,7 +4,7 @@ Porta uses black architectural lines, a quiet measuring grid, and normal-weight
 serif text. Rendering requires no style statement, downloaded font, or runtime
 dependency. The [before/after gallery](style-review/index.html) covers the manor,
 tiny and narrow plans, blocks, outdoor areas, disconnected components, and symbols.
-The [six-case key gallery](style-review/key-layouts/index.html) compares the
+The [seven-case key gallery](style-review/key-layouts/index.html) compares the
 production layouts with independently measured Palatino text bounds.
 
 ## Approved visual rules
@@ -41,17 +41,21 @@ not an exhaustive search of every partition.
 The lowest score wins; exact ties prefer fewer columns:
 
 ```
-B = 0.7 ((L - 4) / 4)² + ((W - T) / T)² + 0.5 S + 0.1 R
+B = 0.7 ((L - 4) / 4)² + a ((W - T) / T)² + 0.5 S + 0.1 R + L / l
+a = 0.5 when W < T, otherwise 1
 ```
 
 - `L`: rendered line count in the tallest column, including wrapped lines.
+- `l`: rendered line count in the shortest column; glyph-only entries count as one.
 - `W`: visible key width, including gutters.
 - `T`: maximum of map width and scale-caption width, excluding margins.
 - `S`: line breaks inside words, summed across key entries.
 - `R`: between-word line breaks within entries, excluding internal-word breaks.
 
 Both shorter and taller keys are penalized relative to four lines; both narrower
-and wider keys are penalized relative to the target width. Wrapping prefers words,
+and wider keys are penalized relative to the target width, with half the cost
+for being narrower. The longest/shortest ratio has coefficient 1. Single-column
+and equal-height layouts both add 1; an empty key has no layout to score. Wrapping prefers words,
 but overlong words may split. Candidate widths come from text wrap breakpoints;
 there is no fixed 48-ft wrap width, three-column cap, or independent column-width
 optimization. The canvas expands to fit the result without shrinking the text.
@@ -66,7 +70,7 @@ Unsupported characters use conservative Unicode-aware estimates; combining
 accents are normalized where possible. Arbitrary script shaping, ligatures, and
 font substitution can differ from these estimates.
 
-All six reviewed cases select the same columns and wrapping with portable metrics
+All seven reviewed cases select the same columns and wrapping with portable metrics
 as with full-string Inkscape measurements; their key widths differ by less than
 0.05 map feet. SVGs retain ordinary editable text and the approved fallback stack.
 The measured bounds apply to Palatino; substituted fonts can change visible fit.
@@ -89,5 +93,5 @@ and enlarged text; a print proof and fallback-font review remain useful.
 
 A follow-up to #99/#16 will review the scale bar proposal, text color, background,
 and any further spacing refinements. This PR retains the original caption and colors.
-[Column-height imbalance](https://github.com/willbradshaw/porta/issues/102) is a
-separate investigation; it is not an extra term in this formula.
+The [column-height imbalance follow-up](https://github.com/willbradshaw/porta/issues/102)
+is implemented by the ratio term. The partition search remains unchanged.

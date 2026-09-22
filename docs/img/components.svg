@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1267.964" height="1035" viewBox="-18.398 -10 126.796 103.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-18.398" y="-10" width="126.796" height="103.5" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1035" viewBox="-10 -10 110 103.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="110" height="103.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M80 0h10v20h-10z M0 0h40v20h-40z M0 20h30v30h-30z M50 0h30v30h-30z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="50" />
@@ -56,16 +56,16 @@
   <g class="scale" font-size="5">
     <text x="29.348" y="62">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="-7.936" y="74">C</text>
-    <text x="-2.704" y="74">Cache</text>
+  <g class="key" font-size="5"><text x="10.863" y="74">C</text>
+    <text x="16.095" y="74">Cache</text>
   </g>
-  <g class="key" font-size="5"><text x="-8.518" y="82">N</text>
-    <text x="-2.651" y="82">North Gate</text>
+  <g class="key" font-size="5"><text x="10.281" y="82">N</text>
+    <text x="16.148" y="82">North Gate</text>
   </g>
-  <g class="key" font-size="5"><text x="29.254" y="74">O</text>
-    <text x="34.948" y="74">North Hall</text>
+  <g class="key" font-size="5"><text x="48.053" y="74">O</text>
+    <text x="53.747" y="74">North Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="68.186" y="74">S</text>
-    <text x="72.53" y="74">South Vault</text>
+  <g class="key" font-size="5"><text x="49.386" y="82">S</text>
+    <text x="53.73" y="82">South Vault</text>
   </g>
 </svg>

@@ -73,31 +73,32 @@
   <g class="scale" font-size="5">
     <text x="-0.652" y="62">1 square = 5 ft</text>
   </g>
-  <g class="key" font-size="5"><text x="-27.746" y="74">A</text>
-    <text x="-22.107" y="74">Passage</text>
+  <g class="key" font-size="5"><text x="-18.388" y="74">A</text>
+    <text x="-12.748" y="74">Passage</text>
   </g>
-  <g class="key" font-size="5"><text x="-27.38" y="82">C</text>
-    <text x="-22.148" y="82">Cloakroom</text>
+  <g class="key" font-size="5"><text x="-18.022" y="82">C</text>
+    <text x="-12.789" y="82">Cloakroom</text>
   </g>
-  <g class="key" font-size="5"><text x="-27.637" y="90">D</text>
-    <text x="-22.038" y="90">Dining Room</text>
+  <g class="key" font-size="5"><text x="-18.278" y="90">D</text>
+    <text x="-12.679" y="90">Dining Room</text>
   </g>
-  <g class="key" font-size="5"><text x="-28.008" y="98">H</text>
-    <text x="-22.095" y="98">Hall</text>
+  <g class="key" font-size="5"><text x="-18.65" y="98">H</text>
+    <text x="-12.736" y="98">Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="-27.567" y="106">K</text>
-    <text x="-22.1" y="106">Kitchen</text>
+  <g class="key" font-size="5"><text x="-18.208" y="106">K</text>
+    <text x="-12.741" y="106">Kitchen</text>
   </g>
-  <g class="key" font-size="5"><text x="18.1" y="74">O</text>
-    <text x="23.782" y="74">Porch</text>
+  <g class="key" font-size="5"><text x="23.178" y="74">O</text>
+    <text x="28.86" y="74">Porch</text>
   </g>
-  <g class="key" font-size="5"><text x="19.018" y="82">P</text>
-    <text x="23.782" y="82">Pantry</text>
+  <g class="key" font-size="5"><text x="24.097" y="82">P</text>
+    <text x="28.86" y="82">Pantry</text>
   </g>
-  <g class="key" font-size="5"><text x="18.598" y="90">R</text>
-    <text x="23.851" y="90">Drawing Room</text>
+  <g class="key" font-size="5"><text x="23.677" y="90">R</text>
+    <text x="28.929" y="90">Drawing</text>
+    <text x="28.882" y="98">Room</text>
   </g>
-  <g class="key" font-size="5"><text x="19.433" y="98">S</text>
-    <text x="23.777" y="98">Scullery</text>
+  <g class="key" font-size="5"><text x="24.511" y="106">S</text>
+    <text x="28.855" y="106">Scullery</text>
   </g>
 </svg>

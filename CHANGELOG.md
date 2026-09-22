@@ -13,7 +13,9 @@ Notable changes per release, newest first.
   choose equal-width key columns and wrapping with a scored layout: height
   coefficient 0.7, internal-word break penalty 0.5, and inter-word penalty 0.1.
   Use portable Palatino metrics without adding runtime dependencies or fonts.
-  Include six fixed review maps, before/after previews, and regenerated references.
+  Include seven fixed review maps, before/after previews, and regenerated references.
+  Penalize column-height imbalance by the longest/shortest line-count ratio,
+  and halve the width penalty for keys narrower than the map/scale target.
 
 ## 1.7.0 (2026-09-20)
 

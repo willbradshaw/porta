@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="815" viewBox="-30 -10 90 81.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-30" y="-10" width="90" height="81.5" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="875" viewBox="-30 -10 90 87.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-30" y="-10" width="90" height="87.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M0 0h30v20h-30z M30 0h20v20h-20z M-20 0h20v20h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="-20" y1="0" x2="-20" y2="20" />
@@ -35,15 +35,20 @@
   <line class="door" x1="0" y1="5" x2="0" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="30" y1="5" x2="30" y2="10" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="-0.652" y="32">1 square = 5 ft</text>
+    <text x="3.765" y="29">0</text>
+    <text x="12.438" y="29">10</text>
+    <text x="20.206" y="29">20 ft</text>
+    <text x="2.273" y="38">5-ft squares</text>
+    <rect x="5" y="30.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="15" y="30.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="3.428" y="44">H</text>
-    <text x="9.341" y="44">Hall</text>
+  <g class="key" font-size="5"><text x="3.428" y="50">H</text>
+    <text x="9.341" y="50">Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="3.869" y="52">K</text>
-    <text x="9.336" y="52">Kitchen</text>
+  <g class="key" font-size="5"><text x="3.869" y="58">K</text>
+    <text x="9.336" y="58">Kitchen</text>
   </g>
-  <g class="key" font-size="5"><text x="4.565" y="60">P</text>
-    <text x="9.329" y="60">Parlour</text>
+  <g class="key" font-size="5"><text x="4.565" y="66">P</text>
+    <text x="9.329" y="66">Parlour</text>
   </g>
 </svg>

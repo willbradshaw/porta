@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="2876.659" height="1995" viewBox="-73.833 -10 287.666 199.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-73.833" y="-10" width="287.666" height="199.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="2876.659" height="2055" viewBox="-73.833 -10 287.666 205.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-73.833" y="-10" width="287.666" height="205.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h20v15h-20z M20 0h20v15h-20z M60 15h20v15h-20z M80 15h20v15h-20z M100 15h20v15h-20z M120 15h20v15h-20z M0 30h20v15h-20z M20 30h20v15h-20z M40 30h20v15h-20z M60 30h20v15h-20z M80 30h20v15h-20z M100 30h20v15h-20z M40 0h20v15h-20z M120 30h20v15h-20z M0 45h20v15h-20z M20 45h20v15h-20z M40 45h20v15h-20z M60 45h20v15h-20z M80 45h20v15h-20z M100 45h20v15h-20z M120 45h20v15h-20z M0 60h20v15h-20z M20 60h20v15h-20z M60 0h20v15h-20z M40 60h20v15h-20z M60 60h20v15h-20z M80 60h20v15h-20z M100 60h20v15h-20z M120 60h20v15h-20z M0 75h20v15h-20z M20 75h20v15h-20z M40 75h20v15h-20z M60 75h20v15h-20z M80 75h20v15h-20z M80 0h20v15h-20z M100 75h20v15h-20z M120 75h20v15h-20z M100 0h20v15h-20z M120 0h20v15h-20z M0 15h20v15h-20z M20 15h20v15h-20z M40 15h20v15h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="90" />
@@ -150,135 +150,140 @@
   <line class="door" x1="120" y1="65" x2="120" y2="70" stroke="black" stroke-width="1.5" />
   <line class="door" x1="120" y1="80" x2="120" y2="85" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="54.348" y="102">1 square = 5 ft</text>
+    <text x="58.765" y="99">0</text>
+    <text x="67.438" y="99">10</text>
+    <text x="75.206" y="99">20 ft</text>
+    <text x="57.273" y="108">5-ft squares</text>
+    <rect x="60" y="100.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="70" y="100.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="-63.579" y="114">1</text>
-    <text x="-59.655" y="114">Gatehouse</text>
+  <g class="key" font-size="5"><text x="-63.579" y="120">1</text>
+    <text x="-59.655" y="120">Gatehouse</text>
   </g>
-  <g class="key" font-size="5"><text x="-63.83" y="122">2</text>
-    <text x="-59.655" y="122">Guardroom</text>
+  <g class="key" font-size="5"><text x="-63.83" y="128">2</text>
+    <text x="-59.655" y="128">Guardroom</text>
   </g>
-  <g class="key" font-size="5"><text x="-63.806" y="130">3</text>
-    <text x="-59.584" y="130">Armory</text>
+  <g class="key" font-size="5"><text x="-63.806" y="136">3</text>
+    <text x="-59.584" y="136">Armory</text>
   </g>
-  <g class="key" font-size="5"><text x="-63.862" y="138">4</text>
-    <text x="-59.565" y="138">Barracks</text>
+  <g class="key" font-size="5"><text x="-63.862" y="144">4</text>
+    <text x="-59.565" y="144">Barracks</text>
   </g>
-  <g class="key" font-size="5"><text x="-63.799" y="146">5</text>
-    <text x="-59.592" y="146">Mess Hall</text>
+  <g class="key" font-size="5"><text x="-63.799" y="152">5</text>
+    <text x="-59.592" y="152">Mess Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="-63.831" y="154">6</text>
-    <text x="-59.624" y="154">Kitchen</text>
+  <g class="key" font-size="5"><text x="-63.831" y="160">6</text>
+    <text x="-59.624" y="160">Kitchen</text>
   </g>
-  <g class="key" font-size="5"><text x="-63.974" y="162">7</text>
-    <text x="-59.631" y="162">Pantry</text>
+  <g class="key" font-size="5"><text x="-63.974" y="168">7</text>
+    <text x="-59.631" y="168">Pantry</text>
   </g>
-  <g class="key" font-size="5"><text x="-63.813" y="170">8</text>
-    <text x="-59.621" y="170">Entrance Hall</text>
+  <g class="key" font-size="5"><text x="-63.813" y="176">8</text>
+    <text x="-59.621" y="176">Entrance Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="-63.799" y="178">9</text>
-    <text x="-59.655" y="178">Great Hall</text>
+  <g class="key" font-size="5"><text x="-63.799" y="184">9</text>
+    <text x="-59.655" y="184">Great Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="-11.073" y="114">10</text>
-    <text x="-4.31" y="114">West Gallery</text>
+  <g class="key" font-size="5"><text x="-11.073" y="120">10</text>
+    <text x="-4.31" y="120">West Gallery</text>
   </g>
-  <g class="key" font-size="5"><text x="-10.561" y="122">11</text>
-    <text x="-4.376" y="122">East Gallery</text>
+  <g class="key" font-size="5"><text x="-10.561" y="128">11</text>
+    <text x="-4.376" y="128">East Gallery</text>
   </g>
-  <g class="key" font-size="5"><text x="-11.085" y="130">12</text>
-    <text x="-4.427" y="130">Chapel</text>
+  <g class="key" font-size="5"><text x="-11.085" y="136">12</text>
+    <text x="-4.427" y="136">Chapel</text>
   </g>
-  <g class="key" font-size="5"><text x="-11.061" y="138">13</text>
-    <text x="-4.305" y="138">Vestry</text>
+  <g class="key" font-size="5"><text x="-11.061" y="144">13</text>
+    <text x="-4.305" y="144">Vestry</text>
   </g>
-  <g class="key" font-size="5"><text x="-11.117" y="146">14</text>
-    <text x="-4.427" y="146">Cloister</text>
+  <g class="key" font-size="5"><text x="-11.117" y="152">14</text>
+    <text x="-4.427" y="152">Cloister</text>
   </g>
-  <g class="key" font-size="5"><text x="-11.054" y="154">15</text>
-    <text x="-4.344" y="154">Library</text>
+  <g class="key" font-size="5"><text x="-11.054" y="160">15</text>
+    <text x="-4.344" y="160">Library</text>
   </g>
-  <g class="key" font-size="5"><text x="-11.085" y="162">16</text>
-    <text x="-4.364" y="162">Reading Room</text>
+  <g class="key" font-size="5"><text x="-11.085" y="168">16</text>
+    <text x="-4.364" y="168">Reading Room</text>
   </g>
-  <g class="key" font-size="5"><text x="-11.229" y="170">17</text>
-    <text x="-4.339" y="170">Archive</text>
+  <g class="key" font-size="5"><text x="-11.229" y="176">17</text>
+    <text x="-4.339" y="176">Archive</text>
   </g>
-  <g class="key" font-size="5"><text x="-11.068" y="178">18</text>
-    <text x="-4.347" y="178">Map Room</text>
+  <g class="key" font-size="5"><text x="-11.068" y="184">18</text>
+    <text x="-4.347" y="184">Map Room</text>
   </g>
-  <g class="key" font-size="5"><text x="44.191" y="114">19</text>
-    <text x="50.853" y="114">Scribe Room</text>
+  <g class="key" font-size="5"><text x="44.191" y="120">19</text>
+    <text x="50.853" y="120">Scribe Room</text>
   </g>
-  <g class="key" font-size="5"><text x="44.172" y="122">20</text>
-    <text x="50.885" y="122">Treasury</text>
+  <g class="key" font-size="5"><text x="44.172" y="128">20</text>
+    <text x="50.885" y="128">Treasury</text>
   </g>
-  <g class="key" font-size="5"><text x="44.411" y="130">21</text>
-    <text x="50.939" y="130">Vault</text>
+  <g class="key" font-size="5"><text x="44.411" y="136">21</text>
+    <text x="50.939" y="136">Vault</text>
   </g>
-  <g class="key" font-size="5"><text x="44.159" y="138">22</text>
-    <text x="50.917" y="138">Upper guest</text>
-    <text x="50.795" y="146">chamber</text>
+  <g class="key" font-size="5"><text x="44.159" y="144">22</text>
+    <text x="50.917" y="144">Upper guest</text>
+    <text x="50.795" y="152">chamber</text>
   </g>
-  <g class="key" font-size="5"><text x="44.184" y="154">23</text>
-    <text x="50.9" y="154">Lower guest</text>
-    <text x="50.795" y="162">chamber</text>
+  <g class="key" font-size="5"><text x="44.184" y="160">23</text>
+    <text x="50.9" y="160">Lower guest</text>
+    <text x="50.795" y="168">chamber</text>
   </g>
-  <g class="key" font-size="5"><text x="44.128" y="170">24</text>
-    <text x="50.897" y="170">Master Bedroom</text>
+  <g class="key" font-size="5"><text x="44.128" y="176">24</text>
+    <text x="50.897" y="176">Master Bedroom</text>
   </g>
-  <g class="key" font-size="5"><text x="44.191" y="178">25</text>
-    <text x="50.927" y="178">Dressing Room</text>
+  <g class="key" font-size="5"><text x="44.191" y="184">25</text>
+    <text x="50.927" y="184">Dressing Room</text>
   </g>
-  <g class="key" font-size="5"><text x="99.404" y="114">26</text>
-    <text x="106.169" y="114">Bath</text>
+  <g class="key" font-size="5"><text x="99.404" y="120">26</text>
+    <text x="106.169" y="120">Bath</text>
   </g>
-  <g class="key" font-size="5"><text x="99.261" y="122">27</text>
-    <text x="106.145" y="122">Linen Store</text>
+  <g class="key" font-size="5"><text x="99.261" y="128">27</text>
+    <text x="106.145" y="128">Linen Store</text>
   </g>
-  <g class="key" font-size="5"><text x="99.421" y="130">28</text>
-    <text x="106.145" y="130">Laundry</text>
+  <g class="key" font-size="5"><text x="99.421" y="136">28</text>
+    <text x="106.145" y="136">Laundry</text>
   </g>
-  <g class="key" font-size="5"><text x="99.436" y="138">29</text>
-    <text x="106.179" y="138">Workshop</text>
+  <g class="key" font-size="5"><text x="99.436" y="144">29</text>
+    <text x="106.179" y="144">Workshop</text>
   </g>
-  <g class="key" font-size="5"><text x="99.417" y="146">30</text>
-    <text x="106.128" y="146">Forge</text>
+  <g class="key" font-size="5"><text x="99.417" y="152">30</text>
+    <text x="106.128" y="152">Forge</text>
   </g>
-  <g class="key" font-size="5"><text x="99.656" y="154">31</text>
-    <text x="106.128" y="154">Fuel Store</text>
+  <g class="key" font-size="5"><text x="99.656" y="160">31</text>
+    <text x="106.128" y="160">Fuel Store</text>
   </g>
-  <g class="key" font-size="5"><text x="99.404" y="162">32</text>
-    <text x="106.179" y="162">Well Room</text>
+  <g class="key" font-size="5"><text x="99.404" y="168">32</text>
+    <text x="106.179" y="168">Well Room</text>
   </g>
-  <g class="key" font-size="5"><text x="99.429" y="170">33</text>
-    <text x="106.062" y="170">Cellar</text>
+  <g class="key" font-size="5"><text x="99.429" y="176">33</text>
+    <text x="106.062" y="176">Cellar</text>
   </g>
-  <g class="key" font-size="5"><text x="99.373" y="178">34</text>
-    <text x="106.062" y="178">Cold Store</text>
+  <g class="key" font-size="5"><text x="99.373" y="184">34</text>
+    <text x="106.062" y="184">Cold Store</text>
   </g>
-  <g class="key" font-size="5"><text x="154.68" y="114">35</text>
-    <text x="161.414" y="114">Brewery</text>
+  <g class="key" font-size="5"><text x="154.68" y="120">35</text>
+    <text x="161.414" y="120">Brewery</text>
   </g>
-  <g class="key" font-size="5"><text x="154.649" y="122">36</text>
-    <text x="161.365" y="122">Infirmary</text>
+  <g class="key" font-size="5"><text x="154.649" y="128">36</text>
+    <text x="161.365" y="128">Infirmary</text>
   </g>
-  <g class="key" font-size="5"><text x="154.505" y="130">37</text>
-    <text x="161.395" y="130">Apothecary</text>
+  <g class="key" font-size="5"><text x="154.505" y="136">37</text>
+    <text x="161.395" y="136">Apothecary</text>
   </g>
-  <g class="key" font-size="5"><text x="154.666" y="138">38</text>
-    <text x="161.36" y="138">Herb Store</text>
+  <g class="key" font-size="5"><text x="154.666" y="144">38</text>
+    <text x="161.36" y="144">Herb Store</text>
   </g>
-  <g class="key" font-size="5"><text x="154.68" y="146">39</text>
-    <text x="161.36" y="146">Northern</text>
-    <text x="161.314" y="154">observation gallery</text>
+  <g class="key" font-size="5"><text x="154.68" y="152">39</text>
+    <text x="161.36" y="152">Northern</text>
+    <text x="161.314" y="160">observation gallery</text>
   </g>
-  <g class="key" font-size="5"><text x="154.662" y="162">40</text>
-    <text x="161.307" y="162">Council Chamber</text>
+  <g class="key" font-size="5"><text x="154.662" y="168">40</text>
+    <text x="161.307" y="168">Council Chamber</text>
   </g>
-  <g class="key" font-size="5"><text x="154.901" y="170">41</text>
-    <text x="161.395" y="170">Antechamber</text>
+  <g class="key" font-size="5"><text x="154.901" y="176">41</text>
+    <text x="161.395" y="176">Antechamber</text>
   </g>
-  <g class="key" font-size="5"><text x="154.649" y="178">42</text>
-    <text x="161.424" y="178">Watch Room</text>
+  <g class="key" font-size="5"><text x="154.649" y="184">42</text>
+    <text x="161.424" y="184">Watch Room</text>
   </g>
 </svg>

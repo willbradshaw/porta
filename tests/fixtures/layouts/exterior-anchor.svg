@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1035" viewBox="-30 -30 90 103.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-30" y="-30" width="90" height="103.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1095" viewBox="-30 -30 90 109.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-30" y="-30" width="90" height="109.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h30v30h-30z M-20 0h20v20h-20z M10 -20h20v20h-20z M30 0h20v30h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="-20" y1="-20" x2="-20" y2="30" />
@@ -48,18 +48,23 @@
   <line class="door" x1="0" y1="5" x2="0" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="15" y1="0" x2="20" y2="0" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="-0.652" y="42">1 square = 5 ft</text>
+    <text x="3.765" y="39">0</text>
+    <text x="12.438" y="39">10</text>
+    <text x="20.206" y="39">20 ft</text>
+    <text x="2.273" y="48">5-ft squares</text>
+    <rect x="5" y="40.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="15" y="40.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="-11.675" y="54">C</text>
-    <text x="-6.443" y="54">Courtyard</text>
+  <g class="key" font-size="5"><text x="-11.675" y="60">C</text>
+    <text x="-6.443" y="60">Courtyard</text>
   </g>
-  <g class="key" font-size="5"><text x="-12.303" y="62">H</text>
-    <text x="-6.39" y="62">Hall</text>
+  <g class="key" font-size="5"><text x="-12.303" y="68">H</text>
+    <text x="-6.39" y="68">Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="23.543" y="54">L</text>
-    <text x="28.338" y="54">Lodge</text>
+  <g class="key" font-size="5"><text x="23.543" y="60">L</text>
+    <text x="28.338" y="60">Lodge</text>
   </g>
-  <g class="key" font-size="5"><text x="23.188" y="62">Y</text>
-    <text x="28.372" y="62">Yard</text>
+  <g class="key" font-size="5"><text x="23.188" y="68">Y</text>
+    <text x="28.372" y="68">Yard</text>
   </g>
 </svg>

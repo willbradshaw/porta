@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="755" viewBox="-20.347 -10 50.695 75.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-20.347" y="-10" width="50.695" height="75.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="494.221" height="815" viewBox="-19.711 -10 49.422 81.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-19.711" y="-10" width="49.422" height="81.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 20h10v10h-10z M0 0h10v20h-10z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="30" />
@@ -30,9 +30,14 @@
     <line x1="1.675" y1="20" x2="8.325" y2="20" stroke="black" stroke-width="0.25" />
   </g>
   <g class="scale" font-size="5">
-    <text x="-10.652" y="42">1 square = 5 ft</text>
+    <text x="-6.235" y="39">0</text>
+    <text x="2.438" y="39">10</text>
+    <text x="10.206" y="39">20 ft</text>
+    <text x="-7.727" y="48">5-ft squares</text>
+    <rect x="-5" y="40.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="5" y="40.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="-2.069" y="54">C</text>
-    <text x="3.164" y="54">Cell</text>
+  <g class="key" font-size="5"><text x="-2.069" y="60">C</text>
+    <text x="3.164" y="60">Cell</text>
   </g>
 </svg>

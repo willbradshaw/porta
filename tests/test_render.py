@@ -182,7 +182,7 @@ def test_has_a_white_background() -> None:
 
 def test_walls_do_not_cover_the_room_grid() -> None:
     root = ET.fromstring(svg_of(TWO))
-    assert len(list(root.iter(tag("rect")))) == 1  # background only
+    assert len(root.findall(tag("rect"))) == 1  # background only
     assert wall_lines(root)
 
 
@@ -198,7 +198,7 @@ def test_scale_caption_states_the_grid_size() -> None:
     texts = " ".join(
         " ".join(t.itertext()) for t in ET.fromstring(svg_of(TWO)).iter(tag("text"))
     )
-    assert "5 ft" in texts
+    assert "5-ft squares" in texts
 
 
 def test_exterior_is_stronger_and_shared_wall_is_drawn_once() -> None:
@@ -1074,13 +1074,18 @@ def test_wrapped_entries_reserve_height_and_reduce_columns() -> None:
             assert current.y - previous.y >= len(previous.names) * 4
 
 
-def test_original_scale_caption_survives_no_key() -> None:
+def test_scale_bar_survives_no_key() -> None:
     root = ET.fromstring(svg_of('room a "" 10x10 root glyph=""'))
     assert root.findall('.//{*}g[@class="key"]') == []
     scale = root.find('.//{*}g[@class="scale"]')
     assert scale is not None
-    assert [mark.text for mark in scale.iter(tag("text"))] == ["1 square = 5 ft"]
-    assert scale.find(tag("path")) is None
+    assert [mark.text for mark in scale.iter(tag("text"))] == [
+        "0",
+        "10",
+        "20 ft",
+        "5-ft squares",
+    ]
+    assert len(scale.findall(tag("rect"))) == 2
 
 
 def test_key_and_scale_share_five_foot_type() -> None:
@@ -1107,7 +1112,10 @@ def test_visible_key_bounds_are_centered_despite_font_bearings(
         "Short": TextBounds(0.3, -4, 13, 5),
         "Wide": TextBounds(-0.4, -4, 50, 5),
         "Other": TextBounds(0.7, -4, 20, 5),
-        "1 square = 5 ft": TextBounds(0.6, -4, 30, 5),
+        "0": TextBounds(0.2, -4, 2, 5),
+        "10": TextBounds(-0.1, -4, 4, 5),
+        "20 ft": TextBounds(0.3, -4, 10, 5),
+        "5-ft squares": TextBounds(0.6, -4, 30, 5),
     }
     choice = candidates(entries, 100, metrics, wrap=False)[columns - 1]
     monkeypatch.setattr(render, "choose_layout", lambda *args: choice)
@@ -1125,6 +1133,61 @@ def test_visible_key_bounds_are_centered_despite_font_bearings(
     right = max(x + width for x, width in boxes)
     assert (left + right) / 2 == pytest.approx(50, abs=0.002)
     assert right - left == pytest.approx(choice.width, abs=0.002)
-    caption = root.find('.//{*}g[@class="scale"]/{*}text')
+    caption = next(
+        t
+        for t in root.findall('.//{*}g[@class="scale"]/{*}text')
+        if t.text == "5-ft squares"
+    )
     assert caption is not None
     assert float(caption.attrib["x"]) + 0.6 + 30 / 2 == pytest.approx(50, abs=0.002)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        'room a "Store" 5x5 root',
+        'room a "" 10x10 root glyph=""',
+        'room a "Hall" 30x20 root\nroom b "Wing" 20x30 left-of a shift=-10',
+    ],
+    ids=["tiny", "no-key", "negative-coordinates"],
+)
+def test_scale_bar_geometry_and_furniture_bounds(source: str) -> None:
+    from porta.text_metrics import text_bounds
+
+    building = solve(parse(source))
+    root = ET.fromstring(render_svg(building))
+    scale = root.find('.//{*}g[@class="scale"]')
+    assert scale is not None
+    segments = scale.findall(tag("rect"))
+    assert [s.attrib["fill"] for s in segments] == ["black", "white"]
+    assert [float(s.attrib["width"]) for s in segments] == [10, 10]
+    start = float(segments[0].attrib["x"])
+    assert float(segments[1].attrib["x"]) == start + 10
+    placed = [(r, r.x, r.y) for r in building.rooms]
+    assert all(x is not None and y is not None for _, x, y in placed)
+    left = min(x for _, x, _ in placed if x is not None)
+    right = max(x + r.width for r, x, _ in placed if x is not None)
+    bottom = max(y + r.height for r, _, y in placed if y is not None)
+    assert start + 10 == (left + right) / 2
+    assert (
+        float(segments[0].attrib["y"]) + float(segments[0].attrib["height"])
+        == bottom + 12
+    )
+    texts = scale.findall(tag("text"))
+    assert [t.text for t in texts] == ["0", "10", "20 ft", "5-ft squares"]
+    for text, expected in zip(texts[:3], [start, start + 10, start + 20], strict=True):
+        bounds = text_bounds(text.text or "")
+        assert float(text.attrib["x"]) + bounds.x + bounds.width / 2 == pytest.approx(
+            expected, abs=0.001
+        )
+    vx, vy, vw, vh = map(float, root.attrib["viewBox"].split())
+    for text in texts:
+        bounds = text_bounds(text.text or "")
+        x, y = float(text.attrib["x"]), float(text.attrib["y"])
+        assert vx <= x + bounds.x <= x + bounds.x + bounds.width <= vx + vw
+        assert vy <= y + bounds.y <= y + bounds.y + bounds.height <= vy + vh
+        assert y + bounds.y > bottom
+    caption_y = float(texts[-1].attrib["y"])
+    keys = root.findall('.//{*}g[@class="key"]/{*}text')
+    if keys:
+        assert min(float(t.attrib["y"]) for t in keys) - caption_y == 12

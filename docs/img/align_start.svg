@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="815" viewBox="-20 -10 60 81.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-20" y="-10" width="60" height="81.5" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="875" viewBox="-20 -10 60 87.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-20" y="-10" width="60" height="87.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M-10 0h10v10h-10z M20 0h10v10h-10z M0 0h20v20h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="-10" y1="0" x2="-10" y2="20" />
@@ -33,15 +33,20 @@
   <line class="door" x1="0" y1="0" x2="0" y2="5" stroke="black" stroke-width="1.5" />
   <line class="door" x1="20" y1="0" x2="20" y2="5" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="-5.652" y="32">1 square = 5 ft</text>
+    <text x="-1.235" y="29">0</text>
+    <text x="7.438" y="29">10</text>
+    <text x="15.206" y="29">20 ft</text>
+    <text x="-2.727" y="38">5-ft squares</text>
+    <rect x="0" y="30.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="10" y="30.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="-5.395" y="44">A</text>
-    <text x="0.287" y="44">Left room</text>
+  <g class="key" font-size="5"><text x="-5.395" y="50">A</text>
+    <text x="0.287" y="50">Left room</text>
   </g>
-  <g class="key" font-size="5"><text x="-4.426" y="52">B</text>
-    <text x="0.267" y="52">Right room</text>
+  <g class="key" font-size="5"><text x="-4.426" y="58">B</text>
+    <text x="0.267" y="58">Right room</text>
   </g>
-  <g class="key" font-size="5"><text x="-4.939" y="60">R</text>
-    <text x="0.267" y="60">Root room</text>
+  <g class="key" font-size="5"><text x="-4.939" y="66">R</text>
+    <text x="0.267" y="66">Root room</text>
   </g>
 </svg>

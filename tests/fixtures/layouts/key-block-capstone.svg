@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1115" viewBox="-10 -10 100 111.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10" y="-10" width="100" height="111.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1175" viewBox="-10 -10 100 117.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="100" height="117.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M20 20h20v10h-20z M0 0h60v20h-60z M40 20h20v30h-20z M60 0h20v20h-20z M0 20h20v30h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="50" />
@@ -54,15 +54,20 @@
   <line class="door" x1="40" y1="20" x2="40" y2="25" stroke="black" stroke-width="1.5" />
   <line class="door" x1="60" y1="5" x2="60" y2="10" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="24.348" y="62">1 square = 5 ft</text>
+    <text x="28.765" y="59">0</text>
+    <text x="37.438" y="59">10</text>
+    <text x="45.206" y="59">20 ft</text>
+    <text x="27.273" y="68">5-ft squares</text>
+    <rect x="30" y="60.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="40" y="60.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="25.799" y="74">A</text>
-    <text x="31.485" y="74">Annexe</text>
+  <g class="key" font-size="5"><text x="25.799" y="80">A</text>
+    <text x="31.485" y="80">Annexe</text>
   </g>
-  <g class="key" font-size="5"><text x="25.537" y="82">H</text>
-    <text x="31.414" y="82">Great Hall</text>
+  <g class="key" font-size="5"><text x="25.537" y="88">H</text>
+    <text x="31.414" y="88">Great Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="27.09" y="90">S</text>
-    <text x="31.433" y="90">Study</text>
+  <g class="key" font-size="5"><text x="27.09" y="96">S</text>
+    <text x="31.433" y="96">Study</text>
   </g>
 </svg>

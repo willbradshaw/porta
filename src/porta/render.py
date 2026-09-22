@@ -39,7 +39,11 @@ _LABEL_FIT = 0.9  # widest fraction of the room width a glyph may span
 _FONT_FAMILY = "Palatino, Georgia, Times New Roman, serif"
 _KEY_FONT_FT = 5.0  # fixed readable key size, in feet
 _SCALE_FONT_FT = _KEY_FONT_FT
-_SCALE_GAP_FT = 12  # map edge to scale baseline, then to first key baseline
+_SCALE_GAP_FT = 12  # map edge to bar bottom; caption to first key baseline
+_SCALE_LENGTH_FT = 20
+_SCALE_HEIGHT_FT = 1.5
+_SCALE_STROKE_FT = 0.2
+_SCALE_CAPTION_OFFSET_FT = 6
 _KEY_GAP_FT = 2
 _COLUMN_GAP_FT = 6
 _KEY_LINE_RATIO = 1.6  # key line spacing as a multiple of the key font
@@ -163,14 +167,12 @@ def render_svg(building: Building, *, background: str = "white") -> str:
     entity_ids = _legend_ids(building, member_block, glyphs)
     entries = [(glyphs[eid], _key_name(building, by_id, eid)) for eid in entity_ids]
     key = _key_layout(entries, plan_w)
-    caption = f"1 square = {_GRID_FT} ft"
-    caption_bounds = text_bounds(caption, _SCALE_FONT_FT)
-    scale_width = caption_bounds.width
+    scale_width = _scale_width()
     furniture_width = max(key.width, scale_width)
     center_x = (min_x + max_x) / 2
     view_w = max(plan_w, furniture_width) + 2 * _MARGIN_FT
     scale_y = max_y + _SCALE_GAP_FT
-    key_top = scale_y + _SCALE_GAP_FT - _KEY_FONT_FT
+    key_top = scale_y + _SCALE_CAPTION_OFFSET_FT + _SCALE_GAP_FT - _KEY_FONT_FT
     view_h = key_top + key.height + _MARGIN_FT - (min_y - _MARGIN_FT)
     view_x = center_x - view_w / 2
     view_y = min_y - _MARGIN_FT
@@ -340,10 +342,19 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         )
 
     lines.append(f'  <g class="scale" font-size="{_num(_SCALE_FONT_FT)}">')
-    lines.append(
-        f'    <text x="{_num(center_x - scale_width / 2 - caption_bounds.x)}" '
-        f'y="{_num(scale_y)}">{caption}</text>'
-    )
+    for dx, dy, label in _scale_labels():
+        bounds = text_bounds(label, _SCALE_FONT_FT)
+        lines.append(
+            f'    <text x="{_num(center_x + dx - bounds.width / 2 - bounds.x)}" '
+            f'y="{_num(scale_y + dy)}">{label}</text>'
+        )
+    for dx, fill in ((-_SCALE_LENGTH_FT / 2, "black"), (0, "white")):
+        lines.append(
+            f'    <rect x="{_num(center_x + dx)}" '
+            f'y="{_num(scale_y - _SCALE_HEIGHT_FT)}" '
+            f'width="{_num(_SCALE_LENGTH_FT / 2)}" height="{_num(_SCALE_HEIGHT_FT)}" '
+            f'fill="{fill}" stroke="black" stroke-width="{_num(_SCALE_STROKE_FT)}" />'
+        )
     lines.append("  </g>")
 
     key_left = center_x - key.width / 2
@@ -409,12 +420,30 @@ class _KeyLayout:
     height: float
 
 
+def _scale_labels() -> list[tuple[float, float, str]]:
+    return [
+        (-_SCALE_LENGTH_FT / 2, -3, "0"),
+        (0, -3, _num(_SCALE_LENGTH_FT / 2)),
+        (_SCALE_LENGTH_FT / 2, -3, f"{_num(_SCALE_LENGTH_FT)} ft"),
+        (0, _SCALE_CAPTION_OFFSET_FT, f"{_GRID_FT}-ft squares"),
+    ]
+
+
+def _scale_width() -> float:
+    # Symmetric footprint keeps the bar centered while reserving its end labels.
+    return max(
+        _SCALE_LENGTH_FT + _SCALE_STROKE_FT,
+        *(
+            2 * abs(dx) + text_bounds(label, _SCALE_FONT_FT).width
+            for dx, _, label in _scale_labels()
+        ),
+    )
+
+
 def _key_layout(entries: list[tuple[str, str]], plan_width: float) -> _KeyLayout:
     """Lay out the lowest-scoring equal-width key using approved coefficients."""
     metrics = TextMetrics()
-    candidate = choose_layout(
-        entries, plan_width, metrics, metrics[f"1 square = {_GRID_FT} ft"].width
-    )
+    candidate = choose_layout(entries, plan_width, metrics, _scale_width())
     if candidate is None:
         return _KeyLayout([], 0, 0)
     result = []

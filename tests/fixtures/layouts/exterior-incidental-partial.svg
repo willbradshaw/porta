@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1015" viewBox="-10 -10 60 101.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10" y="-10" width="60" height="101.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1075" viewBox="-10 -10 60 107.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="60" height="107.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M5 20h30v20h-30z M20 0h20v20h-20z M0 0h20v20h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="40" />
@@ -32,15 +32,20 @@
   <line class="divider" x1="35" y1="20" x2="35" y2="40" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="35" y1="20" x2="40" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <g class="scale" font-size="5">
-    <text x="4.348" y="52">1 square = 5 ft</text>
+    <text x="8.765" y="49">0</text>
+    <text x="17.438" y="49">10</text>
+    <text x="25.206" y="49">20 ft</text>
+    <text x="7.273" y="58">5-ft squares</text>
+    <rect x="10" y="50.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="20" y="50.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="2.774" y="64">L</text>
-    <text x="7.57" y="64">Lower terrace</text>
+  <g class="key" font-size="5"><text x="2.774" y="70">L</text>
+    <text x="7.57" y="70">Lower terrace</text>
   </g>
-  <g class="key" font-size="5"><text x="3.179" y="72">S</text>
-    <text x="7.523" y="72">Side terrace</text>
+  <g class="key" font-size="5"><text x="3.179" y="78">S</text>
+    <text x="7.523" y="78">Side terrace</text>
   </g>
-  <g class="key" font-size="5"><text x="1.863" y="80">U</text>
-    <text x="7.587" y="80">Upper terrace</text>
+  <g class="key" font-size="5"><text x="1.863" y="86">U</text>
+    <text x="7.587" y="86">Upper terrace</text>
   </g>
 </svg>

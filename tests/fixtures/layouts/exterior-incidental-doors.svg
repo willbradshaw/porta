@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="1015" viewBox="-10.347 -10 50.695 101.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10.347" y="-10" width="50.695" height="101.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="1075" viewBox="-10 -10 50 107.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="50" height="107.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M15 20h15v20h-15z M0 0h30v20h-30z M0 20h15v20h-15z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="40" />
@@ -29,15 +29,20 @@
   <line class="divider" x1="15" y1="20" x2="15" y2="40" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="door" x1="20" y1="20" x2="25" y2="20" stroke="black" stroke-width="1.5" />
   <g class="scale" font-size="5">
-    <text x="-0.652" y="52">1 square = 5 ft</text>
+    <text x="3.765" y="49">0</text>
+    <text x="12.438" y="49">10</text>
+    <text x="20.206" y="49">20 ft</text>
+    <text x="2.273" y="58">5-ft squares</text>
+    <rect x="5" y="50.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="15" y="50.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="4.656" y="64">C</text>
-    <text x="9.888" y="64">Court</text>
+  <g class="key" font-size="5"><text x="4.656" y="70">C</text>
+    <text x="9.888" y="70">Court</text>
   </g>
-  <g class="key" font-size="5"><text x="4.027" y="72">H</text>
-    <text x="9.941" y="72">Hall</text>
+  <g class="key" font-size="5"><text x="4.027" y="78">H</text>
+    <text x="9.941" y="78">Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="5.1" y="80">T</text>
-    <text x="9.956" y="80">Terrace</text>
+  <g class="key" font-size="5"><text x="5.1" y="86">T</text>
+    <text x="9.956" y="86">Terrace</text>
   </g>
 </svg>

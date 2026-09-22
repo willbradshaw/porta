@@ -2,8 +2,8 @@
 
 A standalone `window` statement adds one plain window, either between two
 rooms or to the outside. Windows render in SVG as two thin parallel lines
-with white interiors, replacing the wall across the window's span. The interior
-stays white even on a colored background. Like doors, windows do not appear
+with interiors matching the page background, replacing the wall across the
+window's span. Like doors, windows do not appear
 in the ASCII debug view.
 
 ## Placement and sizing

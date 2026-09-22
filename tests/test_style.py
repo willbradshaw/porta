@@ -50,6 +50,14 @@ def test_grid_opacity_range(opacity: float) -> None:
         ("labels.scheme", "alphabetic", "expected numeric or mnemonic"),
         ("labels.scheme", 1, "nonempty string"),
         ("labels.scheme", "", "nonempty string"),
+        ("labels.start", 0, "positive"),
+        ("labels.start", -1, "positive"),
+        ("labels.start", 1000, "must not exceed 999"),
+        ("labels.start", 1.5, "integer"),
+        ("labels.start", 1.0, "integer"),
+        ("labels.start", True, "finite number"),
+        ("labels.start", "10", "finite number"),
+        ("labels.start", None, "finite number"),
         ("typography.font_weight", 1001, "must not exceed 1000"),
         ("key.line_spacing_ft", 0.5, "at least key.font_ft"),
     ],
@@ -154,3 +162,13 @@ def test_label_scheme_override(scheme: str, documented: bool, tmp_path: Path) ->
     path.write_text(json.dumps({"labels": {"scheme": value}}))
     assert load_style(path)["labels"]["scheme"] == scheme
     assert DEFAULT_STYLE["labels"]["scheme"] == "numeric"
+
+
+@pytest.mark.parametrize("start", [1, 10, 999], ids=["default", "higher", "maximum"])
+@pytest.mark.parametrize("documented", [False, True], ids=["concise", "documented"])
+def test_numbering_start_override(start: int, documented: bool, tmp_path: Path) -> None:
+    path = tmp_path / "style.json"
+    value = {"value": start} if documented else start
+    path.write_text(json.dumps({"labels": {"start": value}}))
+    assert load_style(path)["labels"]["start"] == start
+    assert DEFAULT_STYLE["labels"]["start"] == 1

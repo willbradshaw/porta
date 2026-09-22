@@ -7,6 +7,8 @@ from math import isfinite
 from pathlib import Path
 from typing import Any
 
+from porta.model import MAX_GLYPH_LENGTH
+
 # JSON values are checked once at load time; rendering uses their native types.
 type Style = dict[str, dict[str, Any]]
 
@@ -90,6 +92,7 @@ def _validate(style: Style) -> None:
         "labels.scheme",
         "expected numeric or mnemonic",
     )
+    _number(style, "labels.start", integer=True, maximum=10**MAX_GLYPH_LENGTH - 1)
     _number(style, "labels.ratio", maximum=1)
     _number(style, "labels.fit", maximum=1)
 

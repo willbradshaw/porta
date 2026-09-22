@@ -46,7 +46,8 @@ def render_ascii(building: Building, *, style: Style | None = None) -> str:
     Args:
         building: A building whose rooms have been placed by
             :func:`~porta.layout.solve`.
-        style: Resolved style or built-in defaults; ASCII uses labels.scheme only.
+        style: Resolved style or built-in defaults; ASCII uses labels.scheme
+            and labels.start.
 
     Returns:
         The multi-line ASCII rendering (no trailing newline).
@@ -57,7 +58,9 @@ def render_ascii(building: Building, *, style: Style | None = None) -> str:
     """
     style = DEFAULT_STYLE if style is None else style
     placed = _placed_rooms(building)
-    glyphs = _assign_glyphs(building, style["labels"]["scheme"])
+    glyphs = _assign_glyphs(
+        building, style["labels"]["scheme"], style["labels"]["start"]
+    )
 
     min_x = min(x for _, x, _ in placed)
     min_y = min(y for _, _, y in placed)
@@ -112,7 +115,9 @@ def render_svg(
     style = DEFAULT_STYLE if style is None else style
     background = style["page"]["background"] if background is None else background
     placed = _placed_rooms(building)
-    glyphs = _assign_glyphs(building, style["labels"]["scheme"])
+    glyphs = _assign_glyphs(
+        building, style["labels"]["scheme"], style["labels"]["start"]
+    )
     by_id = {room.id: room for room in building.rooms}
     member_block = _member_block(building)
     footprints = stair_footprints(building)
@@ -657,12 +662,12 @@ def _glyph_font(
     return float(min(size, width * style["labels"]["fit"] / advance))
 
 
-def _assign_glyphs(building: Building, scheme: str) -> dict[str, str]:
+def _assign_glyphs(building: Building, scheme: str, start: int) -> dict[str, str]:
     """Assign a glyph to each non-member room and each block; members inherit
     their block's glyph.
 
     Explicit glyphs are preserved and ASCII digit glyphs reserve their numeric
-    values. Automatic numbers start at 1 in casefolded name order, then ID order.
+    values. Automatic numbers begin at start in casefolded name order, then ID order.
     Empty names sort first. Mnemonic glyphs use ID order and unused ID characters.
     Suppressed member glyphs do not reserve labels.
     """
@@ -680,7 +685,7 @@ def _assign_glyphs(building: Building, scheme: str) -> dict[str, str]:
         if (number := _glyph_number(glyph)) is not None
     }
     used_glyphs = set(glyphs.values())
-    next_number = 1
+    next_number = start
     ordered = sorted(
         entities,
         key=lambda entity: (
@@ -702,7 +707,8 @@ def _assign_glyphs(building: Building, scheme: str) -> dict[str, str]:
             raise RenderError(
                 f"automatic numbers exhausted for {entity.id!r}: "
                 f"all glyphs are limited to {MAX_GLYPH_LENGTH} characters; "
-                'use nonnumeric custom glyphs or glyph="" to free numbers',
+                'use nonnumeric custom glyphs or glyph="" to free numbers, '
+                "or lower labels.start",
                 line=entity.line,
             )
         glyphs[entity.id] = str(next_number)

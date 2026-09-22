@@ -92,7 +92,7 @@ porta draw plan.porta --style sepia.json -o plan.svg
 Both plain values and value/description records are accepted, including mixtures.
 Omitted settings retain their defaults; groups merge without replacing their other
 settings. Unknown keys and invalid values produce an error. `--style` also works
-with `--debug-ascii`: ASCII uses `labels.scheme` and ignores visual settings such
+with `--debug-ascii`: ASCII uses `labels.scheme` and `labels.start`, and ignores visual settings such
 as fonts, colors, and grid spacing (its cells remain 5 ft).
 
 Window and scale fills follow the background; symbols and grid use the shared line
@@ -119,7 +119,15 @@ porta draw plan.porta --style mnemonic.json --debug-ascii
 ```
 
 Use `"numeric"` for the default scheme. Explicit room and block glyphs override
-either scheme; see [glyph assignment](docs/room.md#glyphs).
+either scheme; see [glyph assignment](docs/room.md#glyphs). To continue numbering
+from another map, set the first automatic number (from `1` to `999`):
+
+```json
+{"labels": {"start": 10}}
+```
+
+Reserved numbers are still skipped. `labels.start` defaults to `1` and is ignored
+in mnemonic mode.
 
 A plan that can't be solved (due to overlaps, missing anchors, gaps
 between a room and its anchor, etc) will fail and raise an error.

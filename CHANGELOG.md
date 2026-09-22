@@ -14,6 +14,8 @@ Notable changes per release, newest first.
 - Add `labels.scheme` to styles: `numeric` by default or `mnemonic` for the
   previous ID-based labels. Allow `--style` with `--debug-ascii`, applying the
   same glyph scheme while ignoring visual settings.
+- Add `labels.start` (default `1`) to choose the first automatic numeric label
+  in SVG and ASCII, skipping reserved numbers within the three-character limit.
 - Add `porta draw --style` for grouped JSON overrides, using plain values or
   documented value/description records.
 - Read renderer defaults from documented, grouped JSON. Share background and

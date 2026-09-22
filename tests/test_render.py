@@ -1592,3 +1592,107 @@ def test_mnemonic_pool_capacity(renderer: Callable[..., str], count: int) -> Non
         assert exc.value.line == 37
         assert 'labels.scheme="numeric"' in exc.value.message
         assert renderer(building)
+
+
+@pytest.mark.parametrize(
+    ("start", "reserved", "expected"),
+    [
+        pytest.param(10, "11", {"z": "10", "a": "12", "m": "11"}, id="skip-reserved"),
+        pytest.param(
+            10, "5", {"z": "10", "a": "11", "m": "5"}, id="explicit-below-start"
+        ),
+        pytest.param(
+            10,
+            "010",
+            {"z": "11", "a": "12", "m": "010"},
+            id="reserved-start-leading-zero",
+        ),
+        pytest.param(
+            998, "0", {"z": "998", "a": "999", "m": "0"}, id="last-two-numbers"
+        ),
+    ],
+)
+def test_numeric_start_preserves_reservations_and_key_order(
+    start: int, reserved: str, expected: dict[str, str]
+) -> None:
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["labels"]["start"] = start
+    source = (
+        'room z "Atrium" 20x20 root\n'
+        'room a "Library" 20x20 right-of z\n'
+        f'room m "Vault" 20x20 down-of z glyph="{reserved}"'
+    )
+    building = solve(parse(source))
+    entries = sorted(expected.items(), key=lambda item: int(item[1]))
+    assert render_ascii(building, style=style).split("\n\n")[1] == "  ".join(
+        f"{glyph}={eid}" for eid, glyph in entries
+    )
+    root = ET.fromstring(render_svg(building, style=style))
+    assert {eid: text_by_room(root, eid).text for eid in expected} == expected
+    assert [key[0].text for key in root.findall('.//{*}g[@class="key"]')] == [
+        glyph for _, glyph in entries
+    ]
+    assert render_ascii(building) == ascii_of(source)
+    assert DEFAULT_STYLE["labels"]["start"] == 1
+
+
+@pytest.mark.parametrize("renderer", [render_ascii, render_svg], ids=["ascii", "svg"])
+@pytest.mark.parametrize(
+    ("start", "source", "exhausted"),
+    [
+        pytest.param(999, 'room a "" 5x5 root', False, id="last-number"),
+        pytest.param(
+            999, 'room a "" 5x5 root\nroom b "" 5x5 root', True, id="no-wraparound"
+        ),
+        pytest.param(
+            999,
+            'room a "" 5x5 root\nroom b "" 5x5 root glyph="999"',
+            True,
+            id="last-number-reserved",
+        ),
+        pytest.param(
+            999,
+            'room a "" 5x5 root glyph=""\nroom b "" 5x5 root',
+            False,
+            id="hidden-frees-last-number",
+        ),
+    ],
+)
+def test_start_near_numeric_limit(
+    renderer: Callable[..., str], start: int, source: str, exhausted: bool
+) -> None:
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["labels"]["start"] = start
+    building = solve(parse(source))
+    if exhausted:
+        with pytest.raises(RenderError, match=r"lower labels\.start"):
+            renderer(building, style=style)
+    else:
+        assert "999" in renderer(building, style=style)
+
+
+def test_numeric_start_is_shared_by_blocks_and_components() -> None:
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["labels"]["start"] = 10
+    building = solve(
+        parse(
+            'room member "" 5x5 root glyph="10"\n'
+            'block b "Beta" member\n'
+            'room a "Alpha" 5x5 root exterior\n'
+            'room c "Charlie" 5x5 root\n'
+            'room hidden "" 5x5 root glyph=""'
+        )
+    )
+    assert render_ascii(building, style=style).split("\n\n")[1] == "10=a  11=b  12=c"
+    root = ET.fromstring(render_svg(building, style=style))
+    label = root.find('.//{*}text[@data-block="b"]')
+    assert label is not None
+    assert label.text == "11"
+    assert text_by_room(root, "a").text == "10"
+    assert text_by_room(root, "c").text == "12"

@@ -180,11 +180,16 @@ def test_bad_style_does_not_write_output(
 
 
 @pytest.mark.parametrize(
-    ("scheme", "expected"), [("numeric", "1=a  2=z"), ("mnemonic", "A=a  Z=z")]
+    ("scheme", "start", "expected"),
+    [
+        ("numeric", 1, "1=a  2=z"),
+        ("numeric", 10, "10=a  11=z"),
+        ("mnemonic", 10, "A=a  Z=z"),
+    ],
 )
 @pytest.mark.parametrize("ascii_mode", [False, True], ids=["svg", "ascii"])
 def test_style_scheme_applies_to_both_formats(
-    scheme: str, expected: str, ascii_mode: bool, tmp_path: Path
+    scheme: str, start: int, expected: str, ascii_mode: bool, tmp_path: Path
 ) -> None:
     import xml.etree.ElementTree as ET
 
@@ -192,7 +197,8 @@ def test_style_scheme_applies_to_both_formats(
     source.write_text('room z "Zulu" 5x5 root\nroom a "Alpha" 5x5 right-of z')
     style = tmp_path / "style.json"
     style.write_text(
-        f'{{"labels": {{"scheme": "{scheme}"}}, "grid": {{"spacing_ft": 10}}}}'
+        f'{{"labels": {{"scheme": "{scheme}", "start": {start}}}, '
+        '"grid": {"spacing_ft": 10}}'
     )
     output = tmp_path / "out"
     args = ["draw", str(source), "--style", str(style), "-o", str(output)]

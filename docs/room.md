@@ -159,7 +159,7 @@ members inherit its glyph and consume no numbers.
 In numeric mode, explicit numerical glyphs reserve their values before any
 automatic assignment.
 A numerical glyph contains only ASCII digits `0`–`9`: `"01"` reserves `1` but
-is displayed verbatim; `"0"` reserves zero without changing the start at `1`.
+is displayed verbatim; `"0"` reserves zero without changing the starting number.
 Unicode digits, signs, and mixed labels like `"12a"` are nonnumeric custom glyphs
 and reserve no numbers. Suppressed member glyphs reserve nothing.
 
@@ -211,8 +211,21 @@ with the explicit ones.
 All glyphs are limited to three characters, so automatic numbers range from
 `1` to `999`, skipping reserved values. If these run out, rendering reports an
 error; assign nonnumeric custom glyphs or use `glyph=""` to free numbers.
-Labels shrink as needed to fit the room width. There is currently no setting
-to start automatic numbering above `1`.
+Labels shrink as needed to fit the room width.
+
+To start higher, set `labels.start` in a [style file](../README.md#the-porta-tool):
+
+```json
+{"labels": {"start": 10}}
+```
+
+The value must be an integer from `1` to `999` (default `1`). This changes only
+automatic numeric labels, in both SVG and ASCII. Explicit glyphs remain unchanged,
+including numbers below the start, and reserved numbers are still skipped. For
+example, with `start` set to `10` and Vault explicitly labeled `11`, Atrium gets
+`10`, Vault keeps `11`, and Library gets `12`. There is no wraparound after `999`;
+lower the start or free numbers if the available range is exhausted. Mnemonic
+mode ignores `labels.start`.
 
 The empty glyph `glyph=""` marks the room as **unlabeled**: no glyph is
 drawn, and the room gets no key entry at all (`store` above). In the

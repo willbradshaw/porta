@@ -83,6 +83,19 @@ def _validate(style: Style) -> None:
     _text(style, "typography.text_color")
     _number(style, "typography.font_weight", integer=True, maximum=1000)
 
+    for group in ("grid", "key", "scale_bar"):
+        _require(
+            type(_value(style, f"{group}.visible")) is bool,
+            f"{group}.visible",
+            "expected a boolean",
+        )
+    columns = _value(style, "key.columns")
+    _require(
+        columns == "auto" or (type(columns) is int and columns > 0),
+        "key.columns",
+        'expected "auto" or a positive integer',
+    )
+
     _number(style, "grid.spacing_ft", integer=True)
     _number(style, "grid.stroke_ft", positive=False)
     _number(style, "grid.opacity", positive=False, maximum=1)

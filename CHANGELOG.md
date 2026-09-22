@@ -4,6 +4,9 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add SVG style controls for independent key and scale visibility, explicit key
+  column counts with wrapping and canvas expansion, and grid-off rendering that
+  removes the grid-size note while preserving the scale bar.
 - Default to numeric room/block labels ordered by display name, skipping reserved
   numbers. Add style options for mnemonic labels and numbering starts, supported
   in SVG and ASCII.

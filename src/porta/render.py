@@ -140,7 +140,7 @@ def render_svg(
 
     entity_ids = _legend_ids(building, member_block, glyphs)
     entries = [(glyphs[eid], _key_name(building, by_id, eid)) for eid in entity_ids]
-    key = _key_layout(entries, plan_w, style)
+    key = _key_layout(entries if style["key"]["visible"] else [], plan_w, style)
     scale_width = _scale_width(style)
     furniture_width = max(key.width, scale_width)
     center_x = (min_x + max_x) / 2
@@ -152,12 +152,27 @@ def render_svg(
         + style["scale_bar"]["gap_ft"]
         - style["key"]["font_ft"]
     )
-    view_h = (
-        key_top
-        + key.height
-        + style["page"]["margin_ft"]
-        - (min_y - style["page"]["margin_ft"])
-    )
+    if not style["scale_bar"]["visible"]:
+        key_top = max_y + style["scale_bar"]["gap_ft"] - style["key"]["font_ft"]
+    elif not style["grid"]["visible"]:
+        key_top -= style["key"]["font_ft"] * 1.2
+    bottom = key_top + key.height
+    # Preserve legacy default bounds, including glyph-less plans. Optional
+    # visibility modes reserve only the furniture that is actually drawn.
+    if (
+        not style["key"]["visible"]
+        or not style["scale_bar"]["visible"]
+        or not style["grid"]["visible"]
+    ):
+        bottom = max_y
+        if style["scale_bar"]["visible"]:
+            bottom = max(bottom, scale_y + style["key"]["font_ft"] * 0.02)
+            for _, dy, label in _scale_labels(style):
+                bounds = text_bounds(label, style["key"]["font_ft"])
+                bottom = max(bottom, scale_y + dy + bounds.y + bounds.height)
+        if key.entries:
+            bottom = max(bottom, key_top + key.height)
+    view_h = bottom - min_y + 2 * style["page"]["margin_ft"]
     view_x = center_x - view_w / 2
     view_y = min_y - style["page"]["margin_ft"]
 
@@ -177,34 +192,35 @@ def render_svg(
         f'width="{_num(view_w)}" height="{_num(view_h)}" fill="{_attr(background)}" />'
     )
 
-    # One globally aligned grid, clipped to the union of room footprints.
-    # Courtyard voids and component gutters stay blank; declared outdoor rooms
-    # keep the same measuring grid as indoor rooms. A single path avoids seams.
-    outline = " ".join(
-        f"M{_num(x)} {_num(y)}h{room.width}v{room.height}h{-room.width}z"
-        for room, x, y in sorted(placed, key=lambda t: t[0].id)
-    )
-    lines.append(
-        f'  <defs><clipPath id="plan-grid"><path d="{outline}" /></clipPath></defs>'
-    )
-    # 5-ft grid, drawn behind the rooms (over the background).
-    lines.append(
-        f'  <g class="grid" clip-path="url(#plan-grid)" '
-        f'stroke="{_attr(style["page"]["line_color"])}" '
-        f'opacity="{_num(style["grid"]["opacity"])}" '
-        f'stroke-width="{_num(style["grid"]["stroke_ft"])}">'
-    )
-    for gx in range(min_x, max_x + 1, style["grid"]["spacing_ft"]):
-        lines.append(
-            f'    <line x1="{_num(gx)}" y1="{_num(min_y)}" '
-            f'x2="{_num(gx)}" y2="{_num(max_y)}" />'
+    if style["grid"]["visible"]:
+        # One globally aligned grid, clipped to the union of room footprints.
+        # Courtyard voids and component gutters stay blank; declared outdoor rooms
+        # keep the same measuring grid as indoor rooms. A single path avoids seams.
+        outline = " ".join(
+            f"M{_num(x)} {_num(y)}h{room.width}v{room.height}h{-room.width}z"
+            for room, x, y in sorted(placed, key=lambda t: t[0].id)
         )
-    for gy in range(min_y, max_y + 1, style["grid"]["spacing_ft"]):
         lines.append(
-            f'    <line x1="{_num(min_x)}" y1="{_num(gy)}" '
-            f'x2="{_num(max_x)}" y2="{_num(gy)}" />'
+            f'  <defs><clipPath id="plan-grid"><path d="{outline}" /></clipPath></defs>'
         )
-    lines.append("  </g>")
+        # 5-ft grid, drawn behind the rooms (over the background).
+        lines.append(
+            f'  <g class="grid" clip-path="url(#plan-grid)" '
+            f'stroke="{_attr(style["page"]["line_color"])}" '
+            f'opacity="{_num(style["grid"]["opacity"])}" '
+            f'stroke-width="{_num(style["grid"]["stroke_ft"])}">'
+        )
+        for gx in range(min_x, max_x + 1, style["grid"]["spacing_ft"]):
+            lines.append(
+                f'    <line x1="{_num(gx)}" y1="{_num(min_y)}" '
+                f'x2="{_num(gx)}" y2="{_num(max_y)}" />'
+            )
+        for gy in range(min_y, max_y + 1, style["grid"]["spacing_ft"]):
+            lines.append(
+                f'    <line x1="{_num(min_x)}" y1="{_num(gy)}" '
+                f'x2="{_num(max_x)}" y2="{_num(gy)}" />'
+            )
+        lines.append("  </g>")
 
     # Shared walls appear once. Square caps close perpendicular corners.
     exterior, interior = wall_segments(building)
@@ -350,31 +366,32 @@ def render_svg(
             f'paint-order="stroke">S</text>'
         )
 
-    lines.append(
-        f'  <g class="scale" '
-        f'font-size="{_num(style["key"]["font_ft"])}" '
-        f'fill="{_attr(style["typography"]["text_color"])}">'
-    )
-    for dx, dy, label in _scale_labels(style):
-        bounds = text_bounds(label, (style["key"]["font_ft"]))
+    if style["scale_bar"]["visible"]:
         lines.append(
-            f'    <text x="{_num(center_x + dx - bounds.width / 2 - bounds.x)}" '
-            f'y="{_num(scale_y + dy)}">{label}</text>'
+            f'  <g class="scale" '
+            f'font-size="{_num(style["key"]["font_ft"])}" '
+            f'fill="{_attr(style["typography"]["text_color"])}">'
         )
-    for dx, fill in (
-        (-style["scale_bar"]["length_ft"] / 2, style["page"]["line_color"]),
-        (0, background),
-    ):
-        lines.append(
-            f'    <rect x="{_num(center_x + dx)}" '
-            f'y="{_num(scale_y - (style["key"]["font_ft"] * 0.3))}" '
-            f'width="{_num(style["scale_bar"]["length_ft"] / 2)}" '
-            f'height="{_num(style["key"]["font_ft"] * 0.3)}" '
-            f'fill="{_attr(fill)}" '
-            f'stroke="{_attr(style["page"]["line_color"])}" '
-            f'stroke-width="{_num(style["key"]["font_ft"] * 0.04)}" />'
-        )
-    lines.append("  </g>")
+        for dx, dy, label in _scale_labels(style):
+            bounds = text_bounds(label, (style["key"]["font_ft"]))
+            lines.append(
+                f'    <text x="{_num(center_x + dx - bounds.width / 2 - bounds.x)}" '
+                f'y="{_num(scale_y + dy)}">{label}</text>'
+            )
+        for dx, fill in (
+            (-style["scale_bar"]["length_ft"] / 2, style["page"]["line_color"]),
+            (0, background),
+        ):
+            lines.append(
+                f'    <rect x="{_num(center_x + dx)}" '
+                f'y="{_num(scale_y - (style["key"]["font_ft"] * 0.3))}" '
+                f'width="{_num(style["scale_bar"]["length_ft"] / 2)}" '
+                f'height="{_num(style["key"]["font_ft"] * 0.3)}" '
+                f'fill="{_attr(fill)}" '
+                f'stroke="{_attr(style["page"]["line_color"])}" '
+                f'stroke-width="{_num(style["key"]["font_ft"] * 0.04)}" />'
+            )
+        lines.append("  </g>")
 
     key_left = center_x - key.width / 2
     for entry in key.entries:
@@ -459,15 +476,22 @@ def _scale_labels(style: Style = DEFAULT_STYLE) -> list[tuple[float, float, str]
             (style["key"]["font_ft"] * -0.6),
             f"{_num(style['scale_bar']['length_ft'])} ft",
         ),
-        (
-            0,
-            (style["key"]["font_ft"] * 1.2),
-            f"{style['grid']['spacing_ft']}-ft squares",
-        ),
-    ]
+    ] + (
+        [
+            (
+                0,
+                style["key"]["font_ft"] * 1.2,
+                f"{style['grid']['spacing_ft']}-ft squares",
+            )
+        ]
+        if style["grid"]["visible"]
+        else []
+    )
 
 
 def _scale_width(style: Style = DEFAULT_STYLE) -> float:
+    if not style["scale_bar"]["visible"]:
+        return 0
     # Symmetric footprint keeps the bar centered while reserving its end labels.
     return float(
         max(

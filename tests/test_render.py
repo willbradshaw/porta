@@ -1696,3 +1696,119 @@ def test_numeric_start_is_shared_by_blocks_and_components() -> None:
     assert label.text == "11"
     assert text_by_room(root, "a").text == "10"
     assert text_by_room(root, "c").text == "12"
+
+
+@pytest.mark.parametrize("key_visible", [False, True], ids=["no-key", "key"])
+@pytest.mark.parametrize("scale_visible", [False, True], ids=["no-scale", "scale"])
+@pytest.mark.parametrize("grid_visible", [False, True], ids=["no-grid", "grid"])
+@pytest.mark.parametrize("glyph", ["", ' glyph=""'], ids=["labeled", "unlabeled"])
+def test_optional_presentation_visibility(
+    key_visible: bool, scale_visible: bool, grid_visible: bool, glyph: str
+) -> None:
+    from porta.style import DEFAULT_STYLE
+    from porta.text_metrics import text_bounds
+
+    building = solve(parse(f'room a "Hall" 5x5 root{glyph}'))
+    before = deepcopy(building)
+    default = ET.fromstring(render_svg(building))
+    style = deepcopy(DEFAULT_STYLE)
+    for group, visible in [
+        ("key", key_visible),
+        ("scale_bar", scale_visible),
+        ("grid", grid_visible),
+    ]:
+        style[group]["visible"] = visible
+    root = ET.fromstring(render_svg(building, style=style))
+    assert building == before
+    assert render_ascii(building, style=style) == render_ascii(building)
+    assert bool(root.findall('.//{*}g[@class="key"]')) == (key_visible and not glyph)
+    assert bool(root.findall('.//{*}g[@class="scale"]')) == scale_visible
+    assert bool(root.findall('.//{*}g[@class="grid"]')) == grid_visible
+    assert ("5-ft squares" in "".join(root.itertext())) == (
+        scale_visible and grid_visible
+    )
+    # All map elements, including in-room labels, retain exact coordinates.
+    for selector in (".//*[@data-room]", './/*[@class="wall exterior"]'):
+        assert [(e.attrib, e.text) for e in root.findall(selector)] == [
+            (e.attrib, e.text) for e in default.findall(selector)
+        ]
+    x, y, width, height = map(float, root.attrib["viewBox"].split())
+    for element in root.findall(".//{*}g"):
+        if element.get("class") not in ("key", "scale"):
+            continue
+        for text in element.findall("{*}text"):
+            bounds = text_bounds(text.text or "", 5)
+            left = float(text.attrib["x"]) + bounds.x
+            top = float(text.attrib["y"]) + bounds.y
+            assert x <= left
+            assert left + bounds.width <= x + width + 0.001
+            assert y <= top
+            assert top + bounds.height <= y + height + 0.001
+    if scale_visible:
+        halves = root.findall('.//{*}g[@class="scale"]/{*}rect')
+        assert sum(float(r.attrib["width"]) for r in halves) == 20
+    if not key_visible and not scale_visible:
+        assert (x, y, width, height) == (-10, -10, 25, 25)
+
+
+@pytest.mark.parametrize(
+    "columns", [1, 2, 3, 100], ids=["one", "two", "three", "capped"]
+)
+@pytest.mark.parametrize("width", [5, 100], ids=["narrow", "wide"])
+def test_requested_key_columns_fit_without_changing_order(
+    columns: int, width: int
+) -> None:
+    from porta.render import _key_layout
+    from porta.style import DEFAULT_STYLE
+    from porta.text_metrics import text_bounds
+
+    entries = [
+        ("1", "ExtraordinarilyLongUnbrokenName"),
+        ("2", "The Great Dining Hall"),
+        ("3", "Library"),
+    ]
+    style = deepcopy(DEFAULT_STYLE)
+    style["key"]["columns"] = columns
+    layout = _key_layout(entries, width, style)
+    assert len({e.x for e in layout.entries}) == min(columns, len(entries))
+    assert [e.glyph for e in layout.entries] == ["1", "2", "3"]
+    for entry, (_, name) in zip(layout.entries, entries, strict=True):
+        assert "".join(entry.names).replace(" ", "") == name.replace(" ", "")
+        assert entry.x - text_bounds(entry.glyph, 5).width >= -0.001
+        assert (
+            entry.x + 2 + max(text_bounds(row, 5).width for row in entry.names)
+            <= layout.width + 0.001
+        )
+        assert entry.y + (len(entry.names) - 1) * 8 <= layout.height
+    building = solve(parse(DESIGN_MANOR))
+    assert render_ascii(building, style=style) == render_ascii(building)
+    root = ET.fromstring(render_svg(building, style=style))
+    assert [e[0].text for e in root.findall('.//{*}g[@class="key"]')] == ["1", "2", "3"]
+
+
+@pytest.mark.parametrize(
+    ("name", "overrides"),
+    [
+        ("grid-off-columns", {"grid": {"visible": False}, "key": {"columns": 2}}),
+        ("scale-only", {"key": {"visible": False}}),
+        ("key-only", {"scale_bar": {"visible": False}, "key": {"columns": 1}}),
+    ],
+    ids=["grid-off-columns", "scale-only", "key-only"],
+)
+def test_presentation_goldens(
+    name: str, overrides: dict[str, dict[str, bool | int]]
+) -> None:
+    from porta.style import DEFAULT_STYLE
+
+    building = solve(
+        parse(
+            'room a "Extraordinarily Long Gallery" 15x10 root\n'
+            'room b "The Great Dining Hall" 15x10 down-of a\n'
+            'room c "Library" 15x10 down-of b'
+        )
+    )
+    style = deepcopy(DEFAULT_STYLE)
+    for group, values in overrides.items():
+        style[group].update(values)
+    expected = Path(f"tests/fixtures/presentation/{name}.svg").read_text()
+    assert render_svg(building, style=style) + "\n" == expected

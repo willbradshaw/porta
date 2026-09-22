@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from porta.style import DEFAULT_STYLE, _validate, load_style
+from porta.style import DEFAULT_STYLE, Style, _validate, load_style
 
 
 def test_documented_defaults_cover_resolved_parameters() -> None:
@@ -172,3 +172,62 @@ def test_numbering_start_override(start: int, documented: bool, tmp_path: Path) 
     path.write_text(json.dumps({"labels": {"start": value}}))
     assert load_style(path)["labels"]["start"] == start
     assert DEFAULT_STYLE["labels"]["start"] == 1
+
+
+@pytest.mark.parametrize("group", ["grid", "key", "scale_bar"])
+@pytest.mark.parametrize(
+    "value",
+    [None, 0, 1, "false", [], {}],
+    ids=["null", "zero", "one", "string", "array", "object"],
+)
+def test_visibility_requires_boolean(group: str, value: object, tmp_path: Path) -> None:
+    path = tmp_path / "style.json"
+    path.write_text(json.dumps({group: {"visible": value}}))
+    with pytest.raises(ValueError, match=f"{group}.visible"):
+        load_style(path)
+
+
+@pytest.mark.parametrize(
+    "value",
+    [None, 0, -1, True, 2.0, "2", "AUTO", [], {}],
+    ids=[
+        "null",
+        "zero",
+        "negative",
+        "boolean",
+        "float",
+        "numeric-string",
+        "uppercase",
+        "array",
+        "object",
+    ],
+)
+def test_invalid_key_columns(value: object, tmp_path: Path) -> None:
+    path = tmp_path / "style.json"
+    path.write_text(json.dumps({"key": {"columns": value}}))
+    with pytest.raises(ValueError, match=r"key\.columns"):
+        load_style(path)
+
+
+@pytest.mark.parametrize("columns", ["auto", 1, 3, 1000])
+@pytest.mark.parametrize("documented", [False, True], ids=["plain", "documented"])
+def test_presentation_overrides(
+    columns: str | int, documented: bool, tmp_path: Path
+) -> None:
+    overrides: Style = {
+        "grid": {"visible": False},
+        "key": {"visible": False, "columns": columns},
+        "scale_bar": {"visible": True},
+    }
+    if documented:
+        overrides = {
+            g: {k: {"value": v} for k, v in values.items()}
+            for g, values in overrides.items()
+        }
+    path = tmp_path / "style.json"
+    path.write_text(json.dumps(overrides))
+    style = load_style(path)
+    assert style["key"]["columns"] == columns
+    assert style["grid"]["visible"] is False
+    assert style["key"]["visible"] is False
+    assert style["scale_bar"]["visible"] is True

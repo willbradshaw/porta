@@ -10,6 +10,7 @@ Notable changes per release, newest first.
   Sort SVG keys and ASCII legends numerically, followed by custom glyphs;
   document ordering, leading zeros, suppressed labels, and large numbers,
   with a rendered example showing explicit number reservation and skipping.
+  Report exhausted numbers as CLI diagnostics with the source line.
 - Add `porta draw --style` for grouped JSON overrides, using plain values or
   documented value/description records.
 - Read renderer defaults from documented, grouped JSON. Share background and

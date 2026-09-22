@@ -174,3 +174,21 @@ def test_style_rejected_for_ascii(capsys: pytest.CaptureFixture[str]) -> None:
         main(["draw", MANOR, "--style", "style.json", "--debug-ascii"])
     assert exc.value.code == 2
     assert "--style cannot be used with --debug-ascii" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("ascii_mode", [False, True], ids=["svg", "ascii"])
+def test_number_exhaustion_reports_a_diagnostic(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str], ascii_mode: bool
+) -> None:
+    source = tmp_path / "full.porta"
+    source.write_text("\n".join(f'room r{i:04} "" 5x5 root' for i in range(1000)))
+    output = tmp_path / "output"
+    args = ["draw", str(source), "-o", str(output)]
+    if ascii_mode:
+        args.append("--debug-ascii")
+    assert main(args) == 1
+    captured = capsys.readouterr()
+    assert f"{source}:1000: error: automatic numbers exhausted" in captured.err
+    assert "3 characters" in captured.err
+    assert captured.out == ""
+    assert not output.exists()

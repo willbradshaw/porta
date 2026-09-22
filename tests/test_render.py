@@ -522,7 +522,7 @@ def test_automatic_numbering_within_glyph_length_limit(
     renderer: Callable[[str], str], count: int
 ) -> None:
     # Construct a placed row directly so this tests rendering, not solver scaling.
-    building = parse("\n".join(f'room r{i:04} "{i:04}" 5x5 root' for i in range(count)))
+    building = parse("\n".join(f'room r{i:04} "" 5x5 root' for i in range(count)))
     for i, room in enumerate(building.rooms):
         room.x, room.y = i * 5, 0
     if renderer is ascii_of:
@@ -538,7 +538,7 @@ def test_automatic_numbering_within_glyph_length_limit(
         assert [
             "  ".join(span.text or "" for span in group)
             for group in root.findall('.//{*}g[@class="key"]')
-        ] == [f"{i + 1}  {i:04}" for i in range(count)]
+        ] == [str(i + 1) for i in range(count)]
 
 
 @pytest.mark.parametrize("renderer", [render_ascii, render_svg], ids=["ascii", "svg"])
@@ -555,9 +555,9 @@ def test_automatic_numbering_within_glyph_length_limit(
 def test_automatic_number_exhaustion(
     renderer: Callable[..., str], count: int, explicit: str | None, exhausted: bool
 ) -> None:
-    rows = [f'room r{i:04} "{i:04}" 5x5 root' for i in range(count)]
+    rows = [f'room r{i:04} "" 5x5 root' for i in range(count)]
     if explicit is not None:
-        rows.append(f'room fixed "Last" 5x5 root glyph="{explicit}"')
+        rows.append(f'room fixed "" 5x5 root glyph="{explicit}"')
     building = parse("\n".join(rows))
     for i, room in enumerate(building.rooms):
         room.x, room.y = i * 5, 0
@@ -1478,3 +1478,33 @@ def test_supplied_style_is_local_to_one_render(tmp_path: Path) -> None:
     assert background is not None
     assert background.attrib["fill"] == "white"
     assert style["page"]["background"] == "#fff8e7"
+
+
+@pytest.mark.parametrize("font_size", [3, 8], ids=["small-key", "large-key"])
+def test_custom_styles_preserve_numeric_assignments_and_key_order(
+    tmp_path: Path, font_size: int
+) -> None:
+    from porta.style import load_style
+
+    style_path = tmp_path / "style.json"
+    style_path.write_text(
+        '{"labels": {"ratio": 0.4, "fit": 0.7}, '
+        f'"key": {{"font_ft": {font_size}, "line_spacing_ft": 12}}, '
+        '"typography": {"text_color": "#123456"}}'
+    )
+    source = (
+        'room z "Atrium" 20x20 root\n'
+        'room a "Library" 20x20 right-of z\n'
+        'room m "Vault" 20x20 down-of z glyph="2"'
+    )
+    building = solve(parse(source))
+    root = ET.fromstring(render_svg(building, style=load_style(style_path)))
+    assert {rid: text_by_room(root, rid).text for rid in ("z", "m", "a")} == {
+        "z": "1",
+        "m": "2",
+        "a": "3",
+    }
+    keys = root.findall('.//{*}g[@class="key"]')
+    assert [key[0].text for key in keys] == ["1", "2", "3"]
+    assert all(key.attrib["font-size"] == str(font_size) for key in keys)
+    assert ascii_of(source).split("\n\n")[1] == "1=z  2=m  3=a"

@@ -102,9 +102,13 @@ def _draw(
         print(f"{style_path}: error: {exc}", file=sys.stderr)
         return 1
 
-    output = (
-        render_ascii(building) if debug_ascii else render_svg(building, style=style)
-    )
+    try:
+        output = (
+            render_ascii(building) if debug_ascii else render_svg(building, style=style)
+        )
+    except PortaError as exc:
+        print(_format_diagnostic(input_path, exc), file=sys.stderr)
+        return 1
     if output_path is None:
         print(output)
     else:

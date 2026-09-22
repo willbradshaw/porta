@@ -46,6 +46,10 @@
     }
   },
   "labels": {
+    "scheme": {
+      "value": "numeric",
+      "description": "Automatic glyph assignment for SVG and ASCII: numeric assigns 1–999 by display name; mnemonic uses unused characters from entity IDs, then A–Z and 0–9. Explicit glyphs override either scheme."
+    },
     "ratio": {
       "value": 0.6,
       "description": "Starting label font size as a fraction of the shorter available room dimension. labels.fit may shrink it further."

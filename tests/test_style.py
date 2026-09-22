@@ -47,6 +47,9 @@ def test_grid_opacity_range(opacity: float) -> None:
         ("dividers.dash", "0 0", "dash lengths"),
         ("stairs.min_ratio", 0.9, "must not exceed"),
         ("labels.fit", 2, "must not exceed 1"),
+        ("labels.scheme", "alphabetic", "expected numeric or mnemonic"),
+        ("labels.scheme", 1, "nonempty string"),
+        ("labels.scheme", "", "nonempty string"),
         ("typography.font_weight", 1001, "must not exceed 1000"),
         ("key.line_spacing_ft", 0.5, "at least key.font_ft"),
     ],
@@ -141,3 +144,13 @@ def test_bad_style_file_reports_error(
     with pytest.raises(ValueError, match=message):
         load_style(path)
     assert before == DEFAULT_STYLE
+
+
+@pytest.mark.parametrize("scheme", ["numeric", "mnemonic"])
+@pytest.mark.parametrize("documented", [False, True], ids=["concise", "documented"])
+def test_label_scheme_override(scheme: str, documented: bool, tmp_path: Path) -> None:
+    path = tmp_path / "style.json"
+    value = {"value": scheme} if documented else scheme
+    path.write_text(json.dumps({"labels": {"scheme": value}}))
+    assert load_style(path)["labels"]["scheme"] == scheme
+    assert DEFAULT_STYLE["labels"]["scheme"] == "numeric"

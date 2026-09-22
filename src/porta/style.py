@@ -1,4 +1,4 @@
-"""Read and validate the documented SVG defaults as one nested dictionary."""
+"""Read and validate the documented rendering defaults as one nested dictionary."""
 
 import json
 from copy import deepcopy
@@ -85,6 +85,11 @@ def _validate(style: Style) -> None:
     _number(style, "grid.stroke_ft", positive=False)
     _number(style, "grid.opacity", positive=False, maximum=1)
 
+    _require(
+        _text(style, "labels.scheme") in ("numeric", "mnemonic"),
+        "labels.scheme",
+        "expected numeric or mnemonic",
+    )
     _number(style, "labels.ratio", maximum=1)
     _number(style, "labels.fit", maximum=1)
 

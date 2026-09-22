@@ -1508,3 +1508,87 @@ def test_custom_styles_preserve_numeric_assignments_and_key_order(
     assert [key[0].text for key in keys] == ["1", "2", "3"]
     assert all(key.attrib["font-size"] == str(font_size) for key in keys)
     assert ascii_of(source).split("\n\n")[1] == "1=z  2=m  3=a"
+
+
+@pytest.mark.parametrize(
+    ("source", "legend"),
+    [
+        pytest.param(
+            'room z "Atrium" 5x5 root\nroom a "Vault" 5x5 root',
+            "A=a  Z=z",
+            id="id-order-not-name-order",
+        ),
+        pytest.param(
+            'room kitchen "A" 5x5 root\nroom kennel "Z" 5x5 root',
+            "I=kitchen  K=kennel",
+            id="id-contention",
+        ),
+        pytest.param(
+            'room hall "Hall" 5x5 root\nroom z "Z" 5x5 root glyph="H"',
+            "A=hall  H=z",
+            id="reserve-later-explicit",
+        ),
+        pytest.param(
+            'room a "" 5x5 root glyph="A"\nroom a-a "" 5x5 root',
+            "A=a  B=a-a",
+            id="fallback-skips-punctuation",
+        ),
+        pytest.param(
+            'room a "" 5x5 root glyph="A"\nroom a1 "" 5x5 root',
+            "1=a1  A=a",
+            id="id-digit-and-numeric-key-order",
+        ),
+        pytest.param(
+            'room main "" 5x5 root glyph="H"\n'
+            'block hall "Hall" main\nroom z "" 5x5 root exterior',
+            "H=hall  Z=z",
+            id="members-suppressed-exterior-component",
+        ),
+        pytest.param(
+            'room main "" 5x5 root\nblock hall "" main glyph="12"\n'
+            'room a "" 5x5 root glyph=""\nroom z "" 5x5 root',
+            "12=hall  Z=z",
+            id="explicit-block-and-hidden-room",
+        ),
+    ],
+)
+def test_mnemonic_assignments_match_in_svg_and_ascii(source: str, legend: str) -> None:
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["labels"]["scheme"] = "mnemonic"
+    for text in (source, "\n".join(reversed(source.splitlines()))):
+        building = solve(parse(text))
+        assert render_ascii(building, style=style).split("\n\n")[1] == legend
+        root = ET.fromstring(render_svg(building, style=style))
+        expected = dict(entry.split("=")[::-1] for entry in legend.split())
+        assert {
+            node.get("data-room") or node.get("data-block"): node.text
+            for node in root.iter(tag("text"))
+            if node.get("data-room") or node.get("data-block")
+        } == expected
+        assert [key[0].text for key in root.findall('.//{*}g[@class="key"]')] == list(
+            expected.values()
+        )
+        assert render_ascii(building) == ascii_of(text)
+        assert render_svg(building) == svg_of(text)
+
+
+@pytest.mark.parametrize("renderer", [render_ascii, render_svg], ids=["ascii", "svg"])
+@pytest.mark.parametrize("count", [36, 37], ids=["full", "exhausted"])
+def test_mnemonic_pool_capacity(renderer: Callable[..., str], count: int) -> None:
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["labels"]["scheme"] = "mnemonic"
+    building = solve(
+        parse("\n".join(f'room r{i:02} "" 5x5 root' for i in range(count)))
+    )
+    if count == 36:
+        assert renderer(building, style=style)
+    else:
+        with pytest.raises(RenderError, match="mnemonic glyphs exhausted") as exc:
+            renderer(building, style=style)
+        assert exc.value.line == 37
+        assert 'labels.scheme="numeric"' in exc.value.message
+        assert renderer(building)

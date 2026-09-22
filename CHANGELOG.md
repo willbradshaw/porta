@@ -11,6 +11,9 @@ Notable changes per release, newest first.
   document ordering, leading zeros, suppressed labels, and large numbers,
   with a rendered example showing explicit number reservation and skipping.
   Report exhausted numbers as CLI diagnostics with the source line.
+- Add `labels.scheme` to styles: `numeric` by default or `mnemonic` for the
+  previous ID-based labels. Allow `--style` with `--debug-ascii`, applying the
+  same glyph scheme while ignoring visual settings.
 - Add `porta draw --style` for grouped JSON overrides, using plain values or
   documented value/description records.
 - Read renderer defaults from documented, grouped JSON. Share background and

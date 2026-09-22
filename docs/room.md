@@ -146,7 +146,8 @@ is valid within a name, subject to the restrictions above.
 ### Glyphs
 
 Each room is labeled on the rendered map by a short **glyph**, which the key
-below the map maps back to the room's name. Automatic labels are consecutive
+below the map maps back to the room's name. By default (`labels.scheme` set to
+`"numeric"`), automatic labels are consecutive
 positive integers starting at `1`, skipping reserved numbers. Rooms outside
 blocks and the [blocks](block.md) themselves share one sequence across the
 whole map, including disconnected components and exterior rooms. Assignment
@@ -155,7 +156,8 @@ locale-specific collation), then by ID for ties, regardless of declaration
 order. Empty names sort first. A block participates under its own name; its
 members inherit its glyph and consume no numbers.
 
-Explicit numerical glyphs reserve their values before any automatic assignment.
+In numeric mode, explicit numerical glyphs reserve their values before any
+automatic assignment.
 A numerical glyph contains only ASCII digits `0`–`9`: `"01"` reserves `1` but
 is displayed verbatim; `"0"` reserves zero without changing the start at `1`.
 Unicode digits, signs, and mixed labels like `"12a"` are nonnumeric custom glyphs
@@ -216,6 +218,28 @@ The empty glyph `glyph=""` marks the room as **unlabeled**: no glyph is
 drawn, and the room gets no key entry at all (`store` above). In the
 [debug-ascii grid](../README.md#the-porta-tool), an unlabeled room's cells
 render as `_`. Unlabeled entities consume no number.
+
+#### Mnemonic labels
+
+To restore the previous ID-based assignment, use a [style file](../README.md#the-porta-tool)
+with `{"labels": {"scheme": "mnemonic"}}`. This works with both SVG and
+`--debug-ascii` output.
+
+Rooms outside blocks and blocks are processed together in alphabetical ID order.
+Each receives the first unused alphanumeric character of its ID, uppercased,
+ignoring hyphens and underscores. If none is available, assignment tries `A`–`Z`,
+then `0`–`9`. For example, `kennel` gets `K` and `kitchen` gets `I`, regardless
+of display names or declaration order.
+
+Explicit glyphs reserve their exact text before assignment. For example, an
+explicit `"H"` makes `hall` try `A` next; `"01"` does not reserve the single
+character `"1"` in this mode. Block members inherit their block's glyph, and
+suppressed member glyphs reserve nothing. `glyph=""` consumes no label.
+
+The mnemonic pool has 36 labels. If exhausted, rendering reports an error;
+use explicit multi-character glyphs, hide labels with `glyph=""`, or switch to
+`"numeric"`. The three-character glyph limit still applies. Both schemes use
+the numerical-first key ordering described above.
 
 ### Dimensions
 

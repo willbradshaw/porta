@@ -51,12 +51,12 @@ block <id> "<name>" [glyph="<glyph>"] [glyph=<member-id>] <member-id>...
   floorplan; two adjacent rooms can share a block even if neither is anchored
   to the other.
 
-Automatic numerical glyphs are assigned to blocks and rooms outside blocks
+By default, automatic numerical glyphs are assigned to blocks and rooms outside blocks
 in one sequence, by case-insensitive display name with ID tie-breaking, after
 reserving explicit numerical glyphs. A block participates under its own name.
 Its members inherit its glyph, consume no numbers, and reserve no numbers from
 their suppressed explicit glyphs. See [room glyphs](room.md#glyphs) for ordering,
-custom labels, and empty names.
+custom labels, empty names, and the optional ID-based mnemonic scheme.
 
 ## Member rooms
 

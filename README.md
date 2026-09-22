@@ -91,8 +91,9 @@ porta draw plan.porta --style sepia.json -o plan.svg
 [default_style.json](src/porta/default_style.json) documents the supported settings.
 Both plain values and value/description records are accepted, including mixtures.
 Omitted settings retain their defaults; groups merge without replacing their other
-settings. Unknown keys and invalid values produce an error. `--style` applies only
-to SVG output and cannot be combined with `--debug-ascii`.
+settings. Unknown keys and invalid values produce an error. `--style` also works
+with `--debug-ascii`: ASCII uses `labels.scheme` and ignores visual settings such
+as fonts, colors, and grid spacing (its cells remain 5 ft).
 
 Window and scale fills follow the background; symbols and grid use the shared line
 color, with separate grid opacity. Font fitting uses Palatino-based estimates, so
@@ -104,6 +105,21 @@ as an ASCII grid:
 ```sh
 porta draw plan.porta --debug-ascii
 ```
+
+Automatic glyphs default to numbers. To restore the previous ID-based mnemonic
+labels, save this as `mnemonic.json`:
+
+```json
+{"labels": {"scheme": "mnemonic"}}
+```
+
+```sh
+porta draw plan.porta --style mnemonic.json -o plan.svg
+porta draw plan.porta --style mnemonic.json --debug-ascii
+```
+
+Use `"numeric"` for the default scheme. Explicit room and block glyphs override
+either scheme; see [glyph assignment](docs/room.md#glyphs).
 
 A plan that can't be solved (due to overlaps, missing anchors, gaps
 between a room and its anchor, etc) will fail and raise an error.

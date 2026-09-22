@@ -34,7 +34,7 @@ _NO_GLYPH = "_"  # ascii cell fill for an unlabeled (glyph="") room
 _SVG_NS = "http://www.w3.org/2000/svg"
 
 
-def render_ascii(building: Building) -> str:
+def render_ascii(building: Building, *, style: Style | None = None) -> str:
     """Render a solved building as an ASCII grid plus a glyph legend.
 
     One cell per 5-ft square, space-separated, north at the top; every cell is
@@ -46,16 +46,18 @@ def render_ascii(building: Building) -> str:
     Args:
         building: A building whose rooms have been placed by
             :func:`~porta.layout.solve`.
+        style: Resolved style or built-in defaults; ASCII uses labels.scheme only.
 
     Returns:
         The multi-line ASCII rendering (no trailing newline).
 
     Raises:
         ValueError: If any room has not been placed.
-        RenderError: If automatic numbers exceed the glyph length limit.
+        RenderError: If the automatic glyph scheme runs out of labels.
     """
+    style = DEFAULT_STYLE if style is None else style
     placed = _placed_rooms(building)
-    glyphs = _assign_glyphs(building)
+    glyphs = _assign_glyphs(building, style["labels"]["scheme"])
 
     min_x = min(x for _, x, _ in placed)
     min_y = min(y for _, _, y in placed)
@@ -105,12 +107,12 @@ def render_svg(
 
     Raises:
         ValueError: If any room has not been placed.
-        RenderError: If automatic numbers exceed the glyph length limit.
+        RenderError: If the automatic glyph scheme runs out of labels.
     """
     style = DEFAULT_STYLE if style is None else style
     background = style["page"]["background"] if background is None else background
     placed = _placed_rooms(building)
-    glyphs = _assign_glyphs(building)
+    glyphs = _assign_glyphs(building, style["labels"]["scheme"])
     by_id = {room.id: room for room in building.rooms}
     member_block = _member_block(building)
     footprints = stair_footprints(building)
@@ -655,13 +657,14 @@ def _glyph_font(
     return float(min(size, width * style["labels"]["fit"] / advance))
 
 
-def _assign_glyphs(building: Building) -> dict[str, str]:
+def _assign_glyphs(building: Building, scheme: str) -> dict[str, str]:
     """Assign a glyph to each non-member room and each block; members inherit
     their block's glyph.
 
     Explicit glyphs are preserved and ASCII digit glyphs reserve their numeric
     values. Automatic numbers start at 1 in casefolded name order, then ID order.
-    Empty names sort first; suppressed member glyphs do not reserve numbers.
+    Empty names sort first. Mnemonic glyphs use ID order and unused ID characters.
+    Suppressed member glyphs do not reserve labels.
     """
     member_block = _member_block(building)
     entities: list[Room | Block] = [
@@ -676,11 +679,22 @@ def _assign_glyphs(building: Building) -> dict[str, str]:
         for glyph in glyphs.values()
         if (number := _glyph_number(glyph)) is not None
     }
+    used_glyphs = set(glyphs.values())
     next_number = 1
-    for entity in sorted(
-        entities, key=lambda entity: ((entity.name or "").casefold(), entity.id)
-    ):
+    ordered = sorted(
+        entities,
+        key=lambda entity: (
+            (entity.name or "").casefold() if scheme == "numeric" else "",
+            entity.id,
+        ),
+    )
+    for entity in ordered:
         if entity.id in glyphs:
+            continue
+        if scheme == "mnemonic":
+            glyph = _pick_mnemonic(entity, used_glyphs)
+            glyphs[entity.id] = glyph
+            used_glyphs.add(glyph)
             continue
         while next_number in used:
             next_number += 1
@@ -696,6 +710,18 @@ def _assign_glyphs(building: Building) -> dict[str, str]:
     for member, block_id in member_block.items():
         glyphs[member] = glyphs[block_id]
     return glyphs
+
+
+def _pick_mnemonic(entity: Room | Block, used: set[str]) -> str:
+    """Use the first available ID character, then the legacy fallback pool."""
+    for char in entity.id.upper() + "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789":
+        if char.isalnum() and char not in used:
+            return char
+    raise RenderError(
+        f"automatic mnemonic glyphs exhausted for {entity.id!r} (36 used); "
+        'use unique multi-character glyphs, glyph="", or labels.scheme="numeric"',
+        line=entity.line,
+    )
 
 
 def _glyph_number(glyph: str) -> int | None:

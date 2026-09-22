@@ -156,24 +156,57 @@ def test_style_file_changes_svg(documented: bool, tmp_path: Path) -> None:
 @pytest.mark.parametrize(
     "source", [None, "{", '{"unknown": 3}', '{"key": {"font_ft": 0}}']
 )
+@pytest.mark.parametrize("ascii_mode", [False, True], ids=["svg", "ascii"])
 def test_bad_style_does_not_write_output(
-    source: str | None, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ascii_mode: bool,
+    source: str | None,
+    tmp_path: Path,
+    capsys: pytest.CaptureFixture[str],
 ) -> None:
     style = tmp_path / "style.json"
     if source is not None:
         style.write_text(source)
     output = tmp_path / "out.svg"
     output.write_text("previous output")
-    assert main(["draw", MANOR, "--style", str(style), "-o", str(output)]) == 1
+    assert (
+        main(
+            ["draw", MANOR, "--style", str(style), "-o", str(output)]
+            + (["--debug-ascii"] if ascii_mode else [])
+        )
+        == 1
+    )
     assert f"{style}: error:" in capsys.readouterr().err
     assert output.read_text() == "previous output"
 
 
-def test_style_rejected_for_ascii(capsys: pytest.CaptureFixture[str]) -> None:
-    with pytest.raises(SystemExit) as exc:
-        main(["draw", MANOR, "--style", "style.json", "--debug-ascii"])
-    assert exc.value.code == 2
-    assert "--style cannot be used with --debug-ascii" in capsys.readouterr().err
+@pytest.mark.parametrize(
+    ("scheme", "expected"), [("numeric", "1=a  2=z"), ("mnemonic", "A=a  Z=z")]
+)
+@pytest.mark.parametrize("ascii_mode", [False, True], ids=["svg", "ascii"])
+def test_style_scheme_applies_to_both_formats(
+    scheme: str, expected: str, ascii_mode: bool, tmp_path: Path
+) -> None:
+    import xml.etree.ElementTree as ET
+
+    source = tmp_path / "plan.porta"
+    source.write_text('room z "Zulu" 5x5 root\nroom a "Alpha" 5x5 right-of z')
+    style = tmp_path / "style.json"
+    style.write_text(
+        f'{{"labels": {{"scheme": "{scheme}"}}, "grid": {{"spacing_ft": 10}}}}'
+    )
+    output = tmp_path / "out"
+    args = ["draw", str(source), "--style", str(style), "-o", str(output)]
+    if ascii_mode:
+        args.append("--debug-ascii")
+    assert main(args) == 0
+    if ascii_mode:
+        assert output.read_text().split("\n\n")[1] == expected
+        assert len(output.read_text().splitlines()[0].split()) == 2
+    else:
+        root = ET.fromstring(output.read_text())
+        assert [key[0].text for key in root.findall('.//{*}g[@class="key"]')] == [
+            entry.split("=")[0] for entry in expected.split()
+        ]
 
 
 @pytest.mark.parametrize("ascii_mode", [False, True], ids=["svg", "ascii"])

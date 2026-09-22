@@ -63,28 +63,51 @@ For more on the `porta` DSL specification, see the following documentation:
 
 ## The `porta` tool
 
-`porta draw` resolves a floorplan's geometry and renders it as SVG or an ASCII
-grid. Invalid plans produce an error.
+Once a valid floorplan has been written, `porta draw` converts it into an
+SVG map in a two-step process. First, the dependency graph is traversed
+and the relations in the floorplan are converted into a coordinate system.
+Second, that coordinate system is used to deterministically generate an
+SVG file.
 
 ```sh
 porta draw plan.porta -o plan.svg
-porta draw plan.porta --debug-ascii
+```
+
+Override SVG appearance with a grouped JSON file:
+
+```sh
 porta draw plan.porta --style sepia.json -o plan.svg
 ```
 
-Use `--style` with a JSON file to override rendering settings, for example:
-
 ```json
-{"page": {"background": "#fff8e7", "line_color": "#332211"}}
+{
+  "page": {"background": "#fff8e7", "line_color": "#332211"},
+  "typography": {
+    "text_color": {"value": "#654321", "description": "Sepia ink"}
+  }
+}
 ```
 
-[default_style.json](src/porta/default_style.json) documents all settings.
-Overrides accept plain values or value/description records; omitted settings
-keep their defaults. Unknown keys and invalid values produce an error.
+[default_style.json](src/porta/default_style.json) documents the supported settings.
+Both plain values and value/description records are accepted, including mixtures.
+Omitted settings retain their defaults; groups merge without replacing their other
+settings. Unknown keys and invalid values produce an error. With `--debug-ascii`,
+`--style` applies label settings and ignores visual settings. See
+[glyphs](docs/room.md#glyphs) for label schemes and numbering starts.
 
-Labels default to numbers; see [glyphs](docs/room.md#glyphs) for custom labels,
-mnemonic assignment, and numbering starts. `--style` also works with
-`--debug-ascii`, applying label settings while ignoring visual settings.
+Window and scale fills follow the background; symbols and grid use the shared line
+color, with separate grid opacity. Font fitting uses Palatino-based estimates, so
+other fonts may fit differently in the SVG viewer.
+
+The solved coordinate system can also be viewed and debugged directly
+as an ASCII grid:
+
+```sh
+porta draw plan.porta --debug-ascii
+```
+
+A plan that can't be solved (due to overlaps, missing anchors, gaps
+between a room and its anchor, etc) will fail and raise an error.
 
 ## Installation
 

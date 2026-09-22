@@ -48,7 +48,7 @@
   "labels": {
     "scheme": {
       "value": "numeric",
-      "description": "Automatic glyph assignment for SVG and ASCII: numeric assigns numbers from labels.start through 999 by display name; mnemonic uses unused characters from entity IDs, then A–Z and 0–9. Explicit glyphs override either scheme."
+      "description": "Must be exactly one of the case-sensitive strings \"numeric\" or \"mnemonic\". For SVG and ASCII, numeric assigns numbers from labels.start through 999 by display name; mnemonic uses unused characters from entity IDs, then A–Z and 0–9. Explicit glyphs override either scheme."
     },
     "start": {
       "value": 1,

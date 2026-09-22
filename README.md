@@ -118,7 +118,8 @@ porta draw plan.porta --style mnemonic.json -o plan.svg
 porta draw plan.porta --style mnemonic.json --debug-ascii
 ```
 
-Use `"numeric"` for the default scheme. Explicit room and block glyphs override
+`labels.scheme` must be exactly `"numeric"` (the default) or `"mnemonic"`;
+values are case-sensitive. Explicit room and block glyphs override
 either scheme; see [glyph assignment](docs/room.md#glyphs). To continue numbering
 from another map, set the first automatic number (from `1` to `999`):
 

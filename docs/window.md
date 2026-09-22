@@ -3,7 +3,7 @@
 A standalone `window` statement adds one plain window, either between two
 rooms or to the outside. Windows render in SVG as two thin parallel lines
 with white interiors, replacing the wall across the window's span. The interior
-stays white even on a coloured background. Like doors, windows do not appear
+stays white even on a colored background. Like doors, windows do not appear
 in the ASCII debug view.
 
 ## Placement and sizing
@@ -15,7 +15,7 @@ Windows use the same targets, width and offset notation as standalone
 - `window[=W][@O] <room> outside <side>` places one on an exterior side:
   `up`, `down`, `left`, or `right`.
 
-The default is 5 feet wide and centred, with its start rounded down to the
+The default is 5 feet wide and centered, with its start rounded down to the
 5-foot grid (leftward or upward), exactly like a door. Width is a positive
 multiple of 5 feet; offset is a non-negative multiple of 5 feet. Offsets
 are measured from the left or top of the shared wall for interior windows,
@@ -33,7 +33,7 @@ window study outside up
 window study outside right
 ```
 
-<img alt="A study with centred windows on its north and east walls" src="img/window-default.svg" width="45%">
+<img alt="A study with centered windows on its north and east walls" src="img/window-default.svg" width="45%">
 
 ```porta img/window-interior.svg
 room hall "Hall" 20x20 root
@@ -84,7 +84,7 @@ never provide stair access through an indoor/outdoor wall.
 As with doors, the entire window must fit on its wall. Interior windows
 require a shared wall; exterior windows require that no other room sit flush
 against any part of their span. An exposed portion of a partially shared
-side is valid. Centring uses the full side and does not search for a free
+side is valid. Centering uses the full side and does not search for a free
 span; set an explicit offset when necessary.
 
 Windows cannot overlap other windows or any door, including open and secret
@@ -128,7 +128,7 @@ This manor combines broad exterior windows in the drawing room, smaller
 windows in service rooms, and interior windows beside doors. The dining
 room has both an exterior door and a window on its north wall; its shared
 wall with the kitchen also has a door and window placed end to end.
-The pantry's height and passage's width are resolved from their neighbours.
+The pantry's height and passage's width are resolved from their neighbors.
 
 ```porta img/window-capstone.svg
 room hall     "Hall"          20x40 root

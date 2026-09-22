@@ -1,4 +1,4 @@
-"""Stage 1: parser behaviour for the minimal .porta grammar.
+"""Stage 1: parser behavior for the minimal .porta grammar.
 
 Grammar under test::
 
@@ -273,7 +273,7 @@ def test_invalid_source_raises(source: str) -> None:
 
 
 def test_uppercase_id_is_rejected() -> None:
-    # Ids are lowercase only (the name carries any display capitalisation).
+    # Ids are lowercase only (the name carries any display capitalization).
     with pytest.raises(ParseError):
         parse('room Hall "Hall" 10x10 root')
 

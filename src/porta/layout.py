@@ -171,10 +171,10 @@ def _check_block_contiguous(block: Block, by_id: dict[str, Room]) -> None:
     reached = {members[0].id}
     stack = [members[0].id]
     while stack:
-        for neighbour in adjacency[stack.pop()]:
-            if neighbour not in reached:
-                reached.add(neighbour)
-                stack.append(neighbour)
+        for neighbor in adjacency[stack.pop()]:
+            if neighbor not in reached:
+                reached.add(neighbor)
+                stack.append(neighbor)
     if len(reached) != len(members):
         raise LayoutError(
             f"block {block.id!r} is not contiguous: its members do not all "
@@ -849,7 +849,7 @@ def stair_footprints(building: Building) -> list[tuple[Stairs, Rect]]:
 
     The footprint is absolute ``(x, y, w, h)`` in feet. The default size is
     one grid square across the run and two along it (from ``down``'s axis);
-    the default position is centred in the room, rounded down to the grid.
+    the default position is centered in the room, rounded down to the grid.
     Assumes a solved building.
 
     Raises:
@@ -921,7 +921,7 @@ def _check_stair_access(building: Building, door_lines: list[Segment]) -> None:
     An *entrance* (open side) on the room boundary is fine when a door of
     any kind covers part of its span — a stair closet entered through a
     door — but with nothing there to enter from, the flight is inaccessible
-    and almost certainly misorientated. Conversely, a door whose span meets
+    and almost certainly misoriented. Conversely, a door whose span meets
     a *closed* side or flank of a footprint on the boundary opens into the
     back of the staircase and is rejected too.
     """
@@ -1196,11 +1196,11 @@ def _components(rooms: list[Room]) -> list[list[Room]]:
     source, and each component lists its rooms in source order — so packing and
     diagnostics are deterministic. Assumes anchors have been validated.
     """
-    neighbours: dict[str, set[str]] = {room.id: set() for room in rooms}
+    neighbors: dict[str, set[str]] = {room.id: set() for room in rooms}
     for room in rooms:
         for rel in room.relations:
-            neighbours[room.id].add(rel.anchor)
-            neighbours[rel.anchor].add(room.id)
+            neighbors[room.id].add(rel.anchor)
+            neighbors[rel.anchor].add(room.id)
     components: list[list[Room]] = []
     seen: set[str] = set()
     for room in rooms:
@@ -1209,10 +1209,10 @@ def _components(rooms: list[Room]) -> list[list[Room]]:
         member_ids = {room.id}
         stack = [room.id]
         while stack:
-            for neighbour in neighbours[stack.pop()]:
-                if neighbour not in member_ids:
-                    member_ids.add(neighbour)
-                    stack.append(neighbour)
+            for neighbor in neighbors[stack.pop()]:
+                if neighbor not in member_ids:
+                    member_ids.add(neighbor)
+                    stack.append(neighbor)
         seen |= member_ids
         components.append([r for r in rooms if r.id in member_ids])
     return components

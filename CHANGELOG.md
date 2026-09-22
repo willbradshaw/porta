@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Standardize project-authored prose, internal identifiers, and examples on US
+  English, preserving public APIs and existing file paths.
 - Add SVG style controls for independent key and scale visibility, explicit key
   column counts with wrapping and canvas expansion, and grid-off rendering that
   removes the grid-size note while preserving the scale bar.
@@ -14,7 +16,7 @@ Notable changes per release, newest first.
   documented value/description records.
 - Read renderer defaults from documented, grouped JSON. Share background and
   symbol colors, use grid opacity, and derive scale proportions from key text size.
-- Add a labeled 20-ft scale bar and use dark-grey text for room labels, key,
+- Add a labeled 20-ft scale bar and use dark-gray text for room labels, key,
   and scale.
 - Refine SVG typography, grid, and spacing, and automatically balance room-key
   columns and wrapping. Keep key-layout scoring parameters in a separate JSON file.

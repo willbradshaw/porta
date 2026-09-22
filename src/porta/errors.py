@@ -11,7 +11,7 @@ class PortaError(Exception):
     """Base class for all errors that represent invalid ``.porta`` input."""
 
     def __init__(self, message: str, *, line: int | None = None) -> None:
-        """Initialise the error.
+        """Initialize the error.
 
         Args:
             message: Human-readable description of the problem.
@@ -49,7 +49,7 @@ class OverlapError(LayoutError):
     """
 
     def __init__(self, rooms: tuple[str, str], rect: tuple[int, int, int, int]) -> None:
-        """Initialise the error.
+        """Initialize the error.
 
         Args:
             rooms: The ids of the two overlapping rooms (in source order).

@@ -32,7 +32,7 @@ _BLOCK = re.compile(
     re.MULTILINE | re.DOTALL,
 )
 
-# Light grey reads more gently than white on a dark page (tweak to taste).
+# Light gray reads more gently than white on a dark page (tweak to taste).
 _BACKGROUND = "#e0e0e0"
 
 

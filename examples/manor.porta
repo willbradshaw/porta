@@ -2,19 +2,19 @@ room entrance "Entrance Hall" 20x20 root
 room hall     "Great Hall"    40x30 up-of entrance
 room library  "Library"       30x30 left-of hall      no-door
 room dining   "Dining Room"   30x30 right-of hall
-room parlour  "Parlour"       20x20 left-of entrance
+room parlor   "Parlor"        20x20 left-of entrance
 room cloak    "Cloakroom"     20x20 right-of entrance
 room kitchen  "Kitchen"       30x25 down-of dining
 room pantry   "Pantry"        15x?  right-of kitchen
-room study    "Study"         ?x20  down-of parlour
-room corridor "Corridor"      ?x?   down-of library left-of parlour left-of study
+room study    "Study"         ?x20  down-of parlor
+room corridor "Corridor"      ?x?   down-of library left-of parlor left-of study
 room scullery "Scullery"      ?x20  down-of kitchen
 room porch    "Porch"         10x10 down-of entrance shift=5
 room passage  "Passage"       ?x10  right-of study left-of porch
 room larder   "Larder"        15x15 right-of pantry  shift=5
 room gallery  "Gallery"       20x10 up-of hall      align=end
 room turret   "Turret"        15x15 left-of library align=end shift=-5
-door=10 parlour library
+door=10 parlor library
 door@10 cloak hall
 door porch outside down
 door turret outside left

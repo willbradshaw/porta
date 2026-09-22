@@ -19,7 +19,7 @@ shares standalone door placement and sizing conventions.
 
 Every [relation](room.md#relations) connecting two rooms is given a
 door by default. These default doors are 5 feet wide and positioned
-as close to the centre of the wall as possible. If they cannot be placed
+as close to the center of the wall as possible. If they cannot be placed
 fully centrally due to the 5-foot wall grid, they are positioned
 immediately above (for vertical walls) or to the left of the center
 (for horizontal walls).
@@ -144,7 +144,7 @@ door b outside down
 
 External-door offsets are measured along the named room side, from its top
 for `left`/`right` or its left end for `up`/`down`. The entire door span must
-be exterior, but a neighbouring room elsewhere on that side is allowed:
+be exterior, but a neighboring room elsewhere on that side is allowed:
 
 ```porta img/door-partial-exterior.svg
 room hall "Hall" 20x30 root
@@ -187,7 +187,7 @@ door=20@0 open east west
 door=10 open hall outside up
 ```
 
-<img alt="Open boundaries on a relation, between incidental neighbours, and to the outside" src="img/door-open-forms.svg" width="70%">
+<img alt="Open boundaries on a relation, between incidental neighbors, and to the outside" src="img/door-open-forms.svg" width="70%">
 
 Open doors interact with [blocks](block.md) the way solid doors do: between
 two members of the same block the opening is suppressed with a warning (the
@@ -221,7 +221,7 @@ concealed.
   a corner).
 - A door wider than its wall, or pushed past the wall's end by its offset.
 - Two doors that overlap on the same wall.
-- An external door whose span overlaps a neighbouring room flush against
+- An external door whose span overlaps a neighboring room flush against
   that side.
 - An `open` or `secret` marker that doesn't immediately follow a door spec,
   a door carrying both markers, or either combined with `no-door` on the

@@ -584,12 +584,12 @@ def _legend_ids(
 def _glyph_spot(
     room: Room, obstacles: list[Rect], glyph: str, style: Style = DEFAULT_STYLE
 ) -> tuple[float, float, float]:
-    """Room-local glyph centre and font size, keeping clear of stair footprints.
+    """Room-local glyph center and font size, keeping clear of stair footprints.
 
-    With no stairs the glyph sits at the room's centre at the usual size.
-    Otherwise it is centred in the largest free full-width or full-height band
+    With no stairs the glyph sits at the room's center at the usual size.
+    Otherwise it is centered in the largest free full-width or full-height band
     between the room's edges and the footprints, sized to that band — falling
-    back to the room centre when every band is blocked.
+    back to the room center when every band is blocked.
     """
     width, height = room.width, room.height
     if not obstacles:
@@ -641,7 +641,7 @@ def _stair_treads(
     Treads narrow toward the downhill end — the depth cue that shows which
     way the flight descends — shrinking linearly from the maximum ratio
     of the footprint's breadth at the high end to the minimum ratio at
-    the low end, centred across the run. At a closed end the hard edge
+    the low end, centered across the run. At a closed end the hard edge
     already draws the line, so the end tread is emitted only where the
     footprint is open.
     """

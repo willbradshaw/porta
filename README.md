@@ -8,9 +8,9 @@
 
 ```porta
 room hall    "Great Hall" 40x20 root
-room parlour "Parlour"    20x20 left-of hall
+room parlor  "Parlor"     20x20 left-of hall
 room kitchen "Kitchen"    20x20 right-of hall
-room study   "Study"      ?x20  down-of parlour
+room study   "Study"      ?x20  down-of parlor
 ```
 
 ## The `porta` DSL

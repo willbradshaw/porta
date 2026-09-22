@@ -9,7 +9,7 @@ anchors before the rooms that depend on them, regardless of source order.
 
 ```porta img/overview.svg
 room hall    "Hall"    30x20 root
-room parlour "Parlour" 20x20 left-of hall
+room parlor  "Parlor"  20x20 left-of hall
 room kitchen "Kitchen" 20x20 right-of hall
 ```
 
@@ -80,7 +80,7 @@ To connect an interior room to a named exterior space, use a relation, link,
 or `door <interior-id> <exterior-id>`, rather than an `outside` door.
 `no-door` is allowed on outdoor relations and links, where it has no effect.
 
-A [block](block.md) can group exterior rooms into one labelled area, suppressing
+A [block](block.md) can group exterior rooms into one labeled area, suppressing
 their automatic dividers. Use an explicit `divider` to restore a boundary within
 the block. A block must contain either all interior rooms or all exterior rooms;
 mixing the two is an error. Explicit doors between members are suppressed with

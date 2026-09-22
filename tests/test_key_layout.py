@@ -329,3 +329,17 @@ def test_invalid_scoring_parameters(parameter: str, value: object) -> None:
     parameters[parameter] = value
     with pytest.raises(ValueError, match=parameter):
         key_layout._Scoring(**parameters)
+
+
+def test_custom_gaps_are_included_in_candidate_width() -> None:
+    from copy import deepcopy
+
+    from porta.style import DEFAULT_STYLE
+
+    style = deepcopy(DEFAULT_STYLE)
+    style["key"]["identifier_gap_ft"] = 4
+    style["key"]["column_gap_ft"] = 11
+    entries = [("1", "A"), ("2", "A")]
+    options = candidates(entries, 100, sample_metrics(entries), wrap=False, style=style)
+    assert options[0].width == 11  # 3.5-ft glyph + 4-ft gap + 3.5-ft name
+    assert options[1].width == 33  # two 11-ft columns + 11-ft gutter

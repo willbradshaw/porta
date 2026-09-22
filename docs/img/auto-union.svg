@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="522.295" height="975" viewBox="-21.115 -10 52.23 97.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
   <rect x="-21.115" y="-10" width="52.23" height="97.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M0 10h20v20h-20z M-10 0h10v30h-10z M0 0h20v10h-20z" /></clipPath></defs>
-  <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
+  <g class="grid" clip-path="url(#plan-grid)" stroke="black" opacity="0.23" stroke-width="0.125">
     <line x1="-10" y1="0" x2="-10" y2="30" />
     <line x1="-5" y1="0" x2="-5" y2="30" />
     <line x1="0" y1="0" x2="0" y2="30" />
@@ -35,7 +35,7 @@
     <text x="10.206" y="39">20 ft</text>
     <text x="-7.727" y="48">5-ft squares</text>
     <rect x="-5" y="40.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
-    <rect x="5" y="40.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
+    <rect x="5" y="40.5" width="10" height="1.5" fill="#e0e0e0" stroke="black" stroke-width="0.2" />
   </g>
   <g class="key" font-size="5" fill="#333333"><text x="-11.2" y="60">A</text>
     <text x="-5.491" y="60">Down room</text>

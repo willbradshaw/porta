@@ -9,10 +9,8 @@ from dataclasses import dataclass, fields, replace
 from importlib.resources import files
 from math import isfinite
 
+from porta.style import DEFAULT_STYLE, Style
 from porta.text_metrics import TextBounds
-
-_GLYPH_GAP = 2.0
-_COLUMN_GAP = 6.0
 
 
 @dataclass(frozen=True)
@@ -224,6 +222,7 @@ def candidates(
     *,
     wrap: bool = True,
     scale_width: float = 0,
+    style: Style = DEFAULT_STYLE,
 ) -> list[Candidate]:
     """Vary all nonempty column counts and text-wrap breakpoints.
 
@@ -267,7 +266,9 @@ def candidates(
                 (metrics[line].width for name in names for line in rows[name]),
                 default=0,
             )
-            column_width = glyph_width + (_GLYPH_GAP + name_width if name_width else 0)
+            column_width = glyph_width + (
+                style["key"]["identifier_gap_ft"] + name_width if name_width else 0
+            )
             glyph_widths = [glyph_width] * count
             widths = [column_width] * count
             # Equal column pitches; center and score the visible ink, excluding
@@ -279,11 +280,16 @@ def candidates(
             )
             right_trim = column_width - glyph_width
             if last_name_width:
-                right_trim -= _GLYPH_GAP + last_name_width
+                right_trim -= style["key"]["identifier_gap_ft"] + last_name_width
             lines = max(
                 sum(max(1, len(rows[name])) for _, name in col) for col in columns
             )
-            width = sum(widths) + (count - 1) * _COLUMN_GAP - left_trim - right_trim
+            width = (
+                sum(widths)
+                + (count - 1) * style["key"]["column_gap_ft"]
+                - left_trim
+                - right_trim
+            )
             result.append(
                 Candidate(
                     columns,
@@ -308,12 +314,20 @@ def choose_layout(
     map_width: float,
     metrics: dict[str, TextBounds],
     scale_width: float,
+    *,
+    style: Style = DEFAULT_STYLE,
 ) -> Candidate | None:
     """Choose the lowest approved score, breaking exact ties by column count."""
     return min(
         (
             with_interword_penalty(c)
-            for c in candidates(entries, map_width, metrics, scale_width=scale_width)
+            for c in candidates(
+                entries,
+                map_width,
+                metrics,
+                scale_width=scale_width,
+                style=style,
+            )
         ),
         key=lambda c: (c.score, len(c.columns)),
         default=None,

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1335" viewBox="-40 -10 110 133.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
   <rect x="-40" y="-10" width="110" height="133.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M-10 40h10v10h-10z M20 0h30v20h-30z M-30 0h30v40h-30z M0 0h20v40h-20z M20 20h30v20h-30z M50 0h10v40h-10z M20 40h10v10h-10z M0 40h20v10h-20z M30 40h15v10h-15z" /></clipPath></defs>
-  <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
+  <g class="grid" clip-path="url(#plan-grid)" stroke="black" opacity="0.23" stroke-width="0.125">
     <line x1="-30" y1="0" x2="-30" y2="50" />
     <line x1="-25" y1="0" x2="-25" y2="50" />
     <line x1="-20" y1="0" x2="-20" y2="50" />
@@ -73,7 +73,7 @@
     <text x="20.206" y="59">20 ft</text>
     <text x="2.273" y="68">5-ft squares</text>
     <rect x="5" y="60.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
-    <rect x="15" y="60.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
+    <rect x="15" y="60.5" width="10" height="1.5" fill="#e0e0e0" stroke="black" stroke-width="0.2" />
   </g>
   <g class="key" font-size="5" fill="#333333"><text x="-18.388" y="80">A</text>
     <text x="-12.748" y="80">Passage</text>

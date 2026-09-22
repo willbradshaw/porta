@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1335" viewBox="-40 -10 110 133.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
   <rect x="-40" y="-10" width="110" height="133.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M-10 40h10v10h-10z M20 0h30v20h-30z M-30 0h30v40h-30z M0 0h20v40h-20z M20 20h30v20h-30z M50 0h10v40h-10z M20 40h10v10h-10z M0 40h20v10h-20z M30 40h15v10h-15z" /></clipPath></defs>
-  <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
+  <g class="grid" clip-path="url(#plan-grid)" stroke="black" opacity="0.23" stroke-width="0.125">
     <line x1="-30" y1="0" x2="-30" y2="50" />
     <line x1="-25" y1="0" x2="-25" y2="50" />
     <line x1="-20" y1="0" x2="-20" y2="50" />
@@ -67,49 +67,49 @@
   <text data-room="passage" x="25" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">A</text>
   <text data-room="porch" x="10" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">O</text>
   <text data-room="scullery" x="37.5" y="45" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">S</text>
-  <line class="window-fill" x1="-30" y1="0" x2="-30" y2="10" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="-30" y1="0" x2="-30" y2="10" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="-30.25" y1="0" x2="-30.25" y2="10" stroke="black" stroke-width="0.25" />
   <line class="window" x1="-29.75" y1="0" x2="-29.75" y2="10" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="-30" y1="25" x2="-30" y2="35" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="-30" y1="25" x2="-30" y2="35" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="-30.25" y1="25" x2="-30.25" y2="35" stroke="black" stroke-width="0.25" />
   <line class="window" x1="-29.75" y1="25" x2="-29.75" y2="35" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="-25" y1="0" x2="-10" y2="0" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="-25" y1="0" x2="-10" y2="0" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="-25" y1="-0.25" x2="-10" y2="-0.25" stroke="black" stroke-width="0.25" />
   <line class="window" x1="-25" y1="0.25" x2="-10" y2="0.25" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="-25" y1="40" x2="-15" y2="40" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="-25" y1="40" x2="-15" y2="40" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="-25" y1="39.75" x2="-15" y2="39.75" stroke="black" stroke-width="0.25" />
   <line class="window" x1="-25" y1="40.25" x2="-15" y2="40.25" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="-10" y1="50" x2="-5" y2="50" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="-10" y1="50" x2="-5" y2="50" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="-10" y1="49.75" x2="-5" y2="49.75" stroke="black" stroke-width="0.25" />
   <line class="window" x1="-10" y1="50.25" x2="-5" y2="50.25" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="0" y1="35" x2="0" y2="40" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="0" y1="35" x2="0" y2="40" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="-0.25" y1="35" x2="-0.25" y2="40" stroke="black" stroke-width="0.25" />
   <line class="window" x1="0.25" y1="35" x2="0.25" y2="40" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="0" y1="50" x2="5" y2="50" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="0" y1="50" x2="5" y2="50" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="0" y1="49.75" x2="5" y2="49.75" stroke="black" stroke-width="0.25" />
   <line class="window" x1="0" y1="50.25" x2="5" y2="50.25" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="5" y1="0" x2="15" y2="0" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="5" y1="0" x2="15" y2="0" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="5" y1="-0.25" x2="15" y2="-0.25" stroke="black" stroke-width="0.25" />
   <line class="window" x1="5" y1="0.25" x2="15" y2="0.25" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="20" y1="0" x2="20" y2="5" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="20" y1="0" x2="20" y2="5" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="19.75" y1="0" x2="19.75" y2="5" stroke="black" stroke-width="0.25" />
   <line class="window" x1="20.25" y1="0" x2="20.25" y2="5" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="20" y1="0" x2="25" y2="0" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="20" y1="0" x2="25" y2="0" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="20" y1="-0.25" x2="25" y2="-0.25" stroke="black" stroke-width="0.25" />
   <line class="window" x1="20" y1="0.25" x2="25" y2="0.25" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="35" y1="20" x2="45" y2="20" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="35" y1="20" x2="45" y2="20" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="35" y1="19.75" x2="45" y2="19.75" stroke="black" stroke-width="0.25" />
   <line class="window" x1="35" y1="20.25" x2="45" y2="20.25" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="35" y1="50" x2="40" y2="50" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="35" y1="50" x2="40" y2="50" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="35" y1="49.75" x2="40" y2="49.75" stroke="black" stroke-width="0.25" />
   <line class="window" x1="35" y1="50.25" x2="40" y2="50.25" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="50" y1="0" x2="60" y2="0" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="50" y1="0" x2="60" y2="0" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="50" y1="-0.25" x2="60" y2="-0.25" stroke="black" stroke-width="0.25" />
   <line class="window" x1="50" y1="0.25" x2="60" y2="0.25" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="60" y1="5" x2="60" y2="10" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="60" y1="5" x2="60" y2="10" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="59.75" y1="5" x2="59.75" y2="10" stroke="black" stroke-width="0.25" />
   <line class="window" x1="60.25" y1="5" x2="60.25" y2="10" stroke="black" stroke-width="0.25" />
-  <line class="window-fill" x1="60" y1="30" x2="60" y2="35" stroke="white" stroke-width="0.5" />
+  <line class="window-fill" x1="60" y1="30" x2="60" y2="35" stroke="#e0e0e0" stroke-width="0.5" />
   <line class="window" x1="59.75" y1="30" x2="59.75" y2="35" stroke="black" stroke-width="0.25" />
   <line class="window" x1="60.25" y1="30" x2="60.25" y2="35" stroke="black" stroke-width="0.25" />
   <line class="door" x1="-30" y1="15" x2="-30" y2="20" stroke="black" stroke-width="1.5" />
@@ -133,7 +133,7 @@
     <text x="20.206" y="59">20 ft</text>
     <text x="2.273" y="68">5-ft squares</text>
     <rect x="5" y="60.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
-    <rect x="15" y="60.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
+    <rect x="15" y="60.5" width="10" height="1.5" fill="#e0e0e0" stroke="black" stroke-width="0.2" />
   </g>
   <g class="key" font-size="5" fill="#333333"><text x="-18.388" y="80">A</text>
     <text x="-12.748" y="80">Passage</text>

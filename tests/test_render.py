@@ -1088,3 +1088,43 @@ def test_key_and_scale_share_five_foot_type() -> None:
     groups = [g for g in root.iter(tag("g")) if g.get("class") in ("key", "scale")]
     assert groups
     assert all(g.attrib["font-size"] == "5" for g in groups)
+
+
+@pytest.mark.parametrize("columns", [1, 2])
+def test_visible_key_bounds_are_centered_despite_font_bearings(
+    columns: int, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from porta import render
+    from porta.key_layout import candidates
+    from porta.text_metrics import TextBounds
+
+    building = solve(parse('room a "" 100x80 root glyph="1"'))
+    entries = [("1", "Short"), ("100", "Wide"), ("Ab", "Other")]
+    metrics = {
+        "1": TextBounds(0.4, -4, 2, 5),
+        "100": TextBounds(-0.2, -4, 7, 5),
+        "Ab": TextBounds(0.1, -4, 6, 5),
+        "Short": TextBounds(0.3, -4, 13, 5),
+        "Wide": TextBounds(-0.4, -4, 50, 5),
+        "Other": TextBounds(0.7, -4, 20, 5),
+        "1 square = 5 ft": TextBounds(0.6, -4, 30, 5),
+    }
+    choice = candidates(entries, 100, metrics, wrap=False)[columns - 1]
+    monkeypatch.setattr(render, "choose_layout", lambda *args: choice)
+    monkeypatch.setattr(render, "text_bounds", lambda text, size=5: metrics[text])
+    root = ET.fromstring(render.render_svg(building))
+    boxes = [
+        (
+            float(text.attrib["x"]) + metrics[text.text or ""].x,
+            metrics[text.text or ""].width,
+        )
+        for group in root.findall('.//{*}g[@class="key"]')
+        for text in group
+    ]
+    left = min(x for x, _ in boxes)
+    right = max(x + width for x, width in boxes)
+    assert (left + right) / 2 == pytest.approx(50, abs=0.002)
+    assert right - left == pytest.approx(choice.width, abs=0.002)
+    caption = root.find('.//{*}g[@class="scale"]/{*}text')
+    assert caption is not None
+    assert float(caption.attrib["x"]) + 0.6 + 30 / 2 == pytest.approx(50, abs=0.002)

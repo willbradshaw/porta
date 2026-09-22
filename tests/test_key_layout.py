@@ -1,11 +1,11 @@
 """Check key scoring, wrapping, and entry partitioning."""
 
-import xml.etree.ElementTree as ET
+import json
 from pathlib import Path
 
 import pytest
 
-from build_key_review import _review_svg, load_metrics
+from porta import render
 from porta.key_layout import (
     candidates,
     partition_entries,
@@ -13,8 +13,19 @@ from porta.key_layout import (
     wrap_name,
 )
 from porta.layout import solve
+from porta.model import Building
 from porta.parser import parse
 from porta.text_metrics import TextBounds
+
+
+def _entries(building: Building) -> list[tuple[str, str]]:
+    """Get legend entries through the renderer's glyph and ordering rules."""
+    glyphs = render._assign_glyphs(building)
+    by_id = {room.id: room for room in building.rooms}
+    return [
+        (glyphs[eid], render._key_name(building, by_id, eid))
+        for eid in render._legend_ids(building, render._member_block(building), glyphs)
+    ]
 
 
 def sample_metrics(entries: list[tuple[str, str]]) -> dict[str, TextBounds]:
@@ -81,49 +92,6 @@ def test_wide_and_tall_cases_choose_different_column_counts(
 
 def test_empty_key_has_no_candidates() -> None:
     assert candidates([], 20, {}) == []
-
-
-@pytest.mark.parametrize("columns", [1, 2])
-def test_visible_key_bounds_are_centered_despite_font_bearings(columns: int) -> None:
-    building = solve(parse('room a "" 100x80 root glyph="1"'))
-    entries = [("1", "Short"), ("100", "Wide"), ("Ab", "Other")]
-    metrics = {
-        "1": TextBounds(0.4, -4, 2, 5),
-        "100": TextBounds(-0.2, -4, 7, 5),
-        "Ab": TextBounds(0.1, -4, 6, 5),
-        "Short": TextBounds(0.3, -4, 13, 5),
-        "Wide": TextBounds(-0.4, -4, 50, 5),
-        "Other": TextBounds(0.7, -4, 20, 5),
-        "1 square = 5 ft": TextBounds(0.6, -4, 30, 5),
-    }
-    choice = candidates(entries, 100, metrics, wrap=False)[columns - 1]
-    root = ET.fromstring(_review_svg(building, choice, metrics))
-    boxes = [
-        (
-            float(text.attrib["x"]) + metrics[text.text or ""].x,
-            metrics[text.text or ""].width,
-        )
-        for group in root.findall('.//{*}g[@class="key"]')
-        for text in group
-    ]
-    left = min(x for x, _ in boxes)
-    right = max(x + width for x, width in boxes)
-    assert (left + right) / 2 == pytest.approx(50)
-    assert right - left == pytest.approx(choice.width)
-    caption = root.find('.//{*}text[@class="scale"]')
-    assert caption is not None
-    assert float(caption.attrib["x"]) + 0.6 + 30 / 2 == pytest.approx(50)
-
-
-def test_cached_metrics_cover_every_review_entry() -> None:
-    from build_key_review import _entries
-
-    metrics = load_metrics()
-    for path in Path("tests/fixtures/key-layouts").glob("*.porta"):
-        for glyph, name in _entries(solve(parse(path.read_text()))):
-            assert glyph in metrics
-            assert all(text in metrics for text in text_fragments(name) | {name})
-    assert "1 square = 5 ft" in metrics
 
 
 @pytest.mark.parametrize(
@@ -244,7 +212,6 @@ def test_empty_names_and_single_entries_remain_valid(name: str) -> None:
     ids=lambda path: path.stem,
 )
 def test_production_metrics_preserve_reviewed_layout_choices(case: Path) -> None:
-    from build_key_review import _entries
     from porta.key_layout import choose_layout
     from porta.text_metrics import TextMetrics
 
@@ -252,19 +219,17 @@ def test_production_metrics_preserve_reviewed_layout_choices(case: Path) -> None
     entries = _entries(building)
     left = min(r.x for r in building.rooms if r.x is not None)
     right = max(r.x + r.width for r in building.rooms if r.x is not None)
-    measured = load_metrics()
+    expected = json.loads(Path("tests/fixtures/key-layouts/expected.json").read_text())[
+        "cases"
+    ][case.stem]
     portable = TextMetrics()
-    reference = choose_layout(
-        entries, right - left, measured, measured["1 square = 5 ft"].width
-    )
     actual = choose_layout(
         entries, right - left, portable, portable["1 square = 5 ft"].width
     )
-    assert reference is not None
     assert actual is not None
-    assert actual.columns == reference.columns
-    assert actual.rows == reference.rows
-    assert actual.width == pytest.approx(reference.width, abs=0.05)
+    assert [[g for g, _ in col] for col in actual.columns] == expected["columns"]
+    assert actual.rows == expected["rows"]
+    assert actual.width == pytest.approx(expected["measured_width"], abs=0.05)
 
 
 @pytest.mark.parametrize(
@@ -306,7 +271,6 @@ def test_asymmetric_width_cost(target: float, expected: float) -> None:
 
 
 def test_block_capstone_prefers_one_unwrapped_column() -> None:
-    from build_key_review import _entries
     from porta.key_layout import choose_layout
     from porta.text_metrics import TextMetrics
 

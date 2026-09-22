@@ -2,10 +2,7 @@
 
 Porta uses black architectural lines, a quiet measuring grid, and normal-weight
 serif text. Rendering requires no style statement, downloaded font, or runtime
-dependency. The [before/after gallery](style-review/index.html) covers the manor,
-tiny and narrow plans, blocks, outdoor areas, disconnected components, and symbols.
-The [seven-case key gallery](style-review/key-layouts/index.html) compares the
-production layouts with independently measured Palatino text bounds.
+dependency.
 
 ## Approved visual rules
 
@@ -78,18 +75,17 @@ Room-label fitting retains its conservative Unicode-aware width estimates.
 
 ## Reproduction and remaining review
 
-```sh
-uv run python src/build_style_review.py
-uv run python src/build_key_review.py
-uv run python src/build_key_review.py --check
-uv run python src/build_figures.py
-```
+Regenerate documentation figures with `uv run python src/build_figures.py`.
+The seven key-layout regression cases live in `tests/fixtures/key-layouts/`.
+Their expected layouts and measured widths are recorded as test data, independent
+of system fonts and visual-review tooling.
 
-The before/after builder needs baseline commit
-`9fc5e2644b30c478d95b5968806be813295359b1` in local Git history.
-See the [key review instructions](style-review/key-layouts/README.md) for optional
-PNG exports and refreshing font measurements. Review both complete compositions
-and enlarged text; a print proof and fallback-font review remain useful.
+Refresh the portable font metrics with
+`uv run python src/build_text_metrics.py /path/to/inkscape` only on a machine
+with Palatino Regular installed, and inspect the resulting differences.
+Normal rendering and tests require neither Inkscape nor an installed font.
+Review both complete compositions and enlarged text; a print proof and
+fallback-font review remain useful.
 
 A follow-up to #99/#16 will review the scale bar proposal, text color, background,
 and any further spacing refinements. This PR retains the original caption and colors.

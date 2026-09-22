@@ -2,29 +2,28 @@
 
 import pytest
 
-from build_key_review import load_metrics
 from porta.text_metrics import TextMetrics, text_bounds
 
 
+# Independent full-string Inkscape measurements at 5-ft Palatino, recorded
+# during visual review. No review gallery or system fonts are needed by tests.
 @pytest.mark.parametrize(
-    "text",
+    ("text", "expected_x", "expected_width"),
     [
-        "",
-        " ",
-        "Hall",
-        "1 square = 5 ft",
-        "Élodie\u2019s library & archive",
-        "Northern observation gallery",
+        ("", 0, 0),
+        (" ", 0, 0),
+        ("Hall", 0.12, 9.3335),
+        ("1 square = 5 ft", 0.305, 30.6982),
+        ("Élodie\u2019s library & archive", 0.122, 56.1011),
+        ("Northern observation gallery", 0.12, 64.3384),
     ],
 )
-def test_portable_bounds_match_recorded_ink(text: str) -> None:
-    if text.isspace() or not text:
-        assert text_bounds(text).width == 0
-    else:
-        expected = load_metrics()[text]
-        actual = text_bounds(text)
-        assert actual.width == pytest.approx(expected.width, abs=0.03)
-        assert actual.x == pytest.approx(expected.x, abs=0.002)
+def test_portable_bounds_match_recorded_ink(
+    text: str, expected_x: float, expected_width: float
+) -> None:
+    actual = text_bounds(text)
+    assert actual.width == pytest.approx(expected_width, abs=0.03)
+    assert actual.x == pytest.approx(expected_x, abs=0.002)
 
 
 @pytest.mark.parametrize("text", ["庭園", "🗝️", "العربية", "\u0301"])

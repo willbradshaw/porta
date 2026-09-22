@@ -41,7 +41,7 @@ not an exhaustive search of every partition.
 The lowest score wins; exact ties prefer fewer columns:
 
 ```
-B = 0.7 ((L - 4) / 4)² + a ((W - T) / T)² + 0.5 S + 0.1 R + L / l
+B = 0.7 ((L - 4) / 4)² + a ((W - T) / T)² + 0.5 S + 0.15 R + L / l
 a = 0.5 when W < T, otherwise 1
 ```
 

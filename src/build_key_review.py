@@ -35,7 +35,7 @@ _GLYPH_GAP = 2.0
 _COLUMN_GAP = 6.0
 _WORD_SPLIT_PENALTY = 0.5
 _HEIGHT_COEFFICIENT = 0.7
-_INTERWORD_PENALTY = 0.1
+_INTERWORD_PENALTY = 0.15
 _METRICS = _OUTPUT / "palatino-text-bounds.json"
 
 
@@ -214,7 +214,7 @@ def main() -> None:
         "<style>body{font:16px sans-serif;margin:24px}.pair{display:flex;gap:20px}"
         "figure{flex:1;margin:0}img{width:100%}</style>",
         "<h1>Production key layouts</h1>",
-        "<p>B = 0.7((L - 4)/4)² + a((W - T)/T)² + 0.5S + 0.1R + L/l. "
+        "<p>B = 0.7((L - 4)/4)² + a((W - T)/T)² + 0.5S + 0.15R + L/l. "
         "a = 0.5 when W &lt; T, otherwise 1; l is the shortest column. "
         "T = max(map width, scale-line width). S counts internal-word breaks; "
         "R counts between-word breaks. Equal-width columns.</p>",

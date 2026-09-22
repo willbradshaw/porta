@@ -203,7 +203,7 @@ def test_height_coefficient_only_scales_height_cost(coefficient: float) -> None:
         assert weighted.rows == c.rows
 
 
-@pytest.mark.parametrize("penalty", [0, 0.1, 0.2])
+@pytest.mark.parametrize("penalty", [0, 0.1, 0.15, 0.2])
 def test_interword_penalty_excludes_internal_breaks_and_counts_each_entry(
     penalty: float,
 ) -> None:
@@ -319,4 +319,17 @@ def test_block_capstone_prefers_one_unwrapped_column() -> None:
     )
     assert chosen is not None
     assert chosen.column_lines == [3]
+    assert chosen.rows["Great Hall"] == ["Great Hall"]
+
+
+def test_short_key_does_not_wrap_just_to_approach_four_lines() -> None:
+    from porta.key_layout import choose_layout
+    from porta.text_metrics import TextMetrics
+
+    metrics = TextMetrics()
+    chosen = choose_layout(
+        [("H", "Great Hall")], 40, metrics, metrics["1 square = 5 ft"].width
+    )
+    assert chosen is not None
+    assert chosen.column_lines == [1]
     assert chosen.rows["Great Hall"] == ["Great Hall"]

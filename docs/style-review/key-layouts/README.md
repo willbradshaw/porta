@@ -16,7 +16,7 @@ Palatino measurements with the portable metrics used by the renderer.
 | Block capstone | 3 | 80 × 50 ft | Uneven columns and excessive spreading of a short key |
 
 The approved formula is
-`B = 0.7((L - 4)/4)² + a((W - T)/T)² + 0.5S + 0.1R + L/l`,
+`B = 0.7((L - 4)/4)² + a((W - T)/T)² + 0.5S + 0.15R + L/l`,
 where `a = 0.5` for keys narrower than the target, otherwise 1, and `l` is the
 shortest column’s rendered line count.
 See [the visual specification](../../svg-style.md) for definitions, candidate

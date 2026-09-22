@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="855" viewBox="-10.347 -10 50.695 85.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10.347" y="-10" width="50.695" height="85.5" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="915" viewBox="-10 -10 50 91.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="50" height="91.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M10 20h20v20h-20z M0 0h20v20h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="40" />
@@ -27,12 +27,17 @@
   <line class="wall exterior" x1="20" y1="0" x2="20" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="20" y1="20" x2="30" y2="20" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="30" y1="20" x2="30" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-block="chamber" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">C</text>
+  <text data-block="chamber" x="10" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">C</text>
   <line class="divider" x1="10" y1="20" x2="20" y2="20" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
-  <g class="scale" font-size="5">
-    <text x="-0.652" y="52">1 square = 5 ft</text>
+  <g class="scale" font-size="5" fill="#333333">
+    <text x="3.765" y="49">0</text>
+    <text x="12.438" y="49">10</text>
+    <text x="20.206" y="49">20 ft</text>
+    <text x="2.273" y="58">5-ft squares</text>
+    <rect x="5" y="50.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="15" y="50.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="2.096" y="64">C</text>
-    <text x="7.328" y="64">Chamber</text>
+  <g class="key" font-size="5" fill="#333333"><text x="2.096" y="70">C</text>
+    <text x="7.328" y="70">Chamber</text>
   </g>
 </svg>

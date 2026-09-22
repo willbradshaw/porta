@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add a labeled 20-ft scale bar and use dark-grey text for room labels, key,
+  and scale.
 - Refine SVG typography, grid, and spacing, and automatically balance room-key
   columns and wrapping. Keep key-layout scoring parameters in a separate JSON file.
 

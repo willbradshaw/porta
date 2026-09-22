@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1475" viewBox="-10 -10 90 147.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10" y="-10" width="90" height="147.5" fill="#e0e0e0" />
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1535" viewBox="-10 -10 90 153.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="90" height="153.5" fill="#e0e0e0" />
   <defs><clipPath id="plan-grid"><path d="M30 50h20v10h-20z M5 50h20v20h-20z M0 0h30v20h-30z M30 20h40v30h-40z M0 20h30v30h-30z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="70" />
@@ -52,31 +52,36 @@
   <line class="wall exterior" x1="50" y1="50" x2="50" y2="60" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="50" y1="50" x2="70" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="70" y1="20" x2="70" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="cellar" x="40" y="55" text-anchor="middle" dominant-baseline="central" font-size="6">C</text>
-  <text data-room="chapel" x="15" y="60" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>
-  <text data-room="gate" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">G</text>
-  <text data-room="keep" x="50" y="35" text-anchor="middle" dominant-baseline="central" font-size="18">K</text>
-  <text data-room="yard" x="15" y="35" text-anchor="middle" dominant-baseline="central" font-size="18">Y</text>
+  <text data-room="cellar" x="40" y="55" text-anchor="middle" dominant-baseline="central" font-size="6" fill="#333333">C</text>
+  <text data-room="chapel" x="15" y="60" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">H</text>
+  <text data-room="gate" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">G</text>
+  <text data-room="keep" x="50" y="35" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">K</text>
+  <text data-room="yard" x="15" y="35" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">Y</text>
   <line class="open" x1="10" y1="50" x2="20" y2="50" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
   <line class="door" x1="10" y1="20" x2="15" y2="20" stroke="black" stroke-width="1.5" />
   <line class="door" x1="30" y1="30" x2="30" y2="35" stroke="black" stroke-width="1.5" />
   <line class="door" x1="35" y1="50" x2="40" y2="50" stroke="black" stroke-width="1.5" />
-  <g class="scale" font-size="5">
-    <text x="19.348" y="82">1 square = 5 ft</text>
+  <g class="scale" font-size="5" fill="#333333">
+    <text x="23.765" y="79">0</text>
+    <text x="32.438" y="79">10</text>
+    <text x="40.206" y="79">20 ft</text>
+    <text x="22.273" y="88">5-ft squares</text>
+    <rect x="25" y="80.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="35" y="80.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="20.959" y="94">C</text>
-    <text x="26.191" y="94">Cellar</text>
+  <g class="key" font-size="5" fill="#333333"><text x="20.959" y="100">C</text>
+    <text x="26.191" y="100">Cellar</text>
   </g>
-  <g class="key" font-size="5"><text x="20.705" y="102">G</text>
-    <text x="26.208" y="102">Gatehouse</text>
+  <g class="key" font-size="5" fill="#333333"><text x="20.705" y="108">G</text>
+    <text x="26.208" y="108">Gatehouse</text>
   </g>
-  <g class="key" font-size="5"><text x="20.331" y="110">H</text>
-    <text x="26.191" y="110">Chapel</text>
+  <g class="key" font-size="5" fill="#333333"><text x="20.331" y="116">H</text>
+    <text x="26.191" y="116">Chapel</text>
   </g>
-  <g class="key" font-size="5"><text x="20.773" y="118">K</text>
-    <text x="26.239" y="118">Keep</text>
+  <g class="key" font-size="5" fill="#333333"><text x="20.773" y="124">K</text>
+    <text x="26.239" y="124">Keep</text>
   </g>
-  <g class="key" font-size="5"><text x="21.125" y="126">Y</text>
-    <text x="26.191" y="126">Courtyard</text>
+  <g class="key" font-size="5" fill="#333333"><text x="21.125" y="132">Y</text>
+    <text x="26.191" y="132">Courtyard</text>
   </g>
 </svg>

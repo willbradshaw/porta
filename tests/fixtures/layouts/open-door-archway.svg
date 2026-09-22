@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="506.946" height="935" viewBox="-10.347 -10 50.695 93.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10.347" y="-10" width="50.695" height="93.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="995" viewBox="-10 -10 50 99.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="50" height="99.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h30v20h-30z M0 20h30v20h-30z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="40" />
@@ -25,16 +25,21 @@
   <line class="wall exterior" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="0" y1="40" x2="30" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="30" y1="0" x2="30" y2="40" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="hall" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12">H</text>
-  <text data-room="study" x="15" y="30" text-anchor="middle" dominant-baseline="central" font-size="12">S</text>
+  <text data-room="hall" x="15" y="10" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">H</text>
+  <text data-room="study" x="15" y="30" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">S</text>
   <line class="open" x1="10" y1="20" x2="20" y2="20" stroke="black" stroke-width="0.5" stroke-dasharray="0.01 1.5" stroke-linecap="round" />
-  <g class="scale" font-size="5">
-    <text x="-0.652" y="52">1 square = 5 ft</text>
+  <g class="scale" font-size="5" fill="#333333">
+    <text x="3.765" y="49">0</text>
+    <text x="12.438" y="49">10</text>
+    <text x="20.206" y="49">20 ft</text>
+    <text x="2.273" y="58">5-ft squares</text>
+    <rect x="5" y="50.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="15" y="50.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="5.49" y="64">H</text>
-    <text x="11.404" y="64">Hall</text>
+  <g class="key" font-size="5" fill="#333333"><text x="5.49" y="70">H</text>
+    <text x="11.404" y="70">Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="7.043" y="72">S</text>
-    <text x="11.387" y="72">Study</text>
+  <g class="key" font-size="5" fill="#333333"><text x="7.043" y="78">S</text>
+    <text x="11.387" y="78">Study</text>
   </g>
 </svg>

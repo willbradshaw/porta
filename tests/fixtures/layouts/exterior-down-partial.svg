@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="550" height="1035" viewBox="-10 -10 55 103.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10" y="-10" width="55" height="103.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="550" height="1095" viewBox="-10 -10 55 109.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="55" height="109.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h30v30h-30z M15 30h20v20h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="50" />
@@ -26,18 +26,23 @@
   <line class="wall exterior" x1="0" y1="0" x2="30" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="0" y1="30" x2="30" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="30" y1="0" x2="30" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18">H</text>
-  <text data-room="terrace" x="25" y="40" text-anchor="middle" dominant-baseline="central" font-size="12">T</text>
+  <text data-room="hall" x="15" y="15" text-anchor="middle" dominant-baseline="central" font-size="18" fill="#333333">H</text>
+  <text data-room="terrace" x="25" y="40" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">T</text>
   <line class="divider" x1="15" y1="30" x2="15" y2="50" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="30" y1="30" x2="35" y2="30" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="door" x1="20" y1="30" x2="25" y2="30" stroke="black" stroke-width="1.5" />
-  <g class="scale" font-size="5">
-    <text x="1.848" y="62">1 square = 5 ft</text>
+  <g class="scale" font-size="5" fill="#333333">
+    <text x="6.265" y="59">0</text>
+    <text x="14.938" y="59">10</text>
+    <text x="22.706" y="59">20 ft</text>
+    <text x="4.773" y="68">5-ft squares</text>
+    <rect x="7.5" y="60.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="17.5" y="60.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="6.527" y="74">H</text>
-    <text x="12.441" y="74">Hall</text>
+  <g class="key" font-size="5" fill="#333333"><text x="6.527" y="80">H</text>
+    <text x="12.441" y="80">Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="7.6" y="82">T</text>
-    <text x="12.456" y="82">Terrace</text>
+  <g class="key" font-size="5" fill="#333333"><text x="7.6" y="88">T</text>
+    <text x="12.456" y="88">Terrace</text>
   </g>
 </svg>

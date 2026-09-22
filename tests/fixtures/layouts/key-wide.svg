@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="995" viewBox="-10 -10 100 99.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10" y="-10" width="100" height="99.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1055" viewBox="-10 -10 100 105.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="100" height="105.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M0 0h20v15h-20z M20 0h20v15h-20z M40 0h20v15h-20z M60 0h20v15h-20z M0 15h20v15h-20z M20 15h20v15h-20z M40 15h20v15h-20z M60 15h20v15h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="30" />
@@ -35,14 +35,14 @@
   <line class="wall exterior" x1="0" y1="0" x2="80" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="0" y1="30" x2="80" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="80" y1="0" x2="80" y2="30" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="r0" x="10" y="7.5" text-anchor="middle" dominant-baseline="central" font-size="9">1</text>
-  <text data-room="r1" x="30" y="7.5" text-anchor="middle" dominant-baseline="central" font-size="9">2</text>
-  <text data-room="r2" x="50" y="7.5" text-anchor="middle" dominant-baseline="central" font-size="9">3</text>
-  <text data-room="r3" x="70" y="7.5" text-anchor="middle" dominant-baseline="central" font-size="9">4</text>
-  <text data-room="r4" x="10" y="22.5" text-anchor="middle" dominant-baseline="central" font-size="9">5</text>
-  <text data-room="r5" x="30" y="22.5" text-anchor="middle" dominant-baseline="central" font-size="9">6</text>
-  <text data-room="r6" x="50" y="22.5" text-anchor="middle" dominant-baseline="central" font-size="9">7</text>
-  <text data-room="r7" x="70" y="22.5" text-anchor="middle" dominant-baseline="central" font-size="9">8</text>
+  <text data-room="r0" x="10" y="7.5" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#333333">1</text>
+  <text data-room="r1" x="30" y="7.5" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#333333">2</text>
+  <text data-room="r2" x="50" y="7.5" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#333333">3</text>
+  <text data-room="r3" x="70" y="7.5" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#333333">4</text>
+  <text data-room="r4" x="10" y="22.5" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#333333">5</text>
+  <text data-room="r5" x="30" y="22.5" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#333333">6</text>
+  <text data-room="r6" x="50" y="22.5" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#333333">7</text>
+  <text data-room="r7" x="70" y="22.5" text-anchor="middle" dominant-baseline="central" font-size="9" fill="#333333">8</text>
   <line class="door" x1="5" y1="15" x2="10" y2="15" stroke="black" stroke-width="1.5" />
   <line class="door" x1="20" y1="5" x2="20" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="20" y1="20" x2="20" y2="25" stroke="black" stroke-width="1.5" />
@@ -50,31 +50,36 @@
   <line class="door" x1="40" y1="20" x2="40" y2="25" stroke="black" stroke-width="1.5" />
   <line class="door" x1="60" y1="5" x2="60" y2="10" stroke="black" stroke-width="1.5" />
   <line class="door" x1="60" y1="20" x2="60" y2="25" stroke="black" stroke-width="1.5" />
-  <g class="scale" font-size="5">
-    <text x="24.348" y="42">1 square = 5 ft</text>
+  <g class="scale" font-size="5" fill="#333333">
+    <text x="28.765" y="39">0</text>
+    <text x="37.438" y="39">10</text>
+    <text x="45.206" y="39">20 ft</text>
+    <text x="27.273" y="48">5-ft squares</text>
+    <rect x="30" y="40.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="40" y="40.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="11.528" y="54">1</text>
-    <text x="15.452" y="54">Guardroom</text>
+  <g class="key" font-size="5" fill="#333333"><text x="11.528" y="60">1</text>
+    <text x="15.452" y="60">Guardroom</text>
   </g>
-  <g class="key" font-size="5"><text x="11.276" y="62">2</text>
-    <text x="15.523" y="62">Armory</text>
+  <g class="key" font-size="5" fill="#333333"><text x="11.276" y="68">2</text>
+    <text x="15.523" y="68">Armory</text>
   </g>
-  <g class="key" font-size="5"><text x="11.301" y="70">3</text>
-    <text x="15.452" y="70">Gallery</text>
+  <g class="key" font-size="5" fill="#333333"><text x="11.301" y="76">3</text>
+    <text x="15.452" y="76">Gallery</text>
   </g>
-  <g class="key" font-size="5"><text x="11.245" y="78">4</text>
-    <text x="15.435" y="78">Chapel</text>
+  <g class="key" font-size="5" fill="#333333"><text x="11.245" y="84">4</text>
+    <text x="15.435" y="84">Chapel</text>
   </g>
-  <g class="key" font-size="5"><text x="47.435" y="54">5</text>
-    <text x="51.645" y="54">Library</text>
+  <g class="key" font-size="5" fill="#333333"><text x="47.435" y="60">5</text>
+    <text x="51.645" y="60">Library</text>
   </g>
-  <g class="key" font-size="5"><text x="47.403" y="62">6</text>
-    <text x="51.61" y="62">Kitchen</text>
+  <g class="key" font-size="5" fill="#333333"><text x="47.403" y="68">6</text>
+    <text x="51.61" y="68">Kitchen</text>
   </g>
-  <g class="key" font-size="5"><text x="47.26" y="70">7</text>
-    <text x="51.603" y="70">Pantry</text>
+  <g class="key" font-size="5" fill="#333333"><text x="47.26" y="76">7</text>
+    <text x="51.603" y="76">Pantry</text>
   </g>
-  <g class="key" font-size="5"><text x="47.421" y="78">8</text>
-    <text x="51.684" y="78">Vault</text>
+  <g class="key" font-size="5" fill="#333333"><text x="47.421" y="84">8</text>
+    <text x="51.684" y="84">Vault</text>
   </g>
 </svg>

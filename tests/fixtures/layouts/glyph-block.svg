@@ -1,5 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1035" viewBox="-10 -10 60 103.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
-  <rect x="-10" y="-10" width="60" height="103.5" fill="white" />
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="1095" viewBox="-10 -10 60 109.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="60" height="109.5" fill="white" />
   <defs><clipPath id="plan-grid"><path d="M20 30h20v20h-20z M0 0h40v30h-40z M0 30h20v20h-20z" /></clipPath></defs>
   <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="50" />
@@ -29,16 +29,21 @@
   <line class="wall exterior" x1="0" y1="0" x2="40" y2="0" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="0" y1="50" x2="40" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
   <line class="wall exterior" x1="40" y1="0" x2="40" y2="50" stroke="black" stroke-width="0.8" stroke-linecap="square" />
-  <text data-room="cell" x="30" y="40" text-anchor="middle" dominant-baseline="central" font-size="12">20</text>
-  <text data-block="hall" x="10" y="40" text-anchor="middle" dominant-baseline="central" font-size="12">19</text>
+  <text data-room="cell" x="30" y="40" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">20</text>
+  <text data-block="hall" x="10" y="40" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#333333">19</text>
   <line class="door" x1="20" y1="35" x2="20" y2="40" stroke="black" stroke-width="1.5" />
-  <g class="scale" font-size="5">
-    <text x="4.348" y="62">1 square = 5 ft</text>
+  <g class="scale" font-size="5" fill="#333333">
+    <text x="8.765" y="59">0</text>
+    <text x="17.438" y="59">10</text>
+    <text x="25.206" y="59">20 ft</text>
+    <text x="7.273" y="68">5-ft squares</text>
+    <rect x="10" y="60.5" width="10" height="1.5" fill="black" stroke="black" stroke-width="0.2" />
+    <rect x="20" y="60.5" width="10" height="1.5" fill="white" stroke="black" stroke-width="0.2" />
   </g>
-  <g class="key" font-size="5"><text x="1.661" y="74">19</text>
-    <text x="8.404" y="74">Working Hall</text>
+  <g class="key" font-size="5" fill="#333333"><text x="1.661" y="80">19</text>
+    <text x="8.404" y="80">Working Hall</text>
   </g>
-  <g class="key" font-size="5"><text x="1.641" y="82">20</text>
-    <text x="8.287" y="82">Cell 20</text>
+  <g class="key" font-size="5" fill="#333333"><text x="1.641" y="88">20</text>
+    <text x="8.287" y="88">Cell 20</text>
   </g>
 </svg>

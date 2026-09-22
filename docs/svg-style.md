@@ -76,9 +76,9 @@ Room-label fitting retains its conservative Unicode-aware width estimates.
 ## Reproduction and remaining review
 
 Regenerate documentation figures with `uv run python src/build_figures.py`.
-The seven key-layout regression cases live in `tests/fixtures/key-layouts/`.
-Their expected layouts and measured widths are recorded as test data, independent
-of system fonts and visual-review tooling.
+The seven key-layout regression cases are `key-*.porta` / `key-*.svg` pairs
+in `tests/fixtures/layouts/`. They run through the same complete-SVG golden
+comparison as the other layout fixtures, without system fonts or review tooling.
 
 Refresh the portable font metrics with
 `uv run python src/build_text_metrics.py /path/to/inkscape` only on a machine

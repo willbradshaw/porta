@@ -13,7 +13,8 @@ Notable changes per release, newest first.
   choose equal-width key columns and wrapping with a scored layout: height
   coefficient 0.7, internal-word break penalty 0.5, and inter-word penalty 0.15.
   Use portable Palatino metrics without adding runtime dependencies or fonts.
-  Include seven fixed key-layout regression cases and regenerated references.
+  Include seven key-layout cases in the standard SVG golden suite and regenerate
+  the documentation references.
   Penalize column-height imbalance by the longest/shortest line-count ratio,
   and halve the width penalty for keys narrower than the map/scale target.
 

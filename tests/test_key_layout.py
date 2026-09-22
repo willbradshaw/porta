@@ -1,31 +1,14 @@
 """Check key scoring, wrapping, and entry partitioning."""
 
-import json
-from pathlib import Path
-
 import pytest
 
-from porta import render
 from porta.key_layout import (
     candidates,
     partition_entries,
     text_fragments,
     wrap_name,
 )
-from porta.layout import solve
-from porta.model import Building
-from porta.parser import parse
 from porta.text_metrics import TextBounds
-
-
-def _entries(building: Building) -> list[tuple[str, str]]:
-    """Get legend entries through the renderer's glyph and ordering rules."""
-    glyphs = render._assign_glyphs(building)
-    by_id = {room.id: room for room in building.rooms}
-    return [
-        (glyphs[eid], render._key_name(building, by_id, eid))
-        for eid in render._legend_ids(building, render._member_block(building), glyphs)
-    ]
 
 
 def sample_metrics(entries: list[tuple[str, str]]) -> dict[str, TextBounds]:
@@ -207,32 +190,6 @@ def test_empty_names_and_single_entries_remain_valid(name: str) -> None:
 
 
 @pytest.mark.parametrize(
-    "case",
-    sorted(Path("tests/fixtures/key-layouts").glob("*.porta")),
-    ids=lambda path: path.stem,
-)
-def test_production_metrics_preserve_reviewed_layout_choices(case: Path) -> None:
-    from porta.key_layout import choose_layout
-    from porta.text_metrics import TextMetrics
-
-    building = solve(parse(case.read_text()))
-    entries = _entries(building)
-    left = min(r.x for r in building.rooms if r.x is not None)
-    right = max(r.x + r.width for r in building.rooms if r.x is not None)
-    expected = json.loads(Path("tests/fixtures/key-layouts/expected.json").read_text())[
-        "cases"
-    ][case.stem]
-    portable = TextMetrics()
-    actual = choose_layout(
-        entries, right - left, portable, portable["1 square = 5 ft"].width
-    )
-    assert actual is not None
-    assert [[g for g, _ in col] for col in actual.columns] == expected["columns"]
-    assert actual.rows == expected["rows"]
-    assert actual.width == pytest.approx(expected["measured_width"], abs=0.05)
-
-
-@pytest.mark.parametrize(
     ("heights", "expected"),
     [
         ([3], 1),
@@ -274,13 +231,9 @@ def test_block_capstone_prefers_one_unwrapped_column() -> None:
     from porta.key_layout import choose_layout
     from porta.text_metrics import TextMetrics
 
-    building = solve(
-        parse(Path("tests/fixtures/key-layouts/07-block-capstone.porta").read_text())
-    )
+    entries = [("A", "Annexe"), ("H", "Great Hall"), ("S", "Study")]
     metrics = TextMetrics()
-    chosen = choose_layout(
-        _entries(building), 80, metrics, metrics["1 square = 5 ft"].width
-    )
+    chosen = choose_layout(entries, 80, metrics, metrics["1 square = 5 ft"].width)
     assert chosen is not None
     assert chosen.column_lines == [3]
     assert chosen.rows["Great Hall"] == ["Great Hall"]

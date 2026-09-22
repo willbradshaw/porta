@@ -1,4 +1,8 @@
-"""Score equal-width legend columns using portable or measured text bounds."""
+"""Score equal-width legend columns using portable or measured text bounds.
+
+Tune the metric in the packaged key_layout.json; values load once on import.
+All parameters must be finite and nonnegative, with target_lines positive.
+"""
 
 import json
 from dataclasses import dataclass, fields, replace

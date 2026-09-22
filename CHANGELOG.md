@@ -4,22 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
-- Keep key-layout scoring parameters in packaged `key_layout.json` so the metric
-  can be tuned without changing Python code.
-- Refine default SVGs with normal-weight Palatino/Georgia/Times typography,
-  room-proportional labels, and a quieter grid clipped to room footprints.
-  Retain symbol weights, black text, the original scale caption, and 10-ft margins.
-  Use 12-ft spacing from the map edge to the scale baseline and from the scale
-  baseline to the first key baseline.
-- Set key and scale type to 5 ft, align key glyphs and names separately, and
-  choose equal-width key columns and wrapping with a scored layout: height
-  coefficient 0.7 (discounted by 0.85 below four lines), internal-word break
-  penalty 0.5, and inter-word penalty 0.15.
-  Use portable Palatino metrics without adding runtime dependencies or fonts.
-  Include seven key-layout cases in the standard SVG golden suite and regenerate
-  the documentation references.
-  Penalize column-height imbalance by the longest/shortest line-count ratio,
-  and halve the width penalty for keys narrower than the map/scale target.
+- Refine SVG typography, grid, and spacing, and automatically balance room-key
+  columns and wrapping. Keep key-layout scoring parameters in a separate JSON file.
 
 ## 1.7.0 (2026-09-20)
 

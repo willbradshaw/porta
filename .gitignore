@@ -25,6 +25,3 @@ htmlcov/
 *.svg
 !docs/**/*.svg
 !tests/fixtures/**/*.svg
-
-# Local visual-review artifacts
-/docs/style-review/

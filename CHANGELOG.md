@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+## 1.8.0 (2026-09-22)
+
 - Standardize project-authored prose, internal identifiers, and examples on US
   English, preserving public APIs and existing file paths.
 - Add SVG style controls for independent key and scale visibility, explicit key
@@ -12,10 +14,14 @@ Notable changes per release, newest first.
 - Default to numeric room/block labels ordered by display name, skipping reserved
   numbers. Add style options for mnemonic labels and numbering starts, supported
   in SVG and ASCII.
+  To restore ID-based label assignment, pass a JSON style file containing
+  `{"labels": {"scheme": "mnemonic"}}` with `porta draw --style`.
 - Add `porta draw --style` for grouped JSON overrides, using plain values or
   documented value/description records.
 - Read renderer defaults from documented, grouped JSON. Share background and
   symbol colors, use grid opacity, and derive scale proportions from key text size.
+  Window interiors now follow the page background; update the window reference
+  to match.
 - Add a labeled 20-ft scale bar and use dark-gray text for room labels, key,
   and scale.
 - Refine SVG typography, grid, and spacing, and automatically balance room-key

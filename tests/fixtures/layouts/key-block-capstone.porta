@@ -1,0 +1,10 @@
+# Block capstone
+# Short key in a wide map: balance columns without forcing the key to fill the map.
+room back  ""      60x20 root
+room west  ""      20x30 down-of back
+room east  ""      20x30 down-of back align=end
+room study "Study" 20x20 right-of back align=end
+room annexe "Annexe" 20x10 right-of west left-of east
+block hall "Great Hall" back west east
+door west outside down
+door=10 back outside up

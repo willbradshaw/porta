@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="740" height="930" viewBox="-32 -10 74 93">
-  <rect x="-32" y="-10" width="74" height="93" fill="white" />
-  <g stroke="#bbb" stroke-width="0.15">
+<svg xmlns="http://www.w3.org/2000/svg" width="700" height="885" viewBox="-30 -10 70 88.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-30" y="-10" width="70" height="88.5" fill="white" />
+  <defs><clipPath id="plan-grid"><path d="M0 0h30v30h-30z M-20 15h20v20h-20z" /></clipPath></defs>
+  <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="-20" y1="0" x2="-20" y2="35" />
     <line x1="-15" y1="0" x2="-15" y2="35" />
     <line x1="-10" y1="0" x2="-10" y2="35" />
@@ -30,7 +31,13 @@
   <line class="divider" x1="-20" y1="15" x2="0" y2="15" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="divider" x1="0" y1="30" x2="0" y2="35" stroke="black" stroke-width="0.25" stroke-dasharray="1.5 1" />
   <line class="door" x1="0" y1="20" x2="0" y2="25" stroke="black" stroke-width="1.5" />
-  <text class="scale" x="-22" y="54.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="-22" y="63.8" font-size="6">H  Hall</text>
-  <text class="key" x="-22" y="73.4" font-size="6">T  Terrace</text>
+  <g class="scale" font-size="5">
+    <text x="-10.652" y="47">1 square = 5 ft</text>
+  </g>
+  <g class="key" font-size="5"><text x="-5.973" y="59">H</text>
+    <text x="-0.059" y="59">Hall</text>
+  </g>
+  <g class="key" font-size="5"><text x="-4.9" y="67">T</text>
+    <text x="-0.044" y="67">Terrace</text>
+  </g>
 </svg>

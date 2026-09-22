@@ -5,9 +5,12 @@ the debug-ascii rasterizer below. SVG is built from stdlib string templating
 only (no runtime dependencies).
 """
 
+from dataclasses import dataclass
 from itertools import pairwise
+from unicodedata import category, east_asian_width
 from xml.sax.saxutils import escape
 
+from porta.key_layout import choose_layout
 from porta.layout import (
     Rect,
     divider_segments,
@@ -20,6 +23,7 @@ from porta.layout import (
     window_segments,
 )
 from porta.model import Axis, Building, Direction, Room, Stairs
+from porta.text_metrics import TextMetrics, text_bounds
 
 _GRID_FT = 5
 _EMPTY = "."
@@ -32,11 +36,15 @@ _WALL_STROKE_FT = 0.5  # interior walls and stair edges, in feet
 _EXTERIOR_WALL_STROKE_FT = 0.8  # exposed envelope; 160% of interior walls, in feet
 _LABEL_RATIO = 0.6  # room glyph size as a fraction of the room's shorter side
 _LABEL_FIT = 0.9  # widest fraction of the room width a glyph may span
-_KEY_FONT_FT = 6  # key/caption font, in feet (fixed, not tied to room sizes)
+_FONT_FAMILY = "Palatino, Georgia, Times New Roman, serif"
+_KEY_FONT_FT = 5.0  # fixed readable key size, in feet
+_SCALE_FONT_FT = _KEY_FONT_FT
+_SCALE_GAP_FT = 12  # map edge to scale baseline, then to first key baseline
+_KEY_GAP_FT = 2
+_COLUMN_GAP_FT = 6
 _KEY_LINE_RATIO = 1.6  # key line spacing as a multiple of the key font
-_CHAR_W = 0.6  # rough average glyph width (fraction of font), for centring the key
-_GRID_COLOUR = "#bbb"  # grey 5-ft grid
-_GRID_STROKE_FT = 0.15  # grid line thickness, in feet
+_GRID_COLOUR = "#c4c4c4"  # grey 5-ft grid
+_GRID_STROKE_FT = 0.125  # grid line thickness, in feet
 _DOOR_COLOUR = "black"  # door marks
 _DOOR_STROKE_FT = 1.5  # door line thickness, in feet
 # Open boundaries are dotted: a near-zero dash with a round cap renders as a
@@ -151,22 +159,19 @@ def render_svg(building: Building, *, background: str = "white") -> str:
     max_y = max(y + room.height for room, _, y in placed)
 
     plan_w = max_x - min_x
-    plan_h = max_y - min_y
 
-    caption = f"1 square = {_GRID_FT} ft"
     entity_ids = _legend_ids(building, member_block, glyphs)
-    entries = [_key_line(building, by_id, eid, glyphs[eid]) for eid in entity_ids]
-    chrome = [caption, *entries]
-    # The key is a fixed readable size (not tied to room sizes — a single small
-    # room would otherwise shrink the whole key). If a key line is wider than
-    # the plan, the canvas grows and plan + key are centred (no dead space).
-    key_font = _KEY_FONT_FT
-    key_line = key_font * _KEY_LINE_RATIO
-    key_width = max(len(line) for line in chrome) * key_font * _CHAR_W
-
+    entries = [(glyphs[eid], _key_name(building, by_id, eid)) for eid in entity_ids]
+    key = _key_layout(entries, plan_w)
+    caption = f"1 square = {_GRID_FT} ft"
+    caption_bounds = text_bounds(caption, _SCALE_FONT_FT)
+    scale_width = caption_bounds.width
+    furniture_width = max(key.width, scale_width)
     center_x = (min_x + max_x) / 2
-    view_w = max(plan_w, key_width) + 2 * _MARGIN_FT
-    view_h = plan_h + _MARGIN_FT + (len(chrome) + 2) * key_line
+    view_w = max(plan_w, furniture_width) + 2 * _MARGIN_FT
+    scale_y = max_y + _SCALE_GAP_FT
+    key_top = scale_y + _SCALE_GAP_FT - _KEY_FONT_FT
+    view_h = key_top + key.height + _MARGIN_FT - (min_y - _MARGIN_FT)
     view_x = center_x - view_w / 2
     view_y = min_y - _MARGIN_FT
 
@@ -174,7 +179,8 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         f'<svg xmlns="{_SVG_NS}" '
         f'width="{_num(view_w * _DISPLAY_SCALE)}" '
         f'height="{_num(view_h * _DISPLAY_SCALE)}" '
-        f'viewBox="{_num(view_x)} {_num(view_y)} {_num(view_w)} {_num(view_h)}">'
+        f'viewBox="{_num(view_x)} {_num(view_y)} {_num(view_w)} {_num(view_h)}" '
+        f'font-family="{_FONT_FAMILY}" font-weight="400" fill="black">'
     ]
 
     # Opaque background so the drawing is legible on any viewer backdrop.
@@ -183,9 +189,20 @@ def render_svg(building: Building, *, background: str = "white") -> str:
         f'width="{_num(view_w)}" height="{_num(view_h)}" fill="{background}" />'
     )
 
+    # One globally aligned grid, clipped to the union of room footprints.
+    # Courtyard voids and component gutters stay blank; declared outdoor rooms
+    # keep the same measuring grid as indoor rooms. A single path avoids seams.
+    outline = " ".join(
+        f"M{_num(x)} {_num(y)}h{room.width}v{room.height}h{-room.width}z"
+        for room, x, y in sorted(placed, key=lambda t: t[0].id)
+    )
+    lines.append(
+        f'  <defs><clipPath id="plan-grid"><path d="{outline}" /></clipPath></defs>'
+    )
     # 5-ft grid, drawn behind the rooms (over the background).
     lines.append(
-        f'  <g stroke="{_GRID_COLOUR}" stroke-width="{_num(_GRID_STROKE_FT)}">'
+        f'  <g class="grid" clip-path="url(#plan-grid)" '
+        f'stroke="{_GRID_COLOUR}" stroke-width="{_num(_GRID_STROKE_FT)}">'
     )
     for gx in range(min_x, max_x + 1, _GRID_FT):
         lines.append(
@@ -322,34 +339,98 @@ def render_svg(building: Building, *, background: str = "white") -> str:
             f'paint-order="stroke">S</text>'
         )
 
-    # Centre the key block but left-align the lines within it (a legend reads
-    # best as a left-aligned list).
-    key_left = center_x - key_width / 2
-    for j, line in enumerate(chrome):
-        css = "scale" if j == 0 else "key"
+    lines.append(f'  <g class="scale" font-size="{_num(_SCALE_FONT_FT)}">')
+    lines.append(
+        f'    <text x="{_num(center_x - scale_width / 2 - caption_bounds.x)}" '
+        f'y="{_num(scale_y)}">{caption}</text>'
+    )
+    lines.append("  </g>")
+
+    key_left = center_x - key.width / 2
+    for entry in key.entries:
+        key_x, key_y = key_left + entry.x, key_top + entry.y
+        glyph_bounds = text_bounds(entry.glyph)
+        glyph_x = key_x - glyph_bounds.width - glyph_bounds.x
         lines.append(
-            f'  <text class="{css}" x="{_num(key_left)}" '
-            f'y="{_num(max_y + (j + 2) * key_line)}" '
-            f'font-size="{_num(key_font)}">{escape(line)}</text>'
+            f'  <g class="key" font-size="{_num(_KEY_FONT_FT)}">'
+            f'<text x="{_num(glyph_x)}" '
+            f'y="{_num(key_y)}">{escape(entry.glyph)}</text>'
         )
+        for row, name in enumerate(entry.names):
+            lines.append(
+                f'    <text x="{_num(key_x + _KEY_GAP_FT - text_bounds(name).x)}" '
+                f'y="{_num(key_y + row * _KEY_FONT_FT * _KEY_LINE_RATIO)}">'
+                f"{escape(name)}</text>"
+            )
+        lines.append("  </g>")
 
     lines.append("</svg>")
     return "\n".join(lines)
 
 
-def _key_line(
-    building: Building, by_id: dict[str, Room], entity_id: str, glyph: str
-) -> str:
-    """One key line: ``glyph  name``, or just ``glyph`` when there is no name.
-
-    Applies the same way to rooms and blocks (each is named or not).
-    """
+def _key_name(building: Building, by_id: dict[str, Room], entity_id: str) -> str:
+    """Return the name for a room or block key entry."""
     room = by_id.get(entity_id)
     if room is not None:
-        name = room.name
-    else:
-        name = next(block.name for block in building.blocks if block.id == entity_id)
-    return f"{glyph}  {name}" if name else glyph
+        return room.name or ""
+    return next(block.name for block in building.blocks if block.id == entity_id) or ""
+
+
+def _text_width(text: str) -> float:
+    """Conservative em widths for the portable serif stack, without fonts.
+
+    Wide Unicode and broad Latin characters need more space; combining marks
+    add none. This is deliberately an upper estimate rather than font shaping.
+    """
+    return sum(
+        0
+        if category(char).startswith("M")
+        else 1.1
+        if east_asian_width(char) in ("W", "F")
+        else 1.0
+        if char in "MWmw@%&"
+        else 0.7
+        for char in text
+    )
+
+
+@dataclass
+class _KeyEntry:
+    glyph: str
+    names: list[str]
+    x: float
+    y: float
+
+
+@dataclass
+class _KeyLayout:
+    entries: list[_KeyEntry]
+    width: float
+    height: float
+
+
+def _key_layout(entries: list[tuple[str, str]], plan_width: float) -> _KeyLayout:
+    """Lay out the lowest-scoring equal-width key using approved coefficients."""
+    metrics = TextMetrics()
+    candidate = choose_layout(
+        entries, plan_width, metrics, metrics[f"1 square = {_GRID_FT} ft"].width
+    )
+    if candidate is None:
+        return _KeyLayout([], 0, 0)
+    result = []
+    left = -candidate.left_trim
+    line_height = _KEY_FONT_FT * _KEY_LINE_RATIO
+    for column, width, glyph_width in zip(
+        candidate.columns, candidate.widths, candidate.glyph_widths, strict=True
+    ):
+        y = _KEY_FONT_FT
+        for glyph, name in column:
+            rows = candidate.rows[name]
+            result.append(_KeyEntry(glyph, rows, left + glyph_width, y))
+            y += max(1, len(rows)) * line_height
+        left += width + _COLUMN_GAP_FT
+    height = (candidate.lines - 1) * line_height + _KEY_FONT_FT * 1.3
+    return _KeyLayout(result, candidate.width, height)
 
 
 def _num(value: float) -> str:
@@ -484,10 +565,11 @@ def _stair_treads(stairs: Stairs, rect: Rect) -> list[_Line]:
 
 
 def _glyph_font(width: int, height: int, glyph: str) -> float:
-    """Glyph font size: the usual fraction of the shorter side, shrunk when a
-    multi-character glyph would otherwise overflow the room's width."""
+    """Size labels proportionally to the available room or stair band."""
     size = min(width, height) * _LABEL_RATIO
-    return min(size, width * _LABEL_FIT / (len(glyph) * _CHAR_W))
+    # Standalone combining marks are valid explicit glyphs too.
+    advance = max(0.7, _text_width(glyph))
+    return min(size, width * _LABEL_FIT / advance)
 
 
 def _assign_glyphs(building: Building) -> dict[str, str]:

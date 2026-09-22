@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="876" viewBox="-10 -10 100 87.6">
-  <rect x="-10" y="-10" width="100" height="87.6" fill="#e0e0e0" />
-  <g stroke="#bbb" stroke-width="0.15">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="815" viewBox="-10 -10 100 81.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="100" height="81.5" fill="#e0e0e0" />
+  <defs><clipPath id="plan-grid"><path d="M30 0h20v20h-20z M0 0h20v20h-20z M60 0h20v20h-20z" /></clipPath></defs>
+  <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="20" />
     <line x1="5" y1="0" x2="5" y2="20" />
     <line x1="10" y1="0" x2="10" y2="20" />
@@ -72,8 +73,16 @@
     <line x1="66.675" y1="13.333" x2="68.325" y2="13.333" stroke="black" stroke-width="0.25" />
     <line x1="66.825" y1="15" x2="68.175" y2="15" stroke="black" stroke-width="0.25" />
   </g>
-  <text class="scale" x="13" y="39.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="13" y="48.8" font-size="6">G  Stairs Down</text>
-  <text class="key" x="13" y="58.4" font-size="6">O  Stairs Up</text>
-  <text class="key" x="13" y="68" font-size="6">W  Steps Within</text>
+  <g class="scale" font-size="5">
+    <text x="24.348" y="32">1 square = 5 ft</text>
+  </g>
+  <g class="key" font-size="5"><text x="23.797" y="44">G</text>
+    <text x="29.32" y="44">Stairs Down</text>
+  </g>
+  <g class="key" font-size="5"><text x="23.643" y="52">O</text>
+    <text x="29.32" y="52">Stairs Up</text>
+  </g>
+  <g class="key" font-size="5"><text x="22.547" y="60">W</text>
+    <text x="29.32" y="60">Steps Within</text>
+  </g>
 </svg>

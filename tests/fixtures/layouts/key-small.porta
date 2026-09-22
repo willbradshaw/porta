@@ -1,0 +1,6 @@
+# Small cottage
+# 4 short entries; checks that a short key is not needlessly fragmented.
+room r0 "Hall" 15x15 root glyph="1"
+room r1 "Kitchen" 15x15 right-of r0 glyph="2"
+room r2 "Bedroom" 15x15 down-of r0 glyph="3"
+room r3 "Store" 15x15 right-of r2 glyph="4"

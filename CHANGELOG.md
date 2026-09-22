@@ -4,6 +4,9 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Refine SVG typography, grid, and spacing, and automatically balance room-key
+  columns and wrapping. Keep key-layout scoring parameters in a separate JSON file.
+
 ## 1.7.0 (2026-09-20)
 
 - Add standalone `window` statements between rooms or to the outside, rendered

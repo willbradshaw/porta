@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1368" viewBox="-10 -10 110 136.8">
-  <rect x="-10" y="-10" width="110" height="136.8" fill="white" />
-  <g stroke="#bbb" stroke-width="0.15">
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="1275" viewBox="-10 -10 110 127.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-10" y="-10" width="110" height="127.5" fill="white" />
+  <defs><clipPath id="plan-grid"><path d="M20 0h10v10h-10z M0 0h20v20h-20z M40 20h30v30h-30z M80 0h10v10h-10z M40 0h10v20h-10z" /></clipPath></defs>
+  <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="0" y1="0" x2="0" y2="50" />
     <line x1="5" y1="0" x2="5" y2="50" />
     <line x1="10" y1="0" x2="10" y2="50" />
@@ -57,10 +58,22 @@
   <text data-room="tower" x="45" y="10" text-anchor="middle" dominant-baseline="central" font-size="6">T</text>
   <line class="door" x1="20" y1="0" x2="20" y2="5" stroke="black" stroke-width="1.5" />
   <line class="door" x1="40" y1="20" x2="45" y2="20" stroke="black" stroke-width="1.5" />
-  <text class="scale" x="18" y="69.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="18" y="78.8" font-size="6">A  Annex</text>
-  <text class="key" x="18" y="88.4" font-size="6">H  Hall</text>
-  <text class="key" x="18" y="98" font-size="6">K  Keep</text>
-  <text class="key" x="18" y="107.6" font-size="6">S  Shed</text>
-  <text class="key" x="18" y="117.2" font-size="6">T  Tower</text>
+  <g class="scale" font-size="5">
+    <text x="29.348" y="62">1 square = 5 ft</text>
+  </g>
+  <g class="key" font-size="5"><text x="34.951" y="74">A</text>
+    <text x="40.638" y="74">Annex</text>
+  </g>
+  <g class="key" font-size="5"><text x="34.689" y="82">H</text>
+    <text x="40.603" y="82">Hall</text>
+  </g>
+  <g class="key" font-size="5"><text x="35.131" y="90">K</text>
+    <text x="40.598" y="90">Keep</text>
+  </g>
+  <g class="key" font-size="5"><text x="36.242" y="98">S</text>
+    <text x="40.586" y="98">Shed</text>
+  </g>
+  <g class="key" font-size="5"><text x="35.761" y="106">T</text>
+    <text x="40.618" y="106">Tower</text>
+  </g>
 </svg>

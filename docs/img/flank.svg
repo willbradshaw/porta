@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="848" height="1214" viewBox="-37.4 -10 84.8 121.4">
-  <rect x="-37.4" y="-10" width="84.8" height="121.4" fill="#e0e0e0" />
-  <g stroke="#bbb" stroke-width="0.15">
+<svg xmlns="http://www.w3.org/2000/svg" width="651.46" height="1105" viewBox="-27.573 -10 65.146 110.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-27.573" y="-10" width="65.146" height="110.5" fill="#e0e0e0" />
+  <defs><clipPath id="plan-grid"><path d="M-10 0h10v15h-10z M10 0h10v15h-10z M-10 15h10v10h-10z M10 15h10v10h-10z M0 15h10v10h-10z M0 0h10v10h-10z" /></clipPath></defs>
+  <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="-10" y1="0" x2="-10" y2="25" />
     <line x1="-5" y1="0" x2="-5" y2="25" />
     <line x1="0" y1="0" x2="0" y2="25" />
@@ -41,11 +42,25 @@
   <line class="door" x1="10" y1="0" x2="10" y2="5" stroke="black" stroke-width="1.5" />
   <line class="door" x1="10" y1="15" x2="10" y2="20" stroke="black" stroke-width="1.5" />
   <line class="door" x1="10" y1="15" x2="15" y2="15" stroke="black" stroke-width="1.5" />
-  <text class="scale" x="-27.4" y="44.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="-27.4" y="53.8" font-size="6">A  Left room</text>
-  <text class="key" x="-27.4" y="63.4" font-size="6">B  Right room</text>
-  <text class="key" x="-27.4" y="73" font-size="6">C  Left-down room</text>
-  <text class="key" x="-27.4" y="82.6" font-size="6">D  Right-down room</text>
-  <text class="key" x="-27.4" y="92.2" font-size="6">E  Flanked room</text>
-  <text class="key" x="-27.4" y="101.8" font-size="6">R  Root room</text>
+  <g class="scale" font-size="5">
+    <text x="-10.652" y="37">1 square = 5 ft</text>
+  </g>
+  <g class="key" font-size="5"><text x="-17.658" y="49">A</text>
+    <text x="-11.976" y="49">Left room</text>
+  </g>
+  <g class="key" font-size="5"><text x="-16.689" y="57">B</text>
+    <text x="-11.996" y="57">Right room</text>
+  </g>
+  <g class="key" font-size="5"><text x="-17.292" y="65">C</text>
+    <text x="-11.976" y="65">Left-down room</text>
+  </g>
+  <g class="key" font-size="5"><text x="-17.548" y="73">D</text>
+    <text x="-11.996" y="73">Right-down room</text>
+  </g>
+  <g class="key" font-size="5"><text x="-16.731" y="81">E</text>
+    <text x="-11.993" y="81">Flanked room</text>
+  </g>
+  <g class="key" font-size="5"><text x="-17.202" y="89">R</text>
+    <text x="-11.996" y="89">Root room</text>
+  </g>
 </svg>

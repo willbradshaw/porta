@@ -1,0 +1,3 @@
+# Tiny store
+# 1 entry; exposes minimum canvas width and excess space around a very short key.
+room r0 "Store" 5x5 root glyph="1"

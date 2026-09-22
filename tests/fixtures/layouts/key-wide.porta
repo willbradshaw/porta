@@ -1,0 +1,10 @@
+# Wide barracks
+# 8 entries; paired with the tall map, using exactly the same names and room sizes.
+room r0 "Guardroom" 20x15 root glyph="1"
+room r1 "Armory" 20x15 right-of r0 glyph="2"
+room r2 "Gallery" 20x15 right-of r1 glyph="3"
+room r3 "Chapel" 20x15 right-of r2 glyph="4"
+room r4 "Library" 20x15 down-of r0 glyph="5"
+room r5 "Kitchen" 20x15 right-of r4 glyph="6"
+room r6 "Pantry" 20x15 right-of r5 glyph="7"
+room r7 "Vault" 20x15 right-of r6 glyph="8"

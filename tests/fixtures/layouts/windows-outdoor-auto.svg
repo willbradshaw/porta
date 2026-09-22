@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="950" height="1272" viewBox="-20 -10 95 127.2">
-  <rect x="-20" y="-10" width="95" height="127.2" fill="white" />
-  <g stroke="#bbb" stroke-width="0.15">
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="1035" viewBox="-20 -10 95 103.5" font-family="Palatino, Georgia, Times New Roman, serif" font-weight="400" fill="black">
+  <rect x="-20" y="-10" width="95" height="103.5" fill="white" />
+  <defs><clipPath id="plan-grid"><path d="M0 0h30v30h-30z M-10 15h10v20h-10z M30 0h20v30h-20z M0 30h30v20h-30z M50 0h15v20h-15z M30 30h20v20h-20z" /></clipPath></defs>
+  <g class="grid" clip-path="url(#plan-grid)" stroke="#c4c4c4" stroke-width="0.125">
     <line x1="-10" y1="0" x2="-10" y2="50" />
     <line x1="-5" y1="0" x2="-5" y2="50" />
     <line x1="0" y1="0" x2="0" y2="50" />
@@ -69,9 +70,19 @@
   <line class="window" x1="64.75" y1="0" x2="64.75" y2="5" stroke="black" stroke-width="0.25" />
   <line class="window" x1="65.25" y1="0" x2="65.25" y2="5" stroke="black" stroke-width="0.25" />
   <line class="door" x1="50" y1="20" x2="65" y2="20" stroke="black" stroke-width="1.5" />
-  <text class="scale" x="0.5" y="69.2" font-size="6">1 square = 5 ft</text>
-  <text class="key" x="0.5" y="78.8" font-size="6">G  Garden</text>
-  <text class="key" x="0.5" y="88.4" font-size="6">H  House</text>
-  <text class="key" x="0.5" y="98" font-size="6">P  Porch</text>
-  <text class="key" x="0.5" y="107.6" font-size="6">T  Tower</text>
+  <g class="scale" font-size="5">
+    <text x="11.848" y="62">1 square = 5 ft</text>
+  </g>
+  <g class="key" font-size="5"><text x="3.82" y="74">G</text>
+    <text x="9.323" y="74">Garden</text>
+  </g>
+  <g class="key" font-size="5"><text x="3.446" y="82">H</text>
+    <text x="9.359" y="82">House</text>
+  </g>
+  <g class="key" font-size="5"><text x="32.87" y="74">P</text>
+    <text x="37.634" y="74">Porch</text>
+  </g>
+  <g class="key" font-size="5"><text x="32.804" y="82">T</text>
+    <text x="37.661" y="82">Tower</text>
+  </g>
 </svg>

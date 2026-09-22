@@ -12,8 +12,8 @@ from math import isfinite
 from porta.style import DEFAULT_STYLE
 from porta.text_metrics import TextBounds
 
-_GLYPH_GAP = DEFAULT_STYLE.key_gap_ft
-_COLUMN_GAP = DEFAULT_STYLE.column_gap_ft
+_GLYPH_GAP = DEFAULT_STYLE["key"]["identifier_gap_ft"]
+_COLUMN_GAP = DEFAULT_STYLE["key"]["column_gap_ft"]
 
 
 @dataclass(frozen=True)

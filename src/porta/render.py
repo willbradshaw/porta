@@ -103,7 +103,7 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
         ValueError: If any room has not been placed or automatic glyphs run out.
     """
     style = DEFAULT_STYLE
-    background = style.background if background is None else background
+    background = style["page"]["background"] if background is None else background
     placed = _placed_rooms(building)
     glyphs = _assign_glyphs(building)
     by_id = {room.id: room for room in building.rooms}
@@ -132,23 +132,31 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
     scale_width = _scale_width(style)
     furniture_width = max(key.width, scale_width)
     center_x = (min_x + max_x) / 2
-    view_w = max(plan_w, furniture_width) + 2 * style.margin_ft
-    scale_y = max_y + style.scale_gap_ft
+    view_w = max(plan_w, furniture_width) + 2 * style["page"]["margin_ft"]
+    scale_y = max_y + style["scale_bar"]["gap_ft"]
     key_top = (
-        scale_y + style.scale_caption_offset_ft + style.scale_gap_ft - style.key_font_ft
+        scale_y
+        + (style["key"]["font_ft"] * 1.2)
+        + style["scale_bar"]["gap_ft"]
+        - style["key"]["font_ft"]
     )
-    view_h = key_top + key.height + style.margin_ft - (min_y - style.margin_ft)
+    view_h = (
+        key_top
+        + key.height
+        + style["page"]["margin_ft"]
+        - (min_y - style["page"]["margin_ft"])
+    )
     view_x = center_x - view_w / 2
-    view_y = min_y - style.margin_ft
+    view_y = min_y - style["page"]["margin_ft"]
 
     lines = [
         f'<svg xmlns="{_SVG_NS}" '
-        f'width="{_num(view_w * style.display_scale)}" '
-        f'height="{_num(view_h * style.display_scale)}" '
+        f'width="{_num(view_w * style["page"]["display_scale"])}" '
+        f'height="{_num(view_h * style["page"]["display_scale"])}" '
         f'viewBox="{_num(view_x)} {_num(view_y)} {_num(view_w)} {_num(view_h)}" '
-        f'font-family="{_attr(style.font_family)}" '
-        f'font-weight="{style.font_weight}" '
-        f'fill="{_attr(style.line_color)}">'
+        f'font-family="{_attr(style["typography"]["font_family"])}" '
+        f'font-weight="{style["typography"]["font_weight"]}" '
+        f'fill="{_attr(style["page"]["line_color"])}">'
     ]
 
     # Opaque background so the drawing is legible on any viewer backdrop.
@@ -170,16 +178,16 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
     # 5-ft grid, drawn behind the rooms (over the background).
     lines.append(
         f'  <g class="grid" clip-path="url(#plan-grid)" '
-        f'stroke="{_attr(style.line_color)}" '
-        f'opacity="{_num(style.grid_opacity)}" '
-        f'stroke-width="{_num(style.grid_stroke_ft)}">'
+        f'stroke="{_attr(style["page"]["line_color"])}" '
+        f'opacity="{_num(style["grid"]["opacity"])}" '
+        f'stroke-width="{_num(style["grid"]["stroke_ft"])}">'
     )
-    for gx in range(min_x, max_x + 1, style.grid_ft):
+    for gx in range(min_x, max_x + 1, style["grid"]["spacing_ft"]):
         lines.append(
             f'    <line x1="{_num(gx)}" y1="{_num(min_y)}" '
             f'x2="{_num(gx)}" y2="{_num(max_y)}" />'
         )
-    for gy in range(min_y, max_y + 1, style.grid_ft):
+    for gy in range(min_y, max_y + 1, style["grid"]["spacing_ft"]):
         lines.append(
             f'    <line x1="{_num(min_x)}" y1="{_num(gy)}" '
             f'x2="{_num(max_x)}" y2="{_num(gy)}" />'
@@ -189,14 +197,15 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
     # Shared walls appear once. Square caps close perpendicular corners.
     exterior, interior = wall_segments(building)
     for kind, segments, width in (
-        ("interior", interior, style.wall_stroke_ft),
-        ("exterior", exterior, style.exterior_wall_stroke_ft),
+        ("interior", interior, style["walls"]["interior_stroke_ft"]),
+        ("exterior", exterior, style["walls"]["exterior_stroke_ft"]),
     ):
         for x1, y1, x2, y2 in segments:
             lines.append(
                 f'  <line class="wall {kind}" x1="{_num(x1)}" y1="{_num(y1)}" '
                 f'x2="{_num(x2)}" y2="{_num(y2)}" '
-                f'stroke="{_attr(style.line_color)}" stroke-width="{_num(width)}" '
+                f'stroke="{_attr(style["page"]["line_color"])}" '
+                f'stroke-width="{_num(width)}" '
                 f'stroke-linecap="square" />'
             )
 
@@ -211,7 +220,7 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
             f'  <text data-room="{room.id}" x="{_num(x + lx)}" '
             f'y="{_num(y + ly)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}" '
-            f'fill="{_attr(style.text_color)}">'
+            f'fill="{_attr(style["typography"]["text_color"])}">'
             f"{escape(glyph)}</text>"
         )
 
@@ -229,7 +238,7 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
             f'  <text data-block="{block.id}" x="{_num(mx + lx)}" '
             f'y="{_num(my + ly)}" text-anchor="middle" '
             f'dominant-baseline="central" font-size="{_num(font)}" '
-            f'fill="{_attr(style.text_color)}">'
+            f'fill="{_attr(style["typography"]["text_color"])}">'
             f"{escape(glyph)}</text>"
         )
 
@@ -238,9 +247,11 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
     for x1, y1, x2, y2 in sorted(divider_segments(building)):
         lines.append(
             f'  <line class="divider" x1="{_num(x1)}" y1="{_num(y1)}" '
-            f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="{_attr(style.line_color)}" '
-            f'stroke-width="{_num(style.divider_stroke_ft)}" '
-            f'stroke-dasharray="{_attr(style.divider_dash)}" />'
+            f'x2="{_num(x2)}" '
+            f'y2="{_num(y2)}" '
+            f'stroke="{_attr(style["page"]["line_color"])}" '
+            f'stroke-width="{_num(style["dividers"]["stroke_ft"])}" '
+            f'stroke-dasharray="{_attr(style["dividers"]["dash"])}" />'
         )
 
     # Stairs: hard lines on the non-entrance sides and treads across the run,
@@ -251,16 +262,16 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
             lines.append(
                 f'    <line x1="{_num(sx1)}" y1="{_num(sy1)}" '
                 f'x2="{_num(sx2)}" y2="{_num(sy2)}" '
-                f'stroke="{_attr(style.line_color)}" '
-                f'stroke-width="{_num(style.wall_stroke_ft)}" '
+                f'stroke="{_attr(style["page"]["line_color"])}" '
+                f'stroke-width="{_num(style["walls"]["interior_stroke_ft"])}" '
                 f'stroke-linecap="square" />'
             )
         for sx1, sy1, sx2, sy2 in _stair_treads(stairs, rect, style):
             lines.append(
                 f'    <line x1="{_num(sx1)}" y1="{_num(sy1)}" '
                 f'x2="{_num(sx2)}" y2="{_num(sy2)}" '
-                f'stroke="{_attr(style.line_color)}" '
-                f'stroke-width="{_num(style.tread_stroke_ft)}" />'
+                f'stroke="{_attr(style["page"]["line_color"])}" '
+                f'stroke-width="{_num(style["stairs"]["stroke_ft"])}" />'
             )
         lines.append("  </g>")
 
@@ -271,25 +282,28 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
             f'x2="{_num(x2)}" '
             f'y2="{_num(y2)}" '
             f'stroke="{_attr(background)}" '
-            f'stroke-width="{_num(style.window_gap_ft)}" />'
+            f'stroke-width="{_num(style["windows"]["gap_ft"])}" />'
         )
-        for offset in (-style.window_gap_ft / 2, style.window_gap_ft / 2):
+        for offset in (-style["windows"]["gap_ft"] / 2, style["windows"]["gap_ft"] / 2):
             dx, dy = (0, offset) if y1 == y2 else (offset, 0)
             lines.append(
                 f'  <line class="window" x1="{_num(x1 + dx)}" '
                 f'y1="{_num(y1 + dy)}" x2="{_num(x2 + dx)}" '
                 f'y2="{_num(y2 + dy)}" '
-                f'stroke="{_attr(style.line_color)}" '
-                f'stroke-width="{_num(style.window_stroke_ft)}" />'
+                f'stroke="{_attr(style["page"]["line_color"])}" '
+                f'stroke-width="{_num(style["windows"]["stroke_ft"])}" />'
             )
 
     # Open doors: a dotted line across the gap left in the walls above.
     for x1, y1, x2, y2 in sorted(open_door_segments(building)):
         lines.append(
             f'  <line class="open" x1="{_num(x1)}" y1="{_num(y1)}" '
-            f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="{_attr(style.line_color)}" '
-            f'stroke-width="{_num(style.wall_stroke_ft)}" '
-            f'stroke-dasharray="{_attr(style.open_dash)}" stroke-linecap="round" />'
+            f'x2="{_num(x2)}" '
+            f'y2="{_num(y2)}" '
+            f'stroke="{_attr(style["page"]["line_color"])}" '
+            f'stroke-width="{_num(style["walls"]["interior_stroke_ft"])}" '
+            f'stroke-dasharray="{_attr(style["doors"]["open_dash"])}" '
+            f'stroke-linecap="round" />'
         )
 
     # Doors: a thick colored line along the shared wall, over the rooms.
@@ -297,8 +311,10 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
     for x1, y1, x2, y2 in sorted(door_segments(building)):
         lines.append(
             f'  <line class="door" x1="{_num(x1)}" y1="{_num(y1)}" '
-            f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="{_attr(style.line_color)}" '
-            f'stroke-width="{_num(style.door_stroke_ft)}" />'
+            f'x2="{_num(x2)}" '
+            f'y2="{_num(y2)}" '
+            f'stroke="{_attr(style["page"]["line_color"])}" '
+            f'stroke-width="{_num(style["doors"]["stroke_ft"])}" />'
         )
 
     # Secret doors: a normal-style door mark shows the size and position, and
@@ -307,60 +323,68 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
     for x1, y1, x2, y2 in sorted(secret_door_segments(building)):
         lines.append(
             f'  <line class="secret" x1="{_num(x1)}" y1="{_num(y1)}" '
-            f'x2="{_num(x2)}" y2="{_num(y2)}" stroke="{_attr(style.line_color)}" '
-            f'stroke-width="{_num(style.door_stroke_ft)}" />'
+            f'x2="{_num(x2)}" '
+            f'y2="{_num(y2)}" '
+            f'stroke="{_attr(style["page"]["line_color"])}" '
+            f'stroke-width="{_num(style["doors"]["stroke_ft"])}" />'
         )
         lines.append(
             f'  <text class="secret" x="{_num((x1 + x2) / 2)}" '
             f'y="{_num((y1 + y2) / 2)}" text-anchor="middle" '
-            f'dominant-baseline="central" font-size="{_num(style.secret_font_ft)}" '
-            f'stroke="{_attr(background)}" stroke-width="{_num(style.secret_halo_ft)}" '
+            f'dominant-baseline="central" '
+            f'font-size="{_num(style["doors"]["secret_font_ft"])}" '
+            f'stroke="{_attr(background)}" '
+            f'stroke-width="{_num(style["doors"]["secret_halo_ft"])}" '
             f'paint-order="stroke">S</text>'
         )
 
     lines.append(
         f'  <g class="scale" '
-        f'font-size="{_num(style.scale_font_ft)}" '
-        f'fill="{_attr(style.text_color)}">'
+        f'font-size="{_num(style["key"]["font_ft"])}" '
+        f'fill="{_attr(style["typography"]["text_color"])}">'
     )
     for dx, dy, label in _scale_labels(style):
-        bounds = text_bounds(label, style.scale_font_ft)
+        bounds = text_bounds(label, (style["key"]["font_ft"]))
         lines.append(
             f'    <text x="{_num(center_x + dx - bounds.width / 2 - bounds.x)}" '
             f'y="{_num(scale_y + dy)}">{label}</text>'
         )
     for dx, fill in (
-        (-style.scale_length_ft / 2, style.line_color),
+        (-style["scale_bar"]["length_ft"] / 2, style["page"]["line_color"]),
         (0, background),
     ):
         lines.append(
             f'    <rect x="{_num(center_x + dx)}" '
-            f'y="{_num(scale_y - style.scale_height_ft)}" '
-            f'width="{_num(style.scale_length_ft / 2)}" '
-            f'height="{_num(style.scale_height_ft)}" '
+            f'y="{_num(scale_y - (style["key"]["font_ft"] * 0.3))}" '
+            f'width="{_num(style["scale_bar"]["length_ft"] / 2)}" '
+            f'height="{_num(style["key"]["font_ft"] * 0.3)}" '
             f'fill="{_attr(fill)}" '
-            f'stroke="{_attr(style.line_color)}" '
-            f'stroke-width="{_num(style.scale_stroke_ft)}" />'
+            f'stroke="{_attr(style["page"]["line_color"])}" '
+            f'stroke-width="{_num(style["key"]["font_ft"] * 0.04)}" />'
         )
     lines.append("  </g>")
 
     key_left = center_x - key.width / 2
     for entry in key.entries:
         key_x, key_y = key_left + entry.x, key_top + entry.y
-        glyph_bounds = text_bounds(entry.glyph, style.key_font_ft)
+        glyph_bounds = text_bounds(entry.glyph, style["key"]["font_ft"])
         glyph_x = key_x - glyph_bounds.width - glyph_bounds.x
         lines.append(
             f'  <g class="key" '
-            f'font-size="{_num(style.key_font_ft)}" '
-            f'fill="{_attr(style.text_color)}">'
+            f'font-size="{_num(style["key"]["font_ft"])}" '
+            f'fill="{_attr(style["typography"]["text_color"])}">'
             f'<text x="{_num(glyph_x)}" '
             f'y="{_num(key_y)}">{escape(entry.glyph)}</text>'
         )
         for row, name in enumerate(entry.names):
-            name_x = key_x + style.key_gap_ft - text_bounds(name, style.key_font_ft).x
+            name_x = (
+                key_x
+                + style["key"]["identifier_gap_ft"]
+                - text_bounds(name, style["key"]["font_ft"]).x
+            )
             lines.append(
                 f'    <text x="{_num(name_x)}" '
-                f'y="{_num(key_y + row * style.key_line_spacing_ft)}">'
+                f'y="{_num(key_y + row * style["key"]["line_spacing_ft"])}">'
                 f"{escape(name)}</text>"
             )
         lines.append("  </g>")
@@ -412,25 +436,35 @@ class _KeyLayout:
 
 def _scale_labels(style: Style = DEFAULT_STYLE) -> list[tuple[float, float, str]]:
     return [
-        (-style.scale_length_ft / 2, style.scale_label_offset_ft, "0"),
-        (0, style.scale_label_offset_ft, _num(style.scale_length_ft / 2)),
+        (-style["scale_bar"]["length_ft"] / 2, (style["key"]["font_ft"] * -0.6), "0"),
         (
-            style.scale_length_ft / 2,
-            style.scale_label_offset_ft,
-            f"{_num(style.scale_length_ft)} ft",
+            0,
+            (style["key"]["font_ft"] * -0.6),
+            _num(style["scale_bar"]["length_ft"] / 2),
         ),
-        (0, style.scale_caption_offset_ft, f"{style.grid_ft}-ft squares"),
+        (
+            style["scale_bar"]["length_ft"] / 2,
+            (style["key"]["font_ft"] * -0.6),
+            f"{_num(style['scale_bar']['length_ft'])} ft",
+        ),
+        (
+            0,
+            (style["key"]["font_ft"] * 1.2),
+            f"{style['grid']['spacing_ft']}-ft squares",
+        ),
     ]
 
 
 def _scale_width(style: Style = DEFAULT_STYLE) -> float:
     # Symmetric footprint keeps the bar centered while reserving its end labels.
-    return max(
-        style.scale_length_ft + style.scale_stroke_ft,
-        *(
-            2 * abs(dx) + text_bounds(label, style.scale_font_ft).width
-            for dx, _, label in _scale_labels(style)
-        ),
+    return float(
+        max(
+            style["scale_bar"]["length_ft"] + (style["key"]["font_ft"] * 0.04),
+            *(
+                2 * abs(dx) + text_bounds(label, (style["key"]["font_ft"])).width
+                for dx, _, label in _scale_labels(style)
+            ),
+        )
     )
 
 
@@ -438,30 +472,30 @@ def _key_layout(
     entries: list[tuple[str, str]], plan_width: float, style: Style = DEFAULT_STYLE
 ) -> _KeyLayout:
     """Lay out the lowest-scoring equal-width key using approved coefficients."""
-    metrics = TextMetrics(size=style.key_font_ft)
+    metrics = TextMetrics(size=style["key"]["font_ft"])
     candidate = choose_layout(
         entries,
         plan_width,
         metrics,
         _scale_width(style),
-        glyph_gap=style.key_gap_ft,
-        column_gap=style.column_gap_ft,
+        glyph_gap=style["key"]["identifier_gap_ft"],
+        column_gap=style["key"]["column_gap_ft"],
     )
     if candidate is None:
         return _KeyLayout([], 0, 0)
     result = []
     left = -candidate.left_trim
-    line_height = style.key_line_spacing_ft
+    line_height = style["key"]["line_spacing_ft"]
     for column, width, glyph_width in zip(
         candidate.columns, candidate.widths, candidate.glyph_widths, strict=True
     ):
-        y = style.key_font_ft
+        y = style["key"]["font_ft"]
         for glyph, name in column:
             rows = candidate.rows[name]
             result.append(_KeyEntry(glyph, rows, left + glyph_width, y))
             y += max(1, len(rows)) * line_height
-        left += width + style.column_gap_ft
-    height = (candidate.lines - 1) * line_height + style.key_font_ft * 1.3
+        left += width + style["key"]["column_gap_ft"]
+    height = (candidate.lines - 1) * line_height + style["key"]["font_ft"] * 1.3
     return _KeyLayout(result, candidate.width, height)
 
 
@@ -561,12 +595,11 @@ def _stair_hard_edges(stairs: Stairs, rect: Rect) -> list[_Line]:
 def _stair_treads(
     stairs: Stairs, rect: Rect, style: Style = DEFAULT_STYLE
 ) -> list[_Line]:
-    """Tread lines crossing the run every ``1/style.treads_per_grid`` of a grid
-    square, ends included.
+    """Tread lines at the configured number of intervals per grid square.
 
     Treads narrow toward the downhill end — the depth cue that shows which
-    way the flight descends — shrinking linearly from ``style.tread_max_ratio``
-    of the footprint's breadth at the high end to ``style.tread_min_ratio`` at
+    way the flight descends — shrinking linearly from the maximum ratio
+    of the footprint's breadth at the high end to the minimum ratio at
     the low end, centred across the run. At a closed end the hard edge
     already draws the line, so the end tread is emitted only where the
     footprint is open.
@@ -576,19 +609,23 @@ def _stair_treads(
     run = w if horizontal else h
     # Ratios apply to the breadth actually visible between the flank walls'
     # inner faces (each flank stroke intrudes half its width).
-    cross = (h if horizontal else w) - style.wall_stroke_ft
+    cross = (h if horizontal else w) - style["walls"]["interior_stroke_ft"]
     open_sides = stair_open_sides(stairs)
     start_open = (Direction.LEFT if horizontal else Direction.UP) in open_sides
     end_open = (Direction.RIGHT if horizontal else Direction.DOWN) in open_sides
     treads: list[_Line] = []
-    intervals = max(1, run * style.treads_per_grid // style.grid_ft)
+    intervals = max(
+        1, run * style["stairs"]["treads_per_grid"] // style["grid"]["spacing_ft"]
+    )
     for i in range(intervals + 1):
         if (i == 0 and not start_open) or (i == intervals and not end_open):
             continue
         t = run * i / intervals
         downhill = t if stairs.down in (Direction.RIGHT, Direction.DOWN) else run - t
-        scale = style.tread_max_ratio - (
-            (style.tread_max_ratio - style.tread_min_ratio) * downhill / run
+        scale = style["stairs"]["max_ratio"] - (
+            (style["stairs"]["max_ratio"] - style["stairs"]["min_ratio"])
+            * downhill
+            / run
         )
         half = cross * scale / 2
         if horizontal:
@@ -602,10 +639,10 @@ def _glyph_font(
     width: int, height: int, glyph: str, style: Style = DEFAULT_STYLE
 ) -> float:
     """Size labels proportionally to the available room or stair band."""
-    size = min(width, height) * style.label_ratio
+    size = min(width, height) * style["labels"]["ratio"]
     # Standalone combining marks are valid explicit glyphs too.
     advance = max(0.7, _text_width(glyph))
-    return min(size, width * style.label_fit / advance)
+    return float(min(size, width * style["labels"]["fit"] / advance))
 
 
 def _assign_glyphs(building: Building) -> dict[str, str]:

@@ -9,6 +9,7 @@ pool; ties are broken by source order.
 
 import xml.etree.ElementTree as ET
 from collections.abc import Callable
+from copy import deepcopy
 from itertools import pairwise
 from pathlib import Path
 
@@ -1062,7 +1063,7 @@ def test_wrapped_key_names_keep_hanging_alignment_and_space(name: str) -> None:
     positions = [float(row.attrib["x"]) + text_bounds(row.text or "").x for row in rows]
     assert max(positions) - min(positions) < 0.002
     _, top, _, height = map(float, root.attrib["viewBox"].split())
-    assert float(rows[-1].attrib["y"]) + DEFAULT_STYLE.key_font_ft < top + height
+    assert float(rows[-1].attrib["y"]) + DEFAULT_STYLE["key"]["font_ft"] < top + height
 
 
 def test_wrapped_entries_reserve_height_and_reduce_columns() -> None:
@@ -1196,26 +1197,23 @@ def test_scale_bar_geometry_and_furniture_bounds(source: str) -> None:
 
 
 def test_renderer_uses_resolved_defaults(monkeypatch: pytest.MonkeyPatch) -> None:
-    from dataclasses import replace
 
     from porta import render
     from porta.style import DEFAULT_STYLE
 
     building = solve(parse(TWO))
     original = render_svg(building)
-    style = replace(
-        DEFAULT_STYLE,
-        background="#fff8e7",
-        text_color="#654321",
-        line_color="#332211",
-        font_family='"Example Serif", serif',
-        grid_ft=10,
-        scale_length_ft=40,
-        key_font_ft=7,
-        key_gap_ft=4,
-        column_gap_ft=9,
-        display_scale=12,
-    )
+    style = deepcopy(DEFAULT_STYLE)
+    style["page"]["background"] = "#fff8e7"
+    style["typography"]["text_color"] = "#654321"
+    style["page"]["line_color"] = "#332211"
+    style["typography"]["font_family"] = '"Example Serif", serif'
+    style["grid"]["spacing_ft"] = 10
+    style["scale_bar"]["length_ft"] = 40
+    style["key"]["font_ft"] = 7
+    style["key"]["identifier_gap_ft"] = 4
+    style["key"]["column_gap_ft"] = 9
+    style["page"]["display_scale"] = 12
     with monkeypatch.context() as patched:
         patched.setattr(render, "DEFAULT_STYLE", style)
         custom = ET.fromstring(render_svg(building))
@@ -1257,15 +1255,15 @@ def test_renderer_uses_resolved_defaults(monkeypatch: pytest.MonkeyPatch) -> Non
 def test_key_metrics_follow_default_size(
     font_size: int, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from dataclasses import replace
 
     from porta import render
     from porta.style import DEFAULT_STYLE
     from porta.text_metrics import text_bounds
 
-    style = replace(
-        DEFAULT_STYLE, key_font_ft=font_size, key_gap_ft=4, column_gap_ft=11
-    )
+    style = deepcopy(DEFAULT_STYLE)
+    style["key"]["font_ft"] = font_size
+    style["key"]["identifier_gap_ft"] = 4
+    style["key"]["column_gap_ft"] = 11
     source = 'room a "A long room name that needs wrapping" 10x10 root glyph="100"'
     monkeypatch.setattr(render, "DEFAULT_STYLE", style)
     root = ET.fromstring(render_svg(solve(parse(source))))
@@ -1282,7 +1280,7 @@ def test_key_metrics_follow_default_size(
         )
     for first, second in pairwise(rows):
         assert float(second.attrib["y"]) - float(first.attrib["y"]) == pytest.approx(
-            style.key_line_spacing_ft, abs=0.002
+            style["key"]["line_spacing_ft"], abs=0.002
         )
 
 
@@ -1291,18 +1289,19 @@ def test_key_metrics_follow_default_size(
 def test_symbols_share_style_colors(
     fixture: str, background_override: str | None, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    from dataclasses import replace
 
     from porta import render
     from porta.style import DEFAULT_STYLE
 
     source = Path(f"tests/fixtures/layouts/{fixture}.porta").read_text()
-    style = replace(DEFAULT_STYLE, line_color="#123456", background="#ffeedd")
+    style = deepcopy(DEFAULT_STYLE)
+    style["page"]["line_color"] = "#123456"
+    style["page"]["background"] = "#ffeedd"
     monkeypatch.setattr(render, "DEFAULT_STYLE", style)
     root = ET.fromstring(
         render_svg(solve(parse(source)), background=background_override)
     )
-    backdrop = background_override or style.background
+    backdrop = background_override or style["page"]["background"]
     for mark in root.findall('.//{*}line[@class="window-fill"]'):
         assert mark.attrib["stroke"] == backdrop
     for kind in ("door", "secret", "open", "window"):
@@ -1318,12 +1317,13 @@ def test_symbols_share_style_colors(
 def test_grid_uses_shared_color_with_group_opacity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from dataclasses import replace
 
     from porta import render
     from porta.style import DEFAULT_STYLE
 
-    style = replace(DEFAULT_STYLE, line_color="#332211", grid_opacity=0.4)
+    style = deepcopy(DEFAULT_STYLE)
+    style["page"]["line_color"] = "#332211"
+    style["grid"]["opacity"] = 0.4
     monkeypatch.setattr(render, "DEFAULT_STYLE", style)
     root = ET.fromstring(render_svg(solve(parse(TWO))))
     grid = root.find('.//{*}g[@class="grid"]')

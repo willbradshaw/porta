@@ -63,75 +63,28 @@ For more on the `porta` DSL specification, see the following documentation:
 
 ## The `porta` tool
 
-Once a valid floorplan has been written, `porta draw` converts it into an
-SVG map in a two-step process. First, the dependency graph is traversed
-and the relations in the floorplan are converted into a coordinate system.
-Second, that coordinate system is used to deterministically generate an
-SVG file.
+`porta draw` resolves a floorplan's geometry and renders it as SVG or an ASCII
+grid. Invalid plans produce an error.
 
 ```sh
 porta draw plan.porta -o plan.svg
-```
-
-Override SVG appearance with a grouped JSON file:
-
-```sh
+porta draw plan.porta --debug-ascii
 porta draw plan.porta --style sepia.json -o plan.svg
 ```
 
-```json
-{
-  "page": {"background": "#fff8e7", "line_color": "#332211"},
-  "typography": {
-    "text_color": {"value": "#654321", "description": "Sepia ink"}
-  }
-}
-```
-
-[default_style.json](src/porta/default_style.json) documents the supported settings.
-Both plain values and value/description records are accepted, including mixtures.
-Omitted settings retain their defaults; groups merge without replacing their other
-settings. Unknown keys and invalid values produce an error. `--style` also works
-with `--debug-ascii`: ASCII uses `labels.scheme` and `labels.start`, and ignores visual settings such
-as fonts, colors, and grid spacing (its cells remain 5 ft).
-
-Window and scale fills follow the background; symbols and grid use the shared line
-color, with separate grid opacity. Font fitting uses Palatino-based estimates, so
-other fonts may fit differently in the SVG viewer.
-
-The solved coordinate system can also be viewed and debugged directly
-as an ASCII grid:
-
-```sh
-porta draw plan.porta --debug-ascii
-```
-
-Automatic glyphs default to numbers. To restore the previous ID-based mnemonic
-labels, save this as `mnemonic.json`:
+Use `--style` with a JSON file to override rendering settings, for example:
 
 ```json
-{"labels": {"scheme": "mnemonic"}}
+{"page": {"background": "#fff8e7", "line_color": "#332211"}}
 ```
 
-```sh
-porta draw plan.porta --style mnemonic.json -o plan.svg
-porta draw plan.porta --style mnemonic.json --debug-ascii
-```
+[default_style.json](src/porta/default_style.json) documents all settings.
+Overrides accept plain values or value/description records; omitted settings
+keep their defaults. Unknown keys and invalid values produce an error.
 
-`labels.scheme` must be exactly `"numeric"` (the default) or `"mnemonic"`;
-values are case-sensitive. Explicit room and block glyphs override
-either scheme; see [glyph assignment](docs/room.md#glyphs). To continue numbering
-from another map, set the first automatic number (from `1` to `999`):
-
-```json
-{"labels": {"start": 10}}
-```
-
-Reserved numbers are still skipped. `labels.start` defaults to `1` and is ignored
-in mnemonic mode.
-
-A plan that can't be solved (due to overlaps, missing anchors, gaps
-between a room and its anchor, etc) will fail and raise an error.
+Labels default to numbers; see [glyphs](docs/room.md#glyphs) for custom labels,
+mnemonic assignment, and numbering starts. `--style` also works with
+`--debug-ascii`, applying label settings while ignoring visual settings.
 
 ## Installation
 

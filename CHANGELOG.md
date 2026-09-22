@@ -4,20 +4,9 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
-- Number rooms and blocks by case-insensitive display name across the whole map,
-  skipping explicit numerical glyphs and expanding automatic labels to `1`–`999`
-  under the shared three-character glyph limit.
-  Sort SVG keys and ASCII legends numerically, followed by custom glyphs;
-  document ordering, leading zeros, suppressed labels, and large numbers,
-  with a rendered example showing explicit number reservation and skipping.
-  Report exhausted numbers as CLI diagnostics with the source line.
-- Add `labels.scheme` to styles: `numeric` by default or `mnemonic` for the
-  previous ID-based labels. Allow `--style` with `--debug-ascii`, applying the
-  same glyph scheme while ignoring visual settings. Document the two exact,
-  case-sensitive values accepted by `labels.scheme`; organize the glyph reference
-  into shared rules and concise numeric and mnemonic subsections.
-- Add `labels.start` (default `1`) to choose the first automatic numeric label
-  in SVG and ASCII, skipping reserved numbers within the three-character limit.
+- Default to numeric room/block labels ordered by display name, skipping reserved
+  numbers. Add style options for mnemonic labels and numbering starts, supported
+  in SVG and ASCII.
 - Add `porta draw --style` for grouped JSON overrides, using plain values or
   documented value/description records.
 - Read renderer defaults from documented, grouped JSON. Share background and

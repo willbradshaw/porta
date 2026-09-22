@@ -81,7 +81,9 @@ def render_ascii(building: Building) -> str:
     return f"{body}\n\n{legend}"
 
 
-def render_svg(building: Building, *, background: str | None = None) -> str:
+def render_svg(
+    building: Building, *, background: str | None = None, style: Style | None = None
+) -> str:
     """Render a solved building as SVG.
 
     Geometry is drawn directly in feet (1 user unit = 1 foot); no scaling or
@@ -94,7 +96,8 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
     Args:
         building: A building whose rooms have been placed by
             :func:`~porta.layout.solve`.
-        background: Optional backdrop override; takes precedence over the JSON default.
+        background: Optional backdrop override; takes precedence over the style.
+        style: Resolved dictionary from load_style, or built-in defaults if omitted.
 
     Returns:
         The SVG document as a string.
@@ -102,7 +105,7 @@ def render_svg(building: Building, *, background: str | None = None) -> str:
     Raises:
         ValueError: If any room has not been placed or automatic glyphs run out.
     """
-    style = DEFAULT_STYLE
+    style = DEFAULT_STYLE if style is None else style
     background = style["page"]["background"] if background is None else background
     placed = _placed_rooms(building)
     glyphs = _assign_glyphs(building)

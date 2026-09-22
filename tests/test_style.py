@@ -3,10 +3,11 @@
 import json
 from copy import deepcopy
 from importlib.resources import files
+from pathlib import Path
 
 import pytest
 
-from porta.style import DEFAULT_STYLE, _validate
+from porta.style import DEFAULT_STYLE, _validate, load_style
 
 
 def test_documented_defaults_cover_resolved_parameters() -> None:
@@ -64,3 +65,79 @@ def test_missing_default_group_reports_its_path(group: str) -> None:
     del style[group]
     with pytest.raises(ValueError, match=rf"{group}\..*: missing parameter"):
         _validate(style)
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"page": {"background": "#fff8e7"}, "grid": {"opacity": 0.4}},
+        {
+            "page": {"background": {"value": "#fff8e7", "description": "Paper"}},
+            "grid": {"opacity": {"value": 0.4}},
+        },
+        {"page": {"background": "#fff8e7"}, "grid": {"opacity": {"value": 0.4}}},
+    ],
+    ids=["concise", "documented", "mixed"],
+)
+def test_style_overrides_merge_without_mutating_defaults(
+    overrides: dict[str, object], tmp_path: Path
+) -> None:
+    before = deepcopy(DEFAULT_STYLE)
+    path = tmp_path / "style.json"
+    path.write_text(json.dumps(overrides))
+    style = load_style(path)
+    assert style["page"]["background"] == "#fff8e7"
+    assert style["grid"]["opacity"] == 0.4
+    assert style["grid"]["spacing_ft"] == before["grid"]["spacing_ft"]
+    assert style["key"] == before["key"]
+    style["key"]["font_ft"] = 99
+    assert before == DEFAULT_STYLE
+    assert load_style(path)["key"] == before["key"]
+
+
+@pytest.mark.parametrize(
+    "source",
+    ["{}", '{"grid": {}}', None],
+    ids=["empty", "empty-group", "documented-defaults"],
+)
+def test_style_defaults_round_trip(source: str | None, tmp_path: Path) -> None:
+    path = tmp_path / "style.json"
+    path.write_text(
+        source
+        if source is not None
+        else files("porta").joinpath("default_style.json").read_text()
+    )
+    assert load_style(path) == DEFAULT_STYLE
+
+
+@pytest.mark.parametrize(
+    ("source", "message"),
+    [
+        ("[]", "JSON object"),
+        ('{"unknown": {}}', "unknown style parameter"),
+        ('{"page": {"unknown": 2}}', "page.unknown"),
+        ('{"grid": 3}', "grid: expected a JSON object"),
+        ('{"grid": {"opacity": {"description": "Missing value"}}}', "expected value"),
+        ('{"grid": {"opacity": {"value": 0.5, "typo": 1}}}', "expected value"),
+        (
+            '{"grid": {"opacity": {"value": 0.5, "description": 2}}}',
+            "description must be a string",
+        ),
+        ('{"grid": {"opacity": null}}', "finite number"),
+        ('{"grid": {"opacity": true}}', "finite number"),
+        ('{"grid": {"opacity": 1.1}}', "must not exceed"),
+        ('{"grid": {"opacity": NaN}}', "finite number"),
+        ('{"grid": {"opacity": 0.2, "opacity": 0.3}}', "duplicate key"),
+        ('{"grid": {}, "grid": {}}', "duplicate key"),
+        ('{"key": {"font_ft": 10}}', "key.line_spacing_ft"),
+    ],
+)
+def test_bad_style_file_reports_error(
+    source: str, message: str, tmp_path: Path
+) -> None:
+    before = deepcopy(DEFAULT_STYLE)
+    path = tmp_path / "style.json"
+    path.write_text(source)
+    with pytest.raises(ValueError, match=message):
+        load_style(path)
+    assert before == DEFAULT_STYLE

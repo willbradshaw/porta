@@ -1333,3 +1333,31 @@ def test_grid_uses_shared_color_with_group_opacity(
     # Composite the grid as a group so intersections do not become darker.
     assert all("opacity" not in line.attrib for line in grid)
     assert "opacity" not in root.attrib
+
+
+def test_supplied_style_is_local_to_one_render(tmp_path: Path) -> None:
+    from porta.style import load_style
+
+    path = tmp_path / "style.json"
+    path.write_text(
+        '{"page": {"background": "#fff8e7", "line_color": "#332211"}, "key": {"font_ft": 6}, "scale_bar": {"length_ft": 40}}'
+    )
+    style = load_style(path)
+    building = solve(parse(TWO))
+    original = render_svg(building)
+    root = ET.fromstring(render_svg(building, style=style))
+    scale = root.find('.//{*}g[@class="scale"]')
+    assert scale is not None
+    assert scale.attrib["font-size"] == "6"
+    assert [text.text for text in scale.findall(tag("text"))][:3] == [
+        "0",
+        "20",
+        "40 ft",
+    ]
+    assert root.attrib["fill"] == "#332211"
+    assert render_svg(building) == original
+    overridden = ET.fromstring(render_svg(building, style=style, background="white"))
+    background = overridden.find(tag("rect"))
+    assert background is not None
+    assert background.attrib["fill"] == "white"
+    assert style["page"]["background"] == "#fff8e7"

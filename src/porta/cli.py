@@ -16,6 +16,7 @@ from porta.errors import PortaError
 from porta.layout import solve
 from porta.parser import parse
 from porta.render import render_ascii, render_svg
+from porta.style import DEFAULT_STYLE, load_style
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -39,6 +40,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     draw = sub.add_parser("draw", help="Render a .porta file to SVG.")
     draw.add_argument("input", help="Path to the input .porta file.")
+    draw.add_argument(
+        "--style", help="JSON file overriding default SVG style parameters."
+    )
     draw.add_argument("-o", "--output", help="Output file (default: stdout).")
     draw.add_argument(
         "--debug-ascii",
@@ -60,11 +64,18 @@ def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
     if args.command == "draw":
-        return _draw(args.input, args.output, args.debug_ascii)
+        if args.style and args.debug_ascii:
+            parser.error("--style cannot be used with --debug-ascii")
+        return _draw(args.input, args.output, args.debug_ascii, args.style)
     return 0
 
 
-def _draw(input_path: str, output_path: str | None, debug_ascii: bool) -> int:
+def _draw(
+    input_path: str,
+    output_path: str | None,
+    debug_ascii: bool,
+    style_path: str | None = None,
+) -> int:
     """Render ``input_path`` and write the result; return the exit code.
 
     ``--debug-ascii`` selects the format (ASCII vs SVG); ``output_path`` selects
@@ -85,7 +96,15 @@ def _draw(input_path: str, output_path: str | None, debug_ascii: bool) -> int:
 
     _emit_warnings(input_path, building.warnings)
 
-    output = render_ascii(building) if debug_ascii else render_svg(building)
+    try:
+        style = load_style(style_path) if style_path else DEFAULT_STYLE
+    except (OSError, ValueError) as exc:
+        print(f"{style_path}: error: {exc}", file=sys.stderr)
+        return 1
+
+    output = (
+        render_ascii(building) if debug_ascii else render_svg(building, style=style)
+    )
     if output_path is None:
         print(output)
     else:

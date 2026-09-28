@@ -4,6 +4,8 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
+- Add an architectural logo banner to the README.
+
 ## 1.8.0 (2026-09-22)
 
 - Standardize project-authored prose, internal identifiers, and examples on US

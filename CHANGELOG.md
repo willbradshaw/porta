@@ -4,7 +4,7 @@ Notable changes per release, newest first.
 
 ## Unreleased
 
-- Add an architectural logo banner to the README.
+- Add an architectural logo banner to the README with light and dark variants.
 
 ## 1.8.0 (2026-09-22)
 

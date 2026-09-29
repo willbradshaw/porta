@@ -8,7 +8,7 @@ Three variations generated with GPT Image 2.5 Sunburst through the API, asking f
 
 ## First revision
 
-![First revision](assets/porta-banner.svg)
+![First revision](assets/porta-banner-first-revision.svg)
 
 ## Option 1
 
@@ -21,3 +21,7 @@ Three variations generated with GPT Image 2.5 Sunburst through the API, asking f
 ## Option 3
 
 ![Option 3](assets/porta-banner-option-3.svg)
+
+## Selected banner — compact option 3
+
+![Selected banner](assets/porta-banner.svg)

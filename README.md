@@ -1,4 +1,9 @@
-# `porta`
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/porta-banner-dark.svg">
+    <img src="docs/assets/porta-banner.svg" alt="porta — architectural floor plans" width="900">
+  </picture>
+</p>
 
 `porta` is two things:
 
